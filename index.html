@@ -16,11 +16,75 @@
 	<!-- bootstrap -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	<!-- bootstrap javascript -->
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+	</link>
+	<link
+		href="https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap/jquery.smartmenus.bootstrap.min.css"
+		rel="stylesheet">
+	</link>
+	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/jquery.smartmenus.min.js'></script>
+	<script
+		src='https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap/jquery.smartmenus.bootstrap.min.js'></script>
+	<!-- 一堆我不懂第一次用的JavaScript -->
 </head>
 
 <body>
-
-	<ul class="nav nav-tabs">
+	<div class="navbar navbar-inverse" role="navigation">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="sr-only"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">林間小鎮</a>
+		</div>
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="#">首頁</a></li>
+				<li><a href="#">林間UHC<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="#">選項 1</a></li>
+						<li><a href="#">選項 2</a></li>
+						<li><a href="#">第 2 層選單 <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="#">選項 1</a></li>
+								<li><a href="#">第 3 層選單 <span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a href="#">選項 1</a></li>
+										<li><a href="#">選項 2</a></li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li><a href="#">逃走中<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="#">選項 1</a></li>
+						<li><a href="#">選項 2</a></li>
+						<li><a href="#">第 2 層選單 <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="#">選項 1</a></li>
+								<li><a href="#">選項 2</a></li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li><a href="#">關於我們<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a
+								href="https://forestworkbroadcastingteam.github.io/TeamForestBroadcasting/ForestAbout">了解林間小鎮</a>
+						</li>
+						<li><a href="https://discord.gg/up8dAMy">成為居民</a></li>
+						<li><a href="#">成為鎮民</a></li>
+					</ul>
+				</li>
+		</div>
+	</div>
+	<!-- <ul class="nav nav-tabs">
 		<li class="active"><a href="https://forestworkbroadcastingteam.github.io/TeamForestBroadcasting">林間小鎮首頁</a></li>
 		<li><a href="https://forestworkbroadcastingteam.github.io/TeamForestBroadcasting/ForestUHC">林間小鎮UHC</a></li>
 		<li><a href="https://forestworkbroadcastingteam.github.io/TeamForestBroadcasting/ForestRFM">林間小鎮逃走中</a></li>
@@ -32,7 +96,7 @@
 				<li><a href="#">成為鎮民</a></li>
 			</ul>
 		</li>
-	</ul>
+	</ul> -->
 	<audio controls="controls" autoplay="true" loop="loop" preload="auto" volume="0.1" hidden>
 		<source src="BGM.ogg" type="audio/ogg">
 		<source src="BGM.mp3" type="audio/mpeg">
