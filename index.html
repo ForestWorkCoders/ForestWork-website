@@ -1,160 +1,108 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
 <head>
-	<!-- 此區網頁核心請勿編輯 -->
-	<meta charset="utf-8" />
-	<title>林間小鎮</title>
-	<style type="text/css">
-		body {
-			-moz-user-select: none;
-			-webkit-user-select: none;
-		}
-	</style>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script><!-- jquery -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-	<!-- bootstrap -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	<!-- bootstrap javascript -->
-	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-	</link>
-	<link
-		href="https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap/jquery.smartmenus.bootstrap.min.css"
-		rel="stylesheet">
-	</link>
-	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/jquery.smartmenus.min.js'></script>
-	<script
-		src='https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap/jquery.smartmenus.bootstrap.min.js'></script>
-	<!-- 一堆我不懂第一次用的JavaScript -->
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>林間小鎮 ForestWork</title>
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+</style>
+<link href="css/default.css" rel="stylesheet" type="text/css">
+<link rel="apple-touch-icon" sizes="180x180" href="webicons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="webicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="194x194" href="webicons/favicon-194x194.png">
+<link rel="icon" type="image/png" sizes="192x192" href="webicons/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="16x16" href="webicons/favicon-16x16.png">
+<link rel="manifest" href="webicons/site.webmanifest">
+<link rel="mask-icon" href="webicons/safari-pinned-tab.svg" color="#7d7d7d">
+<link rel="shortcut icon" href="webicons/favicon.ico">
+<meta name="msapplication-TileColor" content="#000000">
+<meta name="msapplication-TileImage" content="icons/mstile-144x144.png">
+<meta name="msapplication-config" content="icons/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
 </head>
 
 <body>
-	<div class="navbar navbar-inverse" role="navigation">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-				<span class="sr-only"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="https://forestwork.nctu.me/">林間小鎮</a>
-		</div>
-		<div class="navbar-collapse collapse">
-			<ul class="nav navbar-nav">
-				<li class="active"><a href="https://forestwork.nctu.me/">首頁</a></li>
-				<li><a href="">林間UHC<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="https://forestwork.nctu.me/ForestUHC">了解林間UHC</a></li>
-						<li><a href="https://forestwork.nctu.me/ForestUHC">報名參賽</a></li>
-						<li><a href="https://forestwork.nctu.me/ForestUHC">歷屆回顧<span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="">第一屆～第十屆<span class="caret"></span></a>
-									<ul class="dropdown-menu">
-										<li><a href="https://youtu.be/watch?v=GSUo0-xeyY0">第一屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二屆</a></li>
-										<li><a href="https://youtu.be/watch?v=uMIm8lCqTJs">第三屆</a></li>
-										<li><a href="https://youtu.be/watch?v=NcFZoC0ZiMs">第四屆</a></li>
-										<li><a href="https://youtu.be/watch?v=CuCK8j3-Q-Q">第五屆</a></li>
-										<li><a href="https://youtu.be/watch?v=Wzc_8CA4ngk">第六屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第七屆</a></li>
-										<li><a href="https://youtu.be/watch?v=QSQVED1ZEkA">第八屆</a></li>
-										<li><a href="https://youtu.be/watch?v=F2l71p_Yl24">第九屆</a></li>
-										<li><a href="https://youtu.be/watch?v=20Rt4ZmDoRU">第十屆</a></li>
-									</ul>
-								</li>
-								<li><a href="">第十一屆～第二十屆<span class="caret"></span></a>
-									<ul class="dropdown-menu">
-										<li><a href="https://youtu.be/watch?v=iuHl8CI3KY4">第十一屆</a></li>
-										<li><a href="https://youtu.be/watch?v=p9k1aMBgSAc">第十二屆</a></li>
-										<li><a href="https://youtu.be/watch?v=zMDhoxUYaYA">第十三屆</a></li>
-										<li><a href="https://youtu.be/watch?v=u7mgGdG4rdE">第十四屆</a></li>
-										<li><a href="https://youtu.be/watch?v=Vom4bL7zMXs">第十五屆</a></li>
-										<li><a href="https://youtu.be/watch?v=dIkPd3sneCc">第十六屆</a></li>
-										<li><a href="https://youtu.be/watch?v=8WywDpjddPs">第十七屆</a></li>
-										<li><a href="https://youtu.be/watch?v=BC0zoJvnoEI">第十八屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第十九屆</a></li>
-										<li><a href="https://youtu.be/watch?v=X6jG965PtIU">第二十屆</a></li>
-									</ul>
-								</li>
-								<li><a href="">第二十一屆～第二十五屆<span class="caret"></span></a>
-									<ul class="dropdown-menu">
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十一屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十二屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十三屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十四屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十五屆</a></li>
-										<!--<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十六屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十七屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十八屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第二十九屆</a></li>
-										<li><a href="https://forestwork.nctu.me/ForestUHC/Unknow">第三十屆</a></li> -->
-									</ul>
-								</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-				<li><a href="">逃走中<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="https://forestwork.nctu.me/ForestRFM">關於逃走中</a></li>
-						<li><a href="https://forestwork.nctu.me/ForestRFM">null</a></li>
-						<!-- <li><a href="https://forestwork.nctu.me/ForestRFM">null<span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="https://forestwork.nctu.me/ForestRFM">null</a></li>
-								<li><a href="https://forestwork.nctu.me/ForestRFM">null</a></li>
-							</ul>
-						</li> -->
-					</ul>
-				</li>
-				<li><a href="">關於我們<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="https://forestwork.nctu.me/ForestAbout">了解林間小鎮</a></li>
-						<li><a href="https://discord.gg/up8dAMy">成為居民</a></li>
-						<li><a href="https://forestwork.nctu.me/ForestAbout/BecomeATownee">成為鎮民</a></li>
-					</ul>
-				</li>
-		</div>
-	</div>
-	<audio controls="controls" autoplay="true" loop="loop" preload="auto" volume="0.1" hidden>
-		<source src="BGM.ogg" type="audio/ogg">
-		<source src="BGM.mp3" type="audio/mpeg">
-		該瀏覽器不支持audio屬性
-	</audio>
-	<h1 style="text-align: center; font-weight: bolder;">歡迎光臨林間小鎮</h1>
-	<!-- 以下為防複製script請勿編輯 -->
-	<script type="text/javascript">
-		//<!--
-		function iEsc() { return false; }
-		function iRec() { return true; }
-		function DisableKeys() {
-			if (event.ctrlKey || event.shiftKey || event.altKey) {
-				window.event.returnValue = false;
-				iEsc();
-			}
-		}
-		document.ondragstart = iEsc;
-		document.onkeydown = DisableKeys;
-		document.oncontextmenu = iEsc;
-		if (typeof document.onselectstart != "undefined")
-			document.onselectstart = iEsc;
-		else {
-			document.onmousedown = iEsc;
-			document.onmouseup = iRec;
-		}
-		function DisableRightClick(qsyzDOTnet) {
-			if (window.Event) {
-				if (qsyzDOTnet.which == 2 || qsyzDOTnet.which == 3)
-					iEsc();
-			} else if (event.button == 2 || event.button == 3) {
-				event.cancelBubble = true
-				event.returnValue = false;
-				iEsc();
-			}
-		}
-	//-->
-	</script>
-</body>
 
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">重現系列</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item text-center" href="#">甚麼是重現系列</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item text-center" href="RFM/">逃走中 X Minecraft</a>
+					<a class="dropdown-item text-center" href="#">DERO 密室脫逃 X Minecraft</a>
+					</li>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">競技系列</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item text-center" href="#">甚麼是競技系列</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item text-center" href="#">林間 UHC</a>
+					</li>
+			<li class="nav-item">
+				<a class="nav-link" href="#">積分制</a>
+			</li>
+		</ul>
+	</div>
+	<div>
+        <a class="navbar-brand mx-auto" href="#"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="confirm">加入我們</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">關於林間小鎮</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div>
+  <video id="videoBG" autoplay muted loop>
+		<source src="videos/Logo.mp4" type="video/mp4">
+		Your browser does not support the video tag.
+  </video>
+</div>
+	
+<div id="centerLOGO">
+  <img src="images/logo.svg" width="300" height="300" alt=""/> 
+</div>
+
+<div>
+	<footer id="centerFooter" class="footer-copyright text-center py-3 bg-dark">
+		<a href='https://www.facebook.com/TeamForestWork/'>
+			<img src="images/facebook.svg" alt="Facebook" width="40" height="40">
+		</a>
+		<a href='https://www.instagram.com/teamforestwork/'>
+			<img src="images/instagram.svg" alt="instagram" width="40" height="40">
+		</a>		
+		<a href='https://www.plurk.com/ForestWork'>
+			<img src="images/plurk.svg" alt="plurk" width="40" height="40">
+		</a>	
+		<a href='https://twitter.com/teamforestwork'>
+			<img src="images/twitter.svg" alt="twitter" width="40" height="40">
+		</a>	
+		<a href='https://www.youtube.com/channel/UCpxH-OxcJujRLpnDUgoYlsg'>
+			<img src="images/youtube.svg" alt="youtube" width="40" height="40">
+		</a>
+		<a href='mailto:teamforestwork@gmail.com'>
+		<img src="images/email.svg" alt="youtube" width="40" height="40">
+		</a>
+	</footer>
+</div>
+
+<!-- <script src="js/jquery-3.4.1.min.js"></script> -->
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</body>
 </html>

@@ -1,0 +1,58 @@
+@charset "utf-8";
+html,body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    font-family: "微軟正黑體", Arial;
+}
+#videoBG {
+    position:fixed;
+    z-index: -1;
+}
+@media (min-aspect-ratio: 16/9) {
+    #videoBG {
+        width:100%;
+        height: auto;
+    }
+}
+@media (max-aspect-ratio: 16/9) {
+    #videoBG { 
+        width:auto;
+        height: 100%;
+    }
+}
+@media (max-width: 767px) {
+    #videoBG {
+        width:auto;
+    }
+    body {
+        background: url('poster.jpg');
+        background-size: cover;
+    }
+}
+
+.verticalhorizontal {
+    display: table-cell;
+    height: 100;
+    text-align: center;
+    width: 100;
+    vertical-align: middle;
+}
+
+#centerLOGO {
+    position: absolute;
+    left:50%;
+    top:50%;
+    margin-top: -160px;
+    margin-left: -150px;
+}
+
+#centerFooter {
+	position:fixed;
+	bottom: 0px;
+	width: 100%;
+}
+
+.p-md-0 {
+	padding: 1.9rem !important;
+}

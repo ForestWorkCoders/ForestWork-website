@@ -1,0 +1,96 @@
+body {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background-color: #ebebeb;
+    /*
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='50' height='25' viewBox='0 0 50 25'%3E%3Cdefs%3E%3Crect stroke='%23ffffff' stroke-width='0.23' width='1' height='1' id='s'/%3E%3Cpattern id='a' width='2' height='2' patternUnits='userSpaceOnUse'%3E%3Cg stroke='%23ffffff' stroke-width='0.23'%3E%3Crect fill='%23fafafa' width='1' height='1'/%3E%3Crect fill='%23ffffff' width='1' height='1' x='1' y='1'/%3E%3Crect fill='%23f5f5f5' width='1' height='1' y='1'/%3E%3Crect fill='%23f0f0f0' width='1' height='1' x='1'/%3E%3C/g%3E%3C/pattern%3E%3Cpattern id='b' width='5' height='11' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23ebebeb'%3E%3Cuse xlink:href='%23s' x='2' y='0'/%3E%3Cuse xlink:href='%23s' x='4' y='1'/%3E%3Cuse xlink:href='%23s' x='1' y='2'/%3E%3Cuse xlink:href='%23s' x='2' y='4'/%3E%3Cuse xlink:href='%23s' x='4' y='6'/%3E%3Cuse xlink:href='%23s' x='0' y='8'/%3E%3Cuse xlink:href='%23s' x='3' y='9'/%3E%3C/g%3E%3C/pattern%3E%3Cpattern id='c' width='7' height='7' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23e5e5e5'%3E%3Cuse xlink:href='%23s' x='1' y='1'/%3E%3Cuse xlink:href='%23s' x='3' y='4'/%3E%3Cuse xlink:href='%23s' x='5' y='6'/%3E%3Cuse xlink:href='%23s' x='0' y='3'/%3E%3C/g%3E%3C/pattern%3E%3Cpattern id='d' width='11' height='5' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23ffffff'%3E%3Cuse xlink:href='%23s' x='1' y='1'/%3E%3Cuse xlink:href='%23s' x='6' y='3'/%3E%3Cuse xlink:href='%23s' x='8' y='2'/%3E%3Cuse xlink:href='%23s' x='3' y='0'/%3E%3Cuse xlink:href='%23s' x='0' y='3'/%3E%3C/g%3E%3Cg fill='%23e0e0e0'%3E%3Cuse xlink:href='%23s' x='8' y='3'/%3E%3Cuse xlink:href='%23s' x='4' y='2'/%3E%3Cuse xlink:href='%23s' x='5' y='4'/%3E%3Cuse xlink:href='%23s' x='10' y='0'/%3E%3C/g%3E%3C/pattern%3E%3Cpattern id='e' width='47' height='23' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23343a40'%3E%3Cuse xlink:href='%23s' x='2' y='5'/%3E%3Cuse xlink:href='%23s' x='23' y='13'/%3E%3Cuse xlink:href='%23s' x='4' y='18'/%3E%3Cuse xlink:href='%23s' x='35' y='9'/%3E%3C/g%3E%3C/pattern%3E%3Cpattern id='f' width='61' height='31' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23343a40'%3E%3Cuse xlink:href='%23s' x='16' y='0'/%3E%3Cuse xlink:href='%23s' x='13' y='22'/%3E%3Cuse xlink:href='%23s' x='44' y='15'/%3E%3Cuse xlink:href='%23s' x='12' y='11'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect fill='url(%23a)' width='50' height='25'/%3E%3Crect fill='url(%23b)' width='50' height='25'/%3E%3Crect fill='url(%23c)' width='50' height='25'/%3E%3Crect fill='url(%23d)' width='50' height='25'/%3E%3Crect fill='url(%23e)' width='50' height='25'/%3E%3Crect fill='url(%23f)' width='50' height='25'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    background-size: cover;
+    */
+}
+
+.box {  
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    width: 580px;
+    height: auto;
+    line-height: 26px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 10px 10px 10px 10px;
+    margin: -210px 0 0 -300px;
+    box-shadow:0px 0px 5px rgba(68, 68, 68, 1);
+}
+.footerbox {
+    width: 600px;
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    margin: 0 0 0 -300px;
+}
+
+.picture {
+    opacity: 0.3;
+    display: block;
+    margin: auto;
+}
+
+#hr {
+    color: #ebebeb;
+}
+
+#fontconfig {
+    font-family: consolas,微軟正黑體;
+}
+
+.text-rules,
+.text-attation,
+.button-accept,
+.footer {
+    color: black;
+    font-size: 22px;
+}
+
+.text-attation {
+    color: red;
+    font-weight:bold;
+    margin-bottom: 26px;
+}
+
+.button-accept {
+    background: rgb(28, 184, 65);
+    color: white;
+    border-radius: 3px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow:0px 0px 5px rgba(28, 184, 65, 1);
+}
+
+.footer {
+    color: gray;
+    font-size: 12px;
+    font-weight:normal;
+}
+
+@media screen and (max-width: 600px) {
+    body {
+        width: 100%;
+        height: 100%;
+    }
+    .box { 
+        width: 380px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        padding: 10px 10px 10px 10px;
+        margin: -210px 0 0 -200px;
+    }
+    .footerbox {
+        width: 400px;
+        position: absolute;
+        top: 90%;
+        left: 50%;
+        margin: 0 0 0 -200px;
+    }
+}
