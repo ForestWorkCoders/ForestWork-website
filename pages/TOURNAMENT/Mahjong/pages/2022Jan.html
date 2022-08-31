@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="zh-CN">
+
+<head>
+    <!--完整版meta战队！-->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="林间盃日麻积分赛 赛事存档">
+    <meta name="author" content="EaglePB2">
+    <meta name="keywords" content="林间小镇, 雀魂麻将, 日麻积分赛, 日麻比赛">
+    <meta name="robots" content="noindex">
+
+    <!--不来个动图插图怎么行呢awa-->
+    <link rel="shortcut icon" href="../favicon.png">
+    <link rel="Bookmark" href="../favicon.png">
+
+    <!--css normalize 先给我当一个失忆仔-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!--css table-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"/>
+
+    <!--css一个就好 太多对身体不好-->
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="../headerfooter.css" />
+
+    <!--Jquery 永远的神 awa-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+  	<script src="logic.js"></script>
+  	<script src=tablegen.js defer></script>
+  
+    <!--Sorting libraries (thanks!)-->
+    <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js" defer></script>
+
+    
+
+    <!--可以挡掉低端PH右键下载的东西，但对于html有认识的可能比较难……-->
+    <script src="../norightclick.js"></script>
+
+    <!--下标题！-->
+    <title>2022/01 日麻积分赛</title>
+    
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="#default" class="logo">2022 一月份 林间盃日麻积分赛 赛事结果</a>
+        </header>
+        <main>
+            <table id="myTable" class="row-border hover stripe nowrap sortable">
+            <thead>
+                <tr>
+                    <th>Ranks</th>
+                    <th hidden>ID</th>
+                    <th>Pfp</th>
+                    <th>Discord</th>
+                    <th>Mahjong Soul ID</th>
+                    <th>Total</th>
+                    <th>Game 1</th>
+                    <th>Game 2</th>
+                    <th>Game 3</th>
+                    <th>Game 4</th>
+                    <th>Game 5</th>
+                    <th>Game 6</th>
+                    <th>Game 7</th>
+                    <th>Game 8</th>
+                    <th>Game 9</th>
+                    <th>Game 10</th>
+                    <th>Game 11</th>
+                    <th>Game 12</th>
+                    <th>Game 13</th>
+                    <th>Game 14</th>
+                    <th>Game 15</th>
+                    <th>Game 16</th>
+                    <th>Game 17</th>
+                    <th>Game 18</th>
+                    <th>Game 19</th>
+                    <th>Game 20</th>
+                    <th>Game 21</th>
+                    <th>Game 22</th>
+                    <th>Game 23</th>
+                    <th>Game 24</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td hidden id="search_id">8</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">59</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">64</td>
+                    <td class="scores">-6</td>
+                    <td class="scores">-7</td>
+                    <td class="scores">15</td>
+                    <td class="scores">-18</td>
+                    <td class="scores">7</td>
+                    <td class="scores">-3</td>
+                    <td class="scores">-24</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-12</td>
+                    <td class="scores">10</td>
+                    <td class="scores">56</td>
+                    <td class="scores">76</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">13</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td hidden id="search_id">2</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">-56</td>
+                    <td class="scores">-2</td>
+                    <td class="scores">-12</td>
+                    <td class="scores">33</td>
+                    <td class="scores">—</td>
+                    <td class="scores">1</td>
+                    <td class="scores">18</td>
+                    <td class="scores">35</td>
+                    <td class="scores">28</td>
+                    <td class="scores">-54</td>
+                    <td class="scores">4</td>
+                    <td class="scores">-4</td>
+                    <td class="scores">-17</td>
+                    <td class="scores">-11</td>
+                    <td class="scores">31</td>
+                    <td class="scores">0</td>
+                    <td class="scores">53</td>
+                    <td class="scores">3</td>
+                    <td class="scores">-11</td>
+                    <td class="scores">11</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">25</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td hidden id="search_id">7</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">79</td>
+                    <td class="scores">26</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">64</td>
+                    <td class="scores">38</td>
+                    <td class="scores">-54</td>
+                    <td class="scores">-9</td>
+                    <td class="scores">-9</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">3</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-6</td>
+                    <td class="scores">-17</td>
+                    <td class="scores">8</td>
+                    <td class="scores">-55</td>
+                    <td class="scores">—</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td hidden id="search_id">6</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">-3</td>
+                    <td class="scores">-27</td>
+                    <td class="scores">—</td>
+                    <td class="scores">11</td>
+                    <td class="scores">-78</td>
+                    <td class="scores">—</td>
+                    <td class="scores">41</td>
+                    <td class="scores">4</td>
+                    <td class="scores">10</td>
+                    <td class="scores">40</td>
+                    <td class="scores">21</td>
+                    <td class="scores">29</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-12</td>
+                    <td class="scores">40</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-41</td>
+                    <td class="scores">-31</td>
+                    <td class="scores">1</td>
+                    <td class="scores">-25</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td hidden id="search_id">3</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">—</td>
+                    <td class="scores">-60</td>
+                    <td class="scores">-43</td>
+                    <td class="scores">-31</td>
+                    <td class="scores">14</td>
+                    <td class="scores">-39</td>
+                    <td class="scores">-40</td>
+                    <td class="scores">-27</td>
+                    <td class="scores">31</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-7</td>
+                    <td class="scores">-31</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">57</td>
+                    <td class="scores">30</td>
+                    <td class="scores">41</td>
+                    <td class="scores">-27</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td hidden id="search_id">5</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">-18</td>
+                    <td class="scores">1</td>
+                    <td class="scores">15</td>
+                    <td class="scores">-13</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-18</td>
+                    <td class="scores">1</td>
+                    <td class="scores">-25</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-28</td>
+                    <td class="scores">31</td>
+                    <td class="scores">-22</td>
+                    <td class="scores">-28</td>
+                    <td class="scores">-63</td>
+                    <td class="scores">-59</td>
+                    <td class="scores">-24</td>
+                    <td class="scores">25</td>
+                    <td class="scores">-41</td>
+                    <td class="scores">-13</td>
+                    <td class="scores">14</td>
+                    <td class="scores">-12</td>
+                </tr>
+                <tr>
+                    <td>ᵃDNF</td>
+                    <td hidden id="search_id">24</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">-61</td>
+                    <td class="scores">62</td>
+                    <td class="scores">40</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">22</td>
+                    <td class="scores">-30</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                </tr>
+                <tr>
+                    <td>ᵃDNF</td>
+                    <td hidden id="search_id">10</td>
+                    <td id="pfp"></td>
+                    <td id="discordID"></td>
+                    <td id="mahjongSoulID"></td>
+                    <td id="total"></td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">-10</td>
+                    <td class="scores">-20</td>
+                    <td class="scores">2</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">48</td>
+                    <td class="scores">5</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                    <td class="scores">—</td>
+                </tr>
+            </tbody>
+            </table>
+
+            <a href="https://imgur.com/a/h0ufOhp" style="text-decoration: none" target="_blank">点我查看分数截图</a>
+        </main>
+      
+    <!-- Footer -->
+            <footer>
+                <div class="social">
+                    <a href="https://forestwork.net/Discord"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://www.youtube.com/channel/UCpxH-OxcJujRLpnDUgoYlsg"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://twitter.com/teamforestwork"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href="../index.html">主页</a></li>
+                    <li class="list-inline-item"><a href="../rules.html">赛事规则</a></li>
+                    <li class="list-inline-item"><a href="#">关于林间</a></li>
+                    <li class="list-inline-item"><a href="#">Terms</a></li>
+                    <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
+                </ul>
+                <p class="copyright">林间小镇 © 2022-2077</p>
+            </footer>
+        </div>
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+
+<head>
+
+	<!--Javascript Go!-->
+	<script src="js/components/head.js"></script>
+	<!--神说，这些剧本没办法模块化 所以没办法 awa-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.6.0/umd/popper.min.js"></script>
+	<!--上标题！-->
+	<title>林間小鎮 ForestWork</title>
+
+	<script type="text/javascript">
+		function MM_swapImgRestore() { //v3.0
+			var i, x, a = document.MM_sr; for (i = 0; a && i < a.length && (x = a[i]) && x.oSrc; i++) x.src = x.oSrc;
+		}
+		function MM_preloadImages() { //v3.0
+			var d = document; if (d.images) {
+				if (!d.MM_p) d.MM_p = new Array();
+				var i, j = d.MM_p.length, a = MM_preloadImages.arguments; for (i = 0; i < a.length; i++)
+					if (a[i].indexOf("#") != 0) { d.MM_p[j] = new Image; d.MM_p[j++].src = a[i]; }
+			}
+		}
+
+		function MM_findObj(n, d) { //v4.01
+			var p, i, x; if (!d) d = document; if ((p = n.indexOf("?")) > 0 && parent.frames.length) {
+				d = parent.frames[n.substring(p + 1)].document; n = n.substring(0, p);
+			}
+			if (!(x = d[n]) && d.all) x = d.all[n]; for (i = 0; !x && i < d.forms.length; i++) x = d.forms[i][n];
+			for (i = 0; !x && d.layers && i < d.layers.length; i++) x = MM_findObj(n, d.layers[i].document);
+			if (!x && d.getElementById) x = d.getElementById(n); return x;
+		}
+
+		function MM_swapImage() { //v3.0
+			var i, j = 0, x, a = MM_swapImage.arguments; document.MM_sr = new Array; for (i = 0; i < (a.length - 2); i += 3)
+				if ((x = MM_findObj(a[i])) != null) { document.MM_sr[j++] = x; if (!x.oSrc) x.oSrc = x.src; x.src = a[i + 2]; }
+		}
+	</script>
+</head>
+
+<body onLoad="MM_preloadImages('../../images/facebook.svg')">
+
+	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+		<div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">重現系列</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="#">甚麼是重現系列</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#">逃走中 X Minecraft</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#">DERO 密室脫逃 X Minecraft</a>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">競技系列</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="#">林間 UHC</a>
+				</li>
+			</ul>
+		</div>
+		<div>
+			<a class="navbar-brand mx-auto" href="#"></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+		</div>
+		<div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="#">加入我們</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">關於林間小鎮</a>
+				</li>
+			</ul>
+		</div>
+		<a class="navbar-brand text-center nav-item">
+			<a class="nav-link" href="../">
+				<img src="../images/logo_.png" width="50" height="28" alt="" />
+			</a>
+	</nav>
+
+	<div>
+		<footer id="centerFooter" class="footer-copyright text-center py-3 bg-dark">
+			<a href='https://www.facebook.com/TeamForestWork/'>
+				<img src="../images/facebook.svg" alt="Facebook" width="40" height="40">
+			</a>
+			<a href='https://www.instagram.com/teamforestwork/'>
+				<img src="../images/instagram.svg" alt="instagram" width="40" height="40">
+			</a>
+			<a href='https://www.plurk.com/ForestWork'>
+				<img src="../images/plurk.svg" alt="plurk" width="40" height="40">
+			</a>
+			<a href='https://twitter.com/teamforestwork'>
+				<img src="../images/twitter.svg" alt="twitter" width="40" height="40">
+			</a>
+			<a href='https://www.youtube.com/channel/UCpxH-OxcJujRLpnDUgoYlsg'>
+				<img src="../images/youtube.svg" alt="youtube" width="40" height="40">
+			</a>
+			<a href='mailto:teamforestwork@gmail.com'>
+				<img src="../images/email.svg" alt="youtube" width="40" height="40">
+			</a>
+		</footer>
+	</div>
+
+	<!-- <script src="js/jquery-3.4.1.min.js"></script> -->
+	<script src="../js/jquery-3.3.1.min.js"></script>
+	<script src="../js/popper.min.js"></script>
+	<!-- <script src="../js/bootstrap.min.js"></script> -->
+	<script src="../js/bootstrap-4.3.1.js"></script>
+</body>
+
+</html>
