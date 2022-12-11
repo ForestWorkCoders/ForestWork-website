@@ -5,7 +5,7 @@ $(document).ready(function () {
         "dataType": "json",
         "async": true,
         "crossDomain": true,
-        "url": "playerlist.json",
+        "url": "pages/TOURNAMENT/Mahjong/pages/playerlist.json",
         "method": "GET"
     }
 

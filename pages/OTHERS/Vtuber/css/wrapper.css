@@ -1,0 +1,73 @@
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    height: 100%;
+    white-space: pre-wrap;
+  }
+  .wrapper .item {
+    display: flex;
+    flex-grow: 1;
+    transition: all 0.5s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+  }
+  .wrapper .item:hover {
+    flex-grow: 5;
+    box-shadow: inset 0 0 20px #000;
+  }
+  .wrapper .item:after {
+    content: "";
+    width: 200%;
+    height: 43.33%;
+    background-color: rgba(0, 0, 0, 0.75);
+    left: -50%;
+    bottom: -10%;
+    position: absolute;
+    transform: rotate(-15deg);
+    color: #fff;
+    text-align: center;
+    padding-top: 20px;
+    text-transform: uppercase;
+    font-size: 40px;
+    font-family: "Raleway";
+    font-weight: 100;
+  }
+  .wrapper .item.Vtuber1 {
+    background-image: url("../assets/Ayame_Completed.png");
+    background-position: 50% center;
+  }
+  .wrapper .item.Vtuber1:after {
+    content: "花崎あやめ\A「要跟我成為朋友嗎？只需要一顆香芋喵。」";
+  }
+  .wrapper .item.Vtuber2 {
+    background-image: url("../assets/Sugar_Completed.png");
+    background-position: 50% center;
+  }
+  .wrapper .item.Vtuber2:after {
+    content: "擦布微糖\A「作為一顆糖果，我想要的是完美的舌頭。」";
+  }
+  .wrapper .item.Vtuber3 {
+    background-image: url("../assets/Yuki_Completed.png");
+    background-position: 50% center;
+  }
+  .wrapper .item.Vtuber3:after {
+    content: "冥雪yuki\A「信念即是夢之根本，而我是夢境的主人。」";
+  }
+  .wrapper .item.Vtuber4 {
+    background-image: url("../assets/White_Completed.png");
+    background-position: 50% center;
+  }
+  .wrapper .item.Vtuber4:after {
+    content: "神白みや\A「力量，來自於我想守護你的誓言。」";
+  }
+  .wrapper .item.Vtuber5 {
+    background-image: url("../assets/Oni_Completed.png");
+    background-position: 50% center;
+  }
+  .wrapper .item.Vtuber5:after {
+    content: "和泉ふゆつき\A「要與我一同飲酒嘛？ 這可是你的榮幸。」";
+  }

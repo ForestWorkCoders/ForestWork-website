@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <!-- <base href="https://teamforestwork.nde.tw/" />-->
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>草神 Vtuber 测试</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <!-- 下面两个一定要加上 -->
+  <link rel="stylesheet" type="text/css" href="./live2d/assets/waifu.css" />
+  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+  <main id="main">
+
+    <!-- ======= Portfolio Details Section ======= -->
+    <section id="portfolio-details" class="portfolio-details">
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-8">
+            <div class="waifu">
+              <canvas id="live2d" width="960" height="1080" class="live2d"></canvas>
+              <div class="waifu-tips"></div>
+              <div class="waifu-tool">
+                <span class="fui-home"></span>
+                <span class="fui-chat"></span>
+                <span class="fui-eye"></span>
+                <span class="fui-user"></span>
+                <span class="fui-info-circle"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+
+            <div class="portfolio-info">
+              <h3>草神 纳西妲</h3>
+              <ul>
+                <li><strong>属性</strong>: Web design</li>
+                <li><strong>武器</strong>: ASU Company</li>
+                <li><strong>技能效果</strong>: 01 March, 2020</li>
+              </ul>
+            </div>
+            <div class="portfolio-description"></div>
+            <div class="portfolio-info">
+              <h3>社交媒体链接</h3>
+              <ul>
+                <li><strong>Facebook</strong>: <a href="#">www.facebook.com</a></li>
+                <li><strong>Youtube</strong>: <a href="#">www.youtube.com</a></li>
+                <li><strong>Twitch</strong>: <a href="#">www.twitch.com</a></li>
+                <li><strong>Twitter</strong>: <a href="#">www.twitter.com</a></li>
+                <li><strong>Website</strong>: <a href="#">www.example.com</a></li>
+              </ul>
+            </div>
+            <div class="portfolio-description">
+              <h2>This is an example of portfolio detail</h2>
+              <p>
+                Autem ipsum nam porro corporis rerum. Quis eos dolorem eos itaque inventore commodi labore quia quia.
+                Exercitationem repudiandae officiis neque suscipit non officia eaque itaque enim. Voluptatem officia
+                accusantium nesciunt est omnis tempora consectetur dignissimos. Sequi nulla at esse enim cum deserunt
+                eius.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Portfolio Details Section -->
+
+  </main><!-- End #main -->
+
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- Live2DCubismCore script -->
+  <script src="./live2dcubismcore.js"></script>
+  <!-- Build script -->
+  <script src="./meidou_live2d.js"></script>
+  <script src="./live2d/assets/waifu-tips.js"></script>
+  <script type="text/javascript">
+    //必选参数
+    let modulesPath = "./live2d/models/"
+    let modelNames = ['草神']  //注意，这里的名字是存放你模型文件的主目录的名字，目录中的moc3.json文件的名字一定要与目录同名
+    //可选参数
+    let waifuTipsUrl = "./live2d/assets/waifu-tips.json"
+
+    initModel(modulesPath, modelNames, waifuTipsUrl);
+  </script>
+</body>
+
+</html>
