@@ -14,7 +14,7 @@ header_temp.innerHTML = `
         <ul>
           <li><a class="nav-link scrollto active" href="#">主頁</a></li>
           <li><a class="nav-link scrollto" href="#about">介紹</a></li>
-          <li class="dropdown"><a><span>林間項目</span> <i class="bi bi-chevron-down"></i></a>
+          <li class="dropdown"><a href="#about"><span>林間項目</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li class="dropdown"><a href="#"><span>重現系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
