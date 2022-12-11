@@ -19,7 +19,6 @@ document.querySelector(".join_confirm").addEventListener('click', function(){
         cancelButtonText: '我改變主意了，讓我想想',
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location = "https://youtu.be/dQw4w9WgXcQ";
+            window.location = "https://forms.gle/AhRhyzkXVBZiwrnJ9";
         }})
 })
-
