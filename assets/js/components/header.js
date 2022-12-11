@@ -24,7 +24,7 @@ header_temp.innerHTML = `
               </li>
               <li class="dropdown"><a href="#"><span>競技系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
-                  <li><a href="https://eaglepb2.gitbook.io/uhc_report/">Minecraft UHC</a></li>
+                  <li><a href="https://uhc.forestwork.team">Minecraft UHC</a></li>
                   <li><a href="/pages/TOURNAMENT/Mahjong">林間日麻積分賽</a></li>
                 </ul>
               </li>
