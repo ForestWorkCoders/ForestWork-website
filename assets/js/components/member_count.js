@@ -21,6 +21,7 @@ function(err, data) {
     alert('Something went wrong: ' + err);
   } else {
     counter.innerHTML = `<span data-purecounter-start="0" data-purecounter-end="` + data.approximate_member_count + `" data-purecounter-duration="1" class="purecounter"></span>`
-    document.getElementById("counter2").appendChild(counter);
+    document.getElementById("member_counter").appendChild(counter);
   }
 });
+
