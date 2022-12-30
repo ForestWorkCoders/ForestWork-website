@@ -45,10 +45,11 @@ header_temp.innerHTML = `
           <li><a class="nav-link scrollto " href="#portfolio">部分節目截圖</a></li>
           <!--<li><a class="nav-link scrollto" href="#pricing">Pricing</a></li>-->
           
-          <li><a class="nav-link scrollto" href="#contact">想找我們？</a></li>
+          <li><a class="nav-link scrollto" href="/pages/OTHERS/Vtuber">林間V團 · 極夜夢語</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+      </nav>
+     <!-- .navbar -->
 
       <a href="#cta" class="get-started-btn scrollto">加入我們</a>
     </div>
