@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <base href="https://forestwork.team/" />
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>CTF{What_Ar3_Y0u_Doin?}</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!--Template Main JS File -->
+    <script src="assets/js/norightclick.js"></script>
+
+    <!-- 下面两个一定要加上 -->
+    <link rel="stylesheet" type="text/css" href="pages/OTHERS/Vtuber/live2d/assets/waifu.css" />
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <div class="waifu">
+        <canvas id="live2d" width="1920" height="1080" class="live2d"></canvas>
+        <!--
+              <div class="waifu-tips"></div>
+              <div class="waifu-tool">
+                <span class="fui-home"></span>
+                <span class="fui-chat"></span>
+                <span class="fui-eye"></span>
+                <span class="fui-user"></span>
+                <span class="fui-info-circle"></span>
+              </div>
+            -->
+    </div>
+
+    <!-- Live2DCubismCore script -->
+    <script src="pages/OTHERS/Vtuber/live2dcubismcore.js"></script>
+    <!-- Build script -->
+    <script src="pages/OTHERS/Vtuber/meidou_live2d.js"></script>
+    <script src="pages/OTHERS/Vtuber/live2d/assets/waifu-tips.js"></script>
+    <script type="text/javascript">
+        //必选参数
+        let modulesPath = "pages/OTHERS/Vtuber/live2d/models/"
+        let modelNames = ['rinlen520']  //注意，这里的名字是存放你模型文件的主目录的名字，目录中的moc3.json文件的名字一定要与目录同名
+        //可选参数
+        let waifuTipsUrl = "pages/OTHERS/Vtuber/live2d/assets/waifu-tips.json"
+
+        initModel(modulesPath, modelNames, waifuTipsUrl);
+    </script>
+</body>
+
+</html>
