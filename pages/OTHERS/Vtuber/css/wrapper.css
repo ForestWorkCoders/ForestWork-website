@@ -78,10 +78,10 @@
 }
 
 .wrapper .item.Vtuber5 {
-  background-image: url("../assets/Oni_Completed.png");
+  background-image: url("../assets/Yunji_Completed.png");
   background-position: 50% center;
 }
 
 .wrapper .item.Vtuber5:after {
-  content: "和泉ふゆつき\A「要與我一同飲酒嘛？ 這可是你的榮幸。」";
+  content: "羽海雲姬\A「今天晚上，能不能不吃雞排？」";
 }
