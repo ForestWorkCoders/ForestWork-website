@@ -31,7 +31,7 @@ header_temp.innerHTML = `
               <li class="dropdown"><a href="#"><span>同樂系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
                   <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師 精彩重現</a></li>
-                  <li><a href="#">Minecraft SMP</a></li>
+                  <li><a href="/pages/CASUAL/MinecraftSMP">Minecraft SMP</a></li>
                 </ul>
               </li>
               <li class="dropdown"><a href="#"><span>其他系列</span> <i class="bi bi-chevron-right"></i></a>
