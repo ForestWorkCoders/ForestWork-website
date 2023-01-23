@@ -102,7 +102,7 @@ class Viewer {
             }
 
             this.isClick = false;
-            //this.model.inDrag = false;
+            this.model.inDrag = false;
         });
         console.log("Init finished.")
     }
