@@ -49,6 +49,9 @@ $.when(
         "pageLength": 25,
         //"autoWidth": true,
         "data": solution,
+        columnDefs: [
+            { targets: [0,4], "type": "num"}
+        ],
         "columns": [{
             "title": "Rank",
             "data": "rank",
