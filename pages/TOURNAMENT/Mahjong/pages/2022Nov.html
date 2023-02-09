@@ -5,7 +5,8 @@
     <base href="https://forestwork.team/" />
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <title>林間盃 十一月份 日麻積分賽</title>
     <meta content="一個月舉辦一次的日麻積分賽 太爽了吧？" name="description">
     <meta content="EaglePB2" name="author">
@@ -13,9 +14,9 @@
     <meta name="msapplication-TileImage" content="assets/img/webicons/mstile-144x144.png">
     <meta name="msapplication-config" content="assets/img/webicons/browserconfig.xml">
     <meta name="theme-color" content="#fefefe">
-  
+
     <!-- Favicons -->
-    
+
     <link rel="shortcut icon" href="assets/img/webicons/favicon.png">
     <link rel="Bookmark" href="assets/img/webicons/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/webicons/apple-touch-icon.png">
@@ -25,10 +26,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="assets/img/webicons/favicon.png">
     <link rel="manifest" href="assets/img/webicons/site.webmanifest">
     <link rel="mask-icon" href="assets/img/webicons/safari-pinned-tab.svg" color="#7d7d7d">
-  
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-  
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
     <!-- Vendor CSS Files -->
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -36,453 +39,77 @@
     <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-  
+
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
-    
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-    <script src="assets/js/norightclick.js"></script>
 
     <!--css normalize 先給我當一個失憶仔-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"/>
     <!--css table-->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
 
     <!--Jquery 永遠的神 awa-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 
-    <!--Sorting libraries (thanks!)-->
-    <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
-
-    <script src="pages/TOURNAMENT/Mahjong/pages/logic.js"></script>
+    <script src="pages/TOURNAMENT/Mahjong/pages/js/execute.js"></script>
 
     <!--可以擋掉低端PH右鍵下載的東西，但對於html有認識的可能比較難……-->
     <script src="assets/js/norightclick.js"></script>
-  
+
 </head>
 
 <body>
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top header-inner-pages">
+        <script src="assets/js/components/header.js"></script>
+    </header><!-- End Header -->
 
-<!-- ======= Header ======= -->
-<header id="header" class="fixed-top header-inner-pages">
-  <div class="container-fluid">
-  <div class="container-fluid">
+    <main id="main">
 
-    <div class="row justify-content-center">
-      <div class="col-xl-9 d-flex align-items-center justify-content-lg-between">
-        <h1 class="logo me-auto me-lg-0"><a href="">ForestWork</a></h1>
-        <!-- Uncomment below if you prefer to use an image logo -->
-        <!--<a href="index.html" class="logo me-auto me-lg-0"><img src="assets/img/left-top-icon.png" alt="ForestWork" class="img-fluid"></a>-->
+        <!-- ======= Breadcrumbs ======= -->
+        <section id="breadcrumbs" class="breadcrumbs">
+            <div class="container">
 
-        <nav id="navbar" class="navbar order-last order-lg-0">
-          <ul>
-            <li><a class="nav-link scrollto active" href="">主頁</a></li>
-            <li><a class="nav-link scrollto" href="teamforestwork.nde.tw/#about">介紹</a></li>
-            <li class="dropdown"><a href="#"><span>林間項目</span> <i class="bi bi-chevron-down"></i></a>
-              <ul>
-                <li class="dropdown"><a href="#"><span>重現係列</span> <i class="bi bi-chevron-right"></i></a>
-                  <ul>
-                    <li><a href="https://forum.gamer.com.tw/C.php?bsn=18673&snA=188915">Minecraft X 逃走中</a></li>
-                    <li><a href="#">Minecraft X 九州偽戰意</a></li>
-                  </ul>
-                </li>
-                <li class="dropdown"><a href="#"><span>競技係列</span> <i class="bi bi-chevron-right"></i></a>
-                  <ul>
-                    <li><a href="https://uhc.forestwork.net/">Minecraft UHC</a></li>
-                    <li><a href="teamforestwork.nde.tw/pages/TOURNAMENT/Mahjong">林間日麻積分賽</a></li>
-                  </ul>
-                </li>
-                <li class="dropdown"><a href="#"><span>同樂係列</span> <i class="bi bi-chevron-right"></i></a>
-                  <ul>
-                    <li><a href="teamforestwork.nde.tw/pages/OTHERS/GarticPhone">林間靈魂繪師 精彩重現</a></li>
-                    <li><a href="#">Minecraft SMP</a></li>
-                  </ul>
-                </li>
-                <li class="dropdown"><a href="#"><span>其他係列</span> <i class="bi bi-chevron-right"></i></a>
-                  <ul>
-                    <li><a href="teamforestwork.nde.tw/pages/OTHERS/Quotes">林間名言啟示錄</a></li>
-                    <li><a href="teamforestwork.nde.tw/pages/OTHERS/MonthlyReport">林間月報</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-            <li><a class="nav-link scrollto " href="teamforestwork.nde.tw/#portfolio">部分節目截圖</a></li>
-            <!--<li><a class="nav-link scrollto" href="#pricing">Pricing</a></li>-->
-            
-            <li><a class="nav-link scrollto" href="teamforestwork.nde.tw/#contact">想找我們？</a></li>
-          </ul>
-          <i class="bi bi-list mobile-nav-toggle"></i>
-        </nav><!-- .navbar -->
+                <ol>
+                    <li><a href="">主頁</a></li>
+                    <li><a href="pages/TOURNAMENT/Mahjong">林間盃 日麻積分賽</a></li>
+                    <li>十一月份</li>
+                </ol>
+                <h2>十一月份 林間盃日麻積分賽</h2>
 
-        <a href="teamforestwork.nde.tw/#cta" class="get-started-btn scrollto">加入我們</a>
-      </div>
-    </div>
+            </div>
+        </section><!-- End Breadcrumbs -->
 
-  </div>
-</header><!-- End Header -->
+        <section class="inner-page">
+            <div class="container">
+                <table id="example" class="row-border hover stripe nowrap" width="100%"></table>
+                <a href="https://imgur.com/a/KDC8slY" style="text-decoration: none" target="_blank">點我查看分數截圖</a>
+            </div>
+        </section>
+    </main><!-- End #main -->
 
-  <main id="main">
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+        <script src="assets/js/components/footer.js"></script>
+    </footer><!-- End Footer -->
 
-    <!-- ======= Breadcrumbs ======= -->
-    <section id="breadcrumbs" class="breadcrumbs">
-      <div class="container">
-
-        <ol>
-          <li><a href="">主頁</a></li>
-          <li><a href="pages/TOURNAMENT/Mahjong">林間盃 日麻積分賽</a></li>
-          <li>十一月份</li>
-        </ol>
-        <h2>十一月份 林間盃日麻積分賽</h2>
-
-      </div>
-    </section><!-- End Breadcrumbs -->
-
-    <section class="inner-page">
-      <div class="container">
-        <table id="myTable" class="row-border hover stripe nowrap">
-          <thead>
-              <tr>
-                  <th>Ranks</th>
-                  <th hidden>ID</th>
-                  <th>Pfp</th>
-                  <th>Discord</th>
-                  <th>Mahjong Soul ID</th>
-                  <th>Total</th>
-                  <th>Game 1</th>
-                  <th>Game 2</th>
-                  <th>Game 3</th>
-                  <th>Game 4</th>
-                  <th>Game 5</th>
-                  <th>Game 6</th>
-                  <th>Game 7</th>
-                  <th>Game 8</th>
-                  <th>Game 9</th>
-                  <th>Game 10</th>
-                  <th>Game 11</th>
-                  <th>Game 12</th>
-                  <th>Game 13</th>
-                  <th>Game 14</th>
-                  <th>Game 15</th>
-                  <th>Game 16</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                  <td>1</td>
-                  <td hidden id="search_id">7</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">54</td>
-                  <td class="scores">37</td>
-                  <td class="scores">33</td>
-                  <td class="scores">-33</td>
-                  <td class="scores">-36</td>
-                  <td class="scores">31</td>
-                  <td class="scores">56</td>
-                  <td class="scores">-17</td>
-                  <td class="scores">-33</td>
-                  <td class="scores">-7</td>
-                  <td class="scores">84</td>
-                  <td class="scores">2</td>
-                  <td class="scores">-52</td>
-                  <td class="scores">39</td>
-                  <td class="scores">-30</td>
-                  <td class="scores">60</td>
-              </tr>
-              <tr>
-                  <td>2</td>
-                  <td hidden id="search_id">22</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">-4</td>
-                  <td class="scores">65</td>
-                  <td class="scores">-32</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-1</td>
-                  <td class="scores">34</td>
-                  <td class="scores">2</td>
-                  <td class="scores">55</td>
-                  <td class="scores">-10</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">2</td>
-                  <td class="scores">39</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-              </tr>
-              <tr>
-                  <td>3</td>
-                  <td hidden id="search_id">19</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">8</td>
-                  <td class="scores">-43</td>
-                  <td class="scores">-3</td>
-                  <td class="scores">61</td>
-                  <td class="scores">51</td>
-                  <td class="scores">26</td>
-                  <td class="scores">-58</td>
-                  <td class="scores">8</td>
-                  <td class="scores">43</td>
-                  <td class="scores">-38</td>
-                  <td class="scores">-9</td>
-                  <td class="scores">-28</td>
-                  <td class="scores">-47</td>
-                  <td class="scores">59</td>
-                  <td class="scores">44</td>
-                  <td class="scores">33</td>
-              </tr>
-              <tr>
-                  <td>4</td>
-                  <td hidden id="search_id">1</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">40</td>
-                  <td class="scores">6</td>
-                  <td class="scores">-2</td>
-                  <td class="scores">-12</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-51</td>
-                  <td class="scores">-27</td>
-                  <td class="scores">31</td>
-                  <td class="scores">—</td>
-                  <td class="scores">40</td>
-                  <td class="scores">-44</td>
-                  <td class="scores">22</td>
-                  <td class="scores">53</td>
-                  <td class="scores">-40</td>
-                  <td class="scores">34</td>
-                  <td class="scores">—</td>
-              </tr>
-              <tr>
-                  <td>5</td>
-                  <td hidden id="search_id">12</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">-47</td>
-                  <td class="scores">-4</td>
-                  <td class="scores">28</td>
-                  <td class="scores">-6</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-32</td>
-                  <td class="scores">39</td>
-                  <td class="scores">33</td>
-                  <td class="scores">26</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-4</td>
-                  <td class="scores">-7</td>
-              </tr>
-              <tr>
-                  <td>6</td>
-                  <td hidden id="search_id">2</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">-51</td>
-                  <td class="scores">25</td>
-                  <td class="scores">-2</td>
-                  <td class="scores">-49</td>
-                  <td class="scores">-13</td>
-                  <td class="scores">17</td>
-                  <td class="scores">-3</td>
-                  <td class="scores">47</td>
-                  <td class="scores">41</td>
-                  <td class="scores">-1</td>
-                  <td class="scores">10</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-              </tr>
-              <tr>
-                  <td>7</td>
-                  <td hidden id="search_id">13</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">-1</td>
-                  <td class="scores">-22</td>
-                  <td class="scores">-26</td>
-                  <td class="scores">-33</td>
-                  <td class="scores">-39</td>
-                  <td class="scores">-42</td>
-                  <td class="scores">-60</td>
-                  <td class="scores">-39</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-32</td>
-                  <td class="scores">-75</td>
-                  <td class="scores">-25</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-53</td>
-                  <td class="scores">-30</td>
-                  <td class="scores">-8</td>
-              </tr>
-              <tr>
-                  <td>DNF</td>
-                  <td hidden id="search_id">34</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">34</td>
-                  <td class="scores">39</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-21</td>
-                  <td class="scores">87</td>
-                  <td class="scores">11</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-              </tr>
-              <tr>
-                  <td>DNF</td>
-                  <td hidden id="search_id">5</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">46</td>
-                  <td class="scores">37</td>
-                  <td class="scores">-5</td>
-                  <td class="scores">-18</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-              </tr>
-              <tr>
-                  <td>DNF</td>
-                  <td hidden id="search_id">17</td>
-                  <td id="pfp"></td>
-                  <td id="discordID"></td>
-                  <td id="mahjongSoulID"></td>
-                  <td id="total"></td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">-38</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-                  <td class="scores">—</td>
-              </tr>
-              <tr>
-                <td>DNF</td>
-                <td hidden id="search_id">35</td>
-                <td id="pfp"></td>
-                <td id="discordID"></td>
-                <td id="mahjongSoulID"></td>
-                <td id="total"></td>
-                <td class="scores">22</td>
-                <td class="scores">-43</td>
-                <td class="scores">-31</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-                <td class="scores">—</td>
-            </tr>
-          </tbody>
-          </table>
-
-          <a href="https://imgur.com/a/h0ufOhp" style="text-decoration: none" target="_blank">點我查看分數截圖</a>
-        </div>
-    </section>
-
-  </main><!-- End #main -->
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer">
-    <div class="container">
-      <h3>ForestWork</h3>
-      <p>社交連接</p>
-      <div class="social-links">
-        <a href="https://discord.gg/forestwork" class="discord"><i class="bx bxl-discord-alt"></i></a>
-        <a href="https://twitter.com/teamforestwork" class="twitter"><i class="bx bxl-twitter"></i></a>
-        <a href="https://www.youtube.com/channel/UCpxH-OxcJujRLpnDUgoYlsg" class="youtube"><i class="bx bxl-youtube"></i></a>
-        <a href="mailto:teamforestwork@gmail.com" class="mail"><i class='bx bxs-envelope' ></i></a>
-      </div>
-      <div class="copyright">
-        &copy; Copyright <strong><span>ForestWork</span></strong> 2022-2077. All Rights Reserved
-      </div>
-      <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/knight-simple-one-page-bootstrap-template/ -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-      </div>
-    </div>
-  </footer><!-- End Footer -->
-
-  <div id="preloader"></div>
-  <a onclick=" document.body.scrollTop = 0; document.documentElement.scrollTop = 0;" class="back-to-top d-flex align-items-center justify-content-center"><i class="bx bxs-plane"></i></a>
+    <div id="preloader"></div>
+    <a onclick=" document.body.scrollTop = 0; document.documentElement.scrollTop = 0;"
+        class="back-to-top d-flex align-items-center justify-content-center"><i class="bx bxs-plane"></i></a>
 
 
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <!--<script src="assets/vendor/php-email-form/validate.js"></script>-->
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <!--<script src="assets/vendor/php-email-form/validate.js"></script>-->
 
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
-
-  <script src="pages/TOURNAMENT/Mahjong/pages/tablegen.js"></script>
-
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
 </body>
 
 </html>
