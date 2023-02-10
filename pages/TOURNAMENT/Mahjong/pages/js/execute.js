@@ -50,7 +50,23 @@ $.when(
         //"autoWidth": true,
         "data": solution,
         columnDefs: [
-            { targets: [0,4], "type": "num"}
+            { 
+                targets: [0,4], 
+                render: function ( data, type, row ) {
+                    if ( type === 'sort' ) {
+                      var sortValue = data;
+                      switch( data ) {
+                        case 'DNF':
+                          sortValue = -999999;
+                          break;
+                        default: // already set, in this case
+                      } 
+                      return sortValue;
+                    } else { 
+                      return data;
+                    }
+                }
+            }
         ],
         "columns": [{
             "title": "Rank",

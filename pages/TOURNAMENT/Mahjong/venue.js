@@ -442,7 +442,7 @@ document.getElementById('aesir').innerHTML = `
     </span>
   </span>
       <span class="survey-end-date">
-        2022 - DEC 30
+        2022 - Dec 30
       </span>
       <span class="survey-stage">
         <span class="stage draft">Draft</span>
@@ -483,7 +483,7 @@ document.getElementById('misode').innerHTML = `
     </span>
   </span>
       <span class="survey-end-date">
-        2023 - JAN 25
+        2023 - Jan 25
       </span>
       <span class="survey-stage">
         <span class="stage draft">Draft</span>
