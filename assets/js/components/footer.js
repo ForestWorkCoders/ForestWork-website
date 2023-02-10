@@ -6,8 +6,8 @@ footer_temp.innerHTML = `
 <p>社交連接</p>
 <div class="social-links">
   <a href="https://discord.gg/qKrub9b" class="discord"><i class="bx bxl-discord-alt"></i></a>
-  <a href="/twitter" class="twitter"><i class="bx bxl-twitter"></i></a>
-  <a href="/youtube" class="youtube"><i class="bx bxl-youtube"></i></a>
+  <a href="https://twitter.com/teamforestwork" class="twitter"><i class="bx bxl-twitter"></i></a>
+  <a href="https://www.youtube.com/@forestwork" class="youtube"><i class="bx bxl-youtube"></i></a>
   <a href="mailto:teamforestwork@gmail.com" class="mail"><i class='bx bxs-envelope' ></i></a>
 </div>
 <div class="copyright">
