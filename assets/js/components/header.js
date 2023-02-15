@@ -26,6 +26,7 @@ header_temp.innerHTML = `
                 <ul>
                   <li><a href="https://uhc.forestwork.team">Minecraft UHC</a></li>
                   <li><a href="/pages/TOURNAMENT/Mahjong">林間日麻積分賽</a></li>
+                  <li><a href="https://waitwhat.asia">WaitWhat PvP 回歸！</a></li>
                 </ul>
               </li>
               <li class="dropdown"><a href="#"><span>同樂系列</span> <i class="bi bi-chevron-right"></i></a>
