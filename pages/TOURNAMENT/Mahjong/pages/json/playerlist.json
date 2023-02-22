@@ -26,11 +26,11 @@
     "id": "5",
     "pfp": "https://cdn.discordapp.com/avatars/413861379288596480/9508c17374d9d06cec244d1aaddd59e2.webp",
     "discordID": "ming1235#2720",
-    "mahjongSoulID": "小敏小敏爱大米"
+    "mahjongSoulID": "以姬劈姬"
 },
 {
     "id": "6",
-    "pfp": "https://cdn.discordapp.com/avatars/564740738005467137/da58a90e37e187cbded2e6d052cc5822.png",
+    "pfp": "https://cdn.discordapp.com/avatars/564740738005467137/da58a90e37e187cbded2e6d052cc5822.webp",
     "discordID": "二氧化碳#7339",
     "mahjongSoulID": "化碳"
 },
@@ -42,7 +42,7 @@
 },
 {
     "id": "8",
-    "pfp": "https://cdn.discordapp.com/avatars/495540968662106112/96129d3e0ae36854b3eb4b083e27aca9.webp",
+    "pfp": "https://cdn.discordapp.com/avatars/495540968662106112/f5bf99941f59abc70f1966652626544c.webp",
     "discordID": "冥雪兔幾#5813",
     "mahjongSoulID": "冥雪兔幾"
 },
@@ -126,7 +126,7 @@
 },
 {
     "id": "22",
-    "pfp": "https://cdn.discordapp.com/avatars/505607199918391306/6263a816925488b03f68d8a8427d8a26.png",
+    "pfp": "https://cdn.discordapp.com/embed/avatars/5.webp",
     "discordID": "誰偷了我的500#7847",
     "mahjongSoulID": "谁、"
 },
@@ -168,7 +168,7 @@
 },
 {
     "id": "29",
-    "pfp": "https://cdn.discordapp.com/avatars/795334829357006868/ebe6f7b2c94a95a318c3da20e94d00bb.webp",
+    "pfp": "https://cdn.discordapp.com/avatars/795334829357006868/6ee10449b00a2b517ce81b1670d45ff3.webp",
     "discordID": "緋羽裂楓#8638",
     "mahjongSoulID": "緋羽裂楓"
 },
@@ -186,19 +186,19 @@
 },
 {
     "id": "32",
-    "pfp": "https://cdn.discordapp.com/avatars/624030455460659215/ca3f7cfcadae835271fe78001ef78c98.webp",
+    "pfp": "https://cdn.discordapp.com/avatars/624030455460659215/979fd07ad13ebea82f17a6f204ab2905.webp",
     "discordID": "紅葉#9359",
     "mahjongSoulID": "誰都推的紅葉"
 },
 {
     "id": "33",
-    "pfp": "https://cdn.discordapp.com/avatars/516198322227118092/52054d56ea8a0d2b3907056e576a57f5.webp",
+    "pfp": "https://cdn.discordapp.com/avatars/516198322227118092/a3382807ce50989b40c1acd864dbecf7.webp",
     "discordID": "Younian#2634",
     "mahjongSoulID": "younian"
 },
 {
     "id": "34",
-    "pfp": "https://cdn.discordapp.com/avatars/430722567892893717/6bb1e0caeef1af79a53d15d5686bcb58.webp",
+    "pfp": "https://cdn.discordapp.com/avatars/430722567892893717/f9a59be667d46c0d21501046618ccafa.webp",
     "discordID": "香蕉#7248",
     "mahjongSoulID": "香蕉爱叭叭"
 },
@@ -222,7 +222,19 @@
 },
 {
     "id": "38",
-    "pfp": "https://cdn.discordapp.com/avatars/458889367713480717/10bc32c03b19092183a0d71abb22f965.webp",
+    "pfp": "https://cdn.discordapp.com/avatars/458889367713480717/a9ca1fc986a14528b93d5dfe783b7fb3.webp",
     "discordID": "極宗#6122",
     "mahjongSoulID": "極宗"
+},
+{
+    "id": "39",
+    "pfp": "https://cdn.discordapp.com/avatars/855463026605817856/eaf6bb1dbebb90806f23d50eb6057eb4.webp",
+    "discordID": "機器人001號#1552",
+    "mahjongSoulID": "電腦123456"
+},
+{
+    "id": "40",
+    "pfp": "https://cdn.discordapp.com/avatars/831475251409321984/17832ed067f4f237229cb551e0f33c53.webp",
+    "discordID": "喂白木#7802",
+    "mahjongSoulID": "只胡役滿役滿"
 }]
