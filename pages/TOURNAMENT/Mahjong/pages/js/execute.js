@@ -1,19 +1,19 @@
 var firstSet, secondSet;
 
-/* remove optional end / */ 
+/* remove optional end / */
 const segments = new URL(window.location.href).pathname.split('/');
 const last = segments.pop() || segments.pop(); // Handle potential trailing slash
 sorted = "pages/TOURNAMENT/Mahjong/pages/json/" + last + ".json"
 //console.log(sorted);
 
 $.when(
-    $.getJSON("pages/TOURNAMENT/Mahjong/pages/json/playerlist.json", function(data) {
+    $.getJSON("pages/TOURNAMENT/Mahjong/pages/json/playerlist.json", function (data) {
         firstSet = data;
     }),
-    $.getJSON(sorted, function(data) {
+    $.getJSON(sorted, function (data) {
         secondSet = data;
     })
-).then(function() {
+).then(function () {
     function contains(set, object) {
         var solution = -1;
         set.forEach(function (item, index, array) {
@@ -23,7 +23,7 @@ $.when(
         });
         return solution;
     }
-    
+
     function mergeSets(first, second) {
         var result = first;
         second.forEach(function (item, index, array) {
@@ -36,7 +36,7 @@ $.when(
         });
         return result;
     }
-    
+
     var solution = mergeSets(secondSet, firstSet);
 
     $('#example').DataTable({
@@ -50,35 +50,34 @@ $.when(
         //"autoWidth": true,
         "data": solution,
         columnDefs: [
-            { 
-                targets: [0,4], 
-                render: function ( data, type, row ) {
-                    if ( type === 'sort' ) {
-                      var sortValue = data;
-                      switch( data ) {
-                        case 'DNF':
-                          sortValue = -999999;
-                          break;
-                        default: // already set, in this case
-                      } 
-                      return sortValue;
-                    } else { 
-                      return data;
+            {
+                targets: [0, 4],
+                render: function (data, type, row) {
+                    if (type === 'sort') {
+                        switch (data) {
+                            case 'DNF':
+                                return '1000000';
+                            default: // already set, in this case
+                                return parseInt(data) || 0; // Convert the data to an integer or set it to 0 if it's not a number
+                        }
+                    } else {
+                        return data;
                     }
-                }
+                },
+                type: 'numeric'
             }
         ],
         "columns": [{
             "title": "Rank",
             "data": "rank",
             "render": function (data, type, row) {
-                return '<span style="display: flex; flex-flow: row nowrap; justify-content: center;">'+data+'</span>';
+                return '<span style="display: flex; flex-flow: row nowrap; justify-content: center;">' + data + '</span>';
             }
         }, {
             "title": "Pfp",
             "data": "pfp",
-            "render": function(data, type, row) {
-                return '<img width="40" height="40" src="'+data+'" />';
+            "render": function (data, type, row) {
+                return '<img width="40" height="40" src="' + data + '" />';
             }
         }, {
             "title": "Discord ID",
@@ -89,7 +88,7 @@ $.when(
         }, {
             "title": "Total",
             "data": null,
-            "render": function(data, type, row) {
+            "render": function (data, type, row) {
                 var total = 0;
                 for (var prop in row) {
                     if (prop.indexOf('game') === 0) {
@@ -101,7 +100,7 @@ $.when(
                     }
                 }
                 return total;
-            }            
+            }
         }, {
             "title": "Game 1",
             "data": "game01"
