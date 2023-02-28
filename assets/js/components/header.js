@@ -35,17 +35,11 @@ header_temp.innerHTML = `
                   <li><a href="/pages/CASUAL/MinecraftSMP">Minecraft SMP</a></li>
                 </ul>
               </li>
-              <li class="dropdown"><a href="#"><span>其他系列</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="/pages/OTHERS/Quotes">林間名言啟示錄</a></li>
-                  <li><a href="/pages/OTHERS/MonthlyReport">林間月報</a></li>
-                </ul>
-              </li>
             </ul>
           </li>
-          <li><a class="nav-link scrollto " href="#portfolio">部分節目截圖</a></li>
+          <li><a class="nav-link scrollto" href="/pages/OTHERS/Quotes">林間名言啟示錄</a></li>
+          <li><a class="nav-link scrollto" href="/pages/OTHERS/MonthlyReport">林間月報</a></li>
           <!--<li><a class="nav-link scrollto" href="#pricing">Pricing</a></li>-->
-          
           <li><a class="nav-link scrollto" href="/pages/OTHERS/Vtuber">林間V團 · 極夜夢語</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
