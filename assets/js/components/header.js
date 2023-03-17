@@ -38,8 +38,6 @@ header_temp.innerHTML = `
             </ul>
           </li>
           <li><a class="nav-link scrollto" href="/pages/OTHERS/Quotes">林間名言啟示錄</a></li>
-          <li><a class="nav-link scrollto" href="/pages/OTHERS/MonthlyReport">林間月報</a></li>
-          <!--<li><a class="nav-link scrollto" href="#pricing">Pricing</a></li>-->
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
