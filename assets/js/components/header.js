@@ -16,23 +16,22 @@ header_temp.innerHTML = `
           <li><a class="nav-link scrollto" href="#about">介紹</a></li>
           <li class="dropdown"><a href="#about"><span>林間項目</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
-              <li class="dropdown"><a href="#"><span>重現系列</span> <i class="bi bi-chevron-right"></i></a>
+              <li class="dropdown"><a href="#"><span>日麻系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
-                  <li><a href="https://forum.gamer.com.tw/C.php?bsn=18673&snA=188915">Minecraft X 逃走中</a></li>
-                  <li><a href="#">Minecraft X 九州偽戰意</a></li>
+                  <li><a href="/pages/MAHJONG/League">日常積分賽</a></li>
+                  <li><a href="/pages/MAHJONG/2022JuneMahjongEvent">數番盃活動賽</a></li>
                 </ul>
               </li>
-              <li class="dropdown"><a href="#"><span>競技系列</span> <i class="bi bi-chevron-right"></i></a>
+              <li class="dropdown"><a href="#"><span>麥塊系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
                   <li><a href="https://uhc.forestwork.team">Minecraft UHC</a></li>
-                  <li><a href="/pages/TOURNAMENT/Mahjong">林間日麻積分賽</a></li>
+                  <li><a href="/pages/CASUAL/MinecraftSMP">Minecraft SMP</a></li>
                   <li><a href="https://waitwhat.asia">WaitWhat PvP 回歸！</a></li>
                 </ul>
               </li>
               <li class="dropdown"><a href="#"><span>同樂系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
                   <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師 精彩重現</a></li>
-                  <li><a href="/pages/CASUAL/MinecraftSMP">Minecraft SMP</a></li>
                 </ul>
               </li>
             </ul>
