@@ -32,7 +32,8 @@ header_temp.innerHTML = `
               </li>
               <li class="dropdown"><a href="#"><span>同樂系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
-                  <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師 精彩重現</a></li>
+                  <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師</a></li>
+                  <li><a href="/pages/CASUAL/ExchangeArt">林間交換繪</a></li>
                 </ul>
               </li>
             </ul>
