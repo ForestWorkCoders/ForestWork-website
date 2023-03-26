@@ -1,10 +1,10 @@
 var firstSet, secondSet;
 
 $.when(
-    $.getJSON("pages/TOURNAMENT/Mahjong/pages/json/playerlist.json", function(data) {
+    $.getJSON("pages/MAHJONG/League/pages/json/playerlist.json", function(data) {
         firstSet = data;
     }),
-    $.getJSON("pages/TOURNAMENT/Mahjong/pages/json/2022Jan.json", function(data) {
+    $.getJSON("pages/MAHJONG/League/pages/json/2022Jan.json", function(data) {
         secondSet = data;
     })
 ).then(function() {
