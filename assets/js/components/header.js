@@ -8,7 +8,7 @@ header_temp.innerHTML = `
     <div class="col-xl-9 d-flex align-items-center justify-content-lg-between">
       <!--<h1 class="logo me-auto me-lg-0"><a href="#">ForestWork</a></h1>-->
       <!-- Uncomment below if you prefer to use an image logo -->
-      <a href="index.html" class="logo me-auto me-lg-0"><img src="assets/img/left-top-icon.png" alt="ForestWork" class="img-fluid"></a>
+      <a href="https://forestwork.team" class="logo me-auto me-lg-0"><img src="assets/img/left-top-icon.png" alt="ForestWork" class="img-fluid"></a>
 
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
@@ -34,6 +34,7 @@ header_temp.innerHTML = `
                 <ul>
                   <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師</a></li>
                   <li><a href="/pages/CASUAL/ExchangeArt">林間交換繪</a></li>
+                  <li><a href="/pages/CASUAL/TacitAgreement">林間默契游戲</a></li>
                 </ul>
               </li>
             </ul>
