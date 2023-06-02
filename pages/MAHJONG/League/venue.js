@@ -371,7 +371,7 @@ document.getElementById('Sep2022').innerHTML = `
     </div>
 `;
 
-document.getElementById('Oct2022').innerHTML = `
+document.getElementById('Nov2022').innerHTML = `
     <span class="survey-country list-only">
       NOV
     </span>
@@ -412,7 +412,7 @@ document.getElementById('Oct2022').innerHTML = `
     </div>
 `;
 
-document.getElementById('Nov2022').innerHTML = `
+document.getElementById('Dec2022').innerHTML = `
     <span class="survey-country list-only">
       DEC
     </span>

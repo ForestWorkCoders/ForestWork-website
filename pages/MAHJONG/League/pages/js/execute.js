@@ -39,6 +39,7 @@ $.when(
 
     var solution = mergeSets(secondSet, firstSet);
 
+    //Thanks! https://datatables.net/forums/discussion/22343/new-sorting-plugin-sort-by-any-number-ignore-text
     function sortNumbersIgnoreText(a, b, high) {
         var reg = /[+-]?((\d+(\.\d*)?)|\.\d+)([eE][+-]?[0-9]+)?/;    
         a = a.match(reg);
