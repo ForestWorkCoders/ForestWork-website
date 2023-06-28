@@ -62,7 +62,7 @@
   <!--Sorting libraries (thanks!)-->
   <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
 
-  <script src="pages/MAHJONG/League/pages/logic.js"></script>
+  <script src="pages/MAHJONG/League/pages/js/execute_new.js"></script>
 
   <!--可以挡掉低端PH右键下载的东西，但对于html有认识的可能比较难……-->
   <script src="assets/js/norightclick.js"></script>
@@ -138,9 +138,9 @@
         <ol>
           <li><a href="">主頁</a></li>
           <li><a href="pages/MAHJONG/League/">林間盃 日麻積分賽</a></li>
-          <li>十一月份</li>
+          <li>十二月份</li>
         </ol>
-        <h2>十一月份 林間盃日麻積分賽</h2>
+        <h2>十二月份 林間盃日麻積分賽</h2>
 
       </div>
     </section><!-- End Breadcrumbs -->
@@ -148,13 +148,12 @@
     <section class="inner-page">
       <div class="container">
         <h1>A组</h1>
-        <table id="myTable" class="row-border hover stripe nowrap">
+        <table id="myTableA" class="row-border hover stripe nowrap">
           <thead>
             <tr>
               <th>Ranks</th>
               <th hidden>ID</th>
               <th>Pfp</th>
-              <th>Discord</th>
               <th>Mahjong Soul ID</th>
               <th>Total</th>
               <th>Game 1</th>
@@ -166,10 +165,9 @@
             <tr>
               <td>1</td>
               <td hidden id="search_id">5</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/413861379288596480/9508c17374d9d06cec244d1aaddd59e2.webp"></td>
+              <td id="mahjongSoulID">以姬劈姬</td>
+              <td id="total">22.7</td>
               <td class="scores">-22.1</td>
               <td class="scores">-4.6</td>
               <td class="scores">49.4</td>
@@ -177,10 +175,9 @@
             <tr>
               <td>2</td>
               <td hidden id="search_id">1</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/516257729489272853/d66ff8b2f74844d626572a8c54dc72e4.webp"></td>
+              <td id="mahjongSoulID">餘月</td>
+              <td id="total">-5.3</td>
               <td class="scores">21</td>
               <td class="scores">-22.9</td>
               <td class="scores">-3.4</td>
@@ -188,10 +185,9 @@
             <tr>
               <td>3</td>
               <td hidden id="search_id">7</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/987345056832839720/1ac833811fcc0119d11a1c3ad590be81.webp"></td>
+              <td id="mahjongSoulID">伊吹天玄</td>
+              <td id="total">-17.4</td>
               <td class="scores">1.1</td>
               <td class="scores">27.5</td>
               <td class="scores">-46</td>
@@ -200,13 +196,12 @@
         </table>
 
         <h1>B组</h1>
-        <table id="myTable" class="row-border hover stripe nowrap">
+        <table id="myTableB" class="row-border hover stripe nowrap">
           <thead>
             <tr>
               <th>Ranks</th>
               <th hidden>ID</th>
               <th>Pfp</th>
-              <th>Discord</th>
               <th>Mahjong Soul ID</th>
               <th>Total</th>
               <th>Game 1</th>
@@ -218,10 +213,10 @@
             <tr>
               <td>1</td>
               <td hidden id="search_id">2</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/129569761309753344/669de3f3eada4218c0f2bb67ea300ff1.webp"></td>
+              
+              <td id="mahjongSoulID">安安吃糖吗</td>
+              <td id="total">50.1</td>
               <td class="scores">-47.9</td>
               <td class="scores">65.5</td>
               <td class="scores">32.5</td>
@@ -229,10 +224,10 @@
             <tr>
               <td>2</td>
               <td hidden id="search_id">33</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/516198322227118092/a0dbb890d91fcf588a897ef4ff167f6d.webp"></td>
+              
+              <td id="mahjongSoulID">younian</td>
+              <td id="total">-11.3</td>
               <td class="scores">38.7</td>
               <td class="scores">-15.1</td>
               <td class="scores">-34.9</td>
@@ -240,10 +235,10 @@
             <tr>
               <td>3</td>
               <td hidden id="search_id">22</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/505607199918391306/ba58ffa3f1d16694b7f34915c3f66124.webp"></td>
+              
+              <td id="mahjongSoulID">谁、</td>
+              <td id="total">-38.8</td>
               <td class="scores">9.2</td>
               <td class="scores">-50.4</td>
               <td class="scores">2.4</td>
@@ -252,13 +247,12 @@
         </table>
 
         <h1>C组</h1>
-        <table id="myTable" class="row-border hover stripe nowrap">
+        <table id="myTableC" class="row-border hover stripe nowrap">
           <thead>
             <tr>
               <th>Ranks</th>
               <th hidden>ID</th>
               <th>Pfp</th>
-              <th>Discord</th>
               <th>Mahjong Soul ID</th>
               <th>Total</th>
               <th>Game 1</th>
@@ -270,10 +264,10 @@
             <tr>
               <td>1</td>
               <td hidden id="search_id">12</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/624855413803843584/37972aa87da31a8f79d9eba2b66d5a13.webp"></td>
+              
+              <td id="mahjongSoulID">老英精</td>
+              <td id="total">172.2</td>
               <td class="scores">61.4</td>
               <td class="scores">60.1</td>
               <td class="scores">50.7</td>
@@ -281,10 +275,10 @@
             <tr>
               <td>2</td>
               <td hidden id="search_id">19</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/600648644282286090/2cc820a88790a44cc0343075eb4a72d7.webp"></td>
+              
+              <td id="mahjongSoulID">為啥不可用注音</td>
+              <td id="total">3.3</td>
               <td class="scores">-4</td>
               <td class="scores">-2.7</td>
               <td class="scores">10</td>
@@ -292,10 +286,10 @@
             <tr>
               <td>3</td>
               <td hidden id="search_id">13</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/937977116908220426/cdc3c50fe795c236fb6697eaf3102829.webp"></td>
+              
+              <td id="mahjongSoulID">家贫不能常得</td>
+              <td id="total">-175.5</td>
               <td class="scores">-57.4</td>
               <td class="scores">-57.4</td>
               <td class="scores">-60.7</td>
@@ -304,13 +298,12 @@
         </table>
 
         <h1>决赛</h1>
-        <table id="myTable" class="row-border hover stripe nowrap">
+        <table id="myTableF" class="row-border hover stripe nowrap">
           <thead>
             <tr>
               <th>Ranks</th>
               <th hidden>ID</th>
               <th>Pfp</th>
-              <th>Discord</th>
               <th>Mahjong Soul ID</th>
               <th>Total</th>
               <th>Game 1</th>
@@ -322,10 +315,10 @@
             <tr>
               <td>1</td>
               <td hidden id="search_id">2</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/129569761309753344/669de3f3eada4218c0f2bb67ea300ff1.webp"></td>
+              
+              <td id="mahjongSoulID">安安吃糖吗</td>
+              <td id="total">61.9</td>
               <td class="scores">6.8</td>
               <td class="scores">58.5</td>
               <td class="scores">-3.4</td>
@@ -333,10 +326,10 @@
             <tr>
               <td>2</td>
               <td hidden id="search_id">5</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/413861379288596480/9508c17374d9d06cec244d1aaddd59e2.webp"></td>
+              
+              <td id="mahjongSoulID">以姬劈姬</td>
+              <td id="total">-22.1</td>
               <td class="scores">-50.5</td>
               <td class="scores">-2.8</td>
               <td class="scores">31.2</td>
@@ -344,10 +337,10 @@
             <tr>
               <td>3</td>
               <td hidden id="search_id">12</td>
-              <td id="pfp"></td>
-              <td id="discordID"></td>
-              <td id="mahjongSoulID"></td>
-              <td id="total"></td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/624855413803843584/37972aa87da31a8f79d9eba2b66d5a13.webp"></td>
+              
+              <td id="mahjongSoulID">老英精</td>
+              <td id="total">-39.8</td>
               <td class="scores">43.7</td>
               <td class="scores">-55.7</td>
               <td class="scores">-27.8</td>
@@ -369,8 +362,7 @@
       <div class="social-links">
         <a href="https://discord.gg/forestwork" class="discord"><i class="bx bxl-discord-alt"></i></a>
         <a href="https://twitter.com/teamforestwork" class="twitter"><i class="bx bxl-twitter"></i></a>
-        <a href="https://www.youtube.com/@forestwork" class="youtube"><i
-            class="bx bxl-youtube"></i></a>
+        <a href="https://www.youtube.com/@forestwork" class="youtube"><i class="bx bxl-youtube"></i></a>
         <a href="mailto:teamforestwork@gmail.com" class="mail"><i class='bx bxs-envelope'></i></a>
       </div>
       <div class="copyright">
@@ -401,8 +393,42 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Initialize table for A组
+      $('#myTableA').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
 
-  <script src="pages/MAHJONG/League/pages/tablegen.js"></script>
+      // Initialize table for B组
+      $('#myTableB').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
+
+      // Initialize table for C组
+      $('#myTableC').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
+
+      // Initialize table for 决赛
+      $('#myTableF').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
+    });
+
+  </script>
 
 </body>
 
