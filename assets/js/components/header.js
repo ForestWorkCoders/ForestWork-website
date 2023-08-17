@@ -21,6 +21,7 @@ header_temp.innerHTML = `
                   <li><a href="/pages/MAHJONG/League">日常積分賽</a></li>
                   <li><a href="/pages/MAHJONG/2022JuneMahjongEvent">數番盃活動賽</a></li>
                   <li><a href="/pages/MAHJONG/2023MarchMahjongEvent">役滿盃活動賽</a></li>
+                  <li><a href="/pages/MAHJONG/2023AugustMahjongEvent">鬼門盃活動賽</a></li>
                 </ul>
               </li>
               <li class="dropdown"><a href="#"><span>麥塊系列</span> <i class="bi bi-chevron-right"></i></a>
