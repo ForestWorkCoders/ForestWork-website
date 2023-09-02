@@ -34,7 +34,12 @@ header_temp.innerHTML = `
               <li class="dropdown"><a href="#"><span>同樂系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
                   <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師</a></li>
-                  <li><a href="/pages/CASUAL/ExchangeArt">林間交換繪</a></li>
+                  <li class="dropdown"><a href="#"><span>林間交換繪</span> <i class="bi bi-chevron-right"></i></a>
+                    <ul>
+                      <li><a href="/pages/CASUAL/ExchangeArt/Season_1">第一屆</a></li>
+                      <li><a href="/pages/CASUAL/ExchangeArt/Season_2">第二屆</a></li>
+                    </ul>
+                  </li>
                   <li><a href="/pages/CASUAL/TacitAgreement">林間默契游戲</a></li>
                 </ul>
               </li>
