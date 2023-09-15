@@ -18,6 +18,7 @@ header_temp.innerHTML = `
             <ul>
               <li class="dropdown"><a href="#"><span>日麻系列</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
+                  <li><a href="/pages/MAHJONG/Rules">賽事規章</a></li>
                   <li><a href="/pages/MAHJONG/League">日常積分賽</a></li>
                   <li><a href="/pages/MAHJONG/2022JuneMahjongEvent">數番盃活動賽</a></li>
                   <li><a href="/pages/MAHJONG/2023MarchMahjongEvent">役滿盃活動賽</a></li>
