@@ -19,7 +19,7 @@ $(document).ready(function () {
                                             <img class="" src="${image}" alt="${username}" width="128px">
                                         </div>
                                         <div class="col-lg-8 col-md-6 col-sm-8">
-                                            <p class="card-text">${messages[j]}</p>
+                                            <p class="card-text">${messages[j].replace(/\n/g, '<br>')}</p>
                                         </div>
                                     </div>
                                 </div>
