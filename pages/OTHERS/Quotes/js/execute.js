@@ -1,37 +1,43 @@
-const parentElement = document.querySelector('.explainplease');
+$(document).ready(function () {
+    // Function to generate card elements
+    function generateCards(data) {
+        let html = '';
+        for (let i = 0; i < data.length; i++) {
+            const username = data[i].username;
+            const image = data[i].image;
+            const messages = data[i].messages;
 
-fetch('pages/OTHERS/Quotes/json/quote.json')
-    .then(response => response.json())
-    .then(data => {
-        data.forEach((item) => {
-            item.messages.forEach((message) => {
+            html += `<div class="row">`;
 
-                const productElement = document.createElement('div');
-                productElement.classList.add('product');
+            // Generate message HTML
+            for (let j = 0; j < messages.length; j++) {
+                html += `<div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border border-secondary shadow-0 " style="background-color:#fefefe;">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-4 text-left">
+                                            <img class="" src="${image}" alt="${username}" width="128px">
+                                        </div>
+                                        <div class="col-lg-8 col-md-6 col-sm-8">
+                                            <p class="card-text">${messages[j]}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-header" style="background-color:#fefefe"><p style="text-align: right">—— <b>${username}</b></p></div>
+                            </div>
+                        </div>`;
+            }
+            html += `</div><hr>`;
+        }
+            return html;
+        }
 
-                const imgElement = document.createElement('img');
-                imgElement.setAttribute('src', item.image);
-                imgElement.setAttribute('alt', '');
-                imgElement.classList.add('logo');
-                productElement.appendChild(imgElement);
-
-                const productInfoElement = document.createElement('div');
-                productInfoElement.classList.add('product__info');
-                productElement.appendChild(productInfoElement);
-
-
-                const messageElement = document.createElement('p');
-                messageElement.textContent = message;
-                productInfoElement.appendChild(messageElement);
-
-
-                const usernameElement = document.createElement('h2');
-                usernameElement.classList.add('fw-bold');
-                usernameElement.textContent = `—— ${item.username}`;
-                productInfoElement.appendChild(usernameElement);
-
-                parentElement.appendChild(productElement);
-            });
-        });
-    })
-    .catch(error => console.error(error));
+        // Fetch the JSON data and populate the container with the generated cards
+        fetch('pages/OTHERS/Quotes/json/quote.json')
+            .then(response => response.json())
+            .then(data => {
+                const quotesData = data;
+                $('#quoteContainer').html(generateCards(quotesData));
+            })
+            .catch(error => console.error('Error fetching JSON:', error));
+    });
