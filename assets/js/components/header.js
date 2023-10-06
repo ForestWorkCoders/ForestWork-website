@@ -13,46 +13,48 @@ header_temp.innerHTML = `
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
           <li><a class="nav-link scrollto active" href="#">主頁</a></li>
-          <li><a class="nav-link scrollto" href="#about">介紹</a></li>
-          <li class="dropdown"><a href="#about"><span>林間項目</span> <i class="bi bi-chevron-down"></i></a>
+          
+          <li class="dropdown"><a href="#"><span>麥塊系列</span></a>
             <ul>
-              <li class="dropdown"><a href="#"><span>日麻系列</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="/pages/MAHJONG/Rules">賽事規章</a></li>
-                  <li><a href="/pages/MAHJONG/League">日常積分賽</a></li>
-                  <li><a href="/pages/MAHJONG/2022JuneMahjongEvent">數番盃活動賽</a></li>
-                  <li><a href="/pages/MAHJONG/2023MarchMahjongEvent">役滿盃活動賽</a></li>
-                  <li><a href="/pages/MAHJONG/2023AugustMahjongEvent">鬼門盃活動賽</a></li>
-                </ul>
-              </li>
-              <li class="dropdown"><a href="#"><span>麥塊系列</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="https://uhc.forestwork.team">Minecraft UHC</a></li>
-                  <li><a href="/pages/CASUAL/MinecraftSMP">Minecraft SMP</a></li>
-                  <li><a href="https://waitwhat.tw">WaitWhat PvP 回歸！</a></li>
-                </ul>
-              </li>
-              <li class="dropdown"><a href="#"><span>同樂系列</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師</a></li>
-                  <li class="dropdown"><a href="#"><span>林間交換繪</span> <i class="bi bi-chevron-right"></i></a>
-                    <ul>
-                      <li><a href="/pages/CASUAL/ExchangeArt/Season_1">第一屆</a></li>
-                      <li><a href="/pages/CASUAL/ExchangeArt/Season_2">第二屆</a></li>
-                    </ul>
-                  </li>
-                  <li><a href="/pages/CASUAL/TacitAgreement">林間默契游戲</a></li>
-                </ul>
-              </li>
+              <li><a href="https://uhc.forestwork.team">超极限生存竞赛</a></li>
+              <li><a href="/pages/CASUAL/MinecraftSMP">多人生存 · SMP</a></li>
             </ul>
           </li>
+            
+          <li class="dropdown"><a href="#"><span>日麻系列</span></a>
+            <ul>
+                <li><a href="/pages/MAHJONG/Rules">賽事規章</a></li>
+                <li><a href="/pages/MAHJONG/League">積分賽</a></li>
+                <li class="dropdown"><a href="#"><span>活動賽</span> <i class="bi bi-chevron-right"></i></a>
+                  <ul>
+                    <li><a href="/pages/MAHJONG/2022JuneMahjongEvent">數番盃</a></li>
+                    <li><a href="/pages/MAHJONG/2023MarchMahjongEvent">役滿盃</a></li>
+                    <li><a href="/pages/MAHJONG/2023AugustMahjongEvent">鬼門盃</a></li>
+                  </ul>
+                </li>
+              </ul>
+          </li>
+
+          <li class="dropdown"><a href="#"><span>同樂系列</span></a>
+            <ul>
+              <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師</a></li>
+              <li class="dropdown"><a href="#"><span>林間交換繪</span> <i class="bi bi-chevron-right"></i></a>
+                <ul>
+                  <li><a href="/pages/CASUAL/ExchangeArt/Season_1">第一屆</a></li>
+                  <li><a href="/pages/CASUAL/ExchangeArt/Season_2">第二屆</a></li>
+                </ul>
+              </li>
+              <li><a href="/pages/CASUAL/TacitAgreement">林間默契游戲</a></li>
+            </ul>
+          </li>
+
           <li><a class="nav-link scrollto" href="/pages/OTHERS/Quotes">林間名言啟示錄</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
      <!-- .navbar -->
 
-      <a href="#cta" class="get-started-btn scrollto">加入我們</a>
+      <a href="https://discord.gg/pxEYaZa4Xk" target="_blank" class="get-started-btn scrollto">加入Discord</a>
     </div>
   </div>
 
