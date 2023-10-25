@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <base href="https://forestwork.team/" />
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>林間盃 十二月份 日麻積分賽</title>
+  <meta content="一個月舉辦一次的日麻積分賽 太爽了吧？" name="description">
+  <meta content="EaglePB2" name="author">
+  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="msapplication-TileImage" content="assets/img/webicons/mstile-144x144.png">
+  <meta name="msapplication-config" content="assets/img/webicons/browserconfig.xml">
+  <meta name="theme-color" content="#fefefe">
+
+  <!-- Favicons -->
+
+  <link rel="shortcut icon" href="assets/img/webicons/favicon.png">
+  <link rel="Bookmark" href="assets/img/webicons/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/webicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/webicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="194x194" href="assets/img/webicons/favicon-194x194.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/img/webicons/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/webicons/favicon.png">
+  <link rel="manifest" href="assets/img/webicons/site.webmanifest">
+  <link rel="mask-icon" href="assets/img/webicons/safari-pinned-tab.svg" color="#7d7d7d">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <style>
+    div.dataTables_wrapper {
+      margin-bottom: 3em;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+  <script src="assets/js/norightclick.js"></script>
+
+  <!--css normalize 先给我当一个失忆仔-->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
+  <!--css table-->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" />
+
+  <!--Jquery 永远的神 awa-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+  <!--Sorting libraries (thanks!)-->
+  <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+
+  <script src="pages/mahjong/League/pages/js/execute_new.js"></script>
+
+  <!--可以挡掉低端PH右键下载的东西，但对于html有认识的可能比较难……-->
+  <script src="assets/js/norightclick.js"></script>
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top header-inner-pages">
+    <div class="container-fluid">
+      <div class="container-fluid">
+
+        <div class="row justify-content-center">
+          <div class="col-xl-9 d-flex align-items-center justify-content-lg-between">
+            <h1 class="logo me-auto me-lg-0"><a href="">ForestWork</a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!--<a href="index.html" class="logo me-auto me-lg-0"><img src="assets/img/left-top-icon.png" alt="ForestWork" class="img-fluid"></a>-->
+
+            <nav id="navbar" class="navbar order-last order-lg-0">
+              <ul>
+                <li><a class="nav-link scrollto active" href="">主頁</a></li>
+                <li><a class="nav-link scrollto" href="teamforestwork.nde.tw/#about">介紹</a></li>
+                <li class="dropdown"><a href="#"><span>林間項目</span> <i class="bi bi-chevron-down"></i></a>
+                  <ul>
+                    <li class="dropdown"><a href="#"><span>重現系列</span> <i class="bi bi-chevron-right"></i></a>
+                      <ul>
+                        <li><a href="https://forum.gamer.com.tw/C.php?bsn=18673&snA=188915">Minecraft X 逃走中</a></li>
+                        <li><a href="#">Minecraft X 九州偽戰意</a></li>
+                      </ul>
+                    </li>
+                    <li class="dropdown"><a href="#"><span>競技系列</span> <i class="bi bi-chevron-right"></i></a>
+                      <ul>
+                        <li><a href="https://uhc.forestwork.net/">Minecraft UHC</a></li>
+                        <li><a href="teamforestwork.nde.tw/pages/mahjong/League/">林間日麻積分賽</a></li>
+                      </ul>
+                    </li>
+                    <li class="dropdown"><a href="#"><span>同樂系列</span> <i class="bi bi-chevron-right"></i></a>
+                      <ul>
+                        <li><a href="teamforestwork.nde.tw/pages/others/GarticPhone">林間靈魂繪師 精彩重現</a></li>
+                        <li><a href="#">Minecraft SMP</a></li>
+                      </ul>
+                    </li>
+                    <li class="dropdown"><a href="#"><span>其他系列</span> <i class="bi bi-chevron-right"></i></a>
+                      <ul>
+                        <li><a href="teamforestwork.nde.tw/pages/others/Quotes">林間名言啟示錄</a></li>
+                        <li><a href="teamforestwork.nde.tw/pages/others/MonthlyReport">林間月報</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li><a class="nav-link scrollto " href="teamforestwork.nde.tw/#portfolio">部分節目截圖</a></li>
+                <!--<li><a class="nav-link scrollto" href="#pricing">Pricing</a></li>-->
+
+                <li><a class="nav-link scrollto" href="teamforestwork.nde.tw/#contact">想找我們？</a></li>
+              </ul>
+              <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+
+            <a href="teamforestwork.nde.tw/#cta" class="get-started-btn scrollto">加入我們</a>
+          </div>
+        </div>
+
+      </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+
+        <ol>
+          <li><a href="">主頁</a></li>
+          <li><a href="pages/mahjong/League/">林間盃 日麻積分賽</a></li>
+          <li>十二月份</li>
+        </ol>
+        <h2>十二月份 林間盃日麻積分賽</h2>
+
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <section class="inner-page">
+      <div class="container">
+        <h1>A组</h1>
+        <table id="myTableA" class="row-border hover stripe nowrap">
+          <thead>
+            <tr>
+              <th>Ranks</th>
+              <th hidden>ID</th>
+              <th>Pfp</th>
+              <th>Mahjong Soul ID</th>
+              <th>Total</th>
+              <th>Game 1</th>
+              <th>Game 2</th>
+              <th>Game 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td hidden id="search_id">5</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/413861379288596480/9508c17374d9d06cec244d1aaddd59e2.webp"></td>
+              <td id="mahjongSoulID">以姬劈姬</td>
+              <td id="total">22.7</td>
+              <td class="scores">-22.1</td>
+              <td class="scores">-4.6</td>
+              <td class="scores">49.4</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td hidden id="search_id">1</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/516257729489272853/d66ff8b2f74844d626572a8c54dc72e4.webp"></td>
+              <td id="mahjongSoulID">餘月</td>
+              <td id="total">-5.3</td>
+              <td class="scores">21</td>
+              <td class="scores">-22.9</td>
+              <td class="scores">-3.4</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td hidden id="search_id">7</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/987345056832839720/1ac833811fcc0119d11a1c3ad590be81.webp"></td>
+              <td id="mahjongSoulID">伊吹天玄</td>
+              <td id="total">-17.4</td>
+              <td class="scores">1.1</td>
+              <td class="scores">27.5</td>
+              <td class="scores">-46</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h1>B组</h1>
+        <table id="myTableB" class="row-border hover stripe nowrap">
+          <thead>
+            <tr>
+              <th>Ranks</th>
+              <th hidden>ID</th>
+              <th>Pfp</th>
+              <th>Mahjong Soul ID</th>
+              <th>Total</th>
+              <th>Game 1</th>
+              <th>Game 2</th>
+              <th>Game 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td hidden id="search_id">2</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/129569761309753344/669de3f3eada4218c0f2bb67ea300ff1.webp"></td>
+              
+              <td id="mahjongSoulID">安安吃糖吗</td>
+              <td id="total">50.1</td>
+              <td class="scores">-47.9</td>
+              <td class="scores">65.5</td>
+              <td class="scores">32.5</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td hidden id="search_id">33</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/516198322227118092/a0dbb890d91fcf588a897ef4ff167f6d.webp"></td>
+              
+              <td id="mahjongSoulID">younian</td>
+              <td id="total">-11.3</td>
+              <td class="scores">38.7</td>
+              <td class="scores">-15.1</td>
+              <td class="scores">-34.9</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td hidden id="search_id">22</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/505607199918391306/ba58ffa3f1d16694b7f34915c3f66124.webp"></td>
+              
+              <td id="mahjongSoulID">谁、</td>
+              <td id="total">-38.8</td>
+              <td class="scores">9.2</td>
+              <td class="scores">-50.4</td>
+              <td class="scores">2.4</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h1>C组</h1>
+        <table id="myTableC" class="row-border hover stripe nowrap">
+          <thead>
+            <tr>
+              <th>Ranks</th>
+              <th hidden>ID</th>
+              <th>Pfp</th>
+              <th>Mahjong Soul ID</th>
+              <th>Total</th>
+              <th>Game 1</th>
+              <th>Game 2</th>
+              <th>Game 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td hidden id="search_id">12</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/624855413803843584/37972aa87da31a8f79d9eba2b66d5a13.webp"></td>
+              
+              <td id="mahjongSoulID">老英精</td>
+              <td id="total">172.2</td>
+              <td class="scores">61.4</td>
+              <td class="scores">60.1</td>
+              <td class="scores">50.7</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td hidden id="search_id">19</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/600648644282286090/2cc820a88790a44cc0343075eb4a72d7.webp"></td>
+              
+              <td id="mahjongSoulID">為啥不可用注音</td>
+              <td id="total">3.3</td>
+              <td class="scores">-4</td>
+              <td class="scores">-2.7</td>
+              <td class="scores">10</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td hidden id="search_id">13</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/937977116908220426/cdc3c50fe795c236fb6697eaf3102829.webp"></td>
+              
+              <td id="mahjongSoulID">家贫不能常得</td>
+              <td id="total">-175.5</td>
+              <td class="scores">-57.4</td>
+              <td class="scores">-57.4</td>
+              <td class="scores">-60.7</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h1>决赛</h1>
+        <table id="myTableF" class="row-border hover stripe nowrap">
+          <thead>
+            <tr>
+              <th>Ranks</th>
+              <th hidden>ID</th>
+              <th>Pfp</th>
+              <th>Mahjong Soul ID</th>
+              <th>Total</th>
+              <th>Game 1</th>
+              <th>Game 2</th>
+              <th>Game 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td hidden id="search_id">2</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/129569761309753344/669de3f3eada4218c0f2bb67ea300ff1.webp"></td>
+              
+              <td id="mahjongSoulID">安安吃糖吗</td>
+              <td id="total">61.9</td>
+              <td class="scores">6.8</td>
+              <td class="scores">58.5</td>
+              <td class="scores">-3.4</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td hidden id="search_id">5</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/413861379288596480/9508c17374d9d06cec244d1aaddd59e2.webp"></td>
+              
+              <td id="mahjongSoulID">以姬劈姬</td>
+              <td id="total">-22.1</td>
+              <td class="scores">-50.5</td>
+              <td class="scores">-2.8</td>
+              <td class="scores">31.2</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td hidden id="search_id">12</td>
+              <td id="pfp"><img src="https://cdn.discordapp.com/avatars/624855413803843584/37972aa87da31a8f79d9eba2b66d5a13.webp"></td>
+              
+              <td id="mahjongSoulID">老英精</td>
+              <td id="total">-39.8</td>
+              <td class="scores">43.7</td>
+              <td class="scores">-55.7</td>
+              <td class="scores">-27.8</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <a href="https://imgur.com/a/h0ufOhp" style="text-decoration: none" target="_blank">点我查看分数截图</a>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <h3>ForestWork</h3>
+      <p>社交連接</p>
+      <div class="social-links">
+        <a href="https://discord.gg/forestwork" class="discord"><i class="bx bxl-discord-alt"></i></a>
+        <a href="https://twitter.com/teamforestwork" class="twitter"><i class="bx bxl-twitter"></i></a>
+        <a href="https://www.youtube.com/@forestwork" class="youtube"><i class="bx bxl-youtube"></i></a>
+        <a href="mailto:teamforestwork@gmail.com" class="mail"><i class='bx bxs-envelope'></i></a>
+      </div>
+      <div class="copyright">
+        &copy; Copyright <strong><span>ForestWork</span></strong> 2022-2077. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/knight-simple-one-page-bootstrap-template/ -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <div id="preloader"></div>
+  <a onclick=" document.body.scrollTop = 0; document.documentElement.scrollTop = 0;"
+    class="back-to-top d-flex align-items-center justify-content-center"><i class="bx bxs-plane"></i></a>
+
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <!--<script src="assets/vendor/php-email-form/validate.js"></script>-->
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Initialize table for A组
+      $('#myTableA').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
+
+      // Initialize table for B组
+      $('#myTableB').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
+
+      // Initialize table for C组
+      $('#myTableC').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
+
+      // Initialize table for 决赛
+      $('#myTableF').DataTable({
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>

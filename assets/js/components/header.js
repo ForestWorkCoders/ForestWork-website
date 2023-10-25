@@ -17,19 +17,19 @@ header_temp.innerHTML = `
           <li class="dropdown"><a href="#"><span>麥塊系列</span></a>
             <ul>
               <li><a href="https://uhc.forestwork.team">超极限生存竞赛</a></li>
-              <li><a href="/pages/CASUAL/MinecraftSMP">多人生存 · SMP</a></li>
+              <li><a href="/pages/minecraft/MinecraftSMP">多人生存 · SMP</a></li>
             </ul>
           </li>
             
           <li class="dropdown"><a href="#"><span>日麻系列</span></a>
             <ul>
-                <li><a href="/pages/MAHJONG/Rules">賽事規章</a></li>
-                <li><a href="/pages/MAHJONG/League">積分賽</a></li>
+                <li><a href="/pages/mahjong/Rules">賽事規章</a></li>
+                <li><a href="/pages/mahjong/League">積分賽</a></li>
                 <li class="dropdown"><a href="#"><span>活動賽</span> <i class="bi bi-chevron-right"></i></a>
                   <ul>
-                    <li><a href="/pages/MAHJONG/2022JuneMahjongEvent">數番盃</a></li>
-                    <li><a href="/pages/MAHJONG/2023MarchMahjongEvent">役滿盃</a></li>
-                    <li><a href="/pages/MAHJONG/2023AugustMahjongEvent">鬼門盃</a></li>
+                    <li><a href="/pages/mahjong/2022JuneMahjongEvent">數番盃</a></li>
+                    <li><a href="/pages/mahjong/2023MarchMahjongEvent">役滿盃</a></li>
+                    <li><a href="/pages/mahjong/2023AugustMahjongEvent">鬼門盃</a></li>
                   </ul>
                 </li>
               </ul>
@@ -37,18 +37,19 @@ header_temp.innerHTML = `
 
           <li class="dropdown"><a href="#"><span>同樂系列</span></a>
             <ul>
-              <li><a href="/pages/CASUAL/GarticPhone">林間靈魂繪師</a></li>
+              <li><a href="/pages/drawing/GarticPhone">林間靈魂繪師</a></li>
               <li class="dropdown"><a href="#"><span>林間交換繪</span> <i class="bi bi-chevron-right"></i></a>
                 <ul>
-                  <li><a href="/pages/CASUAL/ExchangeArt/Season_1">第一屆</a></li>
-                  <li><a href="/pages/CASUAL/ExchangeArt/Season_2">第二屆</a></li>
+                  <li><a href="/pages/drawing/ExchangeArt/Season_1">第一屆</a></li>
+                  <li><a href="/pages/drawing/ExchangeArt/Season_2">第二屆</a></li>
                 </ul>
               </li>
-              <li><a href="/pages/CASUAL/TacitAgreement">林間默契游戲</a></li>
+              <li><a href="/pages/drawing/TacitAgreement">林間默契游戲</a></li>
             </ul>
           </li>
 
-          <li><a class="nav-link scrollto" href="/pages/OTHERS/Quotes">林間名言啟示錄</a></li>
+          <li><a class="nav-link scrollto" href="/pages/others/Quotes">林間名言啟示錄</a></li>
+          <li><a class="nav-link scrollto" href="/pages/others/Puzzles">謎語人的呻吟</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
