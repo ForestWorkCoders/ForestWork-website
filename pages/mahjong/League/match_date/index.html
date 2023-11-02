@@ -53,7 +53,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 
-  <script src="pages/mahjong/League/pages/js/execute.js"></script>
+  <script type="module" src="pages/mahjong/League/match_date/index.js"></script>
+
+  <!-- <script src="pages/mahjong/League/pages/js/execute.js"></script> -->
 
   <!--可以擋掉低端PH右鍵下載的東西，但對於html有認識的可能比較難……-->
   <script src="assets/js/norightclick.js"></script>
@@ -85,34 +87,7 @@
     <section class="inner-page">
       <div class="container">
         <table id="participantTable" class="row-border hover stripe nowrap" width="100%">
-          <thead>
-            <tr>
-              <th>排名</th>
-              <th>头像</th>
-              <th>Discord昵称</th>
-              <th>日麻昵称</th>
-              <th>总分</th>
-              <th>Game 1</th>
-              <th>Game 2</th>
-              <th>Game 3</th>
-              <th>Game 4</th>
-              <th>Game 5</th>
-              <th>Game 6</th>
-              <th>Game 7</th>
-              <th>Game 8</th>
-              <th>Game 9</th>
-              <th>Game 10</th>
-              <th>Game 11</th>
-              <th>Game 12</th>
-              <th>Game 13</th>
-              <th>Game 14</th>
-              <th>Game 15</th>
-              <th>Game 16</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Data will be dynamically added here -->
-          </tbody>
+          
         </table>
       </div>
     </section>
@@ -146,7 +121,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
   <!-- Include other Firebase services if needed -->
 
-  <script type="module" src="pages/mahjong/League/match_date/index.js"></script>
+  
 </body>
 
 </html>
