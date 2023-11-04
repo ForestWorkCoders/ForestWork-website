@@ -96,14 +96,13 @@ function mergeData(febData, participantsData) {
     return [];
   }
 
-
   const mergedData = febData
     .map(febItem => {
       const participantItem = participantsData.find(participant => participant.id === febItem.id);
       if (participantItem) {
         const gameScores = [];
 
-        for (let i = 0; i < 16; i++) {
+        for (let i = 0; i < febData[0].gameScore.length; i++) {
           if (!febItem.gameScore[i]) {
             gameScores.push(null);
           } else {
@@ -111,16 +110,19 @@ function mergeData(febData, participantsData) {
           }
         }
 
+        const totalScore = gameScores.reduce((acc, score) => acc + (score || 0), 0);
+        const total = Number.isInteger(totalScore) ? totalScore : totalScore.toFixed(2);
+
         const result = {
           id: participantItem.id,
           pfp: participantItem.pfp,
           discord_username: participantItem.discord_username,
           mahjongSoul_ID: participantItem.mahjongSoul_name,
-          total: gameScores.reduce((acc, score) => acc + (score || 0), 0),
+          total: total,
           gameScores: gameScores
         }
 
-        if (gameScores.filter(score => score === null).length > 8) {
+        if (gameScores.filter(score => score === null).length > (febData[0].gameScore.length/2)) {
           result.rank = "DNF";
         }
 
@@ -133,6 +135,7 @@ function mergeData(febData, participantsData) {
 }
 
 function populateTable(data) {
+
   var columns = [{
       title: '排名',
       data: 'rank'
@@ -157,9 +160,9 @@ function populateTable(data) {
     }
   ];
 
-  for (var i = 0; i < 16; i++) {
+  for (var i = 0; i < data[0].gameScores.length; i++) {
     columns.push({
-      title: 'Game ' + i,
+      title: 'Game ' + (i+1),
       data: 'gameScores.' + i,
       render: NaNdisplay
     });
