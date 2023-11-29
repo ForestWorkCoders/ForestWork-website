@@ -64,3 +64,4 @@ document.getElementById('Jul2023').innerHTML = generateSurveyHTML('Jul', 2023, 2
 document.getElementById('Aug2023').innerHTML = generateSurveyHTML('Aug', 2023, 30, '八');
 document.getElementById('Sep2023').innerHTML = generateSurveyHTML('Sep', 2023, 27, '九');
 document.getElementById('Oct2023').innerHTML = generateSurveyHTML('Oct', 2023, 25, '十');
+document.getElementById('Nov2023').innerHTML = generateSurveyHTML('Nov', 2023, 29, '十一');
