@@ -23,13 +23,13 @@ header_temp.innerHTML = `
             
           <li class="dropdown"><a href="#"><span>日麻系列</span></a>
             <ul>
-                <li><a href="/pages/mahjong/Rules">賽事規章</a></li>
-                <li><a href="/pages/mahjong/League">積分賽</a></li>
+                <li><a href="https://forestwork-mahjong.vercel.app/pages/rules">賽事規章</a></li>
+                <li><a href="https://forestwork-mahjong.vercel.app">積分賽</a></li>
                 <li class="dropdown"><a href="#"><span>活動賽</span> <i class="bi bi-chevron-right"></i></a>
                   <ul>
-                    <li><a href="/pages/mahjong/2022JuneMahjongEvent">數番盃</a></li>
-                    <li><a href="/pages/mahjong/2023MarchMahjongEvent">役滿盃</a></li>
-                    <li><a href="/pages/mahjong/2023AugustMahjongEvent">鬼門盃</a></li>
+                    <li><a href="https://forestwork-mahjong.vercel.app/pages/event_week/2022JuneMahjongEvent">數番盃</a></li>
+                    <li><a href="https://forestwork-mahjong.vercel.app/pages/event_week/pages/mahjong/2023MarchMahjongEvent">役滿盃</a></li>
+                    <li><a href="https://forestwork-mahjong.vercel.app/pages/event_week/pages/mahjong/2023AugustMahjongEvent">鬼門盃</a></li>
                   </ul>
                 </li>
               </ul>
