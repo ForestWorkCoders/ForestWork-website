@@ -47,8 +47,6 @@ header_temp.innerHTML = `
               <li><a href="/pages/drawing/TacitAgreement">林間默契游戲</a></li>
             </ul>
           </li>
-
-          <li><a class="nav-link scrollto" href="/pages/others/Quotes">林間名言啟示錄</a></li>
           <li><a class="nav-link scrollto" href="/pages/others/Puzzles">謎語人的呻吟</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
