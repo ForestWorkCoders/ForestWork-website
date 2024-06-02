@@ -17,7 +17,7 @@ header_temp.innerHTML = `
           <li class="dropdown"><a href="#"><span>麥塊系列</span></a>
             <ul>
               <li><a href="https://eaglepb2.gitbook.io/uhc_report/">超极限生存竞赛</a></li>
-              <li><a href="/pages/minecraft/MinecraftSMP">多人生存 · SMP</a></li>
+              <li><a href="https://forestwork-smp.vercel.app/">多人生存 · SMP</a></li>
             </ul>
           </li>
             
