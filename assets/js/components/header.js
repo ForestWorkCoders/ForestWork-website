@@ -37,13 +37,7 @@ header_temp.innerHTML = `
 
           <li class="dropdown"><a href="#"><span>同樂系列</span></a>
             <ul>
-              <li><a href="/pages/drawing/GarticPhone">林間靈魂繪師</a></li>
-              <li class="dropdown"><a href="#"><span>林間交換繪</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="/pages/drawing/ExchangeArt/Season_1">第一屆</a></li>
-                  <li><a href="/pages/drawing/ExchangeArt/Season_2">第二屆</a></li>
-                </ul>
-              </li>
+              <li><a href="https://eaglepb2.github.io/gartic_phone/">林間靈魂繪師</a></li>
             </ul>
           </li>
           <li><a class="nav-link scrollto" href="/pages/others/Puzzles">謎語人的呻吟</a></li>
