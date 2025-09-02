@@ -40,7 +40,7 @@ header_temp.innerHTML = `
               <li><a href="https://eaglepb2.github.io/gartic_phone/">林間靈魂繪師</a></li>
             </ul>
           </li>
-          <li><a class="nav-link scrollto" href="/pages/others/Puzzles">謎語人的呻吟</a></li>
+          <li><a class="nav-link scrollto" href="http://104.199.236.163/">謎語人的呻吟</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
