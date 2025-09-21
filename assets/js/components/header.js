@@ -46,7 +46,7 @@ header_temp.innerHTML = `
       </nav>
      <!-- .navbar -->
 
-      <a href="https://discord.gg/gfftNV8XWR" target="_blank" class="get-started-btn scrollto">加入Discord</a>
+      <a href="https://discord.gg/lin-jian-xiao-zhen-510192195509157909" target="_blank" class="get-started-btn scrollto">加入Discord</a>
     </div>
   </div>
 
