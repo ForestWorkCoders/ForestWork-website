@@ -26,33 +26,20 @@ const items = [
 
 const searchQuery = ref('')
 
-// 模擬從 Supabase 抓來的資料 (未來這會替換成 useAsyncData)
-const mockTournaments = [
-    { id: 1, title: '林間盃 2025 夏季個人邀請賽', tier: 'Tier B', region: 'ASIA' },
-    { id: 2, title: '林間盃 2025 5月份個人積分賽', tier: 'Tier C', region: 'ASIA' },
-    { id: 3, title: '林間盃 2025 4月份個人積分賽', tier: 'Tier C', region: 'ASIA' }
-]
+// ★ 現在回傳的是一個包含三個陣列的物件
+const { data: allTournaments, pending, error } = await useFetch('/api/mahjong/tournaments')
 
-const pastTournaments = Array.from({ length: 42 }, (_, i) => {
-    const year = 2025 - Math.floor(i / 12)
-    const month = 12 - (i % 12)
-    return {
-        id: `past_${i}`,
-        title: `林間盃 ${year} ${month}月份個人積分賽`,
-        tier: 'Tier C',
-        region: 'ASIA'
-    }
-})
-
-// 分頁狀態管理
+// 分頁狀態管理 (專門給 PAST 使用)
 const currentPage = ref(1)
-const itemsPerPage = 6 // 每一頁顯示 6 個賽事
+const itemsPerPage = 6
 
-// 計算當前頁面要顯示的資料 (Slice)
+// 計算當前頁面要顯示的 PAST 賽事
 const paginatedPastTournaments = computed(() => {
+    // 注意這裡改成讀取 .past 陣列
+    if (!allTournaments.value?.past) return []
     const start = (currentPage.value - 1) * itemsPerPage
     const end = start + itemsPerPage
-    return pastTournaments.slice(start, end)
+    return allTournaments.value.past.slice(start, end)
 })
 </script>
 
@@ -99,10 +86,17 @@ const paginatedPastTournaments = computed(() => {
                                             icon: { base: 'text-gray-500 dark:text-gray-400 transition-colors' }
                                         }" />
                                 </div>
-                                <div class="mt-4 space-y-6">
-                                    <div class="space-y-3">
-                                        <TournamentCard v-for="tourney in mockTournaments" :key="tourney.id"
+                                <div class="mt-4 space-y-4">
+                                    <div v-if="allTournaments?.ongoing?.length" class="space-y-3">
+                                        <TournamentCard v-for="tourney in allTournaments.ongoing" :key="tourney.id"
                                             :tourney="tourney" />
+                                    </div>
+
+                                    <div v-else
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        <UIcon name="i-heroicons-calendar-days"
+                                            class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                        <p class="text-gray-500 dark:text-gray-400">目前沒有進行中的賽事</p>
                                     </div>
                                 </div>
                             </template>
@@ -117,24 +111,33 @@ const paginatedPastTournaments = computed(() => {
                                         }" />
                                 </div>
                                 <div class="mt-4 space-y-6">
-                                    <div class="space-y-3">
-                                        <TournamentCard v-for="tourney in paginatedPastTournaments" :key="tourney.id"
-                                            :tourney="tourney" />
+
+                                    <div v-if="allTournaments?.past?.length">
+                                        <div class="space-y-3">
+                                            <TournamentCard v-for="tourney in paginatedPastTournaments"
+                                                :key="tourney.id" :tourney="tourney" />
+                                        </div>
+
+                                        <div v-if="allTournaments.past.length > itemsPerPage"
+                                            class="flex justify-center pt-4 mt-6 border-t border-gray-200 dark:border-slate-800 transition-colors duration-200">
+                                            <UPagination :model-value="currentPage" :page="currentPage"
+                                                @update:model-value="currentPage = $event"
+                                                @update:page="currentPage = $event" :page-count="itemsPerPage"
+                                                :items-per-page="itemsPerPage" :total="allTournaments.past.length" :ui="{
+                                                    wrapper: 'flex items-center gap-1',
+                                                    rounded: '!rounded-full',
+                                                    default: {
+                                                        activeButton: { variant: 'solid', color: 'gray', class: 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' },
+                                                        inactiveButton: { variant: 'ghost', color: 'gray', class: 'hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors' }
+                                                    }
+                                                }" />
+                                        </div>
                                     </div>
 
-                                    <div v-if="pastTournaments.length > itemsPerPage"
-                                        class="flex justify-center pt-4 border-t border-gray-200 dark:border-slate-800 transition-colors duration-200">
-                                        <UPagination :model-value="currentPage" :page="currentPage"
-                                            @update:model-value="currentPage = $event"
-                                            @update:page="currentPage = $event" :page-count="itemsPerPage"
-                                            :items-per-page="itemsPerPage" :total="pastTournaments.length" :ui="{
-                                                wrapper: 'flex items-center gap-1',
-                                                rounded: '!rounded-full',
-                                                default: {
-                                                    activeButton: { variant: 'solid', color: 'gray', class: 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' },
-                                                    inactiveButton: { variant: 'ghost', color: 'gray', class: 'hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors' }
-                                                }
-                                            }" />
+                                    <div v-else
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        <UIcon name="i-heroicons-inbox" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                        <p class="text-gray-500 dark:text-gray-400">尚無歷史賽事紀錄</p>
                                     </div>
 
                                 </div>
@@ -149,11 +152,18 @@ const paginatedPastTournaments = computed(() => {
                                             icon: { base: 'text-gray-500 dark:text-gray-400 transition-colors' }
                                         }" />
                                 </div>
-                                <div
-                                    class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
-                                    <UIcon name="i-heroicons-calendar-days"
-                                        class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <p class="text-gray-500 dark:text-gray-400">目前沒有即將開始的賽事</p>
+                                <div class="mt-4">
+                                    <div v-if="allTournaments?.upcoming?.length" class="space-y-3">
+                                        <TournamentCard v-for="tourney in allTournaments.upcoming" :key="tourney.id"
+                                            :tourney="tourney" />
+                                    </div>
+
+                                    <div v-else
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        <UIcon name="i-heroicons-calendar-days"
+                                            class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                        <p class="text-gray-500 dark:text-gray-400">目前沒有即將開始的賽事</p>
+                                    </div>
                                 </div>
                             </template>
                         </UTabs>

@@ -21,10 +21,13 @@ defineProps({
 
                 <div class="flex gap-4 text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
                     <span class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-chart-bar" /> {{ tourney.tier }}
+                        <UIcon name="i-lucide-chart-column-increasing" /> {{ tourney.tier }}
                     </span>
                     <span class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-globe-alt" /> {{ tourney.region }}
+                        <UIcon name="i-lucide-globe" /> {{ tourney.region }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <UIcon name="i-lucide-calendar" /> {{ tourney.start_date }} - {{ tourney.end_date }}
                     </span>
                 </div>
             </div>

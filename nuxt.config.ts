@@ -3,8 +3,14 @@ export default defineNuxtConfig({
   // Nuxt 4 的兼容性日期设定，确保你使用最新的内部机制
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@nuxt/ui'],
+  modules: ['@nuxt/ui','@nuxtjs/supabase'],
   css: ['~/assets/css/main.css'],
+
+  supabase: {
+    // 預設情況下，這個模組會強制所有頁面都要登入才能看。
+    // 我們是公開的賽事網站，所以必須把 redirect 關掉。
+    redirect: false
+  },
 
   app: {
     head: {
