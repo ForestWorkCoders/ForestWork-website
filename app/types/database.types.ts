@@ -26,6 +26,7 @@ export type Database = {
           south_score: number
           start_time: string
           tag: number
+          tournament_bind_id: string
           uuid: string
           west_id: number
           west_score: number
@@ -41,6 +42,7 @@ export type Database = {
           south_score: number
           start_time: string
           tag: number
+          tournament_bind_id: string
           uuid: string
           west_id: number
           west_score: number
@@ -56,6 +58,7 @@ export type Database = {
           south_score?: number
           start_time?: string
           tag?: number
+          tournament_bind_id?: string
           uuid?: string
           west_id?: number
           west_score?: number
@@ -74,6 +77,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "matches_tournament_bind_id_fkey"
+            columns: ["tournament_bind_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "matches_west_id_fkey"
