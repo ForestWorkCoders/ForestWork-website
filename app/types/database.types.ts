@@ -108,6 +108,7 @@ export type Database = {
       tournaments: {
         Row: {
           created_at: string | null
+          icon: string | null
           id: string
           region: string | null
           tier: string | null
@@ -116,6 +117,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          icon?: string | null
           id?: string
           region?: string | null
           tier?: string | null
@@ -124,6 +126,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          icon?: string | null
           id?: string
           region?: string | null
           tier?: string | null

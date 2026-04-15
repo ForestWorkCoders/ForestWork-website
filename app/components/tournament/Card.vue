@@ -12,7 +12,12 @@ defineProps({
         class="flex items-center justify-between p-4 bg-white/90 hover:bg-gray-50 dark:bg-[#0f172a]/80 dark:hover:bg-[#1e293b]/90 border border-gray-200 dark:border-slate-800 rounded-lg transition-all shadow-sm hover:shadow-md dark:shadow-none">
 
         <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-gray-200 dark:bg-white/10 rounded flex-shrink-0"></div>
+            <UAvatar :src="tourney.icon" :alt="tourney.title" size="lg" :ui="{
+                rounded: 'rounded-md',
+                fallback: {
+                    text: 'font-bold text-gray-500 dark:text-gray-400'
+                }
+            }" />
 
             <div>
                 <h3 class="font-bold text-lg text-gray-900 dark:text-white transition-colors">

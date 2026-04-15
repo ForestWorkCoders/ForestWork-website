@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
     const formattedTourney = {
       id: t.id,
       title: t.title,
+      icon: t.icon,
       tier: t.tier?.startsWith('Tier') ? t.tier : `Tier ${t.tier}`,
       region: t.region,
       start_date: formatDate(t.created_at),
