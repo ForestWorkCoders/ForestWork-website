@@ -38,7 +38,7 @@ defineProps({
             </div>
         </div>
 
-        <UButton color="gray" variant="ghost" trailing-icon="i-heroicons-chevron-right-20-solid"
+        <UButton color="gray" variant="ghost" trailing-icon="i-lucide-chevron-right"
             class="font-bold text-xs tracking-widest text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
             :to="`/tournaments/${tourney.id}`">
             DETAILS

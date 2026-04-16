@@ -52,7 +52,7 @@ useHead({
         ></iframe>
 
         <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-[#18212f] z-0">
-          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+          <UIcon name="i-lucide-refresh" class="w-8 h-8 text-gray-400 animate-spin" />
         </div>
 
       </div>

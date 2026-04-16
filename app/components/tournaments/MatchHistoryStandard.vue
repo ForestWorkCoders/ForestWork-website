@@ -22,7 +22,7 @@ const { data: matchHistory, pending: matchesPending } = await useFetch(`/api/mah
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
             <div v-if="matchesPending" class="col-span-full py-12 flex justify-center text-gray-500">
-                <UIcon name="i-heroicons-arrow-path" class="animate-spin w-8 h-8" />
+                <UIcon name="i-lucide-refresh-cw" class="animate-spin w-8 h-8" />
             </div>
 
             <div v-else-if="!matchHistory || matchHistory.length === 0"

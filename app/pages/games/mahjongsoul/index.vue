@@ -79,7 +79,7 @@ const paginatedPastTournaments = computed(() => {
 
                             <template #ongoing>
                                 <div class="mt-2 space-y-4">
-                                    <UInput v-model="searchQuery" icon="i-heroicons-magnifying-glass-20-solid"
+                                    <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Ongoing Tournaments..." color="gray" variant="outline"
                                         class="w-full" :ui="{
                                             base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
@@ -94,7 +94,7 @@ const paginatedPastTournaments = computed(() => {
 
                                     <div v-else
                                         class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
-                                        <UIcon name="i-heroicons-calendar-days"
+                                        <UIcon name="i-lucide-calendar-days"
                                             class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">目前沒有進行中的賽事</p>
                                     </div>
@@ -103,7 +103,7 @@ const paginatedPastTournaments = computed(() => {
 
                             <template #past>
                                 <div class="mt-2 space-y-4">
-                                    <UInput v-model="searchQuery" icon="i-heroicons-magnifying-glass-20-solid"
+                                    <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Past Tournaments..." color="gray" variant="outline"
                                         class="w-full" :ui="{
                                             base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
@@ -136,7 +136,7 @@ const paginatedPastTournaments = computed(() => {
 
                                     <div v-else
                                         class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
-                                        <UIcon name="i-heroicons-inbox" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                        <UIcon name="i-lucide-inbox" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">尚無歷史賽事紀錄</p>
                                     </div>
 
@@ -145,7 +145,7 @@ const paginatedPastTournaments = computed(() => {
 
                             <template #upcoming>
                                 <div class="mt-2 space-y-4">
-                                    <UInput v-model="searchQuery" icon="i-heroicons-magnifying-glass-20-solid"
+                                    <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Future Tournaments..." color="gray" variant="outline"
                                         class="w-full" :ui="{
                                             base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
@@ -160,7 +160,7 @@ const paginatedPastTournaments = computed(() => {
 
                                     <div v-else
                                         class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
-                                        <UIcon name="i-heroicons-calendar-days"
+                                        <UIcon name="i-lucide-calendar-days"
                                             class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">目前沒有即將開始的賽事</p>
                                     </div>

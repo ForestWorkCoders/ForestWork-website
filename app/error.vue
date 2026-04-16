@@ -36,7 +36,7 @@ const handleError = () => {
         size="xl"
         color="error"
         variant="solid"
-        icon="i-heroicons-home"
+        icon="i-lucide-house"
         class="shadow-2xl transition-transform hover:scale-105"
         @click="handleError"
       >

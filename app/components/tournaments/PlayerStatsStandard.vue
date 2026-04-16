@@ -64,7 +64,7 @@ const top3Players = mockPlayerStats.slice(0, 3)
         </h2>
         
         <div class="flex items-center gap-1.5 px-2.5 py-1 mb-0.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 text-blue-600 dark:text-blue-400 text-[11px] font-bold tracking-widest uppercase">
-          <UIcon name="i-heroicons-beaker" class="w-3.5 h-3.5" />
+          <UIcon name="i-lucide-beaker" class="w-3.5 h-3.5" />
           <span>Example Data · 真實數據即將上線</span>
         </div>
       </div>
@@ -95,7 +95,7 @@ const top3Players = mockPlayerStats.slice(0, 3)
 
           <div class="p-6 flex-1 flex flex-col items-center justify-center min-h-[280px] bg-gray-50/50 dark:bg-transparent">
             <div class="relative w-full aspect-square max-w-[220px] rounded-full border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
-              <UIcon name="i-heroicons-chart-pie" class="w-8 h-8 text-gray-300 dark:text-gray-600 mb-2" />
+              <UIcon name="i-lucide-chart-pie" class="w-8 h-8 text-gray-300 dark:text-gray-600 mb-2" />
               <span class="absolute mt-12 text-xs text-gray-400 font-mono tracking-widest">RADAR CHART AREA</span>
               <span class="absolute -top-4 text-[10px] font-bold text-gray-500">和牌率</span>
               <span class="absolute -right-6 top-1/4 text-[10px] font-bold text-gray-500">自摸</span>

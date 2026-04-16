@@ -31,7 +31,7 @@ const leaderboardColumns = [...baseColumns, ...gameColumns]
             </h2>
             <div
                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 text-amber-600 dark:text-amber-400 text-xs font-bold tracking-wider">
-                <UIcon name="i-heroicons-information-circle" class="w-4 h-4 shrink-0" />
+                <UIcon name="i-lucide-info" class="w-4 h-4 shrink-0" />
                 <span>需完成 8 場對局始可進入正式排名 (低於 8 場標記為 DNF)</span>
             </div>
         </div>
