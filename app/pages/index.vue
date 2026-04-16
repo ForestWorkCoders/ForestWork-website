@@ -61,7 +61,7 @@ const circuits = [
     title: 'Mahjong Soul', 
     icon: 'i-lucide-id-card-lanyard', 
     description: '雀魂林間小鎮常規積分賽',
-    to: 'https://forestwork-mahjong.vercel.app'
+    to: '/games/mahjongsoul/'
   },
   { 
     id: 3, 

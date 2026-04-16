@@ -36,7 +36,8 @@ const tabs = [
                             class="w-48 h-48 text-5xl drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                             :ui="{ rounded: 'rounded-xl', fallback: { text: 'font-bold text-gray-400' } }" />
 
-                        <UButton color="info" variant="outline" icon="i-heroicons-arrow-down-tray"
+                        <UButton to="/games/mahjongsoul/rules" target="_blank" color="info" variant="outline"
+                            icon="i-lucide-download"
                             class="w-full justify-center font-bold tracking-widest text-sm hover:bg-white hover:text-black transition-colors">
                             Rules · 賽規
                         </UButton>
