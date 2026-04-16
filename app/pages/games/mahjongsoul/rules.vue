@@ -40,19 +40,38 @@ useHead({
         </UButton>
       </div>
 
-      <div 
-        class="bg-white dark:bg-[#1e293b] rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700/50 flex flex-col relative group w-full"
-        style="height: 75vh; min-height: 600px;"
-      >
+      <div class="bg-white dark:bg-[#1e293b] rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700/50 flex flex-col relative group w-full">
         
-        <iframe 
+        <div class="hidden md:flex flex-col w-full relative" style="height: 75vh; min-height: 600px;">
+          <iframe 
           :src="`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`" 
           class="w-full flex-1 border-0 z-10 bg-white"
           title="雀魂賽事通用規則"
         ></iframe>
+          <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-[#18212f] z-0">
+            <UIcon name="i-lucide-refresh" class="w-8 h-8 text-gray-400 animate-spin" />
+          </div>
+        </div>
 
-        <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-[#18212f] z-0">
-          <UIcon name="i-lucide-refresh" class="w-8 h-8 text-gray-400 animate-spin" />
+        <div class="flex md:hidden flex-col items-center justify-center py-20 px-6 text-center bg-gray-50 dark:bg-[#18212f]">
+          <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner">
+            <UIcon name="i-heroicons-document-magnifying-glass" class="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <h3 class="text-xl font-black text-gray-900 dark:text-white mb-3 tracking-wide">在手機上閱讀指南</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+            受限於行動裝置瀏覽器，為提供最佳的流暢滑動與閱讀體驗，請點擊下方按鈕以全螢幕模式開啟文件。
+          </p>
+          <UButton 
+            :to="pdfUrl" 
+            target="_blank" 
+            color="emerald" 
+            size="xl"
+            icon="i-heroicons-arrow-top-right-on-square"
+            class="font-bold tracking-widest shadow-md hover:shadow-lg transition-shadow"
+            :ui="{ rounded: 'rounded-full' }"
+          >
+            全螢幕開啟教學
+          </UButton>
         </div>
 
       </div>
