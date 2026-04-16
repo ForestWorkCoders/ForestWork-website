@@ -22,7 +22,7 @@
         aria-label="Youtube"
       />
       <UButton
-        icon="i-simple-icons-X"
+        icon="i-simple-icons-x"
         color="neutral"
         variant="ghost"
         to="https://twitter.com/forestwork"
