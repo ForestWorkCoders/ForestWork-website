@@ -112,7 +112,7 @@ const tabs = [
                             <TournamentsPlayerStatsStandard :tournament-id="route.params.id" />
                         </template>
                         <template #vods>
-                            <div class="h-[600px] mt-2 bg-gray-200 dark:bg-[#cbd5e1] rounded-lg"></div>
+                            <TournamentsVodsStandard :tournament-id="route.params.id" />
                         </template>
 
                     </UTabs>
