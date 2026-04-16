@@ -88,7 +88,7 @@ const paginatedPastTournaments = computed(() => {
                                 </div>
                                 <div class="mt-4 space-y-4">
                                     <div v-if="allTournaments?.ongoing?.length" class="space-y-3">
-                                        <TournamentCard v-for="tourney in allTournaments.ongoing" :key="tourney.id"
+                                        <TournamentsCard v-for="tourney in allTournaments.ongoing" :key="tourney.id"
                                             :tourney="tourney" />
                                     </div>
 
@@ -114,7 +114,7 @@ const paginatedPastTournaments = computed(() => {
 
                                     <div v-if="allTournaments?.past?.length">
                                         <div class="space-y-3">
-                                            <TournamentCard v-for="tourney in paginatedPastTournaments"
+                                            <TournamentsCard v-for="tourney in paginatedPastTournaments"
                                                 :key="tourney.id" :tourney="tourney" />
                                         </div>
 
@@ -154,7 +154,7 @@ const paginatedPastTournaments = computed(() => {
                                 </div>
                                 <div class="mt-4">
                                     <div v-if="allTournaments?.upcoming?.length" class="space-y-3">
-                                        <TournamentCard v-for="tourney in allTournaments.upcoming" :key="tourney.id"
+                                        <TournamentsCard v-for="tourney in allTournaments.upcoming" :key="tourney.id"
                                             :tourney="tourney" />
                                     </div>
 
