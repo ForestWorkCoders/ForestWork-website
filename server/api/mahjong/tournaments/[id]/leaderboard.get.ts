@@ -98,7 +98,7 @@ export default defineEventHandler(async (event) => {
 
         // 處理單一座位分數的輔助函數
         const processSeat = (accountId: number | null, score: number | null) => {
-            if (!accountId || score === null) return
+            if (!accountId || score === null || accountId === 1) return
 
             const pStat = initPlayer(accountId)
             pStat.played += 1

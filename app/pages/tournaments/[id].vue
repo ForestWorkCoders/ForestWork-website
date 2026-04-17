@@ -5,12 +5,24 @@ const route = useRoute()
 const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournaments/${route.params.id}`)
 
 // 定義下方的導覽標籤
-const tabs = [
+const baseTabs = [
     { label: '賽事資訊 · Information', slot: 'info' },
     { label: '賽事結果 · Result', slot: 'result' },
     { label: '玩家數據 · Player Stats', slot: 'stats' },
     { label: '直播記錄 · VODs', slot: 'vods' }
 ]
+
+const tabs = computed(() => {
+    // 記得用可選串連 (?.) 因為初始載入時 tourney 可能是 null
+    if (tourney.value?.format === 'invitational') {
+        return [
+            baseTabs[0], // info
+            { label: '參賽資格 · Prerequisites', slot: 'prereq' },
+            ...baseTabs.slice(1) // result, stats, vods
+        ]
+    }
+    return baseTabs
+})
 </script>
 
 <template>
@@ -100,6 +112,12 @@ const tabs = [
                             <div
                                 class="bg-white/90 dark:bg-[#1a1b26] w-full h-[600px] mt-2 rounded-lg flex items-center justify-center">
                                 <span class="text-gray-500 font-bold tracking-widest">CONTENT PLACEHOLDER</span>
+                            </div>
+                        </template>
+
+                        <template #prereq>
+                            <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
+                                <TournamentsLeaderboardInvitational :tournament-id="route.params.id" />
                             </div>
                         </template>
 

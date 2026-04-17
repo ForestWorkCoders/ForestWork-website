@@ -18,6 +18,13 @@ export default defineEventHandler(async (event) => {
   if (matchErr) throw createError({ statusCode: 500, statusMessage: matchErr.message })
   if (!matches || matches.length === 0) return []
 
+  const { data: ruleData } = await supabase
+    .schema('mahjong') // 假設你建在 mahjong schema
+    .from('rules')
+    .select('basepts, uma1, uma2, uma3, uma4')
+    .eq('id', id)
+    .single()
+
   // 2. 玩家字典建置 (The String Cast Magic)
   const accountIds = new Set<number>()
   matches.forEach(m => {
@@ -77,16 +84,32 @@ export default defineEventHandler(async (event) => {
 
       if (isSanma) {
         // ★ 三麻計分邏輯 ★
-        // 依照你的公式： (得分 / 1000) + Uma(15, 0, -15) 
-        // 備註：如果你的基底是 35000 返點，公式應該是 (score - 35000)/1000 + uma，這裡我先依照標準實作，你可以自由微調
-        const basePts = (p.score - 35000) / 1000 
-        const uma = rank === 1 ? 15 : rank === 2 ? 0 : -15
+        // 嚴格的 Fallback 機制：如果 rules 表沒資料，退回標準 35000 返點與 (15, 0, -15) Uma
+        const base = ruleData?.basepts ?? 35000
+        const sanmaUmaMap = [
+          ruleData?.uma1 ?? 15,
+          ruleData?.uma2 ?? 0,
+          ruleData?.uma3 ?? -15
+        ]
+        
+        const basePts = (p.score - base) / 1000
+        // 好品味：直接用 rank - 1 當作陣列索引，消除所有 if/else
+        const uma = sanmaUmaMap[rank - 1] ?? 0 
         pts = basePts + uma
+
       } else {
         // ★ 四麻計分邏輯 ★
-        const basePts = (p.score - 25000) / 1000
-        // 標準雀魂 Uma (15, 5, -5, -15)，請依照你的賽規修改
-        const uma = rank === 1 ? 15 : rank === 2 ? 5 : rank === 3 ? -5 : -15
+        // 嚴格的 Fallback 機制：退回標準 25000 返點與 (15, 5, -5, -15) Uma
+        const base = ruleData?.basepts ?? 25000
+        const yonmaUmaMap = [
+          ruleData?.uma1 ?? 15,
+          ruleData?.uma2 ?? 5,
+          ruleData?.uma3 ?? -5,
+          ruleData?.uma4 ?? -15
+        ]
+
+        const basePts = (p.score - base) / 1000
+        const uma = yonmaUmaMap[rank - 1] ?? 0
         pts = basePts + uma
       }
 

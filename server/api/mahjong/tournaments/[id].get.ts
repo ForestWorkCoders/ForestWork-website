@@ -48,6 +48,8 @@ export default defineEventHandler(async (event) => {
     imageUrl: tourney.icon,
     duration: `${formatDate(tourney.created_at)} ~ ${formatDate(tourney.updates_at)}`,
     status: status,
-    organizer: '林間小鎮 ForestWork' // 先給定預設值
+    organizer: tourney.organizer,
+    dnfThreshold: tourney.dnfThreshold,
+    format: tourney.format
   }
 })

@@ -14,6 +14,35 @@ export type Database = {
   }
   mahjong: {
     Tables: {
+      fwmp_configs: {
+        Row: {
+          month: number
+          points_map: Json | null
+          tournament_bind_id: string | null
+          year: number
+        }
+        Insert: {
+          month: number
+          points_map?: Json | null
+          tournament_bind_id?: string | null
+          year: number
+        }
+        Update: {
+          month?: number
+          points_map?: Json | null
+          tournament_bind_id?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fwmp_configs_tournament_bind_id_fkey"
+            columns: ["tournament_bind_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           east_id: number
@@ -72,6 +101,13 @@ export type Database = {
             referencedColumns: ["account_id"]
           },
           {
+            foreignKeyName: "matches_north_id_fkey"
+            columns: ["north_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
             foreignKeyName: "matches_south_id_fkey"
             columns: ["south_id"]
             isOneToOne: false
@@ -115,10 +151,46 @@ export type Database = {
         }
         Relationships: []
       }
+      rules: {
+        Row: {
+          basepts: number | null
+          id: string
+          uma1: number | null
+          uma2: number | null
+          uma3: number | null
+          uma4: number | null
+        }
+        Insert: {
+          basepts?: number | null
+          id?: string
+          uma1?: number | null
+          uma2?: number | null
+          uma3?: number | null
+          uma4?: number | null
+        }
+        Update: {
+          basepts?: number | null
+          id?: string
+          uma1?: number | null
+          uma2?: number | null
+          uma3?: number | null
+          uma4?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rules_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
           created_at: string | null
           dnfThreshold: number
+          format: string
           icon: string | null
           id: string
           organizer: string | null
@@ -130,6 +202,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           dnfThreshold?: number
+          format?: string
           icon?: string | null
           id?: string
           organizer?: string | null
@@ -141,6 +214,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           dnfThreshold?: number
+          format?: string
           icon?: string | null
           id?: string
           organizer?: string | null
@@ -153,7 +227,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      monthly_player_ranks: {
+        Row: {
+          account_id: number | null
+          month: number | null
+          points: number | null
+          tournament_bind_id: string | null
+          year: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
