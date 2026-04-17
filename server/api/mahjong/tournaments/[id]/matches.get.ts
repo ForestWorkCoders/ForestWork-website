@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { calculateMahjongPoints } from '~~/server/utils/mahjongScoreEngine'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -80,38 +81,7 @@ export default defineEventHandler(async (event) => {
 
     const players = rawPlayers.map(p => {
       const rank = getRank(p.score)
-      let pts = 0
-
-      if (isSanma) {
-        // ★ 三麻計分邏輯 ★
-        // 嚴格的 Fallback 機制：如果 rules 表沒資料，退回標準 35000 返點與 (15, 0, -15) Uma
-        const base = ruleData?.basepts ?? 35000
-        const sanmaUmaMap = [
-          ruleData?.uma1 ?? 15,
-          ruleData?.uma2 ?? 0,
-          ruleData?.uma3 ?? -15
-        ]
-        
-        const basePts = (p.score - base) / 1000
-        // 好品味：直接用 rank - 1 當作陣列索引，消除所有 if/else
-        const uma = sanmaUmaMap[rank - 1] ?? 0 
-        pts = basePts + uma
-
-      } else {
-        // ★ 四麻計分邏輯 ★
-        // 嚴格的 Fallback 機制：退回標準 25000 返點與 (15, 5, -5, -15) Uma
-        const base = ruleData?.basepts ?? 25000
-        const yonmaUmaMap = [
-          ruleData?.uma1 ?? 15,
-          ruleData?.uma2 ?? 5,
-          ruleData?.uma3 ?? -5,
-          ruleData?.uma4 ?? -15
-        ]
-
-        const basePts = (p.score - base) / 1000
-        const uma = yonmaUmaMap[rank - 1] ?? 0
-        pts = basePts + uma
-      }
+      const pts = calculateMahjongPoints(p.score, rank, isSanma, ruleData)
 
       return {
         seat: p.seat,

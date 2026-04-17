@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { calculateMahjongPoints } from '~~/server/utils/mahjongScoreEngine'
 
 export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, 'id')
@@ -28,6 +29,14 @@ export default defineEventHandler(async (event) => {
         .eq('tournament_bind_id', id)
 
     if (matchErr) throw createError({ statusCode: 500, statusMessage: matchErr.message })
+
+    // ★ 補上缺失的 rules 查詢，讓它和 matches.get.ts 一模一樣
+    const { data: ruleData } = await supabase
+        .schema('mahjong') 
+        .from('rules')
+        .select('basepts, uma1, uma2, uma3, uma4')
+        .eq('id', id)
+        .single()
 
     const totalGames = (!matches || matches.length === 0) ? 16 : Math.max(...matches.map(m => m.tag || 1))
     // 如果還沒有任何對局，直接回傳空陣列
@@ -94,30 +103,39 @@ export default defineEventHandler(async (event) => {
 
     // 遍歷所有對局，把分數塞進對應的玩家身上
     matches.forEach(m => {
-        const gameTag = m.tag // 這場是第幾局 (1~16)
+        const gameTag = m.tag 
 
-        // 處理單一座位分數的輔助函數
-        const processSeat = (accountId: number | null, score: number | null) => {
-            if (!accountId || score === null || accountId === 1) return
+        // 判斷是否為三麻
+        const isSanma = m.north_id === null
 
-            const pStat = initPlayer(accountId)
-            pStat.played += 1
-            pStat.total_score += score
-
-            // ★ 積分計算 (Points Calculation) ★
-            // 這裡我先放一個最基礎的佔位邏輯：(得點 - 25000) / 1000
-            // 之後你可以根據你們賽制的 Uma (順位馬) 和 Oka 去修改這個算式
-            const pts = (score - 25000) / 1000
-
-            pStat.total_pts += pts
-            // 將這局的積分記錄進 game_X 欄位 (UI 顯示使用)
-            pStat.games[`game_${gameTag}`] = Number(pts.toFixed(1))
+        // 抽出有效玩家陣列，這一步是為了計算單局名次 (Rank)
+        const rawPlayers = [
+            { id: m.east_id, score: m.east_score },
+            { id: m.south_id, score: m.south_score },
+            { id: m.west_id, score: m.west_score }
+        ]
+        if (!isSanma && m.north_id && m.north_score !== null) {
+            rawPlayers.push({ id: m.north_id, score: m.north_score })
         }
 
-        processSeat(m.east_id, m.east_score)
-        processSeat(m.south_id, m.south_score)
-        processSeat(m.west_id, m.west_score)
-        processSeat(m.north_id, m.north_score) // 北風可能為 Null，輔助函數會自動略過
+        // 計算名次對照表
+        const sortedScores = [...rawPlayers].sort((a, b) => b.score - a.score)
+        const getRank = (score: number) => sortedScores.findIndex(p => p.score === score) + 1
+
+        // 結算分數並寫入 Map
+        rawPlayers.forEach(p => {
+            // 過濾帳號 1 或髒資料 (沿用你之前的防禦邏輯)
+            if (!p.id || p.score === null || p.id === 1) return
+
+            const rank = getRank(p.score)
+            const pts = calculateMahjongPoints(p.score, rank, isSanma, ruleData)
+
+            const pStat = initPlayer(p.id)
+            pStat.played += 1
+            pStat.total_score += p.score
+            pStat.total_pts += pts
+            pStat.games[`game_${gameTag}`] = pts
+        })
     })
 
     // ==========================================
