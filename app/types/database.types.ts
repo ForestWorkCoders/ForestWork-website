@@ -118,8 +118,10 @@ export type Database = {
       tournaments: {
         Row: {
           created_at: string | null
+          dnfThreshold: number
           icon: string | null
           id: string
+          organizer: string | null
           region: string | null
           tier: string | null
           title: string
@@ -127,8 +129,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          dnfThreshold?: number
           icon?: string | null
           id?: string
+          organizer?: string | null
           region?: string | null
           tier?: string | null
           title: string
@@ -136,8 +140,10 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          dnfThreshold?: number
           icon?: string | null
           id?: string
+          organizer?: string | null
           region?: string | null
           tier?: string | null
           title?: string

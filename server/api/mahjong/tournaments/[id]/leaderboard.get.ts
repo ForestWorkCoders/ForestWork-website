@@ -7,6 +7,17 @@ export default defineEventHandler(async (event) => {
 
     const supabase = await serverSupabaseClient<Database>(event)
 
+    // ★ 魔法 0：撈取賽事的 dnfThreshold
+    // (注意：請確認你的資料庫欄位名稱是 camelCase 的 dnfThreshold 還是 snake_case 的 dnf_threshold)
+    const { data: tourney } = await supabase
+        .schema('mahjong')
+        .from('tournaments') // 依照你說的資料表名稱
+        .select('dnfThreshold')
+        .eq('id', id)
+        .single()
+
+    const dnfThreshold = tourney?.dnfThreshold || 8 // 如果沒設定，預設為 8
+
     // ==========================================
     // 1. 撈取該賽事所有的對局 (Matches)
     // ==========================================
@@ -18,6 +29,7 @@ export default defineEventHandler(async (event) => {
 
     if (matchErr) throw createError({ statusCode: 500, statusMessage: matchErr.message })
 
+    const totalGames = (!matches || matches.length === 0) ? 16 : Math.max(...matches.map(m => m.tag || 1))
     // 如果還沒有任何對局，直接回傳空陣列
     if (!matches || matches.length === 0) return []
 
@@ -120,7 +132,7 @@ export default defineEventHandler(async (event) => {
     let currentRank = 1
     const finalLeaderboard = leaderboard.map(p => {
         // 判斷是否完賽
-        const isDNF = p.played < 8
+        const isDNF = p.played < dnfThreshold
 
         // 把 .games 裡面的 { game_1, game_2... } 展開到外層，符合 TanStack Table 格式
         const result = {
@@ -140,5 +152,8 @@ export default defineEventHandler(async (event) => {
         return 0
     })
 
-    return finalLeaderboard
+    return {
+        meta: { totalGames, dnfThreshold },
+        data: finalLeaderboard
+    }
 })
