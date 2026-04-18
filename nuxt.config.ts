@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   // Nuxt 4 的兼容性日期设定，确保你使用最新的内部机制
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@nuxt/ui','@nuxtjs/supabase','@vercel/speed-insights/nuxt'],
+  modules: ['@nuxt/ui','@nuxtjs/supabase','@vercel/speed-insights/nuxt', '@vercel/analytics/nuxt'],
   css: ['~/assets/css/main.css'],
 
   supabase: {
