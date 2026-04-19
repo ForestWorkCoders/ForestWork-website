@@ -15,11 +15,40 @@ export default defineEventHandler(async (event) => {
         .eq('id', id)
         .single()
 
-    // 實用主義：直接信任資料庫的創建時間
-    // 只要這個 12 月的總決賽是在當年度建立的，getFullYear() 就會完美運作
-    const targetYear = finaleTourney?.created_at
-        ? new Date(finaleTourney.created_at).getFullYear()
-        : new Date().getFullYear()
+    const targetDate = finaleTourney?.created_at ? new Date(finaleTourney.created_at) : new Date()
+    const targetYear = targetDate.getFullYear()
+    const targetMonth = targetDate.getMonth() + 1
+
+    let validMonths: number[] = []
+    let displayMonthsMeta: { val: number, label: string }[] = []
+
+    if (targetYear < 2025) {
+        // 【舊紀元 Legacy】2023, 2024 年制：全年 11 個月大亂鬥
+        validMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        displayMonthsMeta = [
+            { val: 1, label: 'JAN' }, { val: 2, label: 'FEB' }, { val: 3, label: 'MAR' },
+            { val: 4, label: 'APR' }, { val: 5, label: 'MAY' }, { val: 6, label: 'JUN' },
+            { val: 7, label: 'JUL' }, { val: 8, label: 'AUG' }, { val: 9, label: 'SEP' },
+            { val: 10, label: 'OCT' }, { val: 11, label: 'NOV' }
+        ]
+    } else {
+        // 【新紀元 Modern】2025 年起：半年制
+        if (targetMonth <= 6) {
+            // 上半賽季：邀請賽在 6 月，抓取 1~5 月
+            validMonths = [1, 2, 3, 4, 5]
+            displayMonthsMeta = [
+                { val: 1, label: 'JAN' }, { val: 2, label: 'FEB' }, { val: 3, label: 'MAR' },
+                { val: 4, label: 'APR' }, { val: 5, label: 'MAY' }
+            ]
+        } else {
+            // 下半賽季：邀請賽在 12 月，抓取 7~11 月
+            validMonths = [7, 8, 9, 10, 11]
+            displayMonthsMeta = [
+                { val: 7, label: 'JUL' }, { val: 8, label: 'AUG' }, { val: 9, label: 'SEP' },
+                { val: 10, label: 'OCT' }, { val: 11, label: 'NOV' }
+            ]
+        }
+    }
 
     interface MonthlyRankRow {
         account_id: number;
@@ -32,10 +61,10 @@ export default defineEventHandler(async (event) => {
         .schema('mahjong')
         .from('monthly_player_ranks')
         .select('account_id, points, month')
-        .eq('year', targetYear) // ★★★ 不再用 UUID 過濾，而是用年份把 11 個月的資料全撈出來！
+        .eq('year', targetYear)
+        .in('month', validMonths)
 
     if (rankErr) throw createError({ statusCode: 500, statusMessage: rankErr.message })
-
     const rawRanks = data as MonthlyRankRow[] | null
 
     if (!rawRanks || rawRanks.length === 0) return []
@@ -87,12 +116,17 @@ export default defineEventHandler(async (event) => {
     })
 
     // 5. 組裝成前端需要的陣列
-    return finalRanks.map((r, index) => ({
-        rank: index + 1,
-        account_id: r.account_id,
-        name: playerDict.get(r.account_id)?.name,
-        avatar: playerDict.get(r.account_id)?.avatar,
-        points: r.points,
-        months: r.months
-    }))
+    return {
+        meta: {
+            months: displayMonthsMeta
+        },
+        data: finalRanks.map((r, index) => ({
+            rank: index + 1,
+            account_id: r.account_id,
+            name: playerDict.get(r.account_id)?.name,
+            avatar: playerDict.get(r.account_id)?.avatar,
+            points: r.points,
+            months: r.months
+        }))
+    }
 })

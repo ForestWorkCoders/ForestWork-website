@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "14.5"
   }
   mahjong: {
     Tables: {
@@ -18,26 +18,26 @@ export type Database = {
         Row: {
           month: number
           points_map: Json | null
-          tournament_bind_id: string | null
+          tournament_bind_id: string
           year: number
         }
         Insert: {
           month: number
           points_map?: Json | null
-          tournament_bind_id?: string | null
+          tournament_bind_id: string
           year: number
         }
         Update: {
           month?: number
           points_map?: Json | null
-          tournament_bind_id?: string | null
+          tournament_bind_id?: string
           year?: number
         }
         Relationships: [
           {
             foreignKeyName: "fwmp_configs_tournament_bind_id_fkey"
             columns: ["tournament_bind_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "tournaments"
             referencedColumns: ["id"]
           },
@@ -48,6 +48,7 @@ export type Database = {
           east_id: number
           east_score: number
           end_time: string
+          group_tag: string | null
           id: number
           north_id: number | null
           north_score: number | null
@@ -64,6 +65,7 @@ export type Database = {
           east_id: number
           east_score: number
           end_time: string
+          group_tag?: string | null
           id?: number
           north_id?: number | null
           north_score?: number | null
@@ -80,6 +82,7 @@ export type Database = {
           east_id?: number
           east_score?: number
           end_time?: string
+          group_tag?: string | null
           id?: number
           north_id?: number | null
           north_score?: number | null
@@ -194,6 +197,7 @@ export type Database = {
           icon: string | null
           id: string
           organizer: string | null
+          phase_configs: Json | null
           region: string | null
           tier: string | null
           title: string
@@ -206,6 +210,7 @@ export type Database = {
           icon?: string | null
           id?: string
           organizer?: string | null
+          phase_configs?: Json | null
           region?: string | null
           tier?: string | null
           title: string
@@ -218,6 +223,7 @@ export type Database = {
           icon?: string | null
           id?: string
           organizer?: string | null
+          phase_configs?: Json | null
           region?: string | null
           tier?: string | null
           title?: string

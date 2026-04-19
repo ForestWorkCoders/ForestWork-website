@@ -50,6 +50,7 @@ export default defineEventHandler(async (event) => {
     status: status,
     organizer: tourney.organizer,
     dnfThreshold: tourney.dnfThreshold,
-    format: tourney.format
+    format: tourney.format,
+    created_at: tourney.created_at,
   }
 })

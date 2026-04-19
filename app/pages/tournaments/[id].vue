@@ -23,6 +23,17 @@ const tabs = computed(() => {
     }
     return baseTabs
 })
+
+const isModernInvitational = computed(() => {
+    // 1. 如果不是邀請賽，直接 false
+    if (tourney.value?.format !== 'invitational') return false
+
+    // 2. 獲取賽事的建立年份
+    const year = tourney.value?.created_at ? new Date(tourney.value.created_at).getFullYear() : 0
+
+    // 3. 判斷是否跨過 2025 分水嶺
+    return year >= 2025
+})
 </script>
 
 <template>
@@ -123,13 +134,23 @@ const tabs = computed(() => {
 
                         <template #result>
                             <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
-                                <TournamentsLeaderboardStandard :tournament-id="route.params.id" />
-                                <TournamentsMatchHistoryStandard :tournament-id="route.params.id" />
+
+                                <template v-if="isModernInvitational">
+                                    <TournamentsLeaderboardPhased :tournament-id="route.params.id" />
+                                </template>
+
+                                <template v-else>
+                                    <TournamentsLeaderboardStandard :tournament-id="route.params.id" />
+                                    <TournamentsMatchHistoryStandard :tournament-id="route.params.id" />
+                                </template>
+
                             </div>
                         </template>
+
                         <template #stats>
                             <TournamentsPlayerStatsStandard :tournament-id="route.params.id" />
                         </template>
+
                         <template #vods>
                             <TournamentsVodsStandard :tournament-id="route.params.id" />
                         </template>

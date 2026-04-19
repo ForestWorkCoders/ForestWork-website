@@ -82,5 +82,12 @@ const leaderboardColumns = computed(() => {
                 </template>
             </UTable>
         </div>
+
+                <div
+                class="mt-4 p-6 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800/60 bg-gray-50/50 dark:bg-gray-900/20 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 transition-colors">
+                <UIcon name="i-lucide-sticky-note" class="w-6 h-6 mb-2 opacity-50" />
+                <span class="text-sm font-medium tracking-wide">備註保留區塊 · Sidenotes</span>
+                <p class="text-xs mt-1 opacity-70">未來的裁判備註或賽事附註將顯示於此</p>
+            </div>
     </section>
 </template>
