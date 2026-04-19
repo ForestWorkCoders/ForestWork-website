@@ -13,7 +13,8 @@ const { data: phasesData, pending, error } = await useFetch(`/api/mahjong/tourna
 const getColumns = (gameCount) => {
   const baseCols = [
     { id: 'rank', accessorKey: 'rank', header: 'RANK', class: 'text-center w-20' },
-    { id: 'player', accessorKey: 'name', header: 'PLAYER', class: 'min-w-[150px]' }
+    { id: 'player', accessorKey: 'name', header: 'PLAYER', class: 'min-w-[150px]' },
+    { id: 'total', accessorKey: 'total', header: 'TOTAL', class: 'text-center w-24' }
   ]
 
   const gameCols = Array.from({ length: gameCount }, (_, i) => ({
@@ -23,11 +24,7 @@ const getColumns = (gameCount) => {
     class: 'text-center text-gray-500 w-16'
   }))
 
-  const endCols = [
-    { id: 'total', accessorKey: 'total', header: 'TOTAL', class: 'text-right w-24' }
-  ]
-
-  return [...baseCols, ...gameCols, ...endCols]
+  return [...baseCols, ...gameCols]
 }
 
 // 3. 終極高亮邏輯：由資料驅動 (Data-Driven Styling)
@@ -99,6 +96,12 @@ const getRankColor = (phase, rank) => {
               </div>
             </template>
 
+            <template #total-cell="{ row }">
+              <div class="text-center font-black text-lg font-mono text-white">
+                {{ row.original.total }}
+              </div>
+            </template>
+
             <template v-for="i in phase.gameCount" :key="i" #[`game_${i}-cell`]="{ row }">
               <div class="text-center font-mono text-sm"
                 :class="row.original[`game_${i}`] > 0 ? 'text-emerald-400' : row.original[`game_${i}`] < 0 ? 'text-red-400' : 'text-gray-500'">
@@ -106,11 +109,6 @@ const getRankColor = (phase, rank) => {
               </div>
             </template>
 
-            <template #total-cell="{ row }">
-              <div class="text-right font-black text-lg font-mono text-white">
-                {{ row.original.total }}
-              </div>
-            </template>
           </UTable>
         </div>
 
