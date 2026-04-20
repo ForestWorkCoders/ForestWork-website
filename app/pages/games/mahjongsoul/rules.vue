@@ -2,6 +2,13 @@
 // 定義 PDF 檔案的路徑 (對應到 public/docs/MahjongRule2025.pdf)
 const pdfUrl = '/docs/MahjongRule2025.pdf'
 
+const breadcrumbLinks = [
+    { label: '首頁 · Home', icon: 'i-lucide-home', to: '/' },
+    // 假設有一個遊戲大廳或賽事列表，如果沒有可以把這層刪掉
+    { label: '賽事大廳 · Tournaments', icon: 'i-lucide-trophy', to: '/games/mahjongsoul' },
+    { label: '賽規 · Rules', icon: 'i-lucide-book-open' } // 當前頁面
+]
+
 // 設定網頁標題
 useHead({
   title: '通用賽事規則 · General Rules | 雀魂 Mahjong Soul'
@@ -9,9 +16,25 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] py-12 px-4 sm:px-6 animate-fade-in">
-    
+  <div class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] pt-24 pb-12 px-4 sm:px-6 animate-fade-in">
+
     <UContainer class="max-w-5xl">
+
+      <div class="mb-8 px-2 animate-fade-in">
+        <UBreadcrumb 
+                    :items="breadcrumbLinks" 
+                    separator="i-lucide-chevron-right"
+                    :ui="{
+                        wrapper: 'flex flex-wrap items-center gap-1.5',
+                        li: 'flex items-center gap-1.5',
+                        base: 'text-sm font-semibold tracking-wide transition-colors',
+                        active: 'text-emerald-500 dark:text-emerald-400 cursor-default drop-shadow-md',
+                        inactive: 'text-gray-400 hover:text-emerald-500 dark:text-gray-500 dark:hover:text-emerald-400',
+                        icon: { base: 'w-4 h-4', active: 'text-emerald-500', inactive: 'text-gray-500' },
+                        separator: { base: 'w-4 h-4 text-gray-500' }
+                    }"
+                />
+      </div>
       
       <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8 pb-6 border-b border-gray-200 dark:border-gray-800">
         <div>

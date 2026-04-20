@@ -14,6 +14,7 @@ const mahjongSidebarData = {
         { icon: 'i-heroicons-globe-alt', url: 'https://mahjongsoul.yo-star.com/' }, // 官網
         { icon: 'i-simple-icons-x', url: 'https://twitter.com/MahjongSoul_EN' },   // Twitter (X)
         { icon: 'i-simple-icons-discord', url: 'https://discord.gg/mahjongsoul' },  // Discord
+        { icon: 'i-lucide-scale', url: '/games/mahjongsoul/rules' }, // Rules
         { icon: 'i-lucide-badge-question-mark', url: '/games/mahjongsoul/how-to' } // How-To
     ]
 }
