@@ -84,6 +84,7 @@ export default defineEventHandler(async (event) => {
             id: team.id,
             name: team.name,
             logo: team.logo,
+            notes: team.notes,
             players: players
         }
     })

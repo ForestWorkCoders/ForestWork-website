@@ -64,6 +64,10 @@ const isModernInvitational = computed(() => {
     // 3. 判斷是否跨過 2025 分水嶺
     return year >= 2025
 })
+
+const isRelay = computed(() => {
+    return tourney.value?.format === 'relay'
+})
 </script>
 
 <template>
@@ -184,7 +188,11 @@ const isModernInvitational = computed(() => {
                             <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
 
                                 <template v-if="isModernInvitational">
-                                    <TournamentsLeaderboardPhased :tournament-id="route.params.id" />
+                                    <TournamentsLeaderboardPhased v-if="isModernInvitational" :tournament-id="route.params.id" />
+                                </template>
+
+                                <template v-else-if="isRelay">
+                                    <TournamentsLeaderboardRelay :tournament-id="route.params.id" />
                                 </template>
 
                                 <template v-else>

@@ -91,12 +91,20 @@ export default defineEventHandler(async (event) => {
     .eq('id', id)
     .single()
 
-  const dbPhaseConfigs = tourney?.phase_configs as PhaseConfig[] | undefined | null
+  const rawConfigs = tourney?.phase_configs as PhaseConfig[] | undefined | null
 
-  const phaseConfigs = dbPhaseConfigs || [
-    { id: 'A', title: 'Group A', subtitle: 'Group Stage', promotionCount: 1, isFinal: false },
-    { id: 'D', title: 'Finals', subtitle: 'Championship', promotionCount: 0, isFinal: true }
-  ]
+  let phaseConfigs: any[] = []
+
+  if (typeof rawConfigs === 'string') {
+    // 情況 A：它是字串，把它 Parse 成陣列
+    try { phaseConfigs = JSON.parse(rawConfigs) } catch (e) { phaseConfigs = [] }
+  } else if (Array.isArray(rawConfigs)) {
+    // 情況 B：它已經是完美的陣列
+    phaseConfigs = rawConfigs
+  } else if (typeof rawConfigs === 'object' && rawConfigs !== null) {
+    // 情況 C：它不小心被存成了 Object，我們提取它的 values 變成陣列
+    phaseConfigs = Object.values(rawConfigs)
+  }
 
   // ==========================================
   // 4. 核心處理引擎：分組 Map/Reduce
@@ -104,7 +112,7 @@ export default defineEventHandler(async (event) => {
   const results = phaseConfigs.map(config => {
     // 篩選出該組的所有對局 (利用我們新加的 group_tag 欄位)
     const groupMatches = matches.filter(m => m.group_tag === config.id)
-    
+
     // 如果這組還沒開始打，直接跳過不渲染
     if (groupMatches.length === 0) return null
 
@@ -157,7 +165,7 @@ export default defineEventHandler(async (event) => {
         if (!p.id || p.score === null || p.id === 1) return
 
         const rank = getRank(p.score)
-        
+
         // ★ 呼叫共用算分引擎，確保全站分數絕對一致 ★
         const pts = calculateMahjongPoints(p.score, rank, isSanma, ruleData)
 
@@ -178,7 +186,7 @@ export default defineEventHandler(async (event) => {
       // 5. 格式化單場對局物件 (供 MatchCard 使用)
       // 將分數由高到低排序，讓贏家排在最上面
       matchPlayersDetails.sort((a, b) => b.pts - a.pts)
-      
+
       formattedMatches.push({
         id: m.uuid,
         round: `Game ${relativeGameIndex}`, // 顯示相對局數

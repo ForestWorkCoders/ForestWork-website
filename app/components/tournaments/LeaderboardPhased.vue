@@ -44,7 +44,7 @@ const getRankColor = (phase, rank) => {
     const isDisqualified = phase.disqualifiedRanks
       ? phase.disqualifiedRanks.includes(rank)   // 新玩法：如果 API 給了 [5, 6]，就檢查 rank 在不在裡面
       : false                                    // 舊玩法：沒有明確規定淘汰名單，所以先不處理
-      
+
     if (isPromoted) {
       return 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20'
     }
@@ -61,7 +61,10 @@ const getRankColor = (phase, rank) => {
     <div v-if="pending" class="flex justify-center py-12">
       <UIcon name="i-lucide-loader-2" class="animate-spin w-8 h-8 text-emerald-500" />
     </div>
-    <div v-else-if="error" class="text-red-500">載入失敗: {{ error.message }}</div>
+    <div v-else-if="error"
+      class="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-500 text-center font-bold tracking-wide">
+      載入失敗: {{ error.message }}
+    </div>
 
     <template v-else v-for="phase in phasesData" :key="phase.id">
       <section class="space-y-6">
@@ -112,16 +115,17 @@ const getRankColor = (phase, rank) => {
           </UTable>
         </div>
 
-        <div class="mt-4 p-6 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800/60 bg-gray-50/50 dark:bg-gray-900/20 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 transition-colors">
+        <div
+          class="mt-4 p-6 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800/60 bg-gray-50/50 dark:bg-gray-900/20 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 transition-colors">
           <UIcon name="i-lucide-sticky-note" class="w-6 h-6 mb-2 opacity-50" />
           <span class="text-sm font-medium tracking-wide">備註保留區塊 · Sidenotes</span>
           <p class="text-xs mt-1 opacity-70">未來的裁判備註或賽事附註將顯示於此</p>
         </div>
 
         <div class="mb-6 border-b border-gray-200 dark:border-gray-800 pb-4">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-                對局紀錄 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Match Details</span>
-            </h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
+            對局紀錄 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Match Details</span>
+          </h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">

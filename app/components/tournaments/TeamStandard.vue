@@ -58,9 +58,11 @@ const roleColor = {
           />
           <div class="flex flex-col">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ team.name }}</h3>
-            <div class="flex items-center gap-1.5 mt-1 opacity-75">
-              <UIcon name="i-simple-icons-discord" class="w-4 h-4 text-[#5865F2]" />
-              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Discord Server</span>
+            <div v-if="team.notes" class="flex items-center gap-1.5 mt-1 opacity-75">
+              <UIcon name="i-lucide-trophy" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate max-w-[200px]" :title="team.notes">
+                {{ team.notes }}
+              </span>
             </div>
           </div>
         </div>
