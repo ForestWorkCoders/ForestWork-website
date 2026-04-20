@@ -7,19 +7,19 @@ const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournamen
 // 新增：動態麵包屑導航
 const breadcrumbLinks = computed(() => {
     return [
-        { 
-            label: '首頁 · Home', 
-            icon: 'i-lucide-home', 
-            to: '/' 
+        {
+            label: '首頁 · Home',
+            icon: 'i-lucide-home',
+            to: '/'
         },
-        { 
-            label: '賽事大廳 · Tournaments', 
-            icon: 'i-lucide-trophy', 
+        {
+            label: '賽事大廳 · Tournaments',
+            icon: 'i-lucide-trophy',
             to: '/games/mahjongsoul' // 假設你的賽事列表頁在這裡
         },
-        { 
+        {
             // 如果還在載入中，顯示佔位符；載入完成後顯示賽事簡稱或標題
-            label: tourney.value?.title || '載入中...', 
+            label: tourney.value?.title || '載入中...',
             icon: 'i-lucide-swords',
             // 當前頁面不需要給 to，因為就在這一頁
         }
@@ -42,6 +42,13 @@ const tabs = computed(() => {
             baseTabs[0], // info
             { label: '參賽資格 · Prerequisites', slot: 'prereq' },
             ...baseTabs.slice(1) // result, stats, vods
+        ]
+    }
+    if (tourney.value?.format === 'relay') {
+        return [
+            baseTabs[0],
+            { label: '參賽隊伍 · Teams', slot: 'teams' },
+            ...baseTabs.slice(1)
         ]
     }
     return baseTabs
@@ -75,20 +82,16 @@ const isModernInvitational = computed(() => {
 
             <UContainer class="max-w-6xl">
                 <div class="mb-8 px-2 animate-fade-in">
-                <UBreadcrumb 
-                        :items="breadcrumbLinks" 
-                        separator="i-lucide-chevron-right"
-                        :ui="{
-                            wrapper: 'flex flex-wrap items-center gap-1.5',
-                            li: 'flex items-center gap-1.5',
-                            base: 'text-sm font-semibold tracking-wide transition-colors',
-                            active: 'text-white dark:text-gray-200 cursor-default drop-shadow-md',
-                            inactive: 'text-gray-400 hover:text-emerald-400 dark:text-gray-500 dark:hover:text-emerald-400',
-                            icon: { base: 'w-4 h-4', active: 'text-emerald-500', inactive: 'text-gray-500' },
-                            separator: { base: 'w-4 h-4 text-gray-500' }
-                        }"
-                    />
-                    </div>
+                    <UBreadcrumb :items="breadcrumbLinks" separator="i-lucide-chevron-right" :ui="{
+                        wrapper: 'flex flex-wrap items-center gap-1.5',
+                        li: 'flex items-center gap-1.5',
+                        base: 'text-sm font-semibold tracking-wide transition-colors',
+                        active: 'text-white dark:text-gray-200 cursor-default drop-shadow-md',
+                        inactive: 'text-gray-400 hover:text-emerald-400 dark:text-gray-500 dark:hover:text-emerald-400',
+                        icon: { base: 'w-4 h-4', active: 'text-emerald-500', inactive: 'text-gray-500' },
+                        separator: { base: 'w-4 h-4 text-gray-500' }
+                    }" />
+                </div>
 
                 <div
                     class="bg-white/90 dark:bg-[#1a1b26] text-gray-900 dark:text-white rounded-t-xl overflow-hidden shadow-2xl flex flex-col md:flex-row p-8 md:p-16 gap-12 items-center md:items-start border border-gray-200 dark:border-gray-800 transition-colors duration-300">
@@ -168,6 +171,12 @@ const isModernInvitational = computed(() => {
                         <template #prereq>
                             <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
                                 <TournamentsLeaderboardInvitational :tournament-id="route.params.id" />
+                            </div>
+                        </template>
+
+                        <template #teams>
+                            <div class="px-4 md:px-6 mt-8 space-y-12 animate-fade-in pb-12">
+                                <TournamentsTeamStandard :tournament-id="route.params.id" />
                             </div>
                         </template>
 

@@ -133,6 +133,39 @@ export type Database = {
           },
         ]
       }
+      paipu_yaku_dict: {
+        Row: {
+          created_at: string
+          fan: number | null
+          id: number
+          name_chs: string
+          name_chs_t: string
+          name_en: string
+          name_jp: string
+          name_kr: string
+        }
+        Insert: {
+          created_at?: string
+          fan?: number | null
+          id?: number
+          name_chs: string
+          name_chs_t: string
+          name_en: string
+          name_jp: string
+          name_kr: string
+        }
+        Update: {
+          created_at?: string
+          fan?: number | null
+          id?: number
+          name_chs?: string
+          name_chs_t?: string
+          name_en?: string
+          name_jp?: string
+          name_kr?: string
+        }
+        Relationships: []
+      }
       participants: {
         Row: {
           account_id: number
@@ -158,6 +191,8 @@ export type Database = {
         Row: {
           basepts: number | null
           id: string
+          oka: number
+          returnpts: number
           uma1: number | null
           uma2: number | null
           uma3: number | null
@@ -166,6 +201,8 @@ export type Database = {
         Insert: {
           basepts?: number | null
           id?: string
+          oka?: number
+          returnpts?: number
           uma1?: number | null
           uma2?: number | null
           uma3?: number | null
@@ -174,6 +211,8 @@ export type Database = {
         Update: {
           basepts?: number | null
           id?: string
+          oka?: number
+          returnpts?: number
           uma1?: number | null
           uma2?: number | null
           uma3?: number | null
@@ -192,9 +231,9 @@ export type Database = {
       tournaments: {
         Row: {
           created_at: string | null
-          dnfThreshold: number
+          dnfThreshold: number | null
           format: string
-          icon: string | null
+          icon: string
           id: string
           organizer: string | null
           phase_configs: Json | null
@@ -205,9 +244,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
-          dnfThreshold?: number
+          dnfThreshold?: number | null
           format?: string
-          icon?: string | null
+          icon?: string
           id?: string
           organizer?: string | null
           phase_configs?: Json | null
@@ -218,9 +257,9 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          dnfThreshold?: number
+          dnfThreshold?: number | null
           format?: string
-          icon?: string | null
+          icon?: string
           id?: string
           organizer?: string | null
           phase_configs?: Json | null
@@ -230,6 +269,77 @@ export type Database = {
           updates_at?: string
         }
         Relationships: []
+      }
+      tourney_players: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: number
+          role: Database["mahjong"]["Enums"]["relay_role"]
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id: number
+          role: Database["mahjong"]["Enums"]["relay_role"]
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: number
+          role?: Database["mahjong"]["Enums"]["relay_role"]
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "tourney_players_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "tourney_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tourney_teams: {
+        Row: {
+          created_at: string
+          id: string
+          logo: string | null
+          name: string
+          tournament_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name: string
+          tournament_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name?: string
+          tournament_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -248,7 +358,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      relay_role:
+        | "Senpo"
+        | "Jiho"
+        | "Chuken"
+        | "Fukusho"
+        | "Taisho"
+        | "Substitute"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -660,7 +776,16 @@ export type CompositeTypes<
 
 export const Constants = {
   mahjong: {
-    Enums: {},
+    Enums: {
+      relay_role: [
+        "Senpo",
+        "Jiho",
+        "Chuken",
+        "Fukusho",
+        "Taisho",
+        "Substitute",
+      ],
+    },
   },
   public: {
     Enums: {},
