@@ -230,6 +230,7 @@ export type Database = {
       }
       tournaments: {
         Row: {
+          content_url: string | null
           created_at: string | null
           dnfThreshold: number | null
           format: string
@@ -243,6 +244,7 @@ export type Database = {
           updates_at: string
         }
         Insert: {
+          content_url?: string | null
           created_at?: string | null
           dnfThreshold?: number | null
           format?: string
@@ -256,6 +258,7 @@ export type Database = {
           updates_at: string
         }
         Update: {
+          content_url?: string | null
           created_at?: string | null
           dnfThreshold?: number | null
           format?: string
