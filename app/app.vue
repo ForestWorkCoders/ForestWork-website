@@ -3,6 +3,10 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <SpeedInsights />
+    <SpeedInsights v-if="!isDev" />
   </div>
 </template>
+
+<script setup>
+const isDev = process.dev;
+</script>

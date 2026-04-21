@@ -1,18 +1,18 @@
 <script setup>
 import { computed } from 'vue'
 
-// 定義接收外部傳入的賽事 ID
 const props = defineProps({
     tournamentId: {
         type: String,
         required: true
     }
 })
-
 // 呼叫 API 取得排行榜資料
 const { data: leaderboardData, pending: leaderboardPending } = await useFetch(`/api/mahjong/tournaments/${props.tournamentId}/leaderboard`)
 
-// 定義欄位 (從原本的 [id].vue 搬過來)
+console.log('Leaderboard Data:', leaderboardData.value)
+
+// 定義 UTable 的 Columns (表頭契約)
 const leaderboardColumns = computed(() => {
     const baseColumns = [
         { accessorKey: 'rank', header: '排名' },
@@ -58,10 +58,13 @@ const leaderboardColumns = computed(() => {
                 <template #rank-cell="{ row }">
                     <span v-if="row.original.rank === 'DNF'"
                         class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs font-bold rounded">DNF</span>
-                    <span v-else class="font-bold text-lg"
-                        :class="{ 'text-amber-500': row.original.rank === 1, 'text-gray-400': row.original.rank === 2, 'text-amber-700 dark:text-amber-600': row.original.rank === 3 }">
-                        #{{ row.original.rank }}
-                    </span>
+                    <div v-else class="flex items-center gap-2">
+                        <span class="font-bold text-lg"
+                            :class="{ 'text-amber-500': row.original.rank === 1, 'text-gray-400': row.original.rank === 2, 'text-amber-700 dark:text-amber-600': row.original.rank === 3 }">
+                            #{{ row.original.rank }} 
+                            <RankTrend :diff="row.original.rank_diff" />
+                        </span>
+                    </div>
                 </template>
                 <template #player-cell="{ row }">
                     <div class="flex items-center gap-3">
@@ -83,11 +86,11 @@ const leaderboardColumns = computed(() => {
             </UTable>
         </div>
 
-                <div
-                class="mt-4 p-6 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800/60 bg-gray-50/50 dark:bg-gray-900/20 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 transition-colors">
-                <UIcon name="i-lucide-sticky-note" class="w-6 h-6 mb-2 opacity-50" />
-                <span class="text-sm font-medium tracking-wide">備註保留區塊 · Sidenotes</span>
-                <p class="text-xs mt-1 opacity-70">未來的裁判備註或賽事附註將顯示於此</p>
-            </div>
+        <div
+            class="mt-4 p-6 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800/60 bg-gray-50/50 dark:bg-gray-900/20 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 transition-colors">
+            <UIcon name="i-lucide-sticky-note" class="w-6 h-6 mb-2 opacity-50" />
+            <span class="text-sm font-medium tracking-wide">備註保留區塊 · Sidenotes</span>
+            <p class="text-xs mt-1 opacity-70">未來的裁判備註或賽事附註將顯示於此</p>
+        </div>
     </section>
 </template>

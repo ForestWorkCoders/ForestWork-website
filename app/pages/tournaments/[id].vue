@@ -1,10 +1,56 @@
 <script setup>
 const route = useRoute()
 
-// 唯一的 API 呼叫：取得賽事基本資訊 (Hero Section 使用)
+// ==========================================
+// 1. 取得基本資料 (第一個 await 必須在最前面)
+// ==========================================
 const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournaments/${route.params.id}`)
 
-// 新增：動態麵包屑導航
+// ==========================================
+// 2. 宣告所有 computed 賽制判斷 (馬上宣告，避免後面找不到)
+// ==========================================
+const isModernInvitational = computed(() => {
+    // 1. 如果不是邀請賽，直接 false
+    if (tourney.value?.format !== 'invitational') return false
+
+    // 2. 獲取賽事的建立年份
+    const year = tourney.value?.created_at ? new Date(tourney.value.created_at).getFullYear() : 0
+
+    // 3. 判斷是否跨過 2025 分水嶺
+    return year >= 2025
+})
+
+const isRelay = computed(() => {
+    return tourney.value?.format === 'relay'
+})
+
+const isEvent = computed(() => {
+    return tourney.value?.format === 'event'
+})
+
+// ==========================================
+// 3. 取得 Content (第二個 await，依賴前面的 isEvent)
+// ==========================================
+// 我們呼叫上一動剛寫好的魔法 API，它會回傳注入好玩家大頭貼的 JSON
+// ★ 新增：全站通用的 Markdown 網址解析器
+const contentUrl = computed(() => {
+    const rawConfig = tourney.value?.phase_configs
+    if (!rawConfig) return null
+
+    let parsed = {}
+    if (typeof rawConfig === 'string') {
+        try { parsed = JSON.parse(rawConfig) } catch (e) {}
+    } else if (typeof rawConfig === 'object') {
+        parsed = rawConfig
+    }
+
+    // 只要你的 JSON 裡面有設定 content_url，所有賽事都能讀到！
+    return parsed.content_url || null
+})
+
+// ==========================================
+// 4. 動態麵包屑導航
+// ==========================================
 const breadcrumbLinks = computed(() => {
     return [
         {
@@ -27,15 +73,18 @@ const breadcrumbLinks = computed(() => {
 })
 
 
-// 定義下方的導覽標籤
-const baseTabs = [
-    { label: '賽事資訊 · Information', slot: 'info' },
-    { label: '賽事結果 · Result', slot: 'result' },
-    { label: '玩家數據 · Player Stats', slot: 'stats' },
-    { label: '直播記錄 · VODs', slot: 'vods' }
-]
-
+// ==========================================
+// 5. 定義下方的導覽標籤 (★ 必須放在檔案最下方 ★)
+// ==========================================
 const tabs = computed(() => {
+
+    const baseTabs = [
+        { label: '賽事資訊 · Information', slot: 'info' },
+        { label: '賽事結果 · Result', slot: 'result' },
+        { label: '玩家數據 · Player Stats', slot: 'stats' },
+        { label: '直播記錄 · VODs', slot: 'vods' }
+    ]
+
     // 記得用可選串連 (?.) 因為初始載入時 tourney 可能是 null
     if (tourney.value?.format === 'invitational') {
         return [
@@ -51,22 +100,13 @@ const tabs = computed(() => {
             ...baseTabs.slice(1)
         ]
     }
+
+    // 如果是特殊賽事 (Event)，如果你想隱藏某些 Tab (例如 Player Stats)，可以在這裡操作
+    // 例如：過濾掉 key 為 stats 的標籤
+    if (isEvent.value) {
+        return baseTabs.filter(tab => tab.slot !== 'stats')
+    }
     return baseTabs
-})
-
-const isModernInvitational = computed(() => {
-    // 1. 如果不是邀請賽，直接 false
-    if (tourney.value?.format !== 'invitational') return false
-
-    // 2. 獲取賽事的建立年份
-    const year = tourney.value?.created_at ? new Date(tourney.value.created_at).getFullYear() : 0
-
-    // 3. 判斷是否跨過 2025 分水嶺
-    return year >= 2025
-})
-
-const isRelay = computed(() => {
-    return tourney.value?.format === 'relay'
 })
 </script>
 
@@ -168,12 +208,13 @@ const isRelay = computed(() => {
                         <template #info>
                             <div
                                 class="bg-white/90 dark:bg-[#1a1b26] w-full h-[600px] mt-2 rounded-lg flex items-center justify-center">
-                                <span class="text-gray-500 font-bold tracking-widest">CONTENT PLACEHOLDER</span>
+                                <TournamentsInfo :content-url="contentUrl" />
                             </div>
                         </template>
 
                         <template #prereq>
                             <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
+
                                 <TournamentsLeaderboardInvitational :tournament-id="route.params.id" />
                             </div>
                         </template>
@@ -188,7 +229,8 @@ const isRelay = computed(() => {
                             <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
 
                                 <template v-if="isModernInvitational">
-                                    <TournamentsLeaderboardPhased v-if="isModernInvitational" :tournament-id="route.params.id" />
+                                    <TournamentsLeaderboardPhased v-if="isModernInvitational"
+                                        :tournament-id="route.params.id" />
                                 </template>
 
                                 <template v-else-if="isRelay">
@@ -199,7 +241,6 @@ const isRelay = computed(() => {
                                     <TournamentsLeaderboardStandard :tournament-id="route.params.id" />
                                     <TournamentsMatchHistoryStandard :tournament-id="route.params.id" />
                                 </template>
-
                             </div>
                         </template>
 

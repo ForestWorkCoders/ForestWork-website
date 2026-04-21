@@ -189,33 +189,33 @@ export type Database = {
       }
       rules: {
         Row: {
-          basepts: number | null
+          basepts: number
           id: string
           oka: number
           returnpts: number
-          uma1: number | null
-          uma2: number | null
-          uma3: number | null
+          uma1: number
+          uma2: number
+          uma3: number
           uma4: number | null
         }
         Insert: {
-          basepts?: number | null
+          basepts?: number
           id?: string
           oka?: number
           returnpts?: number
-          uma1?: number | null
-          uma2?: number | null
-          uma3?: number | null
+          uma1?: number
+          uma2?: number
+          uma3?: number
           uma4?: number | null
         }
         Update: {
-          basepts?: number | null
+          basepts?: number
           id?: string
           oka?: number
           returnpts?: number
-          uma1?: number | null
-          uma2?: number | null
-          uma3?: number | null
+          uma1?: number
+          uma2?: number
+          uma3?: number
           uma4?: number | null
         }
         Relationships: [

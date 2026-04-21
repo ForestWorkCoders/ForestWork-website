@@ -69,30 +69,59 @@ export default defineEventHandler(async (event) => {
 
     if (!rawRanks || rawRanks.length === 0) return []
 
+    const latestMonth = Math.max(...rawRanks.map(r => r.month))
+
     // 3. 升級版 Map/Reduce：保留月份明細
-    const aggregatedStats = new Map<number, { total: number, months: Record<number, number> }>()
+    const aggregatedStats = new Map<number, {
+        total: number,
+        previous_total: number,
+        previous_played_months: number,
+        months: Record<number, number>
+    }>()
 
     rawRanks.forEach(r => {
         if (!aggregatedStats.has(r.account_id)) {
-            aggregatedStats.set(r.account_id, { total: 0, months: {} })
+            aggregatedStats.set(r.account_id, {
+                total: 0,
+                previous_total: 0,
+                previous_played_months: 0,
+                months: {}
+            })
         }
         const stat = aggregatedStats.get(r.account_id)!
         stat.total += r.points
-        // 記錄該月份的分數
         stat.months[r.month] = (stat.months[r.month] || 0) + r.points
+
+        // ★ 如果這個月早於「最新的月」，把它算進歷史成績中！
+        if (r.month < latestMonth) {
+            stat.previous_total += r.points
+            stat.previous_played_months += 1
+        }
     })
 
-    // 轉回陣列，並按總分排序
-    const finalRanks = Array.from(aggregatedStats.entries())
-        .map(([account_id, data]) => ({
-            account_id,
-            points: data.total,
-            months: data.months
-        }))
-        .sort((a, b) => b.points - a.points)
+    // ==========================================
+    // 4. 計算上個月的排行榜 (模擬快照)
+    // ==========================================
+    const prevLeaderboard = Array.from(aggregatedStats.entries())
+        .sort((a, b) => b[1].previous_total - a[1].previous_total)
+
+    const previousRanks = new Map<number, number | 'DNF'>()
+    let prevRankCounter = 1
+    prevLeaderboard.forEach(([account_id, stat]) => {
+        if (stat.previous_played_months === 0) {
+            // 如果上個月為止他都還沒參加過任何月賽，標記為 DNF (不存在排行榜上)
+            previousRanks.set(account_id, 'DNF')
+        } else {
+            previousRanks.set(account_id, prevRankCounter++)
+        }
+    })
+
+    // 計算這個月的最終排行榜
+    const currentLeaderboard = Array.from(aggregatedStats.entries())
+        .sort((a, b) => b[1].total - a[1].total)
 
     // 4. 獲取玩家名稱與頭像 (保持你原來的邏輯不變)
-    const accountIds = finalRanks.map(r => r.account_id)
+    const accountIds = currentLeaderboard.map(r => r[0])
     const { data: participants } = await supabase
         .schema('mahjong')
         .from('participants')
@@ -120,13 +149,26 @@ export default defineEventHandler(async (event) => {
         meta: {
             months: displayMonthsMeta
         },
-        data: finalRanks.map((r, index) => ({
-            rank: index + 1,
-            account_id: r.account_id,
-            name: playerDict.get(r.account_id)?.name,
-            avatar: playerDict.get(r.account_id)?.avatar,
-            points: r.points,
-            months: r.months
-        }))
+        data: currentLeaderboard.map(([account_id, stat], index) => {
+            const currentRank = index + 1
+            const prevRank = previousRanks.get(account_id)
+
+            let rankDiff: number | string | null = null
+
+            // 只要上個月他有排名，就可以相減算出變動
+            if (prevRank && prevRank !== 'DNF') {
+                rankDiff = prevRank - currentRank
+            }
+
+            return {
+                rank: currentRank,
+                rank_diff: rankDiff, // ★ 將名次趨勢傳給前端
+                account_id: account_id,
+                name: playerDict.get(account_id)?.name,
+                avatar: playerDict.get(account_id)?.avatar,
+                points: Number(stat.total.toFixed(1)),
+                months: stat.months
+            }
+        })
     }
 })

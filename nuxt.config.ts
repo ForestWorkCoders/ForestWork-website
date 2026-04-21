@@ -12,6 +12,13 @@ export default defineNuxtConfig({
     redirect: false
   },
 
+  vue: {
+    compilerOptions: {
+      // Treat 'SpeedInsights' as a custom element so Vue stops looking for a component
+      isCustomElement: (tag) => tag === 'SpeedInsights'
+    }
+  },
+
   app: {
     head: {
       htmlAttrs: { 

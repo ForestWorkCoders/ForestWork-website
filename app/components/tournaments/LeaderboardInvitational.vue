@@ -1,20 +1,23 @@
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   tournamentId: {
     type: String,
     required: true
   }
 })
-
-// 1. 獲取資料 (這裡假設你已經用 as 修復了型別)
+// 呼叫 API 取得排行榜資料
 const { data: response, pending, error } = await useFetch(`/api/mahjong/tournaments/${props.tournamentId}/invitational-leaderboard`)
 
-// 2. 定義 UTable 的 Columns (表頭契約)
-const columns = computed(() => {
-  const baseCols = [
-    { id: 'rank', accessorKey: 'rank', header: 'RANK', class: 'text-center w-20' },
-    { id: 'player', accessorKey: 'name', header: 'PLAYER', class: 'min-w-[150px]' },
-    { id: 'total', accessorKey: 'total', header: 'TOTAL', class: 'text-right' }
+console.log(response.value)
+
+// 定義 UTable 的 Columns (表頭契約)
+const leaderboardColumns = computed(() => {
+  const baseColumns = [
+    { id: 'rank', accessorKey: 'rank', header: '排名', class: 'text-center w-20' },
+    { id: 'player', accessorKey: 'name', header: '玩家 (Player)', class: 'min-w-[150px]' },
+    { id: 'total', accessorKey: 'total', header: '總積分', class: 'text-right' }
   ]
 
   // API 給幾個月，這裡就長出幾根柱子
@@ -26,7 +29,7 @@ const columns = computed(() => {
     class: 'text-center text-gray-500 w-16'
   }))
 
-  return [...baseCols, ...monthCols]
+  return [...baseColumns, ...monthCols]
 })
 
 // 4. 展平資料 (The Data Adapter)
@@ -39,6 +42,7 @@ const tableRows = computed(() => {
   return response.value.data.map(p => {
     const row = {
       rank: p.rank,
+      rank_diff: p.rank_diff,
       avatar: p.avatar,
       name: p.name,
       total: p.points,
@@ -71,7 +75,7 @@ const getRankColor = (rank) => {
 
     <div v-else
       class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
-      <UTable :columns="columns" :data="tableRows" :loading="pending"
+      <UTable :columns="leaderboardColumns" :data="tableRows" :loading="pending"
         :empty-state="{ icon: 'i-lucide-database', label: '尚無玩家獲得積分' }" class="w-full" :ui="{
           td: { padding: 'py-3 px-4' },
           th: { padding: 'py-3 px-4', font: 'font-bold tracking-wider' }
@@ -80,6 +84,7 @@ const getRankColor = (rank) => {
           <div class="text-left font-black text-lg italic" :class="getRankColor(row.original.rank)">
             #{{ row.original.rank }}
           </div>
+          <RankTrend :diff="row.original.rank_diff" />
         </template>
 
         <template #player-cell="{ row }">
