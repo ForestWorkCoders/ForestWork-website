@@ -376,6 +376,64 @@ export type Database = {
       [_ in never]: never
     }
   }
+  plazmaburst: {
+    Tables: {
+      tournaments: {
+        Row: {
+          content_url: string | null
+          created_at: string | null
+          format: string
+          icon: string
+          id: string
+          organizer: string | null
+          phase_configs: Json | null
+          region: string | null
+          tier: string | null
+          title: string
+          updates_at: string
+        }
+        Insert: {
+          content_url?: string | null
+          created_at?: string | null
+          format?: string
+          icon?: string
+          id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
+          region?: string | null
+          tier?: string | null
+          title: string
+          updates_at: string
+        }
+        Update: {
+          content_url?: string | null
+          created_at?: string | null
+          format?: string
+          icon?: string
+          id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
+          region?: string | null
+          tier?: string | null
+          title?: string
+          updates_at?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       mahjong_data: {
@@ -792,6 +850,9 @@ export const Constants = {
         "Substitute",
       ],
     },
+  },
+  plazmaburst: {
+    Enums: {},
   },
   public: {
     Enums: {},

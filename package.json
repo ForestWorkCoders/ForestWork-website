@@ -8,7 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "update-database": "npx -y supabase gen types typescript --project-id \"efsheupssjxlmrfgmxwp\" --schema public --schema mahjong > app/types/database.types.ts"
+    "update-database": "npx -y supabase gen types typescript --project-id \"efsheupssjxlmrfgmxwp\" --schema public --schema mahjong --schema plazmaburst > app/types/database.types.ts"
   },
   "dependencies": {
     "@nuxt/image": "^2.0.0",
