@@ -3,6 +3,10 @@ defineProps({
     tourney: {
         type: Object,
         required: true
+    },
+    gameSlug: {
+        type: String,
+        required: true
     }
 })
 </script>
@@ -40,7 +44,7 @@ defineProps({
 
         <UButton color="gray" variant="ghost" trailing-icon="i-lucide-chevron-right"
             class="font-bold text-xs tracking-widest text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-            :to="`/tournaments/${tourney.id}`">
+            :to="`/games/${gameSlug}/tournaments/${tourney.id}`">
             DETAILS
         </UButton>
     </div>
