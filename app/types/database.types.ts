@@ -378,6 +378,119 @@ export type Database = {
   }
   plazmaburst: {
     Tables: {
+      players: {
+        Row: {
+          created_at: string
+          discord_id: number | null
+          id: number
+          nickname: string | null
+          profile_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          discord_id?: number | null
+          id?: number
+          nickname?: string | null
+          profile_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          discord_id?: number | null
+          id?: number
+          nickname?: string | null
+          profile_url?: string | null
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: number
+          joined_at: string | null
+          left_at: string | null
+          player_id: number | null
+          role: string
+          status: Database["plazmaburst"]["Enums"]["status"] | null
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          joined_at?: string | null
+          left_at?: string | null
+          player_id?: number | null
+          role: string
+          status?: Database["plazmaburst"]["Enums"]["status"] | null
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          joined_at?: string | null
+          left_at?: string | null
+          player_id?: number | null
+          role?: string
+          status?: Database["plazmaburst"]["Enums"]["status"] | null
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          colour: string
+          created_at: string
+          id: string
+          logo: string | null
+          name: string
+          notes: string | null
+          short_sign: string
+          tournament_id: string
+        }
+        Insert: {
+          colour: string
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name: string
+          notes?: string | null
+          short_sign: string
+          tournament_id: string
+        }
+        Update: {
+          colour?: string
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name?: string
+          notes?: string | null
+          short_sign?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
           content_url: string | null
@@ -428,7 +541,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      role: "manager" | "player" | "substitute"
+      status: "active" | "inactive" | "retired" | "traded" | "released"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -852,7 +966,10 @@ export const Constants = {
     },
   },
   plazmaburst: {
-    Enums: {},
+    Enums: {
+      role: ["manager", "player", "substitute"],
+      status: ["active", "inactive", "retired", "traded", "released"],
+    },
   },
   public: {
     Enums: {},

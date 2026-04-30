@@ -33,7 +33,7 @@ const breadcrumbLinks = computed(() => {
         {
             label: '賽事大廳 · Tournaments',
             icon: 'i-lucide-trophy',
-            to: '/games/mahjongsoul' 
+            to: '/games/mahjongsoul'
         },
         {
             label: tourney.value?.title || '載入中...',
@@ -171,7 +171,8 @@ const tabs = computed(() => {
                         }
                     }">
                         <template #info>
-                            <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in pb-12">
+                            <div
+                                class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in pb-12">
                                 <TournamentsInfo :content-url="contentUrl" />
                             </div>
                         </template>
