@@ -54,7 +54,7 @@ const circuits = [
     title: 'Plazma Burst 2', 
     icon: 'i-lucide-crosshair', 
     description: '經典橫向捲軸射擊賽事',
-    to: 'https://plazmaburst2.com' // 這裡換成 PB2 的實際連結
+    to: '/games/plazmaburst' 
   },
   { 
     id: 2, 
