@@ -378,26 +378,127 @@ export type Database = {
   }
   plazmaburst: {
     Tables: {
+      maps: {
+        Row: {
+          category: Database["plazmaburst"]["Enums"]["map_category"]
+          id: string
+          name: string
+          pb2_map_id: string
+          thumbnail_url: string
+        }
+        Insert: {
+          category: Database["plazmaburst"]["Enums"]["map_category"]
+          id?: string
+          name: string
+          pb2_map_id: string
+          thumbnail_url: string
+        }
+        Update: {
+          category?: Database["plazmaburst"]["Enums"]["map_category"]
+          id?: string
+          name?: string
+          pb2_map_id?: string
+          thumbnail_url?: string
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          blue_team_id: string
+          blue_team_score: number | null
+          completed_at: string | null
+          id: string
+          map_id: string | null
+          phase_tag: string
+          red_team_id: string
+          red_team_score: number | null
+          round_history: number[] | null
+          scheduled_at: string | null
+          status: string
+          tournament_id: string
+        }
+        Insert: {
+          blue_team_id: string
+          blue_team_score?: number | null
+          completed_at?: string | null
+          id?: string
+          map_id?: string | null
+          phase_tag: string
+          red_team_id: string
+          red_team_score?: number | null
+          round_history?: number[] | null
+          scheduled_at?: string | null
+          status?: string
+          tournament_id: string
+        }
+        Update: {
+          blue_team_id?: string
+          blue_team_score?: number | null
+          completed_at?: string | null
+          id?: string
+          map_id?: string | null
+          phase_tag?: string
+          red_team_id?: string
+          red_team_score?: number | null
+          round_history?: number[] | null
+          scheduled_at?: string | null
+          status?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_blue_team_id_fkey"
+            columns: ["blue_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_red_team_id_fkey"
+            columns: ["red_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       players: {
         Row: {
           created_at: string
           discord_id: number | null
-          id: number
-          nickname: string | null
+          id: string
+          nickname: string
+          profile_img: string | null
           profile_url: string | null
         }
         Insert: {
           created_at?: string
           discord_id?: number | null
-          id?: number
-          nickname?: string | null
+          id?: string
+          nickname: string
+          profile_img?: string | null
           profile_url?: string | null
         }
         Update: {
           created_at?: string
           discord_id?: number | null
-          id?: number
-          nickname?: string | null
+          id?: string
+          nickname?: string
+          profile_img?: string | null
           profile_url?: string | null
         }
         Relationships: []
@@ -408,8 +509,8 @@ export type Database = {
           id: number
           joined_at: string | null
           left_at: string | null
-          player_id: number | null
-          role: string
+          player_id: string
+          role: Database["plazmaburst"]["Enums"]["role"]
           status: Database["plazmaburst"]["Enums"]["status"] | null
           team_id: string
         }
@@ -418,8 +519,8 @@ export type Database = {
           id?: number
           joined_at?: string | null
           left_at?: string | null
-          player_id?: number | null
-          role: string
+          player_id: string
+          role?: Database["plazmaburst"]["Enums"]["role"]
           status?: Database["plazmaburst"]["Enums"]["status"] | null
           team_id: string
         }
@@ -428,8 +529,8 @@ export type Database = {
           id?: number
           joined_at?: string | null
           left_at?: string | null
-          player_id?: number | null
-          role?: string
+          player_id?: string
+          role?: Database["plazmaburst"]["Enums"]["role"]
           status?: Database["plazmaburst"]["Enums"]["status"] | null
           team_id?: string
         }
@@ -541,6 +642,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      map_category: "arena" | "rails" | "snipers" | "rockets" | "rays" | "snd"
       role: "manager" | "player" | "substitute"
       status: "active" | "inactive" | "retired" | "traded" | "released"
     }
@@ -967,6 +1069,7 @@ export const Constants = {
   },
   plazmaburst: {
     Enums: {
+      map_category: ["arena", "rails", "snipers", "rockets", "rays", "snd"],
       role: ["manager", "player", "substitute"],
       status: ["active", "inactive", "retired", "traded", "released"],
     },
