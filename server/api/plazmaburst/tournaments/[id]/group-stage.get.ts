@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
             red_team_score,
             blue_team_score,
             scheduled_at,
-            red_team:teams!matches_red_team_id_fkey(id, name, short_sign, colour),
-            blue_team:teams!matches_blue_team_id_fkey(id, name, short_sign, colour)
+            red_team:teams!matches_red_team_id_fkey(id, name, logo, short_sign, colour),
+            blue_team:teams!matches_blue_team_id_fkey(id, name, logo, short_sign, colour)
         `)
         .eq('tournament_id', tournamentId)
         .order('scheduled_at', { ascending: true })
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     const initTeam = (team: any) => {
         if (!team || standingsMap[team.id]) return
         standingsMap[team.id] = {
-            id: team.id, name: team.name, short_sign: team.short_sign, colour: team.colour,
+            id: team.id, name: team.name, short_sign: team.short_sign, colour: team.colour, logo: team.logo,
             pld: 0, w: 0, d: 0, l: 0, pts: 0, diff: 0
         }
     }

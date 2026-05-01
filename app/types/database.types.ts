@@ -402,47 +402,159 @@ export type Database = {
         }
         Relationships: []
       }
+      match_game_stats: {
+        Row: {
+          aces: number
+          deaths: number
+          double_kills: number
+          headshots: number
+          id: string
+          kills: number
+          match_game_id: string
+          penta_kills: number
+          player_id: string
+          quad_kills: number
+          team_id: string
+          triple_kills: number
+        }
+        Insert: {
+          aces?: number
+          deaths?: number
+          double_kills?: number
+          headshots?: number
+          id?: string
+          kills?: number
+          match_game_id: string
+          penta_kills?: number
+          player_id: string
+          quad_kills?: number
+          team_id: string
+          triple_kills?: number
+        }
+        Update: {
+          aces?: number
+          deaths?: number
+          double_kills?: number
+          headshots?: number
+          id?: string
+          kills?: number
+          match_game_id?: string
+          penta_kills?: number
+          player_id?: string
+          quad_kills?: number
+          team_id?: string
+          triple_kills?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_game_stats_match_game_id_fkey"
+            columns: ["match_game_id"]
+            isOneToOne: false
+            referencedRelation: "match_games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_game_stats_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_game_stats_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_games: {
+        Row: {
+          blue_team_score: number
+          game_number: number
+          id: string
+          map_id: string
+          match_id: string
+          red_team_score: number
+          round_history: number[]
+          status: Database["plazmaburst"]["Enums"]["match_status"]
+        }
+        Insert: {
+          blue_team_score: number
+          game_number: number
+          id?: string
+          map_id: string
+          match_id: string
+          red_team_score: number
+          round_history: number[]
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
+        }
+        Update: {
+          blue_team_score?: number
+          game_number?: number
+          id?: string
+          map_id?: string
+          match_id?: string
+          red_team_score?: number
+          round_history?: number[]
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_games_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_games_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           blue_team_id: string
           blue_team_score: number | null
           completed_at: string | null
+          format: Database["plazmaburst"]["Enums"]["match_format"]
           id: string
-          map_id: string | null
           phase_tag: string
           red_team_id: string
           red_team_score: number | null
-          round_history: number[] | null
           scheduled_at: string | null
-          status: string
+          status: Database["plazmaburst"]["Enums"]["match_status"]
           tournament_id: string
         }
         Insert: {
           blue_team_id: string
           blue_team_score?: number | null
           completed_at?: string | null
+          format?: Database["plazmaburst"]["Enums"]["match_format"]
           id?: string
-          map_id?: string | null
           phase_tag: string
           red_team_id: string
           red_team_score?: number | null
-          round_history?: number[] | null
           scheduled_at?: string | null
-          status?: string
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
           tournament_id: string
         }
         Update: {
           blue_team_id?: string
           blue_team_score?: number | null
           completed_at?: string | null
+          format?: Database["plazmaburst"]["Enums"]["match_format"]
           id?: string
-          map_id?: string | null
           phase_tag?: string
           red_team_id?: string
           red_team_score?: number | null
-          round_history?: number[] | null
           scheduled_at?: string | null
-          status?: string
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
           tournament_id?: string
         }
         Relationships: [
@@ -451,13 +563,6 @@ export type Database = {
             columns: ["blue_team_id"]
             isOneToOne: false
             referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "matches_map_id_fkey"
-            columns: ["map_id"]
-            isOneToOne: false
-            referencedRelation: "maps"
             referencedColumns: ["id"]
           },
           {
@@ -643,6 +748,14 @@ export type Database = {
     }
     Enums: {
       map_category: "arena" | "rails" | "snipers" | "rockets" | "rays" | "snd"
+      match_format: "BO1" | "BO3" | "BO5" | "BO7"
+      match_status:
+        | "Upcoming"
+        | "Completed"
+        | "Walkover_Red"
+        | "Walkover_Blue"
+        | "Draw"
+        | "Cancelled"
       role: "manager" | "player" | "substitute"
       status: "active" | "inactive" | "retired" | "traded" | "released"
     }
@@ -1070,6 +1183,15 @@ export const Constants = {
   plazmaburst: {
     Enums: {
       map_category: ["arena", "rails", "snipers", "rockets", "rays", "snd"],
+      match_format: ["BO1", "BO3", "BO5", "BO7"],
+      match_status: [
+        "Upcoming",
+        "Completed",
+        "Walkover_Red",
+        "Walkover_Blue",
+        "Draw",
+        "Cancelled",
+      ],
       role: ["manager", "player", "substitute"],
       status: ["active", "inactive", "retired", "traded", "released"],
     },
