@@ -521,9 +521,12 @@ export type Database = {
         Row: {
           blue_team_id: string
           blue_team_score: number | null
+          bracket_position: string | null
           completed_at: string | null
           format: Database["plazmaburst"]["Enums"]["match_format"]
           id: string
+          next_loser_match_id: string | null
+          next_match_id: string | null
           phase_tag: string
           red_team_id: string
           red_team_score: number | null
@@ -534,9 +537,12 @@ export type Database = {
         Insert: {
           blue_team_id: string
           blue_team_score?: number | null
+          bracket_position?: string | null
           completed_at?: string | null
           format?: Database["plazmaburst"]["Enums"]["match_format"]
           id?: string
+          next_loser_match_id?: string | null
+          next_match_id?: string | null
           phase_tag: string
           red_team_id: string
           red_team_score?: number | null
@@ -547,9 +553,12 @@ export type Database = {
         Update: {
           blue_team_id?: string
           blue_team_score?: number | null
+          bracket_position?: string | null
           completed_at?: string | null
           format?: Database["plazmaburst"]["Enums"]["match_format"]
           id?: string
+          next_loser_match_id?: string | null
+          next_match_id?: string | null
           phase_tag?: string
           red_team_id?: string
           red_team_score?: number | null
@@ -563,6 +572,20 @@ export type Database = {
             columns: ["blue_team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_next_loser_match_id_fkey"
+            columns: ["next_loser_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_next_match_id_fkey"
+            columns: ["next_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
             referencedColumns: ["id"]
           },
           {

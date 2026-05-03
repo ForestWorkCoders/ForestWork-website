@@ -73,7 +73,7 @@ const displayData = computed(() => {
 const totalRounds = computed(() => {
   if (!displayData.value || displayData.value.isOverview) return 0
   const historyLen = displayData.value.roundHistory.length
-  return Math.max(historyLen, 28) // 即使沒打滿也預留 28 格的空間，比較好看
+  return Math.max(historyLen, 15) // 即使沒打滿也預留 15 格的空間，比較好看
 })
 
 
@@ -226,7 +226,6 @@ const getContrastClass = (hexColor) => {
             </div>
 
             <!-- 時間軸格子區 -->
-            <!-- 時間軸格子區 -->
             <div class="flex gap-1.5">
               <div v-for="roundNum in totalRounds" :key="roundNum" class="flex flex-col gap-1 w-8 items-center">
 
@@ -241,7 +240,7 @@ const getContrastClass = (hexColor) => {
                   :style="displayData.roundHistory[roundNum - 1] === 1 ? { backgroundColor: match.redTeam.colour || '#ef4444' } : {}"
                   :class="displayData.roundHistory[roundNum - 1] === 1 ? '' : 'bg-gray-200 dark:bg-gray-800/50'">
                   <UIcon v-if="displayData.roundHistory[roundNum - 1] === 1" name="i-lucide-crosshair"
-                    class="w-4 h-4 text-white" :class="getContrastClass(match.redTeam.colour)" />
+                    class="w-4 h-4" :class="getContrastClass(match.redTeam.colour)" />
                 </div>
 
                 <!-- 藍隊結果格子 (完美修復版) -->

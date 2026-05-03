@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
             blue_team:teams!matches_blue_team_id_fkey(id, name, logo, short_sign, colour)
         `)
         .eq('tournament_id', tournamentId)
+        .is('bracket_position', null)
         .order('scheduled_at', { ascending: true })
 
     if (error) throw createError({ statusCode: 500, statusMessage: error.message })
@@ -102,7 +103,7 @@ export default defineEventHandler(async (event) => {
     // 加上排名 (Rank) 和晉級線標記 (Qualified)
     standings.forEach((team, index) => {
         team.rank = index + 1
-        team.qualified = index < 4 // 假設前 4 名晉級，這個可以根據賽事配置調整
+        team.qualified = index < 6 // 假設前 6 名晉級，這個可以根據賽事配置調整
     })
 
     // 格式化賽程為陣列
