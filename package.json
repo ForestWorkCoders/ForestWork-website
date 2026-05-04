@@ -24,6 +24,7 @@
   "devDependencies": {
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.6.1",
+    "@vite-pwa/nuxt": "^1.1.1",
     "nuxt": "^4.4.2",
     "tailwindcss": "^4.2.4",
     "vue": "^3.5.32",
