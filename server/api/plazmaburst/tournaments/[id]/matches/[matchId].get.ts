@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         .schema('plazmaburst')
         .from('matches')
         .select(`
-            id, phase_tag, format, status, red_team_score, blue_team_score, scheduled_at,
+            id, phase_tag, format, status, red_team_score, blue_team_score, scheduled_at, tournament:tournaments(id, title),
             red_team:teams!matches_red_team_id_fkey(id, name, short_sign, colour, logo),
             blue_team:teams!matches_blue_team_id_fkey(id, name, short_sign, colour, logo),
             match_games (
@@ -58,9 +58,12 @@ export default defineEventHandler(async (event) => {
         headshots: s.headshots,
         aces: s.aces
     })
+    
+    console.log("Tournament Title:", match.tournament.title)
 
     const formattedMatch = {
         id: match.id,
+        tournamentTitle: match.tournament?.title,
         phase: match.phase_tag,
         format: match.format, // 'BO1', 'BO3', 'BO5'
         status: match.status,
@@ -75,6 +78,8 @@ export default defineEventHandler(async (event) => {
         // 隊伍資訊
         redTeam: match.red_team,
         blueTeam: match.blue_team,
+
+        
         
         // 子地圖戰況列表
         games: rawGames.map(g => {

@@ -76,9 +76,6 @@ const totalRounds = computed(() => {
   return Math.max(historyLen, 15) // 即使沒打滿也預留 15 格的空間，比較好看
 })
 
-
-// ... 保留你原有的 match fetch 邏輯
-
 // 動態麵包屑導航
 const breadcrumbLinks = computed(() => {
   return [
@@ -93,9 +90,8 @@ const breadcrumbLinks = computed(() => {
       to: '/games/plazmaburst'
     },
     {
-      // 這裡退回賽事首頁。由於我們沒在 match API 裡抓賽事名稱，用通用字眼即可，
-      // 或是你可以回後端 API 把 tournament(title) 也 JOIN 出來。
-      label: '賽事主頁 · Tournament',
+      // 直接读取后端喂过来的赛事标题。使用可选链 (?.) 和回退操作符 (||) 防止白屏崩溃
+      label: match.value?.tournamentTitle || '賽事主頁 · Tournament', 
       icon: 'i-lucide-trophy',
       to: `/games/plazmaburst/tournaments/${tournamentId}`
     },
