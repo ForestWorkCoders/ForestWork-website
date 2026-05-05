@@ -58,8 +58,6 @@ export default defineEventHandler(async (event) => {
         headshots: s.headshots,
         aces: s.aces
     })
-    
-    console.log("Tournament Title:", match.tournament.title)
 
     const formattedMatch = {
         id: match.id,
