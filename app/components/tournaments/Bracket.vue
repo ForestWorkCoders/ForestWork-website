@@ -166,7 +166,7 @@ const drawOrthogonalLine = (x1, y1, x2, y2, isDrop) => {
       <NuxtLink 
         v-for="node in graphData.nodes" 
         :key="node.id"
-        :to="`/games/plazmaburst/tournaments/${$route.params.tournamentId}/matches/${node.match.id}`"
+        :to="`/games/plazmaburst/tournaments/${$route.params.id}/matches/${node.match.id}`"
         class="absolute block bg-white dark:bg-[#1a1c23] border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm z-10 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer group"
         :style="{ left: node.x + 'px', top: node.y + 'px', width: CARD_W + 'px', height: CARD_H + 'px' }"
       >
