@@ -1,2 +1,10 @@
 User-Agent: *
-Disallow:
+# Block administrative or private folders
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /do_you_believe_there_is_a_flag_in_here/
+Disallow: /you_wot_seriously_do_that/
+Disallow: /i_have_no_idea/
+# Block specific file types if needed
+Disallow: /*.json$

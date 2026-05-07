@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 // 定義給 Sidebar 的資料
-const mahjongSidebarData = {
+const plazmaBurstSidebarData = {
     name: '超时空战士 2 · Plazma Burst 2',
     image_light: '/images/plazmaBurst/logo-black.png',
     image_dark: '/images/plazmaBurst/logo-white.png',
@@ -174,10 +174,10 @@ const paginatedPastTournaments = computed(() => {
                     </div>
 
                     <div class="lg:col-span-4 space-y-6">
-                        <GameSidebar :gameName="mahjongSidebarData.name"
-                            :coverImageLight="mahjongSidebarData.image_light"
-                            :coverImageDark="mahjongSidebarData.image_dark" :description="mahjongSidebarData.desc"
-                            :links="mahjongSidebarData.socialLinks" />
+                        <GameSidebar :gameName="plazmaBurstSidebarData.name"
+                            :coverImageLight="plazmaBurstSidebarData.image_light"
+                            :coverImageDark="plazmaBurstSidebarData.image_dark" :description="plazmaBurstSidebarData.desc"
+                            :links="plazmaBurstSidebarData.socialLinks" />
                     </div>
 
                 </div>
