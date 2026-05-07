@@ -50,7 +50,7 @@ const parsedHtml = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white/90 dark:bg-[#1a1b26] p-8 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+  <div class="bg-white dark:bg-[#1a1b26] text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
 
     <div v-if="pending" class="flex flex-col items-center justify-center py-12 text-gray-500">
       <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin mb-4 text-emerald-500" />
@@ -65,55 +65,57 @@ const parsedHtml = computed(() => {
       尚未設定賽事內容。
     </div>
 
-
-      <div v-else class="markdown-body" v-html="parsedHtml"></div>
-
-
+    <div v-else class="markdown-body text-gray-900 dark:text-gray-100" v-html="parsedHtml"></div>
 
   </div>
 </template>
 
 <style scoped>
-@reference "tailwindcss";
+@reference "tailwindcss"; 
 
-/* 使用 :deep() 穿透作用域，命中 v-html 内部的元素 */
+/* Linus 规则：绝对不要在这里写任何颜色和 dark: 前缀。
+  所有的基础颜色由父组件的 div (text-gray-900 / dark:text-gray-100) 决定。
+*/
+
 .markdown-body :deep(h1) {
-  @apply text-3xl font-bold mb-6 mt-8 text-gray-900 dark:text-white;
+  @apply text-3xl font-bold mb-6 mt-8;
+  /* 自动继承 100% 不透明的父元素文字颜色 */
 }
 
 .markdown-body :deep(h2) {
-  @apply text-2xl font-bold mb-4 mt-8 border-b pb-2 border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-100;
+  @apply text-2xl font-bold mb-4 mt-8 border-b pb-2;
+  /* 用 currentColor 让边框颜色自动跟随文字颜色，只保留 20% 透明度 */
+  border-color: currentColor;
+  opacity: 0.9;
 }
 
 .markdown-body :deep(h3) {
-  @apply text-xl font-semibold mb-3 mt-6 text-gray-800 dark:text-gray-100;
+  @apply text-xl font-semibold mb-3 mt-6;
 }
 
 .markdown-body :deep(p) {
-  @apply mb-4 leading-relaxed text-gray-600 dark:text-gray-300;
+  @apply mb-4 leading-relaxed;
+  /* 85% 的透明度。在白底上自动变成深灰，在黑底上自动变成浅灰。极度优雅。 */
+  opacity: 0.85;
 }
 
-.markdown-body :deep(ul) {
-  @apply list-disc pl-6 mb-4 text-gray-600 dark:text-gray-300 space-y-1;
-}
-
-.markdown-body :deep(ol) {
-  @apply list-decimal pl-6 mb-4 text-gray-600 dark:text-gray-300 space-y-1;
+.markdown-body :deep(ul), .markdown-body :deep(ol) {
+  @apply pl-6 mb-4 space-y-1;
+  opacity: 0.85;
 }
 
 .markdown-body :deep(a) {
-  @apply text-emerald-600 dark:text-emerald-400 hover:underline;
-}
-
-.markdown-body :deep(strong) {
-  @apply font-bold text-gray-900 dark:text-white;
+  @apply hover:underline;
+  /* 祖母绿 500 是完美的中间色，在黑底和白底上都能清晰阅读 */
+  color: #10b981; 
 }
 
 .markdown-body :deep(blockquote) {
-  @apply border-l-4 border-gray-300 dark:border-gray-700 pl-4 italic text-gray-500 dark:text-gray-400 my-4;
+  @apply border-l-4 pl-4 italic my-4;
+  border-color: currentColor;
+  opacity: 0.6;
 }
 
-/* 确保第一个元素的顶部没有多余空白 */
 .markdown-body :deep(> *:first-child) {
   @apply mt-0;
 }

@@ -1,6 +1,38 @@
+/* 1. 绝对干净的入口声明。不准再加任何 @tailwind 指令！ */
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* 2. 斯巴达式原生实现，消除所有 @apply 魔法，直接读取 V4 变量 */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-300) transparent;
+}
+
+/* 适配 Firefox 深色模式 */
+.dark .custom-scrollbar {
+  scrollbar-color: var(--color-gray-700) transparent;
+}
+
+/* WebKit (Chrome/Safari/Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-300);
+  border-radius: 9999px; /* 绝对等同于 rounded-full */
+}
+
+/* 适配 WebKit 深色模式 (基于 Nuxt UI 的 .dark 类) */
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-700);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-emerald-500);
+}
