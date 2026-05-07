@@ -340,10 +340,10 @@ const abnormalMatchMessage = computed(() => {
                 match.redTeam.name }}</h4>
             </div>
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
-              <table class="w-full text-right text-sm">
+              <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
                   <tr class="text-xs text-gray-400 border-b border-gray-200 dark:border-gray-800">
-                    <th class="py-2 pr-4 text-left font-medium">Player</th>
+                    <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
                     <th class="py-2 px-3 font-medium w-12">K</th>
                     <th class="py-2 px-3 font-medium w-12">D</th>
                     <th class="py-2 px-3 font-bold text-gray-600 dark:text-gray-300 w-16">K/D</th>
@@ -354,7 +354,7 @@ const abnormalMatchMessage = computed(() => {
                 <tbody>
                   <tr v-for="player in displayData.redTeamStats" :key="player.id"
                     class="border-b border-gray-50 dark:border-gray-800/30 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100 truncate max-w-[120px]">
+                    <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100">
                       {{ player.name }}</td>
                     <td class="py-2.5 px-3 font-mono">{{ player.kills }}</td>
                     <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.deaths }}</td>
@@ -383,10 +383,10 @@ const abnormalMatchMessage = computed(() => {
                 match.blueTeam.name }}</h4>
             </div>
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
-              <table class="w-full text-right text-sm">
+              <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
                   <tr class="text-xs text-gray-400 border-b border-gray-200 dark:border-gray-800">
-                    <th class="py-2 pr-4 text-left font-medium">Player</th>
+                    <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
                     <th class="py-2 px-3 font-medium w-12">K</th>
                     <th class="py-2 px-3 font-medium w-12">D</th>
                     <th class="py-2 px-3 font-bold text-gray-600 dark:text-gray-300 w-16">K/D</th>
@@ -397,7 +397,7 @@ const abnormalMatchMessage = computed(() => {
                 <tbody>
                   <tr v-for="player in displayData.blueTeamStats" :key="player.id"
                     class="border-b border-gray-50 dark:border-gray-800/30 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100 truncate max-w-[120px]">
+                    <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100">
                       {{ player.name }}</td>
                     <td class="py-2.5 px-3 font-mono">{{ player.kills }}</td>
                     <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.deaths }}</td>
