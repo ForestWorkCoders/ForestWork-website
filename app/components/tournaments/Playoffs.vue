@@ -40,13 +40,14 @@ const isEmpty = computed(() => {
         <div class="flex items-center gap-3 pl-2">
           <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
           <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">
-            {{ brackets.lowerBracket.length > 0 ? 'Upper Bracket' : 'Playoffs Bracket' }}
+            <!-- {{ brackets.lowerBracket.length > 0 ? 'Upper Bracket' : 'Playoffs Bracket' }} -->
+            {{  'Playoffs Bracket' }}
           </h2>
         </div>
         <TournamentsBracket :upperBracket="brackets.upperBracket" :lowerBracket="brackets.lowerBracket" />
       </div>
 
-      <div v-if="brackets.lowerBracket.length > 0" class="space-y-6 relative">
+      <!-- <div v-if="brackets.lowerBracket.length > 0" class="space-y-6 relative">
         <div class="absolute -top-8 left-0 right-0 border-t border-dashed border-gray-200 dark:border-gray-800"></div>
         
         <div class="flex items-center gap-3 pl-2">
@@ -54,7 +55,7 @@ const isEmpty = computed(() => {
           <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Lower Bracket</h2>
         </div>
         <TournamentsBracket :rounds="brackets.lowerBracket" />
-      </div>
+      </div> -->
     </div>
 
     <div class="mt-16 pt-12 border-t-2 border-gray-100 dark:border-gray-800">
