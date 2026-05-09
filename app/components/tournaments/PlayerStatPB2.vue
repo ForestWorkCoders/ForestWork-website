@@ -144,13 +144,26 @@ const chartOptions = {
     r: {
       min: 0,
       max: 100,
-      ticks: { display: false }, // 隐藏圈圈上的数字
-      grid: { color: 'rgba(156, 163, 175, 0.2)' }, // 暗黑模式友好的网格线
-      angleLines: { color: 'rgba(156, 163, 175, 0.2)' }
+      ticks: { 
+        stepSize: 10,
+        display: false // 依然隐藏刻度数字，保持雷达图干净
+      },
+      grid: { 
+        // 核心魔法：只有遇到 0 或者 >= 60 的刻度时，才画出蜘蛛网
+        color: (context) => {
+          if (context.tick.value === 0 || context.tick.value >= 60) {
+            return 'rgba(156, 163, 175, 0.2)'; // Tailwind gray-400 的 20% 透明度
+          }
+          return 'transparent'; // 把 10, 20, 30, 40, 50 的网格线彻底隐形
+        }
+      },
+      angleLines: { 
+        color: 'rgba(156, 163, 175, 0.2)' // 保持从中心射出的 5 条对角线
+      }
     }
   },
   plugins: {
-    legend: { display: false }, // 不需要显示图例
+    legend: { display: false },
     tooltip: { enabled: true }
   }
 }
