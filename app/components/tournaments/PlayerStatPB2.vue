@@ -53,10 +53,10 @@ const tableColumns = [
   { accessorKey: 'kdr', header: 'KDR' },
   { accessorKey: 'aces', header: 'Aces' },
   { accessorKey: 'headshots', header: 'Clutch' },
-  { accessorKey: 'double_kills', header: '2K' },
-  { accessorKey: 'triple_kills', header: '3K' },
-  { accessorKey: 'quad_kills', header: '4K' },
-  { accessorKey: 'penta_kills', header: '5K' }
+  // { accessorKey: 'double_kills', header: '2K' },
+  // { accessorKey: 'triple_kills', header: '3K' },
+  // { accessorKey: 'quad_kills', header: '4K' },
+  // { accessorKey: 'penta_kills', header: '5K' }
 ]
 
 const currentTableData = computed(() => {
@@ -83,10 +83,10 @@ const currentTableData = computed(() => {
       kdr: kdrValue.toFixed(2),
       aces: detail.aces || 0,
       headshots: detail.headshots || 0,
-      double_kills: detail.double_kills || 0,
-      triple_kills: detail.triple_kills || 0,
-      quad_kills: detail.quad_kills || 0,
-      penta_kills: detail.penta_kills || 0
+      // double_kills: detail.double_kills || 0,
+      // triple_kills: detail.triple_kills || 0,
+      // quad_kills: detail.quad_kills || 0,
+      // penta_kills: detail.penta_kills || 0
     }
   })
 

@@ -58,6 +58,7 @@ const isEmpty = computed(() => {
       </div> -->
     </div>
 
+    <!--
     <div class="mt-16 pt-12 border-t-2 border-gray-100 dark:border-gray-800">
       <div class="flex items-center justify-between mb-8">
         <div>
@@ -91,6 +92,6 @@ const isEmpty = computed(() => {
         </div>
       </div>
     </div>
-
+-->
   </div>
 </template>
