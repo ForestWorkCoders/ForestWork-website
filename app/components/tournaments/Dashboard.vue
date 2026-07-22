@@ -29,7 +29,7 @@ const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tou
         
         <div class="border-b border-gray-200 dark:border-gray-800 pb-4 flex items-center justify-between">
           <h2 class="text-3xl font-black tracking-tight flex items-center gap-3">
-            <UIcon :name="phase.is_final ? 'i-heroicons-trophy' : 'i-heroicons-flag'" 
+            <UIcon :name="phase.is_final ? 'i-lucide-trophy' : 'i-lucide-flag'" 
                    :class="phase.is_final ? 'text-yellow-500' : 'text-emerald-500'" />
             <span :class="phase.is_final ? 'text-yellow-500' : 'text-emerald-500'">
               {{ phase.title }}

@@ -48,8 +48,6 @@ function formatDate(dateString: string) {
 async function processPlayerMatches(matches: any[], ruleData: any, config: any, playerDict: Map<number, any>, dnfThreshold: number) {
     const data: Record<string, any> = {}
 
-    console.log(matches)
-
     // 遍歷 JSON 裡的 phases (常規賽只有一個 [{id: 'MAIN'}], 階段賽有多個)
     config.phases.forEach((phase: any) => {
         // 如果是常規賽(MAIN)，拿所有對局；如果是階段賽，根據 group_tag 過濾
