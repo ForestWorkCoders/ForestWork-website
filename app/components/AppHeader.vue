@@ -69,12 +69,8 @@ const variants: { [k: string]: VariantType | ((custom: unknown) => VariantType) 
   <UHeader>
     <template #title>
       <NuxtLink to="/" class="flex-shrink-0 flex items-center gap-2">
-        <UColorModeImage
-    light="/images/logo-light.png"
-    dark="/images/logo-dark.png"
-    width="32" height="32"
-    alt="ForestWork" class="h-8 w-auto"
-    />
+        <UColorModeImage light="/images/logo-light.png" dark="/images/logo-dark.png" width="32" height="32"
+          alt="ForestWork" class="h-8 w-auto" />
         <!-- <img src="~assets/images/favicon.png" alt="ForestWork" class="h-8 w-auto"> -->
         <span class="font-bold hidden sm:block">ForestWork</span>
       </NuxtLink>
@@ -93,15 +89,17 @@ const variants: { [k: string]: VariantType | ((custom: unknown) => VariantType) 
     <template #toggle="{ open, toggle, ui }">
       <UButton size="sm" variant="ghost" color="neutral" square :class="ui.toggle({ toggleSide: 'right' })"
         @click="toggle">
-        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <motion.line x1="4" y1="6" x2="20" y2="6" :variants="variants" :animate="open ? 'close' : 'normal'"
-            :custom="1" class="outline-none" />
-          <motion.line x1="4" y1="12" x2="20" y2="12" :variants="variants" :animate="open ? 'close' : 'normal'"
-            :custom="2" class="outline-none" />
-          <motion.line x1="4" y1="18" x2="20" y2="18" :variants="variants" :animate="open ? 'close' : 'normal'"
-            :custom="3" class="outline-none" />
-        </svg>
+        <ClientOnly>
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <motion.line x1="4" y1="6" x2="20" y2="6" :variants="variants" :animate="open ? 'close' : 'normal'"
+              :custom="1" class="outline-none" />
+            <motion.line x1="4" y1="12" x2="20" y2="12" :variants="variants" :animate="open ? 'close' : 'normal'"
+              :custom="2" class="outline-none" />
+            <motion.line x1="4" y1="18" x2="20" y2="18" :variants="variants" :animate="open ? 'close' : 'normal'"
+              :custom="3" class="outline-none" />
+          </svg>
+        </ClientOnly>
       </UButton>
     </template>
 

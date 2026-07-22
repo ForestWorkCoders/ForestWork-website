@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: 'Failed to fetch match stats' })
   }
 
-  console.log('Fetched match stats:', data)
   // 5. 直接吐給前端乾淨的 JSON 陣列
   return data
 })

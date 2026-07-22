@@ -1,35 +1,30 @@
 {
   "name": "ForestWorkWebsite",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "update-database": "npx -y supabase gen types typescript --project-id \"efsheupssjxlmrfgmxwp\" --schema public --schema mahjong --schema plazmaburst > app/types/database.types.ts"
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@nuxt/image": "^2.0.0",
-    "@nuxt/ui": "^4.6.1",
-    "@nuxtjs/supabase": "^2.0.5",
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0",
-    "chart.js": "^4.5.1",
+    "@iconify-json/lucide": "^1.2.117",
+    "@iconify-json/simple-icons": "^1.2.90",
+    "@nuxt/ui": "^4.10.0",
+    "@nuxtjs/supabase": "^2.0.9",
     "markdown-it": "^14.3.0",
-    "motion-v": "^2.3.0",
-    "vue": "^3.5.32",
-    "vue-chartjs": "^5.3.3",
-    "vue-router": "^5.0.4"
+    "nuxt": "^4.4.8",
+    "tailwindcss": "^4.3.2",
+    "vue-chartjs": "^5.3.4"
   },
   "devDependencies": {
-    "@nuxt/image": "^2.0.0",
-    "@nuxt/ui": "^4.6.1",
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "@types/markdown-it": "^14.1.2",
-    "nuxt": "^4.5.0",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4"
-  }
+    "@nuxt/eslint": "^1.16.0",
+    "eslint": "^10.7.0",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.7"
+  },
+  "packageManager": "pnpm@11.13.1"
 }
