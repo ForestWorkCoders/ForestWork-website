@@ -93,6 +93,7 @@ const matchColumns = buildSortableColumns([
   { accessorKey: 'avg_rank_west', header: '西風平均順位' },
   { accessorKey: 'top_rate_pct', header: '一位率' },
   { accessorKey: 'top2_rate_pct', header: '连对率' },
+  { accessorKey: 'busting_rate', header: '被飛率' },
   { accessorKey: 'avg_score', header: '平均馬點' },
   { accessorKey: 'highest_point', header: '最高馬點' },
   { accessorKey: 'lowest_point', header: '最低馬點' }
@@ -111,7 +112,6 @@ const playstyleColumns = buildSortableColumns([
   { accessorKey: 'avg_turns', header: '平均和牌巡數', class: 'text-right' },
   { accessorKey: 'avg_win_score', header: '平均打點', class: 'text-right' },
   { accessorKey: 'avg_deal_in_score', header: '平均銃點', class: 'text-right' },
-  { accessorKey: 'busting_rate', header: '被飛率', class: 'text-right' }
 ])
 </script>
 
