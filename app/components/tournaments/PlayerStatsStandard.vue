@@ -201,8 +201,15 @@ const percentStyles = [
             <UTable :columns="matchColumns" :data="matchData" :ui="{
               wrapper: 'overflow-x-auto w-full',
               base: 'min-w-[1600px]',
-              th: { color: 'text-gray-500 dark:text-gray-400', font: 'font-bold tracking-wider', base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]' },
-              td: { color: 'text-gray-900 dark:text-gray-200', base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50' }
+              th: { 
+                color: 'text-gray-500 dark:text-gray-400', 
+                font: 'font-bold tracking-wider', 
+                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f] first:sticky first:left-0 first:z-20 first:bg-gray-50 dark:first:bg-[#18212f] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              },
+              td: { 
+                color: 'text-gray-900 dark:text-gray-200', 
+                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50 first:sticky first:left-0 first:z-10 first:bg-white dark:first:bg-[#1e293b] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              }
             }">
               <template #nickname-cell="{ row }">
                 <div class="flex items-center gap-3">
@@ -221,8 +228,15 @@ const percentStyles = [
             <UTable :columns="playstyleColumns" :data="playstyleData" :ui="{
               wrapper: 'overflow-x-auto w-full',
               base: 'min-w-[1800px]', /* 随着列数增加，稍微放宽基础宽度 */
-              th: { color: 'text-gray-500 dark:text-gray-400', font: 'font-bold tracking-wider', base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]' },
-              td: { color: 'text-gray-900 dark:text-gray-200', base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50' }
+              th: { 
+                color: 'text-gray-500 dark:text-gray-400', 
+                font: 'font-bold tracking-wider', 
+                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f] first:sticky first:left-0 first:z-20 first:bg-gray-50 dark:first:bg-[#18212f] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              },
+              td: { 
+                color: 'text-gray-900 dark:text-gray-200', 
+                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50 first:sticky first:left-0 first:z-10 first:bg-white dark:first:bg-[#1e293b] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              }
             }">
 
               <template #nickname-cell="{ row }">
