@@ -18,10 +18,11 @@
     "@nuxtjs/supabase": "^2.0.9",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "echarts": "^6.1.0",
     "markdown-it": "^14.3.0",
     "nuxt": "^4.4.8",
     "tailwindcss": "^4.3.2",
-    "vue-chartjs": "^5.3.4"
+    "vue-echarts": "^8.0.1"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.16.0",

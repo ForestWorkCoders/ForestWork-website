@@ -1,10 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { Radar } from 'vue-chartjs'
-import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip } from 'chart.js'
+import { use } from 'echarts/core'
+import { RadarChart } from 'echarts/charts'
+import { TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import VChart from 'vue-echarts'
 
-// 注册 Chart.js 核心组件
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip)
+use([RadarChart, TooltipComponent, CanvasRenderer])
 
 const props = defineProps({
   tournamentId: { type: String, required: true }

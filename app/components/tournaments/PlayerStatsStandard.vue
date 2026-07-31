@@ -1,11 +1,15 @@
 <script setup>
 import { ref, computed, h, resolveComponent } from 'vue'
+import { use } from 'echarts/core'
+import { RadarChart } from 'echarts/charts'
+import { TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import VChart from 'vue-echarts'
+
+use([RadarChart, TooltipComponent, CanvasRenderer])
 
 const props = defineProps({
-  tournamentId: {
-    type: String,
-    required: true
-  }
+  tournamentId: { type: String, required: true }
 })
 
 const { data: matchData, pending, error } = await useFetch(
@@ -31,6 +35,78 @@ const top3Players = computed(() => {
     })
     // 3. 截取：只拿前三名上领奖台
     .slice(0, 3)
+})
+
+// ====== 雷达图数据引擎 ======
+// ----------------------------------------------------
+// 魔法引擎：将麻将的真实数据，转化为 0-100 的雷达图分数
+// ----------------------------------------------------
+const radarConfigs = computed(() => {
+  if (!playstyleData.value) return []
+  return playstyleData.value.slice(0, 3).map(player => {
+
+    const pData = player.original ? player.original : player
+
+    // 1. 提取真实数据
+    const rawData = {
+      win: Number(pData.win_rate) || 0,
+      power: Number(pData.avg_win_score) || 0,
+      call: Number(pData.call_rate) || 0,
+      def: Number(pData.deal_in_rate) || 0,
+      riichi: Number(pData.riichi_rate) || 0,
+      tsumo: Number(pData.tsumo_rate) || 0
+    }
+
+    console.log(rawData)
+
+    // 2. 防御轴单独做数学反转 (满分20，0放铳=20，20放铳=0)
+    const reversedDef = Math.max(20 - rawData.def, 0)
+
+    // 3. 返回 ECharts 专属的声明式 Option
+    return {
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+        textStyle: { color: 'rgba(255, 255, 255, 0.8)', fontWeight: 'bold' },
+        borderWidth: 0,
+        // 自定义 Tooltip 显示真实的业务数据
+        formatter: () => `
+          和牌: ${rawData.win}%<br/>
+          打点: ${rawData.power}<br/>
+          副露: ${rawData.call}%<br/>
+          防禦: ${rawData.def}% (放铳)<br/>
+          立直: ${rawData.riichi}%<br/>
+          自摸: ${rawData.tsumo}%
+        `
+      },
+      radar: {
+        // ECharts 天生支持给每个维度设定独立的满分线！
+        indicator: [
+          { name: '和牌', max: 40 },     // 40% 为满格
+          { name: '打点', max: 8000 },   // 8000 分满格
+          { name: '副露', max: 60 },     // 60% 为满格
+          { name: '防禦', max: 20 },     // 反转后的防御值（20为满格）
+          { name: '立直', max: 40 },     // 40% 为满格
+          { name: '自摸', max: 50 }      // 50% 为满格
+        ],
+        radius: '65%', // 控制雷达图的大小留出文字空间
+        splitNumber: 5,
+        axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 11, fontWeight: 'bold' },
+        splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.15)' } },
+        splitArea: { show: false }, // 隐藏背景色块交替
+        axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
+      },
+      series: [{
+        type: 'radar',
+        data: [{
+          value: [rawData.win, rawData.power, rawData.call, reversedDef, rawData.riichi, rawData.tsumo],
+          itemStyle: { color: 'rgb(16, 185, 129)' }, // Emerald 500
+          areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
+          lineStyle: { width: 2 }
+        }]
+      }]
+    }
+  })
 })
 
 const items = [{
@@ -169,16 +245,15 @@ const percentStyles = [
 
           <div
             class="p-6 flex-1 flex flex-col items-center justify-center min-h-[280px] bg-gray-50/50 dark:bg-transparent">
-            <div
-              class="relative w-full aspect-square max-w-[220px] rounded-full border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
-              <UIcon name="i-lucide-chart-pie" class="w-8 h-8 text-gray-300 dark:text-gray-600 mb-2" />
-              <span class="absolute mt-12 text-xs text-gray-400 font-mono tracking-widest">RADAR CHART AREA</span>
-              <span class="absolute -top-4 text-[10px] font-bold text-gray-500">和牌率</span>
-              <span class="absolute -right-6 top-1/4 text-[10px] font-bold text-gray-500">自摸</span>
-              <span class="absolute -right-6 bottom-1/4 text-[10px] font-bold text-gray-500">副露</span>
-              <span class="absolute -bottom-4 text-[10px] font-bold text-gray-500">速度</span>
-              <span class="absolute -left-6 bottom-1/4 text-[10px] font-bold text-gray-500">立直</span>
-              <span class="absolute -left-6 top-1/4 text-[10px] font-bold text-gray-500">防禦</span>
+            <div class="relative w-full aspect-square max-w-[220px]">
+              <ClientOnly>
+                <VChart v-if="radarConfigs[index]" :option="radarConfigs[index]" class="w-full h-full" autoresize />
+                <template #fallback>
+                  <div class="w-full h-full flex items-center justify-center">
+                    <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+                  </div>
+                </template>
+              </ClientOnly>
             </div>
           </div>
 
@@ -201,14 +276,14 @@ const percentStyles = [
             <UTable :columns="matchColumns" :data="matchData" :ui="{
               wrapper: 'overflow-x-auto w-full',
               base: 'min-w-[1600px]',
-              th: { 
-                color: 'text-gray-500 dark:text-gray-400', 
-                font: 'font-bold tracking-wider', 
-                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f] first:sticky first:left-0 first:z-20 first:bg-gray-50 dark:first:bg-[#18212f] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              th: {
+                color: 'text-gray-500 dark:text-gray-400',
+                font: 'font-bold tracking-wider',
+                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f] first:sticky first:left-0 first:z-20 first:bg-gray-50 dark:first:bg-[#18212f] first:border-r first:border-gray-200 dark:first:border-gray-800'
               },
-              td: { 
-                color: 'text-gray-900 dark:text-gray-200', 
-                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50 first:sticky first:left-0 first:z-10 first:bg-white dark:first:bg-[#1e293b] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              td: {
+                color: 'text-gray-900 dark:text-gray-200',
+                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50 first:sticky first:left-0 first:z-10 first:bg-white dark:first:bg-[#1e293b] first:border-r first:border-gray-200 dark:first:border-gray-800'
               }
             }">
               <template #nickname-cell="{ row }">
@@ -228,14 +303,14 @@ const percentStyles = [
             <UTable :columns="playstyleColumns" :data="playstyleData" :ui="{
               wrapper: 'overflow-x-auto w-full',
               base: 'min-w-[1800px]', /* 随着列数增加，稍微放宽基础宽度 */
-              th: { 
-                color: 'text-gray-500 dark:text-gray-400', 
-                font: 'font-bold tracking-wider', 
-                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f] first:sticky first:left-0 first:z-20 first:bg-gray-50 dark:first:bg-[#18212f] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              th: {
+                color: 'text-gray-500 dark:text-gray-400',
+                font: 'font-bold tracking-wider',
+                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f] first:sticky first:left-0 first:z-20 first:bg-gray-50 dark:first:bg-[#18212f] first:border-r first:border-gray-200 dark:first:border-gray-800'
               },
-              td: { 
-                color: 'text-gray-900 dark:text-gray-200', 
-                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50 first:sticky first:left-0 first:z-10 first:bg-white dark:first:bg-[#1e293b] first:border-r first:border-gray-200 dark:first:border-gray-800' 
+              td: {
+                color: 'text-gray-900 dark:text-gray-200',
+                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50 first:sticky first:left-0 first:z-10 first:bg-white dark:first:bg-[#1e293b] first:border-r first:border-gray-200 dark:first:border-gray-800'
               }
             }">
 
@@ -257,7 +332,7 @@ const percentStyles = [
                   {{ row.original.avg_win_score != null ? `+${row.original.avg_win_score}` : '-' }}
                 </span>
               </template>
-              
+
               <template #avg_deal_in_score-cell="{ row }">
                 <span class="font-mono font-semibold text-red-600 dark:text-red-400">
                   {{ row.original.avg_deal_in_score != null ? `-${row.original.avg_deal_in_score}` : '-' }}
