@@ -42,22 +42,26 @@ const top3Players = computed(() => {
 // 魔法引擎：将麻将的真实数据，转化为 0-100 的雷达图分数
 // ----------------------------------------------------
 const radarConfigs = computed(() => {
-  if (!playstyleData.value) return []
-  return playstyleData.value.slice(0, 3).map(player => {
+  if (!top3Players.value || !playstyleData.value) return []
 
-    const pData = player.original ? player.original : player
+  return top3Players.value.map(matchPlayer => {
 
-    // 1. 提取真实数据
+    const tacticalData = playstyleData.value.find(
+      p => p.player_id === matchPlayer.player_id
+    )
+
+    // 如果因为极端原因没找到这个人，返回防爆数据
+    if (!tacticalData) return null 
+
+    // 1. 提取真实数据 (注意：现在是从 tacticalData 里取值，而不是 matchPlayer)
     const rawData = {
-      win: Number(pData.win_rate) || 0,
-      power: Number(pData.avg_win_score) || 0,
-      call: Number(pData.call_rate) || 0,
-      def: Number(pData.deal_in_rate) || 0,
-      riichi: Number(pData.riichi_rate) || 0,
-      tsumo: Number(pData.tsumo_rate) || 0
+      win: Number(tacticalData.win_rate) || 0,
+      power: Number(tacticalData.avg_win_score) || 0,
+      call: Number(tacticalData.call_rate) || 0,
+      def: Number(tacticalData.deal_in_rate) || 0,
+      riichi: Number(tacticalData.riichi_rate) || 0,
+      tsumo: Number(tacticalData.tsumo_rate) || 0
     }
-
-    console.log(rawData)
 
     // 2. 防御轴单独做数学反转 (满分20，0放铳=20，20放铳=0)
     const reversedDef = Math.max(20 - rawData.def, 0)
@@ -74,7 +78,7 @@ const radarConfigs = computed(() => {
           和牌: ${rawData.win}%<br/>
           打点: ${rawData.power}<br/>
           副露: ${rawData.call}%<br/>
-          防禦: ${rawData.def}% (放铳)<br/>
+          放铳: ${rawData.def}% <br/>
           立直: ${rawData.riichi}%<br/>
           自摸: ${rawData.tsumo}%
         `
@@ -82,12 +86,12 @@ const radarConfigs = computed(() => {
       radar: {
         // ECharts 天生支持给每个维度设定独立的满分线！
         indicator: [
-          { name: '和牌', max: 40 },     // 40% 为满格
-          { name: '打点', max: 8000 },   // 8000 分满格
-          { name: '副露', max: 60 },     // 60% 为满格
-          { name: '防禦', max: 20 },     // 反转后的防御值（20为满格）
-          { name: '立直', max: 40 },     // 40% 为满格
-          { name: '自摸', max: 50 }      // 50% 为满格
+          { name: '和牌', max: 50 },     // 50% 为满格
+          { name: '打点', max: 10000 },   // 10000 分满格
+          { name: '副露', max: 80 },     // 80% 为满格
+          { name: '放铳', max: 20 },     // 反转后的放铳值（20为满格）
+          { name: '立直', max: 80 },     // 80% 为满格
+          { name: '自摸', max: 80 }      // 80% 为满格
         ],
         radius: '65%', // 控制雷达图的大小留出文字空间
         splitNumber: 5,
