@@ -113,62 +113,78 @@ const top3Charts = computed(() => {
   if (!players.value) return []
 
   // 只截取前3名渲染雷达图
-  return players.value.slice(0, 3).map(p => ({
-    name: p.nickname,
-    avatar: p.avatar,
-    overallScore: p.scores.overall ? p.scores.overall.toFixed(2) : '0.00',
-    chartData: {
-      labels: ['Arena', 'Rails', 'Snipers', 'Rockets', 'Rays'],
-      datasets: [{
-        backgroundColor: 'rgba(16, 185, 129, 0.2)', // Tailwind emerald-500/20
-        borderColor: 'rgb(16, 185, 129)',
-        pointBackgroundColor: 'rgb(16, 185, 129)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(16, 185, 129)',
-        data: [
-          p.scores.arena || 0,
-          p.scores.rails || 0,
-          p.scores.snipers || 0,
-          p.scores.rockets || 0,
-          p.scores.rays || 0
-        ]
-      }]
-    }
-  }))
-})
+  return players.value.slice(0, 3).map(p => {
 
-// 锁定雷达图刻度为 0 - 100，并隐藏多余图例
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: true,
-  scales: {
-    r: {
-      min: 0,
-      max: 100,
-      ticks: {
-        stepSize: 10,
-        display: false // 依然隐藏刻度数字，保持雷达图干净
-      },
-      grid: {
-        // 核心魔法：只有遇到 0 或者 >= 60 的刻度时，才画出蜘蛛网
-        color: (context) => {
-          if (context.tick.value === 0 || context.tick.value >= 60) {
-            return 'rgba(156, 163, 175, 0.2)'; // Tailwind gray-400 的 20% 透明度
-          }
-          return 'transparent'; // 把 10, 20, 30, 40, 50 的网格线彻底隐形
-        }
-      },
-      angleLines: {
-        color: 'rgba(156, 163, 175, 0.2)' // 保持从中心射出的 5 条对角线
+    // 1. 提取物理真实数据
+    const rawData = [
+      Number((p.scores.arena).toFixed(2)) || 0,
+      Number((p.scores.rails).toFixed(2)) || 0,
+      Number((p.scores.snipers).toFixed(2)) || 0,
+      Number((p.scores.rockets).toFixed(2)) || 0,
+      Number((p.scores.rays).toFixed(2)) || 0
+    ]
+
+    return {
+      name: p.nickname,
+      avatar: p.avatar,
+      overallScore: p.scores.overall ? Number(p.scores.overall).toFixed(2) : '0.00',
+
+      // 2. 组装 ECharts 专属 Option
+      option: {
+        tooltip: {
+          trigger: 'item',
+          backgroundColor: 'rgba(17, 24, 39, 0.9)',
+          textStyle: { color: 'rgba(255, 255, 255, 0.8)', fontWeight: 'bold' },
+          borderWidth: 0,
+          formatter: () => `
+            Arena: ${rawData[0]}<br/>
+            Rails: ${rawData[1]}<br/>
+            Snipers: ${rawData[2]}<br/>
+            Rockets: ${rawData[3]}<br/>
+            Rays: ${rawData[4]}
+          `
+        },
+        radar: {
+          // 直接定义 5 维武器/地图指标，满分全部钉死在 100
+          indicator: [
+            { name: 'Arena', max: 100 },
+            { name: 'Rails', max: 100 },
+            { name: 'Snipers', max: 100 },
+            { name: 'Rockets', max: 100 },
+            { name: 'Rays', max: 100 }
+          ],
+          radius: '65%',
+          splitNumber: 5, // 将 0-100 分成 5 圈 (20, 40, 60, 80, 100)
+          axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 11, fontWeight: 'bold' },
+
+          // 🔥 核心魔法：复刻你的去噪逻辑！从内到外，只显示 60, 80, 100 的蜘蛛网
+          splitLine: {
+            lineStyle: {
+              color: [
+                'transparent',                 // 20 分线: 隐形
+                'transparent',                 // 40 分线: 隐形
+                'rgba(156, 163, 175, 0.2)',    // 60 分线: 显形 (及格线)
+                'rgba(156, 163, 175, 0.2)',    // 80 分线: 显形
+                'rgba(156, 163, 175, 0.2)'     // 100 分线: 显形
+              ]
+            }
+          },
+          splitArea: { show: false }, // 隐藏雷达图默认的丑陋黑白交替背景
+          axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } } // 从中心射出的对角线
+        },
+        series: [{
+          type: 'radar',
+          data: [{
+            value: rawData,
+            itemStyle: { color: 'rgb(16, 185, 129)' }, // Emerald 500
+            areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
+            lineStyle: { width: 2 }
+          }]
+        }]
       }
     }
-  },
-  plugins: {
-    legend: { display: false },
-    tooltip: { enabled: true }
-  }
-}
+  })
+})
 </script>
 
 <template>
@@ -199,7 +215,13 @@ const chartOptions = {
 
           <div class="w-full max-w-[200px] aspect-square">
             <ClientOnly>
-              <Radar :data="chart.chartData" :options="chartOptions" />
+              <VChart v-if="chart.option" :option="chart.option" class="w-full h-full" autoresize />
+
+              <template #fallback>
+                <div class="w-full h-full flex items-center justify-center">
+                  <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+                </div>
+              </template>
             </ClientOnly>
           </div>
         </div>
