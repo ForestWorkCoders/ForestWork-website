@@ -12,7 +12,9 @@ const { data: matchData, pending, error } = await useFetch(
   `/api/mahjong/tournaments/${props.tournamentId}/stats`
 )
 
-const playstyleData = ref([])
+const { data: playstyleData, pending: playstylePending } = await useFetch(
+  `/api/mahjong/tournaments/${props.tournamentId}/playstyle`
+)
 
 const top3Players = computed(() => {
   if (!matchData.value) return []
@@ -101,18 +103,34 @@ const matchColumns = buildSortableColumns([
 
 const playstyleColumns = buildSortableColumns([
   { accessorKey: 'nickname', header: '选手' },
-  { accessorKey: 'win_rate', header: '和牌率', class: 'text-right' },
-  { accessorKey: 'deal_in_rate', header: '放銃率', class: 'text-right' },
-  { accessorKey: 'tsumo_rate', header: '自摸率', class: 'text-right' },
-  { accessorKey: 'dama_rate', header: '默聽率', class: 'text-right' },
-  { accessorKey: 'exhaustive_draw_rate', header: '流局率', class: 'text-right' },
-  { accessorKey: 'draw_tenpai_rate', header: '流局聽牌率', class: 'text-right' },
-  { accessorKey: 'call_rate', header: '副露率', class: 'text-right' },
-  { accessorKey: 'riichi_rate', header: '立直率', class: 'text-right' },
-  { accessorKey: 'avg_turns', header: '平均和牌巡數', class: 'text-right' },
-  { accessorKey: 'avg_win_score', header: '平均打點', class: 'text-right' },
-  { accessorKey: 'avg_deal_in_score', header: '平均銃點', class: 'text-right' },
+  { accessorKey: 'win_rate', header: '和牌率' },
+  { accessorKey: 'deal_in_rate', header: '放铳率' },
+  { accessorKey: 'tsumo_rate', header: '自摸率' },
+  { accessorKey: 'dama_rate', header: '默听率' },
+  { accessorKey: 'exhaustive_draw_rate', header: '流局率' },
+  { accessorKey: 'draw_tenpai_rate', header: '流局听牌率' },
+  { accessorKey: 'call_rate', header: '副露率' },
+  { accessorKey: 'riichi_rate', header: '立直率' },
+  { accessorKey: 'avg_turns', header: '平均和牌巡数' },
+  { accessorKey: 'avg_win_score', header: '平均打点' },
+  { accessorKey: 'avg_deal_in_score', header: '平均铳点' },
+  { accessorKey: 'babei_rate_pct', header: '拔北率' },
+  { accessorKey: 'avg_baopai', header: '平均宝牌' },
+  { accessorKey: 'li_baopai_rate_pct', header: '里宝率' }
 ])
+
+const percentStyles = [
+  { key: 'win_rate', color: 'text-emerald-500 dark:text-emerald-400' },
+  { key: 'deal_in_rate', color: 'text-red-500 dark:text-red-400' },
+  { key: 'tsumo_rate', color: 'text-blue-500 dark:text-blue-400' },
+  { key: 'dama_rate', color: 'text-purple-500 dark:text-purple-400' },
+  { key: 'exhaustive_draw_rate', color: 'text-gray-500 dark:text-gray-400' },
+  { key: 'draw_tenpai_rate', color: 'text-amber-500 dark:text-amber-400' },
+  { key: 'call_rate', color: 'text-orange-500 dark:text-orange-400' },
+  { key: 'riichi_rate', color: 'text-rose-500 dark:text-rose-400' },
+  { key: 'babei_rate_pct', color: 'text-teal-500 dark:text-teal-400' },
+  { key: 'li_baopai_rate_pct', color: 'text-pink-500 dark:text-pink-400' }
+]
 </script>
 
 <template>
@@ -202,10 +220,11 @@ const playstyleColumns = buildSortableColumns([
           <template #playstyle>
             <UTable :columns="playstyleColumns" :data="playstyleData" :ui="{
               wrapper: 'overflow-x-auto w-full',
-              base: 'min-w-[1600px]',
+              base: 'min-w-[1800px]', /* 随着列数增加，稍微放宽基础宽度 */
               th: { color: 'text-gray-500 dark:text-gray-400', font: 'font-bold tracking-wider', base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]' },
               td: { color: 'text-gray-900 dark:text-gray-200', base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50' }
             }">
+
               <template #nickname-cell="{ row }">
                 <div class="flex items-center gap-3">
                   <UAvatar :src="row.original.avatar" :alt="row.original.nickname" size="sm" />
@@ -213,9 +232,30 @@ const playstyleColumns = buildSortableColumns([
                 </div>
               </template>
 
-              <template #deal_in_rate-cell="{ row }">
-                <span class="text-red-400 font-mono">{{ row.original.deal_in_rate }}%</span>
+              <template v-for="col in percentStyles" #[`${col.key}-cell`]="{ row }" :key="col.key">
+                <span :class="['font-mono', col.color]">
+                  {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '-' }}
+                </span>
               </template>
+
+              <template #avg_win_score-cell="{ row }">
+                <span class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                  {{ row.original.avg_win_score != null ? `+${row.original.avg_win_score}` : '-' }}
+                </span>
+              </template>
+              
+              <template #avg_deal_in_score-cell="{ row }">
+                <span class="font-mono font-semibold text-red-600 dark:text-red-400">
+                  {{ row.original.avg_deal_in_score != null ? `-${row.original.avg_deal_in_score}` : '-' }}
+                </span>
+              </template>
+
+              <template #avg_baopai-cell="{ row }">
+                <span class="font-mono font-bold text-amber-500">
+                  {{ row.original.avg_baopai ?? '-' }}
+                </span>
+              </template>
+
             </UTable>
           </template>
 

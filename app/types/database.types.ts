@@ -1,4 +1,6 @@
-export type Json =
+Need to install the following packages:
+supabase@2.110.0
+Ok to proceed? (y) export type Json =
   | string
   | number
   | boolean
@@ -133,6 +135,66 @@ export type Database = {
           },
         ]
       }
+      paipu_rounds: {
+        Row: {
+          babei_status: Json | null
+          ben: number
+          chang: number
+          delta_scores: Json
+          dora_indicators: Json | null
+          draw_tenpai: Json | null
+          fulo_status: Json
+          id: number
+          ju: number
+          paipu_id: string
+          riichi_status: Json
+          ron_seat: number | null
+          win_turn: number | null
+          won_cards: Json | null
+          won_seat: number | null
+          won_type: string
+          won_yaku: Json | null
+        }
+        Insert: {
+          babei_status?: Json | null
+          ben: number
+          chang: number
+          delta_scores: Json
+          dora_indicators?: Json | null
+          draw_tenpai?: Json | null
+          fulo_status: Json
+          id?: number
+          ju: number
+          paipu_id: string
+          riichi_status: Json
+          ron_seat?: number | null
+          win_turn?: number | null
+          won_cards?: Json | null
+          won_seat?: number | null
+          won_type: string
+          won_yaku?: Json | null
+        }
+        Update: {
+          babei_status?: Json | null
+          ben?: number
+          chang?: number
+          delta_scores?: Json
+          dora_indicators?: Json | null
+          draw_tenpai?: Json | null
+          fulo_status?: Json
+          id?: number
+          ju?: number
+          paipu_id?: string
+          riichi_status?: Json
+          ron_seat?: number | null
+          win_turn?: number | null
+          won_cards?: Json | null
+          won_seat?: number | null
+          won_type?: string
+          won_yaku?: Json | null
+        }
+        Relationships: []
+      }
       paipu_yaku_dict: {
         Row: {
           created_at: string
@@ -231,7 +293,7 @@ export type Database = {
       tournaments: {
         Row: {
           content_url: string | null
-          created_at: string | null
+          created_at: string
           dnfThreshold: number | null
           format: string
           icon: string
@@ -245,7 +307,7 @@ export type Database = {
         }
         Insert: {
           content_url?: string | null
-          created_at?: string | null
+          created_at?: string
           dnfThreshold?: number | null
           format?: string
           icon?: string
@@ -259,7 +321,7 @@ export type Database = {
         }
         Update: {
           content_url?: string | null
-          created_at?: string | null
+          created_at?: string
           dnfThreshold?: number | null
           format?: string
           icon?: string
@@ -353,7 +415,10 @@ export type Database = {
         Row: {
           account_id: number | null
           month: number | null
+          month_rank: number | null
+          played_rounds: number | null
           points: number | null
+          raw_score: number | null
           tournament_bind_id: string | null
           year: number | null
         }
@@ -372,6 +437,7 @@ export type Database = {
           avg_rank_west: number
           avg_score: number
           avoid_last_rate_pct: number
+          busting_rate: number
           east_count: number
           highest_point: number
           lowest_point: number
@@ -387,6 +453,29 @@ export type Database = {
           top_rate_pct: number
           top2_rate_pct: number
           west_count: number
+        }[]
+      }
+      get_tournament_playstyle_stats: {
+        Args: { t_id: string }
+        Returns: {
+          avatar: string
+          avg_baopai: number
+          avg_deal_in_score: number
+          avg_turns: number
+          avg_win_score: number
+          babei_rate_pct: number
+          call_rate: number
+          dama_rate: number
+          deal_in_rate: number
+          draw_tenpai_rate: number
+          exhaustive_draw_rate: number
+          li_baopai_rate_pct: number
+          nickname: string
+          player_id: number
+          riichi_rate: number
+          total_rounds: number
+          tsumo_rate: number
+          win_rate: number
         }[]
       }
     }
