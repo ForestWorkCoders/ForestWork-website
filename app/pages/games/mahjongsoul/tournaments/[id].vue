@@ -184,7 +184,7 @@ const tabs = computed(() => {
                             <!-- 參賽隊伍 （团体赛） -->
                             <template #teams>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <TournamentsPB2Teams :tournament-id="route.params.id" />
+                                    <TournamentsTeamStandard :tournament-id="route.params.id" />
                                 </div>
                             </template>
 
