@@ -20,7 +20,7 @@
       <p class="text-gray-500">探索林間小鎮的多元賽事與社群活動</p>
     </div>
 
-    <div class="max-w-2xl mx-auto mb-16 px-4 flex flex-col gap-2"">
+    <div class="max-w-2xl mx-auto mb-16 px-4 flex flex-col gap-2">
       <UInput v-model="searchQuery" icon="i-lucide-search" size="xl" placeholder="Search..." color="neutral"
         variant="outline" class="shadow-sm transition-all focus-within:ring-2 focus-within:ring-green-500/50" :ui="{
           base: 'py-4 rounded-full'
