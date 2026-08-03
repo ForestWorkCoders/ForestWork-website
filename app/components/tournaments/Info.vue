@@ -65,7 +65,7 @@ const parsedHtml = computed(() => {
       尚未設定賽事內容。
     </div>
 
-    <div v-else class="markdown-body text-gray-900 dark:text-gray-100" v-html="parsedHtml"></div>
+    <div v-else class="markdown-body max-w-8xl mx-auto px-4 sm:px-6 py-8 text-gray-900 dark:text-gray-100" v-html="parsedHtml"></div>
 
   </div>
 </template>
@@ -118,5 +118,29 @@ const parsedHtml = computed(() => {
 
 .markdown-body :deep(> *:first-child) {
   @apply mt-0;
+}
+/* 1. 表格外壳：重置边距、加上圆角、边框和阴影，防止超宽挤破版面 */
+.markdown-body :deep(table) {
+  @apply w-full text-sm text-left border-collapse table-auto;
+}
+
+.markdown-body :deep(thead) {
+  @apply bg-gray-50 dark:bg-[#18212f] text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700;
+}
+
+.markdown-body :deep(th) {
+  @apply px-4 py-3 font-semibold tracking-wider m-0;
+}
+
+.markdown-body :deep(tbody tr) {
+  @apply border-b border-gray-100 dark:border-gray-800/60 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors;
+}
+
+.markdown-body :deep(td) {
+  @apply px-4 py-3 m-0;
+}
+
+.markdown-body :deep(tbody tr:last-child) {
+  @apply border-b-0;
 }
 </style>

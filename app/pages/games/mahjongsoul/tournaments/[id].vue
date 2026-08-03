@@ -35,6 +35,12 @@ const breadcrumbLinks = computed(() => {
 // 5. 定義下方的導覽標籤
 // ==========================================
 const tabs = computed(() => {
+    if (isEvent.value) {
+        return [
+            { label: '賽事資訊 · Information', slot: 'info' }
+        ]
+    }
+
     const baseTabs = [
         { label: '賽事資訊 · Information', slot: 'info' },
         { label: '賽事結果 · Result', slot: 'result' },
@@ -57,9 +63,6 @@ const tabs = computed(() => {
         ]
     }
 
-    if (isEvent.value) {
-        return baseTabs.filter(tab => tab.slot !== 'stats')
-    }
     return baseTabs
 })
 </script>
@@ -148,63 +151,68 @@ const tabs = computed(() => {
                 <!-- 導覽與內容區塊 -->
                 <div
                     class="bg-white dark:bg-[#1a1c23] w-full border-x border-b border-gray-200 dark:border-gray-800 rounded-b-xl shadow-sm">
-                    <UTabs :items="tabs" class="w-full" :ui="{
-                        list: {
-                            background: 'bg-gray-50 dark:bg-[#15171e]',
-                            rounded: 'rounded-none',
-                            padding: 'p-0',
-                            marker: { background: 'bg-emerald-600/20 dark:bg-emerald-500/20', rounded: 'rounded-none' },
-                            tab: {
+                    <div v-if="tabs.length > 1">
+                        <UTabs :items="tabs" class="w-full" :ui="{
+                            list: {
+                                background: 'bg-gray-50 dark:bg-[#15171e]',
                                 rounded: 'rounded-none',
-                                active: 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500',
-                                inactive: 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
-                                padding: 'py-4 px-6',
-                                font: 'font-bold tracking-wider'
+                                padding: 'p-0',
+                                marker: { background: 'bg-emerald-600/20 dark:bg-emerald-500/20', rounded: 'rounded-none' },
+                                tab: {
+                                    rounded: 'rounded-none',
+                                    active: 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500',
+                                    inactive: 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
+                                    padding: 'py-4 px-6',
+                                    font: 'font-bold tracking-wider'
+                                }
                             }
-                        }
-                    }">
-                        <!-- 賽事資訊 -->
-                        <template #info>
-                            <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsInfo :content-url="contentUrl" />
-                            </div>
-                        </template>
+                        }">
+                            <!-- 賽事資訊 -->
+                            <template #info>
+                                <div class="px-6 py-8 animate-fade-in">
+                                    <TournamentsInfo :content-url="contentUrl" />
+                                </div>
+                            </template>
 
-                        <!-- 先前条件 （邀请赛） -->
-                        <template #prereq>
-                            <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsLeaderboardInvitational :tournament-id="route.params.id" />
-                            </div>
-                        </template>
+                            <!-- 先前条件 （邀请赛） -->
+                            <template #prereq>
+                                <div class="px-6 py-8 animate-fade-in">
+                                    <TournamentsLeaderboardInvitational :tournament-id="route.params.id" />
+                                </div>
+                            </template>
 
-                        <!-- 參賽隊伍 （团体赛） -->
-                        <template #teams>
-                            <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsPB2Teams :tournament-id="route.params.id" />
-                            </div>
-                        </template>
+                            <!-- 參賽隊伍 （团体赛） -->
+                            <template #teams>
+                                <div class="px-6 py-8 animate-fade-in">
+                                    <TournamentsPB2Teams :tournament-id="route.params.id" />
+                                </div>
+                            </template>
 
-                        <!-- 賽事結果 -->
-                        <template #result>
-                            <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsDashboard :tournament-id="route.params.id" />
-                            </div>
-                        </template>
+                            <!-- 賽事結果 -->
+                            <template #result>
+                                <div class="px-6 py-8 animate-fade-in">
+                                    <TournamentsDashboard :tournament-id="route.params.id" />
+                                </div>
+                            </template>
 
-                        <!-- 玩家數據 -->
-                        <template #stats>
-                            <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsPlayerStatsStandard :tournament-id="route.params.id" />
-                            </div>
+                            <!-- 玩家數據 -->
+                            <template #stats>
+                                <div class="px-6 py-8 animate-fade-in">
+                                    <TournamentsPlayerStatsStandard :tournament-id="route.params.id" />
+                                </div>
 
-                        </template>
-                        <!-- 直播記錄 -->
-                        <template #vods>
-                            <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsVodsStandard :tournament-id="route.params.id" />
-                            </div>
-                        </template>
-                    </UTabs>
+                            </template>
+                            <!-- 直播記錄 -->
+                            <template #vods>
+                                <div class="px-6 py-8 animate-fade-in">
+                                    <TournamentsVodsStandard :tournament-id="route.params.id" />
+                                </div>
+                            </template>
+                        </UTabs>
+                    </div>
+                    <div v-else>
+                        <TournamentsInfo :content-url="contentUrl" />
+                    </div>
                 </div>
             </UContainer>
         </div>
