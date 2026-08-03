@@ -17,6 +17,7 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
+        '@vercel/speed-insights/vue',
         'echarts/charts',
         'echarts/components',
         'echarts/core',
