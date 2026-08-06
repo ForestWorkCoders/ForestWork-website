@@ -21,9 +21,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     children: [
       { label: '賽事規章', to: '/games/mahjongsoul/rules', target: '_blank' },
       { label: '積分賽', to: '/games/mahjongsoul/', target: '_blank' },
-      { label: '數番盃', to: 'https://forestwork-mahjong.vercel.app/pages/event_week/2022JuneMahjongEvent', target: '_blank' },
-      { label: '役滿盃', to: 'https://forestwork-mahjong.vercel.app/pages/event_week/pages/mahjong/2023MarchMahjongEvent', target: '_blank' },
-      { label: '鬼門盃', to: 'https://forestwork-mahjong.vercel.app/pages/event_week/pages/mahjong/2023AugustMahjongEvent', target: '_blank' }
+      { label: '如何加入比賽場', to: '/games/mahjongsoul/how-to', target: '_blank' },
     ]
   },
   {
