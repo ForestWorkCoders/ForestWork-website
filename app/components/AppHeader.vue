@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { motion } from 'motion-v'
-import type { VariantType } from 'motion-v'
 
 const items = computed<NavigationMenuItem[]>(() => [
   { label: '主頁', icon: 'i-lucide-house', to: '/' },
@@ -40,27 +38,6 @@ const items = computed<NavigationMenuItem[]>(() => [
     target: '_blank'
   }
 ])
-
-const variants: { [k: string]: VariantType | ((custom: unknown) => VariantType) } = {
-  normal: {
-    rotate: 0,
-    y: 0,
-    opacity: 1
-  },
-  close: (custom: unknown) => {
-    const c = custom as number
-    return {
-      rotate: c === 1 ? 45 : c === 3 ? -45 : 0,
-      y: c === 1 ? 6 : c === 3 ? -6 : 0,
-      opacity: c === 2 ? 0 : 1,
-      transition: {
-        type: 'spring',
-        stiffness: 260,
-        damping: 20
-      }
-    }
-  }
-}
 </script>
 
 <template>
@@ -78,7 +55,7 @@ const variants: { [k: string]: VariantType | ((custom: unknown) => VariantType) 
 
     <template #right>
       <UColorModeButton />
-      <UButton to="https://discord.gg/lin-jian-xiao-zhen-510192195509157909" target="_blank" color="primary"
+      <UButton to="https://discord.com/servers/510192195509157909" target="_blank" color="primary"
         variant="solid" class="hidden lg:inline-flex">
         加入Discord
       </UButton>
@@ -90,12 +67,9 @@ const variants: { [k: string]: VariantType | ((custom: unknown) => VariantType) 
         <ClientOnly>
           <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <motion.line x1="4" y1="6" x2="20" y2="6" :variants="variants" :animate="open ? 'close' : 'normal'"
-              :custom="1" class="outline-none" />
-            <motion.line x1="4" y1="12" x2="20" y2="12" :variants="variants" :animate="open ? 'close' : 'normal'"
-              :custom="2" class="outline-none" />
-            <motion.line x1="4" y1="18" x2="20" y2="18" :variants="variants" :animate="open ? 'close' : 'normal'"
-              :custom="3" class="outline-none" />
+            <line x1="4" y1="6" x2="20" y2="6" class="outline-none" />
+            <line x1="4" y1="12" x2="20" y2="12" class="outline-none" />
+            <line x1="4" y1="18" x2="20" y2="18" class="outline-none" />
           </svg>
         </ClientOnly>
       </UButton>
