@@ -44,7 +44,7 @@ const isEmpty = computed(() => {
             {{  'Playoffs Bracket' }}
           </h2>
         </div>
-        <TournamentsBracket :upperBracket="brackets.upperBracket" :lowerBracket="brackets.lowerBracket" />
+        <Pb2Bracket :upperBracket="brackets.upperBracket" :lowerBracket="brackets.lowerBracket" />
       </div>
 
       <!-- <div v-if="brackets.lowerBracket.length > 0" class="space-y-6 relative">
@@ -54,7 +54,7 @@ const isEmpty = computed(() => {
           <div class="w-1.5 h-6 bg-red-500 rounded-full"></div>
           <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Lower Bracket</h2>
         </div>
-        <TournamentsBracket :rounds="brackets.lowerBracket" />
+        <Pb2Bracket :rounds="brackets.lowerBracket" />
       </div> -->
     </div>
 
