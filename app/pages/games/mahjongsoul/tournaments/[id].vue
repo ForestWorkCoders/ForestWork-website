@@ -177,35 +177,35 @@ const tabs = computed(() => {
                             <!-- 先前条件 （邀请赛） -->
                             <template #prereq>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <TournamentsLeaderboardInvitational :tournament-id="route.params.id" />
+                                    <MahjongLeaderboardInvitational :tournament-id="route.params.id" />
                                 </div>
                             </template>
 
                             <!-- 參賽隊伍 （团体赛） -->
                             <template #teams>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <TournamentsTeamStandard :tournament-id="route.params.id" />
+                                    <MahjongTeams :tournament-id="route.params.id" />
                                 </div>
                             </template>
 
                             <!-- 賽事結果 -->
                             <template #result>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <TournamentsDashboard :tournament-id="route.params.id" />
+                                    <MahjongDashboard :tournament-id="route.params.id" />
                                 </div>
                             </template>
 
                             <!-- 玩家數據 -->
                             <template #stats>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <TournamentsPlayerStatsStandard :tournament-id="route.params.id" />
+                                    <MahjongPlayerStats :tournament-id="route.params.id" />
                                 </div>
 
                             </template>
                             <!-- 直播記錄 -->
                             <template #vods>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <TournamentsVodsStandard :tournament-id="route.params.id" />
+                                    <MahjongVods :tournament-id="route.params.id" />
                                 </div>
                             </template>
                         </UTabs>
