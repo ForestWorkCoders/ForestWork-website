@@ -174,7 +174,7 @@ const paginatedPastTournaments = computed(() => {
                     </div>
 
                     <div class="lg:col-span-4 space-y-6">
-                        <GameSidebar :gameName="plazmaBurstSidebarData.name"
+                        <LayoutSidebar :gameName="plazmaBurstSidebarData.name"
                             :coverImageLight="plazmaBurstSidebarData.image_light"
                             :coverImageDark="plazmaBurstSidebarData.image_dark" :description="plazmaBurstSidebarData.desc"
                             :links="plazmaBurstSidebarData.socialLinks" />

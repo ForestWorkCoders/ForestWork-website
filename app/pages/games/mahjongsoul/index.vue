@@ -173,7 +173,7 @@ const paginatedPastTournaments = computed(() => {
                     </div>
 
                     <div class="lg:col-span-4 space-y-6">
-                        <GameSidebar :gameName="mahjongSidebarData.name"
+                        <LayoutSidebar :gameName="mahjongSidebarData.name"
                             :coverImageLight="mahjongSidebarData.image_light"
                             :coverImageDark="mahjongSidebarData.image_dark" :description="mahjongSidebarData.desc"
                             :links="mahjongSidebarData.socialLinks" />
