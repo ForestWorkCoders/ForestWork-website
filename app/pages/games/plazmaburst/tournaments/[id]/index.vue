@@ -140,7 +140,7 @@ const tabs = computed(() => {
                         <!-- 賽事資訊 -->
                         <template #info>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsInfo :content-url="contentUrl" />
+                                <BaseTournamentInfo :content-url="contentUrl" />
                             </div>
                         </template>
 
