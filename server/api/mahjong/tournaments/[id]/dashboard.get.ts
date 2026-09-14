@@ -1,39 +1,12 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { calculateMahjongPoints } from '~~/server/utils/mahjongScoreEngine'
+import { fetchPlayerDict } from '~~/server/utils/mahjongPlayer'
 
 // ============================================================================
 // 1. 基礎設施層 (Infrastructure Layer) - 永遠不要讓我再看到你 Copy-Paste 這些代碼
 // ============================================================================
 
-async function fetchPlayerDict(supabase: any, accountIds: Set<number> | number[]) {
-    const idsArray = Array.from(accountIds)
-    if (idsArray.length === 0) return new Map()
-
-    const { data: participants } = await supabase
-        .schema('mahjong')
-        .from('participants')
-        .select('account_id, nickname, discord_id_str:discord_id::text')
-        .in('account_id', idsArray)
-
-    const discordIdsStr = participants?.map((p: any) => p.discord_id_str).filter(Boolean) as string[]
-
-    const { data: profiles } = await supabase
-        .schema('public')
-        .from('participant_data')
-        .select('discord_id_str:discord_id::text, discord_username, profile_img')
-        .in('discord_id', discordIdsStr)
-
-    const playerDict = new Map()
-    participants?.forEach((p: any) => {
-        const profile = profiles?.find((pr: any) => pr.discord_id_str === p.discord_id_str)
-        playerDict.set(p.account_id, {
-            name: p.nickname || profile?.discord_username || `Unknown_${p.account_id}`,
-            avatar: profile?.profile_img || null
-        })
-    })
-    return playerDict
-}
 
 function formatDate(dateString: string) {
     const d = new Date(dateString)

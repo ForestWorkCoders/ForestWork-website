@@ -11,7 +11,7 @@ const props = defineProps({
 //     "F": { leaderboard: [...], matches: [...] }
 //   }
 // }
-const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tournaments/${props.tournamentId}/matches`)
+const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tournaments/${props.tournamentId}/dashboard`)
 </script>
 
 <template>
