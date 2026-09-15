@@ -14,7 +14,7 @@ const items = computed<NavigationMenuItem[]>(() => [
   },
   {
     label: '雀魂麻將',
-    icon: 'i-lucide-playing-card',
+    icon: 'i-lucide-playing-cards',
     defaultOpen: true, // 預設展開
     children: [
       { label: '戰報一覽', to: '/games/mahjongsoul/' },

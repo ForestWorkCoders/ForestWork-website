@@ -59,7 +59,7 @@ const circuits = [
   { 
     id: 2, 
     title: 'Mahjong Soul', 
-    icon: 'i-lucide-playing-card', 
+    icon: 'i-lucide-playing-cards', 
     description: '雀魂林間小鎮常規積分賽',
     to: '/games/mahjongsoul/'
   },
