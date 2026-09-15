@@ -19,18 +19,18 @@ const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tou
     <div v-if="pending" class="flex justify-center py-12">
       <UIcon name="i-lucide-loader-2" class="animate-spin w-8 h-8" />
     </div>
-    
+
     <div v-else-if="error" class="text-red-500 text-center font-bold">
       載入失敗: {{ error.message }}
     </div>
 
     <template v-else-if="dashboardData" v-for="phase in dashboardData.config.phases" :key="phase.id">
       <section class="space-y-6 animate-fade-in">
-        
+
         <div class="border-b border-gray-200 dark:border-gray-800 pb-4 flex items-center justify-between">
           <h2 class="text-3xl font-black tracking-tight flex items-center gap-3">
-            <UIcon :name="phase.is_final ? 'i-lucide-trophy' : 'i-lucide-flag'" 
-                   :class="phase.is_final ? 'text-yellow-500' : 'text-emerald-500'" />
+            <UIcon :name="phase.is_final ? 'i-lucide-trophy' : 'i-lucide-flag'"
+              :class="phase.is_final ? 'text-yellow-500' : 'text-emerald-500'" />
             <span :class="phase.is_final ? 'text-yellow-500' : 'text-emerald-500'">
               {{ phase.title }}
             </span>
@@ -40,22 +40,18 @@ const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tou
           </h2>
         </div>
 
-        <BaseLeaderboardTable
-          :entity-type="dashboardData.config.entity_type" 
-          :columns="dashboardData.config.columns"
-          :data="dashboardData.data[phase.id]?.leaderboard || []"
-          :is-final="phase.is_final"
-          :promoted-ranks="phase.promoted_ranks"
-          :disqualified-ranks="phase.disqualified_ranks"
-        />
+        <UAlert icon="i-lucide-info" color="neutral" variant="subtle" title="排名規則說明"
+          description="選手需完成至少 8 場對局始可列入正式排名；出賽未達標者標記為 DNF 並順延至後段。" class="mb-4 text-xs" />
 
-        <div class="mt-4 p-6 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center">
-            <span class="text-sm font-medium tracking-wide">備註保留區塊</span>
-        </div>
+        <BaseLeaderboardTable :entity-type="dashboardData.config.entity_type" :columns="dashboardData.config.columns"
+          :data="dashboardData.data[phase.id]?.leaderboard || []" :is-final="phase.is_final"
+          :promoted-ranks="phase.promoted_ranks" :disqualified-ranks="phase.disqualified_ranks" />
 
-        <BaseMatchGrid 
-          :matches="dashboardData.data[phase.id]?.matches || []"
-        />
+        <!-- <div class="mt-4 p-6 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center">
+          <span class="text-sm font-medium tracking-wide">備註保留區塊</span>
+        </div> -->
+
+        <BaseMatchGrid :matches="dashboardData.data[phase.id]?.matches || []" />
 
       </section>
     </template>
