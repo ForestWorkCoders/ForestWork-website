@@ -22,9 +22,9 @@ const plazmaBurstSidebarData = {
 
 // 定義頂部選單 (適配 Nuxt UI 的 UTabs)
 const items = [
-    { label: 'ONGOING TOURNAMENTS', description: '進行中的比賽', slot: 'ongoing' },
-    { label: 'PAST TOURNAMENTS', description: '已結束的比賽', slot: 'past' },
-    { label: 'UPCOMING TOURNAMENTS', description: '即將開始的比賽', slot: 'upcoming' }
+    { label: 'ONGOING TOURNAMENTS', description: '進行中的比賽', slot: 'ongoing', shortLabel: 'ONGOING' },
+    { label: 'PAST TOURNAMENTS', description: '已結束的比賽', slot: 'past', shortLabel: 'PAST' },
+    { label: 'UPCOMING TOURNAMENTS', description: '即將開始的比賽', slot: 'upcoming', shortLabel: 'UPCOMING' }
 ]
 
 const searchQuery = ref('')
@@ -83,16 +83,34 @@ useSeoMeta({
                     <div class="lg:col-span-8 space-y-4">
 
                         <UTabs :items="items" class="w-full" :ui="{
+                            // 1. 核心修复：拍平成类名字符串，绝不在内部套伪造的 { background: ... }
                             list: 'bg-gray-100 dark:bg-[#0f172a]',
-                            indicator: 'bg-emerald-600 dark:bg-emerald-400 text-white shadow-sm'
+                            // 翡翠绿指示药丸，选中时自带白字高亮
+                            indicator: 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm'
                         }">
+                            <!-- 核心：响应式双模式表头排版 -->
                             <template #default="{ item }">
-                                <div class="text-center py-2 transition-colors duration-200">
-                                    <div class="font-bold text-sm tracking-wider">
-                                        {{ item.label }}
-                                    </div>
-                                    <div v-if="item.description" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {{ item.description }}
+                                <div class="text-center py-1.5 sm:py-2 transition-colors duration-200">
+                                    <!-- 英文主标题：利用 group-data-[state=active] 或当前继承色，无需手写三元表达式 -->
+                                    <div
+                                        class="font-bold text-xs sm:text-sm tracking-wider uppercase transition-colors">
+
+                                        <!-- 1. 移动端专用短词 (屏幕 < 640px 时显示，彻底消灭文字截断) -->
+                                        <span class="inline sm:hidden">
+                                            {{ item.shortLabel }}
+                                        </span>
+
+                                        <!-- 2. 桌面端专用完整词 (屏幕 >= 640px 时自然展开) -->
+                                        <span class="hidden sm:inline">
+                                            {{ item.label }}
+                                        </span>
+
+
+                                        <!-- 中文副标题：保持原有呼吸感与半透明对比度 -->
+                                        <div v-if="item.description"
+                                            class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
+                                            {{ item.description }}
+                                        </div>
                                     </div>
                                 </div>
                             </template>
