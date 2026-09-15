@@ -12,6 +12,11 @@ const props = defineProps({
 //   }
 // }
 const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tournaments/${props.tournamentId}/dashboard`)
+
+const isDefaultTournament = computed(() => {
+  const fmt = dashboardData.value?.config.phases[0].id
+  return !fmt || fmt === 'MAIN'
+})
 </script>
 
 <template>
@@ -40,7 +45,7 @@ const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tou
           </h2>
         </div>
 
-        <UAlert icon="i-lucide-info" color="neutral" variant="subtle" title="排名規則說明"
+        <UAlert v-if="isDefaultTournament" icon="i-lucide-info" color="neutral" variant="subtle" title="排名規則說明"
           description="選手需完成至少 8 場對局始可列入正式排名；出賽未達標者標記為 DNF 並順延至後段。" class="mb-4 text-xs" />
 
         <BaseLeaderboardTable :entity-type="dashboardData.config.entity_type" :columns="dashboardData.config.columns"
