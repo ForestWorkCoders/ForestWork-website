@@ -59,7 +59,7 @@ const circuits = [
   { 
     id: 2, 
     title: 'Mahjong Soul', 
-    icon: 'i-lucide-id-card-lanyard', 
+    icon: 'i-lucide-playing-card', 
     description: '雀魂林間小鎮常規積分賽',
     to: '/games/mahjongsoul/'
   },
@@ -69,6 +69,20 @@ const circuits = [
     icon: 'i-lucide-pickaxe', 
     description: '超極限生存競賽',
     to: 'https://eaglepb2.gitbook.io/uhc_report/'
+  },
+  { 
+    id: 4, 
+    title: 'Minecraft SMP', 
+    icon: 'i-lucide-shield', 
+    description: '多人生存競賽',
+    to: '/games/minecraftsmp'
+  },
+  { 
+    id: 5, 
+    title: 'Gartic Phone', 
+    icon: 'i-lucide-palette', 
+    description: '靈魂繪師',
+    to: '/games/garticphone'
   },
 ]
 
