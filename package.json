@@ -9,7 +9,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst > app/types/database.types.ts"
+    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst > app/types/database.types.ts",
+    "gartic-sync": "node --env-file=.env scripts/sync-gartic-manifest.js"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.117",
@@ -21,11 +22,14 @@
     "echarts": "^6.1.0",
     "markdown-it": "^14.3.0",
     "nuxt": "^4.5.2",
+    "reveal.js": "^6.0.2",
     "tailwindcss": "^4.3.2",
     "vue-echarts": "^8.0.1"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.16.0",
+    "@supabase/supabase-js": "^2.116.0",
+    "@types/node": "^26.5.1",
     "eslint": "^10.7.0",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.7"
