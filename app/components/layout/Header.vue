@@ -34,8 +34,8 @@ const items = computed<NavigationMenuItem[]>(() => [
   },
   {
     label: '謎語人的呻吟',
-    icon: 'i-lucide-message-circle',
-    to: '#',
+    icon: 'i-lucide-square-terminal',
+    to: '/games/ctf',
   }
 ])
 </script>

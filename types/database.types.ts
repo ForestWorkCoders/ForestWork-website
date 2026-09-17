@@ -1,0 +1,1477 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
+  ctf: {
+    Tables: {
+      challenges: {
+        Row: {
+          artifact_url: string | null
+          category: string
+          created_at: string
+          decay_solves: number
+          flag_hash: string
+          id: string
+          initial_points: number
+          is_active: boolean
+          min_points: number
+          prompt: string
+          title: string
+        }
+        Insert: {
+          artifact_url?: string | null
+          category: string
+          created_at?: string
+          decay_solves?: number
+          flag_hash: string
+          id: string
+          initial_points?: number
+          is_active?: boolean
+          min_points?: number
+          prompt: string
+          title: string
+        }
+        Update: {
+          artifact_url?: string | null
+          category?: string
+          created_at?: string
+          decay_solves?: number
+          flag_hash?: string
+          id?: string
+          initial_points?: number
+          is_active?: boolean
+          min_points?: number
+          prompt?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      solves: {
+        Row: {
+          account_id: number
+          challenge_id: string
+          id: number
+          solved_at: string
+        }
+        Insert: {
+          account_id: number
+          challenge_id: string
+          id?: number
+          solved_at?: string
+        }
+        Update: {
+          account_id?: number
+          challenge_id?: string
+          id?: number
+          solved_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solves_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solves_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      challenge_points: {
+        Row: {
+          artifact_url: string | null
+          category: string | null
+          current_points: number | null
+          decay_solves: number | null
+          id: string | null
+          initial_points: number | null
+          is_active: boolean | null
+          min_points: number | null
+          prompt: string | null
+          solve_count: number | null
+          title: string | null
+        }
+        Relationships: []
+      }
+      leaderboard: {
+        Row: {
+          account_id: number | null
+          last_solve_time: string | null
+          solves_count: number | null
+          total_score: number | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  mahjong: {
+    Tables: {
+      fwmp_configs: {
+        Row: {
+          month: number
+          points_map: Json | null
+          tournament_bind_id: string
+          year: number
+        }
+        Insert: {
+          month: number
+          points_map?: Json | null
+          tournament_bind_id: string
+          year: number
+        }
+        Update: {
+          month?: number
+          points_map?: Json | null
+          tournament_bind_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fwmp_configs_tournament_bind_id_fkey"
+            columns: ["tournament_bind_id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          east_id: number
+          east_score: number
+          end_time: string
+          group_tag: string | null
+          id: number
+          north_id: number | null
+          north_score: number | null
+          south_id: number
+          south_score: number
+          start_time: string
+          tag: number
+          tournament_bind_id: string
+          uuid: string
+          west_id: number
+          west_score: number
+        }
+        Insert: {
+          east_id: number
+          east_score: number
+          end_time: string
+          group_tag?: string | null
+          id?: number
+          north_id?: number | null
+          north_score?: number | null
+          south_id: number
+          south_score: number
+          start_time: string
+          tag: number
+          tournament_bind_id: string
+          uuid: string
+          west_id: number
+          west_score: number
+        }
+        Update: {
+          east_id?: number
+          east_score?: number
+          end_time?: string
+          group_tag?: string | null
+          id?: number
+          north_id?: number | null
+          north_score?: number | null
+          south_id?: number
+          south_score?: number
+          start_time?: string
+          tag?: number
+          tournament_bind_id?: string
+          uuid?: string
+          west_id?: number
+          west_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_east_id_fkey"
+            columns: ["east_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "matches_north_id_fkey"
+            columns: ["north_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "matches_south_id_fkey"
+            columns: ["south_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "matches_tournament_bind_id_fkey"
+            columns: ["tournament_bind_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_west_id_fkey"
+            columns: ["west_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+        ]
+      }
+      paipu_rounds: {
+        Row: {
+          babei_status: Json | null
+          ben: number
+          chang: number
+          delta_scores: Json
+          dora_indicators: Json | null
+          draw_tenpai: Json | null
+          fulo_status: Json
+          id: number
+          ju: number
+          paipu_id: string
+          riichi_status: Json
+          ron_seat: number | null
+          win_turn: number | null
+          won_cards: Json | null
+          won_seat: number | null
+          won_type: string
+          won_yaku: Json | null
+        }
+        Insert: {
+          babei_status?: Json | null
+          ben: number
+          chang: number
+          delta_scores: Json
+          dora_indicators?: Json | null
+          draw_tenpai?: Json | null
+          fulo_status: Json
+          id?: number
+          ju: number
+          paipu_id: string
+          riichi_status: Json
+          ron_seat?: number | null
+          win_turn?: number | null
+          won_cards?: Json | null
+          won_seat?: number | null
+          won_type: string
+          won_yaku?: Json | null
+        }
+        Update: {
+          babei_status?: Json | null
+          ben?: number
+          chang?: number
+          delta_scores?: Json
+          dora_indicators?: Json | null
+          draw_tenpai?: Json | null
+          fulo_status?: Json
+          id?: number
+          ju?: number
+          paipu_id?: string
+          riichi_status?: Json
+          ron_seat?: number | null
+          win_turn?: number | null
+          won_cards?: Json | null
+          won_seat?: number | null
+          won_type?: string
+          won_yaku?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paipu_rounds_paipu_id_fkey"
+            columns: ["paipu_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["uuid"]
+          },
+        ]
+      }
+      paipu_yaku_dict: {
+        Row: {
+          created_at: string
+          fan: number | null
+          id: number
+          name_chs: string
+          name_chs_t: string
+          name_en: string
+          name_jp: string
+          name_kr: string
+        }
+        Insert: {
+          created_at?: string
+          fan?: number | null
+          id?: number
+          name_chs: string
+          name_chs_t: string
+          name_en: string
+          name_jp: string
+          name_kr: string
+        }
+        Update: {
+          created_at?: string
+          fan?: number | null
+          id?: number
+          name_chs?: string
+          name_chs_t?: string
+          name_en?: string
+          name_jp?: string
+          name_kr?: string
+        }
+        Relationships: []
+      }
+      participants: {
+        Row: {
+          account_id: number
+          discord_id: number | null
+          id: number
+          nickname: string
+        }
+        Insert: {
+          account_id: number
+          discord_id?: number | null
+          id?: number
+          nickname: string
+        }
+        Update: {
+          account_id?: number
+          discord_id?: number | null
+          id?: number
+          nickname?: string
+        }
+        Relationships: []
+      }
+      rules: {
+        Row: {
+          basepts: number
+          id: string
+          oka: number
+          returnpts: number
+          uma1: number
+          uma2: number
+          uma3: number
+          uma4: number | null
+        }
+        Insert: {
+          basepts?: number
+          id?: string
+          oka?: number
+          returnpts?: number
+          uma1?: number
+          uma2?: number
+          uma3?: number
+          uma4?: number | null
+        }
+        Update: {
+          basepts?: number
+          id?: string
+          oka?: number
+          returnpts?: number
+          uma1?: number
+          uma2?: number
+          uma3?: number
+          uma4?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rules_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournaments: {
+        Row: {
+          content_url: string | null
+          created_at: string
+          dnfThreshold: number | null
+          format: string
+          icon: string
+          id: string
+          organizer: string | null
+          phase_configs: Json | null
+          region: string | null
+          tier: string | null
+          title: string
+          updates_at: string
+        }
+        Insert: {
+          content_url?: string | null
+          created_at?: string
+          dnfThreshold?: number | null
+          format?: string
+          icon?: string
+          id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
+          region?: string | null
+          tier?: string | null
+          title: string
+          updates_at: string
+        }
+        Update: {
+          content_url?: string | null
+          created_at?: string
+          dnfThreshold?: number | null
+          format?: string
+          icon?: string
+          id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
+          region?: string | null
+          tier?: string | null
+          title?: string
+          updates_at?: string
+        }
+        Relationships: []
+      }
+      tourney_players: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: number
+          role: Database["mahjong"]["Enums"]["relay_role"]
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id: number
+          role: Database["mahjong"]["Enums"]["relay_role"]
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: number
+          role?: Database["mahjong"]["Enums"]["relay_role"]
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "tourney_players_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "tourney_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tourney_teams: {
+        Row: {
+          created_at: string
+          id: string
+          logo: string | null
+          name: string
+          notes: string | null
+          tournament_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name: string
+          notes?: string | null
+          tournament_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name?: string
+          notes?: string | null
+          tournament_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      monthly_player_ranks: {
+        Row: {
+          account_id: number | null
+          month: number | null
+          month_rank: number | null
+          played_rounds: number | null
+          points: number | null
+          raw_score: number | null
+          tournament_bind_id: string | null
+          year: number | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      get_tournament_match_stats: {
+        Args: { t_id: string }
+        Returns: {
+          avatar: string
+          avg_rank: number
+          avg_rank_east: number
+          avg_rank_north: number
+          avg_rank_south: number
+          avg_rank_west: number
+          avg_score: number
+          avoid_last_rate_pct: number
+          busting_rate: number
+          east_count: number
+          highest_point: number
+          lowest_point: number
+          nickname: string
+          north_count: number
+          play_count: number
+          player_id: number
+          rank_1_count: number
+          rank_2_count: number
+          rank_3_count: number
+          rank_4_count: number
+          south_count: number
+          top_rate_pct: number
+          top2_rate_pct: number
+          west_count: number
+        }[]
+      }
+      get_tournament_playstyle_stats: {
+        Args: { t_id: string }
+        Returns: {
+          avatar: string
+          avg_baopai: number
+          avg_deal_in_score: number
+          avg_turns: number
+          avg_win_score: number
+          babei_rate_pct: number
+          call_rate: number
+          dama_rate: number
+          deal_in_rate: number
+          draw_tenpai_rate: number
+          exhaustive_draw_rate: number
+          li_baopai_rate_pct: number
+          nickname: string
+          player_id: number
+          riichi_rate: number
+          total_rounds: number
+          tsumo_rate: number
+          win_rate: number
+        }[]
+      }
+    }
+    Enums: {
+      relay_role:
+        | "Senpo"
+        | "Jiho"
+        | "Chuken"
+        | "Fukusho"
+        | "Taisho"
+        | "Substitute"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  plazmaburst: {
+    Tables: {
+      maps: {
+        Row: {
+          category: Database["plazmaburst"]["Enums"]["map_category"]
+          id: string
+          name: string
+          pb2_map_id: string
+          thumbnail_url: string
+        }
+        Insert: {
+          category: Database["plazmaburst"]["Enums"]["map_category"]
+          id?: string
+          name: string
+          pb2_map_id: string
+          thumbnail_url: string
+        }
+        Update: {
+          category?: Database["plazmaburst"]["Enums"]["map_category"]
+          id?: string
+          name?: string
+          pb2_map_id?: string
+          thumbnail_url?: string
+        }
+        Relationships: []
+      }
+      match_game_stats: {
+        Row: {
+          aces: number
+          deaths: number
+          double_kills: number
+          headshots: number
+          id: string
+          kills: number
+          match_game_id: string
+          penta_kills: number
+          player_id: string
+          quad_kills: number
+          team_id: string
+          triple_kills: number
+        }
+        Insert: {
+          aces?: number
+          deaths?: number
+          double_kills?: number
+          headshots?: number
+          id?: string
+          kills?: number
+          match_game_id: string
+          penta_kills?: number
+          player_id: string
+          quad_kills?: number
+          team_id: string
+          triple_kills?: number
+        }
+        Update: {
+          aces?: number
+          deaths?: number
+          double_kills?: number
+          headshots?: number
+          id?: string
+          kills?: number
+          match_game_id?: string
+          penta_kills?: number
+          player_id?: string
+          quad_kills?: number
+          team_id?: string
+          triple_kills?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_game_stats_match_game_id_fkey"
+            columns: ["match_game_id"]
+            isOneToOne: false
+            referencedRelation: "match_games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_game_stats_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_game_stats_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_games: {
+        Row: {
+          blue_team_score: number
+          game_number: number
+          id: string
+          map_id: string
+          match_id: string
+          red_team_score: number
+          round_history: number[] | null
+          status: Database["plazmaburst"]["Enums"]["match_status"]
+        }
+        Insert: {
+          blue_team_score: number
+          game_number: number
+          id?: string
+          map_id: string
+          match_id: string
+          red_team_score: number
+          round_history?: number[] | null
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
+        }
+        Update: {
+          blue_team_score?: number
+          game_number?: number
+          id?: string
+          map_id?: string
+          match_id?: string
+          red_team_score?: number
+          round_history?: number[] | null
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_games_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_games_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          blue_team_id: string
+          blue_team_score: number | null
+          bracket_position: string | null
+          completed_at: string | null
+          format: Database["plazmaburst"]["Enums"]["match_format"]
+          id: string
+          next_loser_match_id: string | null
+          next_match_id: string | null
+          phase_tag: string
+          red_team_id: string
+          red_team_score: number | null
+          scheduled_at: string | null
+          status: Database["plazmaburst"]["Enums"]["match_status"]
+          tournament_id: string
+        }
+        Insert: {
+          blue_team_id: string
+          blue_team_score?: number | null
+          bracket_position?: string | null
+          completed_at?: string | null
+          format?: Database["plazmaburst"]["Enums"]["match_format"]
+          id?: string
+          next_loser_match_id?: string | null
+          next_match_id?: string | null
+          phase_tag: string
+          red_team_id: string
+          red_team_score?: number | null
+          scheduled_at?: string | null
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
+          tournament_id: string
+        }
+        Update: {
+          blue_team_id?: string
+          blue_team_score?: number | null
+          bracket_position?: string | null
+          completed_at?: string | null
+          format?: Database["plazmaburst"]["Enums"]["match_format"]
+          id?: string
+          next_loser_match_id?: string | null
+          next_match_id?: string | null
+          phase_tag?: string
+          red_team_id?: string
+          red_team_score?: number | null
+          scheduled_at?: string | null
+          status?: Database["plazmaburst"]["Enums"]["match_status"]
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_blue_team_id_fkey"
+            columns: ["blue_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_next_loser_match_id_fkey"
+            columns: ["next_loser_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_next_match_id_fkey"
+            columns: ["next_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_red_team_id_fkey"
+            columns: ["red_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          created_at: string
+          discord_id: number | null
+          id: string
+          nickname: string
+          profile_img: string | null
+          profile_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          discord_id?: number | null
+          id?: string
+          nickname: string
+          profile_img?: string | null
+          profile_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          discord_id?: number | null
+          id?: string
+          nickname?: string
+          profile_img?: string | null
+          profile_url?: string | null
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: number
+          joined_at: string | null
+          left_at: string | null
+          player_id: string
+          role: Database["plazmaburst"]["Enums"]["role"]
+          status: Database["plazmaburst"]["Enums"]["status"] | null
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          joined_at?: string | null
+          left_at?: string | null
+          player_id: string
+          role?: Database["plazmaburst"]["Enums"]["role"]
+          status?: Database["plazmaburst"]["Enums"]["status"] | null
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          joined_at?: string | null
+          left_at?: string | null
+          player_id?: string
+          role?: Database["plazmaburst"]["Enums"]["role"]
+          status?: Database["plazmaburst"]["Enums"]["status"] | null
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          colour: string
+          created_at: string
+          id: string
+          logo: string | null
+          name: string
+          notes: string | null
+          short_sign: string
+          tournament_id: string
+        }
+        Insert: {
+          colour: string
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name: string
+          notes?: string | null
+          short_sign: string
+          tournament_id: string
+        }
+        Update: {
+          colour?: string
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name?: string
+          notes?: string | null
+          short_sign?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournaments: {
+        Row: {
+          content_url: string | null
+          created_at: string | null
+          format: string
+          icon: string
+          id: string
+          organizer: string | null
+          phase_configs: Json | null
+          region: string | null
+          tier: string | null
+          title: string
+          updates_at: string
+        }
+        Insert: {
+          content_url?: string | null
+          created_at?: string | null
+          format?: string
+          icon?: string
+          id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
+          region?: string | null
+          tier?: string | null
+          title: string
+          updates_at: string
+        }
+        Update: {
+          content_url?: string | null
+          created_at?: string | null
+          format?: string
+          icon?: string
+          id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
+          region?: string | null
+          tier?: string | null
+          title?: string
+          updates_at?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      get_tournament_player_stats: {
+        Args: { t_id: string }
+        Returns: {
+          avatar: string
+          details: Json
+          nickname: string
+          player_id: string
+          scores: Json
+        }[]
+      }
+    }
+    Enums: {
+      map_category: "arena" | "rails" | "snipers" | "rockets" | "rays" | "snd"
+      match_format: "BO1" | "BO3" | "BO5" | "BO7"
+      match_status:
+        | "Upcoming"
+        | "Completed"
+        | "Walkover_Red"
+        | "Walkover_Blue"
+        | "Draw"
+        | "Cancelled"
+      role: "manager" | "player" | "substitute"
+      status: "active" | "inactive" | "retired" | "traded" | "released"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  public: {
+    Tables: {
+      mahjong_data: {
+        Row: {
+          account_id: number
+          discord_id: number
+          username: string
+        }
+        Insert: {
+          account_id: number
+          discord_id: number
+          username: string
+        }
+        Update: {
+          account_id?: number
+          discord_id?: number
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mahjong_data_discord_id_fkey"
+            columns: ["discord_id"]
+            isOneToOne: true
+            referencedRelation: "participant_data"
+            referencedColumns: ["discord_id"]
+          },
+        ]
+      }
+      participant_data: {
+        Row: {
+          discord_id: number
+          discord_username: string
+          id: number
+          profile_img: string | null
+        }
+        Insert: {
+          discord_id: number
+          discord_username: string
+          id?: number
+          profile_img?: string | null
+        }
+        Update: {
+          discord_id?: number
+          discord_username?: string
+          id?: number
+          profile_img?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      overall_rankings_2023: {
+        Row: {
+          account_id: number | null
+          first_place_count: number | null
+          first_place_percentage: number | null
+          nickname: string | null
+          second_place_count: number | null
+          second_place_percentage: number | null
+          third_place_count: number | null
+          third_place_percentage: number | null
+        }
+        Relationships: []
+      }
+      overall_rankings_2024: {
+        Row: {
+          account_id: number | null
+          first_place_count: number | null
+          first_place_percentage: number | null
+          nickname: string | null
+          second_place_count: number | null
+          second_place_percentage: number | null
+          third_place_count: number | null
+          third_place_percentage: number | null
+        }
+        Relationships: []
+      }
+      overall_rankings_2025: {
+        Row: {
+          account_id: number | null
+          first_place_count: number | null
+          first_place_percentage: number | null
+          nickname: string | null
+          second_place_count: number | null
+          second_place_percentage: number | null
+          third_place_count: number | null
+          third_place_percentage: number | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      available_months: { Args: { league: string }; Returns: string[] }
+      count_tables: { Args: { league: string }; Returns: number }
+      fetch_game_results: {
+        Args: { game_id: number; league_month: string; league_year: string }
+        Returns: {
+          adjusted_east_point_diff: number
+          adjusted_south_point_diff: number
+          adjusted_west_point_diff: number
+          east_nickname: string
+          east_score: number
+          game_end_time: string
+          south_nickname: string
+          south_score: number
+          uuid: string
+          west_nickname: string
+          west_score: number
+        }[]
+      }
+      fetch_group_season: {
+        Args: { season_param: number }
+        Returns: {
+          defender_name: string
+          defender_score: number
+          diff_100000_striker: number
+          diff_midfield_defender: number
+          diff_striker_midfield: number
+          finals: boolean
+          match: string
+          midfield_name: string
+          midfield_score: number
+          season: number
+          striker_name: string
+          striker_score: number
+          team_name: string
+        }[]
+      }
+      fetch_league_participants: {
+        Args: { league_month: string; league_year: string }
+        Returns: {
+          discord_id: number
+          discord_username: string
+          game_1: number
+          game_10: number
+          game_11: number
+          game_12: number
+          game_13: number
+          game_14: number
+          game_15: number
+          game_16: number
+          game_2: number
+          game_3: number
+          game_4: number
+          game_5: number
+          game_6: number
+          game_7: number
+          game_8: number
+          game_9: number
+          profile_img: string
+          rank: number
+          rank_label: string
+          total: number
+        }[]
+      }
+      fetch_league_participants_new: {
+        Args: { league_month: string; league_year: number }
+        Returns: {
+          discord_username: string
+          game_1: number
+          game_10: number
+          game_11: number
+          game_12: number
+          game_13: number
+          game_14: number
+          game_15: number
+          game_16: number
+          game_2: number
+          game_3: number
+          game_4: number
+          game_5: number
+          game_6: number
+          game_7: number
+          game_8: number
+          game_9: number
+          participation_count: number
+          profile_img: string
+          rank: number
+          rank_label: string
+          total: number
+        }[]
+      }
+      fwmp_rankings: {
+        Args: { league_schema: string }
+        Returns: {
+          april: number
+          august: number
+          discord_username: string
+          february: number
+          january: number
+          july: number
+          june: number
+          march: number
+          may: number
+          november: number
+          october: number
+          profile_img: string
+          rank: number
+          september: number
+          total: number
+        }[]
+      }
+      get_adjusted_point_diff: {
+        Args: {
+          east_score: number
+          south_score: number
+          team: string
+          west_score: number
+        }
+        Returns: number
+      }
+      get_available_months: {
+        Args: { year: number }
+        Returns: {
+          month: string
+          month_number: number
+        }[]
+      }
+      get_discord_ids: { Args: never; Returns: string[] }
+      get_individual_records_new: {
+        Args: never
+        Returns: {
+          month: number
+          year: number
+        }[]
+      }
+      get_participants: {
+        Args: never
+        Returns: {
+          discord_id: number
+          discord_username: string
+          mahjongsoul_id: number
+          mahjongsoul_name: string
+          profile_img: string
+        }[]
+      }
+      get_player_meetup_frequency: {
+        Args: never
+        Returns: {
+          meet_up_count: number
+          player1: number
+          player1_name: string
+          player2: number
+          player2_name: string
+        }[]
+      }
+      get_player_recent_ranks: {
+        Args: { matches_count: number; p_player_id: number }
+        Returns: number[]
+      }
+      get_seat_frequency: {
+        Args: never
+        Returns: {
+          account_id: number
+          east: number
+          mahjong_username: string
+          south: number
+          west: number
+        }[]
+      }
+      get_team_data: {
+        Args: { season_param: string }
+        Returns: {
+          defender: string
+          hex_color: number
+          leader: number
+          midfield: string
+          season: number
+          striker: string
+          substitude: string
+          team_name: string
+        }[]
+      }
+      update_user_data: {
+        Args: { new_pfp: string; new_username: string; user_id: number }
+        Returns: undefined
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  ctf: {
+    Enums: {},
+  },
+  mahjong: {
+    Enums: {
+      relay_role: [
+        "Senpo",
+        "Jiho",
+        "Chuken",
+        "Fukusho",
+        "Taisho",
+        "Substitute",
+      ],
+    },
+  },
+  plazmaburst: {
+    Enums: {
+      map_category: ["arena", "rails", "snipers", "rockets", "rays", "snd"],
+      match_format: ["BO1", "BO3", "BO5", "BO7"],
+      match_status: [
+        "Upcoming",
+        "Completed",
+        "Walkover_Red",
+        "Walkover_Blue",
+        "Draw",
+        "Cancelled",
+      ],
+      role: ["manager", "player", "substitute"],
+      status: ["active", "inactive", "retired", "traded", "released"],
+    },
+  },
+  public: {
+    Enums: {},
+  },
+} as const
