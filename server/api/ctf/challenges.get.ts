@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   const { data, error } = await supabase
     .schema('ctf')
     .from('challenge_points')
-    .select('id, title, category, prompt, artifact_url, current_points, solve_count')
+    .select('id, title, category, prompt, current_points, solve_count, files')
     .eq('is_active', true)
 
   if (error) {

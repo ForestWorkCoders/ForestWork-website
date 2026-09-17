@@ -16,10 +16,10 @@ export type Database = {
     Tables: {
       challenges: {
         Row: {
-          artifact_url: string | null
           category: string
           created_at: string
           decay_solves: number
+          files: Json
           flag_hash: string
           id: string
           initial_points: number
@@ -30,10 +30,10 @@ export type Database = {
           title: string
         }
         Insert: {
-          artifact_url?: string | null
           category: string
           created_at?: string
           decay_solves?: number
+          files?: Json
           flag_hash: string
           id: string
           initial_points?: number
@@ -44,10 +44,10 @@ export type Database = {
           title: string
         }
         Update: {
-          artifact_url?: string | null
           category?: string
           created_at?: string
           decay_solves?: number
+          files?: Json
           flag_hash?: string
           id?: string
           initial_points?: number
@@ -99,10 +99,10 @@ export type Database = {
     Views: {
       challenge_points: {
         Row: {
-          artifact_url: string | null
           category: string | null
           current_points: number | null
           decay_solves: number | null
+          files: Json | null
           id: string | null
           initial_points: number | null
           is_active: boolean | null
@@ -117,6 +117,7 @@ export type Database = {
         Row: {
           account_id: number | null
           last_solve_time: string | null
+          rank: number | null
           solves_count: number | null
           total_score: number | null
         }

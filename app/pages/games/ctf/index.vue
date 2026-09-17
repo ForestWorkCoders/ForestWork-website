@@ -279,6 +279,9 @@ function getCurrentNode(): VFSNode {
     return curr
 }
 
+// ==========================================
+// 动态关卡数据水合引擎 (支持多文本文件与代码注入)
+// ==========================================
 async function hydrateChallenges() {
     try {
         const data = await $fetch<any[]>('/api/ctf/challenges')
@@ -288,10 +291,9 @@ async function hydrateChallenges() {
 
         data.forEach((c) => {
             const dirName = c.id
+            const cleanPrompt = (c.prompt || c.description || '').replace(/\\n/g, '\n')
 
-            // ★ 核心修复：把字符串里的字面量 "\n" 归一化为真实的控制台换行符
-            const cleanPrompt = (c.prompt || '').replace(/\\n/g, '\n')
-
+            // 1. 初始化目录节点，内置题面
             const childrenNodes: Record<string, VFSNode> = {
                 'prompt.txt': {
                     type: 'file',
@@ -299,14 +301,38 @@ async function hydrateChallenges() {
                 }
             }
 
-            if (c.artifact_url) {
-                const fileName = c.artifact_url.split('/').pop()?.split('?')[0] || 'artifact.bin'
-                childrenNodes[fileName] = {
-                    type: 'file',
-                    isBinary: true,
-                    artifactUrl: c.artifact_url
+            // 2. 核心好品味：单一事实源！纯文本代码与二进制附件全由 files 统领, 智能感知纯代码、扁平 URL 与嵌套附件对象
+            if (c.files && typeof c.files === 'object') {
+                for (const [filename, val] of Object.entries(c.files)) {
+                    // 场景 A: 纯字符串形态
+                    if (typeof val === 'string') {
+                        // 嗅探：如果字符串是以 http:// 或 https:// 开头，它就是外部直链附件！
+                        if (/^https?:\/\//i.test(val.trim())) {
+                            childrenNodes[filename] = {
+                                type: 'file',
+                                isBinary: true,
+                                artifactUrl: val.trim()
+                            }
+                        } else {
+                            // 否则按纯文本源码/题面处理
+                            childrenNodes[filename] = {
+                                type: 'file',
+                                content: val.replace(/\\n/g, '\n')
+                            }
+                        }
+                    } 
+                    // 场景 B: 嵌套对象形态（兼容兜底）
+                    else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
+                        childrenNodes[filename] = {
+                            type: 'file',
+                            isBinary: true,
+                            artifactUrl: (val as any).artifact_url
+                        }
+                    }
                 }
             }
+
+            // 👈 那个恶心的 if (c.artifact_url) 已经被彻底抹杀！
 
             challengesRoot[dirName] = {
                 type: 'dir',
@@ -378,7 +404,6 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
 }
 
 // 2. 易失状态（Session State）
-const cwd = ref<string[]>([]) // 根目录为 []
 const inputCmd = ref('')
 const terminalRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
@@ -401,33 +426,6 @@ const currentPath = ref<string[]>([])
 const currentPathStr = computed(() => {
     return currentPath.value.length === 0 ? '/' : '/' + currentPath.value.join('/')
 })
-
-// 3. 好品味路径解析器：统一消除特殊情况
-function resolveNode(path: string): { node: VFSNode | null; newPath: string[] } {
-    const parts = path.startsWith('/')
-        ? path.split('/').filter(Boolean)
-        : [...cwd.value, ...path.split('/').filter(Boolean)]
-
-    const resolvedStack: string[] = []
-    for (const part of parts) {
-        if (part === '.') continue
-        if (part === '..') {
-            resolvedStack.pop()
-        } else {
-            resolvedStack.push(part)
-        }
-    }
-
-    let curr: VFSNode = { type: 'dir', children: vfs }
-    for (const p of resolvedStack) {
-        if (curr.type !== 'dir' || !curr.children || !curr.children[p]) {
-            return { node: null, newPath: [] }
-        }
-        curr = curr.children[p]
-    }
-
-    return { node: curr, newPath: resolvedStack }
-}
 
 function appendHistory(text: string, type: HistoryLine['type'] = 'output') {
     history.value.push({ id: Date.now() + Math.random(), text, type })
@@ -621,7 +619,7 @@ const commands: Record<string, (args: string[]) => void> = {
     open: (args) => {
         const target = args[0]?.trim()
         if (!target) {
-            appendHistory('open: missing file operand', 'error')
+            appendHistory('open: missing file operand. Usage: open <image>', 'error')
             return
         }
 
@@ -638,7 +636,14 @@ const commands: Record<string, (args: string[]) => void> = {
         }
 
         if (!node.artifactUrl) {
-            appendHistory(`open: ${target}: Not a viewable media artifact.`, 'error')
+            appendHistory(`open: ${target}: Not an external media artifact.`, 'error')
+            return
+        }
+
+        // ★ 好品味防呆：验证是否属于浏览器可渲染的图像扩展名
+        const isImage = /\.(jpe?g|png|gif|webp|svg|bmp|ico)$/i.test(target)
+        if (!isImage) {
+            appendHistory(`open: ${target}: Not a viewable image format. Use 'download' instead.`, 'error')
             return
         }
 
