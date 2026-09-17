@@ -304,24 +304,37 @@ async function hydrateChallenges() {
             // 2. 核心好品味：单一事实源！纯文本代码与二进制附件全由 files 统领, 智能感知纯代码、扁平 URL 与嵌套附件对象
             if (c.files && typeof c.files === 'object') {
                 for (const [filename, val] of Object.entries(c.files)) {
-                    // 场景 A: 纯字符串形态
                     if (typeof val === 'string') {
-                        // 嗅探：如果字符串是以 http:// 或 https:// 开头，它就是外部直链附件！
-                        if (/^https?:\/\//i.test(val.trim())) {
+                        const trimmedVal = val.trim()
+                        const isHttp = /^https?:\/\//i.test(trimmedVal)
+                        const isUrlShortcut = /\.url$/i.test(filename)
+
+                        // ★ 核心好品味：如果是 .url 快捷方式，它是纯文本！允许 cat 查看，也允许 open 唤起
+                        if (isUrlShortcut) {
+                            childrenNodes[filename] = {
+                                type: 'file',
+                                content: trimmedVal,       // 填入纯文本，cat 时直接打印这行 URL！
+                                artifactUrl: trimmedVal,   // 记录直链，open 时直接弹射！
+                                isBinary: false            // 绝非二进制！
+                            }
+                        } 
+                        // 其他普通的 http 外链（图片、视频、zip、bin）保持为二进制物料
+                        else if (isHttp) {
                             childrenNodes[filename] = {
                                 type: 'file',
                                 isBinary: true,
-                                artifactUrl: val.trim()
+                                artifactUrl: trimmedVal
                             }
-                        } else {
-                            // 否则按纯文本源码/题面处理
+                        } 
+                        // 本地纯文本/代码
+                        else {
                             childrenNodes[filename] = {
                                 type: 'file',
                                 content: val.replace(/\\n/g, '\n')
                             }
                         }
-                    }
-                    // 场景 B: 嵌套对象形态（兼容兜底）
+                    } 
+                    // 兼容旧的嵌套对象结构
                     else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
                         childrenNodes[filename] = {
                             type: 'file',
@@ -622,10 +635,20 @@ const commands: Record<string, (args: string[]) => void> = {
         appendHistory(node.content || '', 'output')
     },
 
+    // ==========================================
+    // open: 通用媒体工件检查器 与 外部靶场穿透
+    // ==========================================
     open: (args) => {
         const target = args[0]?.trim()
         if (!target) {
-            appendHistory('open: missing file operand. Usage: open <media_file>', 'error')
+            appendHistory('open: missing operand. Usage: open <media_file | url>', 'error')
+            return
+        }
+
+        // 1. 如果输入本身就是纯 URL：直接无视拦截弹射新标签页
+        if (/^https?:\/\//i.test(target)) {
+            openExternalTab(target)
+            appendHistory(`[SYSTEM] Dispatched external uplink: ${target}`, 'system')
             return
         }
 
@@ -641,12 +664,22 @@ const commands: Record<string, (args: string[]) => void> = {
             return
         }
 
+        // 2. ★ 核心好品味：针对 .url 快捷方式文件，提取其内容/直链并以 DOM 锚点穿透打开！
+        if (target.toLowerCase().endsWith('.url') || (node.artifactUrl && /^https?:\/\//i.test(node.artifactUrl) && !/\.(jpe?g|png|gif|webp|svg|bmp|ico|mp4|webm|ogg|mov|zip|pcap|bin|tar|gz)$/i.test(target))) {
+            const destUrl = node.artifactUrl || node.content?.trim()
+            if (destUrl) {
+                openExternalTab(destUrl)
+                appendHistory(`[SYSTEM] Dispatched external uplink from shortcut: ${destUrl}`, 'system')
+                return
+            }
+        }
+
         if (!node.artifactUrl) {
             appendHistory(`open: ${target}: Not an external media artifact.`, 'error')
             return
         }
 
-        // 媒体格式确定性嗅探
+        // 3. 图像与视频媒体嗅探
         const isImage = /\.(jpe?g|png|gif|webp|svg|bmp|ico)$/i.test(target)
         const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(target)
 
@@ -656,7 +689,6 @@ const commands: Record<string, (args: string[]) => void> = {
         }
 
         const fileName = target.split('/').pop() || target
-        // 唤起统一媒体检查器
         activeMedia.value = {
             url: node.artifactUrl,
             name: fileName,
@@ -780,6 +812,24 @@ function triggerDownload(url: string, filename?: string) {
     link.target = '_blank'
     link.rel = 'noopener noreferrer'
 
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+}
+
+function openExternalTab(rawUrl: string) {
+    if (!rawUrl) return
+    let dest = rawUrl.trim()
+    
+    // 协议安全补齐：防止相对路径污染
+    if (!/^https?:\/\//i.test(dest)) {
+        dest = `https://${dest}`
+    }
+
+    const link = document.createElement('a')
+    link.href = dest
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
