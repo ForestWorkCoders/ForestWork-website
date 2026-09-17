@@ -52,8 +52,8 @@ export default defineNuxtConfig({
     '/pages/event_week/**': { redirect: { to: '/games/mahjongsoul', statusCode: 302 } },
 
     // 3. Gartic Phone 旧站重定向（301 永久重定向）
-    '/gartic_phone': { redirect: { to: '/games/gartic-phone', statusCode: 301 } },
-    '/gartic_phone/**': { redirect: { to: '/games/gartic-phone', statusCode: 301 } }
+    '/gartic_phone': { redirect: { to: '/games/garticphone', statusCode: 301 } },
+    '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } }
   },
 
   compatibilityDate: '2026-06-30',

@@ -18,13 +18,13 @@ const TEST_CASES = [
     desc: 'Gartic Phone 舊門牌',
     path: '/gartic_phone',
     status: 301,
-    target: '/games/gartic-phone'
+    target: '/games/garticphone'
   },
   {
     desc: 'Gartic Phone 舊子目錄通配',
     path: '/gartic_phone/test_room',
     status: 301,
-    target: '/games/gartic-phone'
+    target: '/games/garticphone'
   },
   {
     desc: '歷史活動周：2022 數番盃',
