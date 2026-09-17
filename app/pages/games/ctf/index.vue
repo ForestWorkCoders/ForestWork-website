@@ -11,6 +11,8 @@ interface VFSNode {
     children?: Record<string, VFSNode>
 }
 
+const CURRENT_OPERATOR = 'operator_10001'
+
 // ==========================================
 // 1. 历史命令栈状态（Command History Buffer）
 // ==========================================
@@ -70,127 +72,127 @@ async function showScoreboard() {
 
 // 辅助纯函数：计算多个字符串的最长公共前缀 (LCP)
 function getLongestCommonPrefix(words: string[]): string {
-  if (words.length === 0) return ''
-  const first = words[0] || ''
-  let prefix = ''
-  for (let i = 0; i < first.length; i++) {
-    const char = first[i]
-    if (words.every(w => w[i] === char)) {
-      prefix += char
-    } else {
-      break
+    if (words.length === 0) return ''
+    const first = words[0] || ''
+    let prefix = ''
+    for (let i = 0; i < first.length; i++) {
+        const char = first[i]
+        if (words.every(w => w[i] === char)) {
+            prefix += char
+        } else {
+            break
+        }
     }
-  }
-  return prefix
+    return prefix
 }
 
 function handleTabComplete(e: KeyboardEvent) {
-  e.preventDefault()
+    e.preventDefault()
 
-  const rawCmd = inputCmd.value
-  // 如果输入全为空白，直接忽略
-  if (!rawCmd.trim() && !rawCmd.endsWith(' ')) {
-    return
-  }
+    const rawCmd = inputCmd.value
+    // 如果输入全为空白，直接忽略
+    if (!rawCmd.trim() && !rawCmd.endsWith(' ')) {
+        return
+    }
 
-  const endsWithSpace = rawCmd.endsWith(' ')
-  const tokens = rawCmd.trim().split(/\s+/)
+    const endsWithSpace = rawCmd.endsWith(' ')
+    const tokens = rawCmd.trim().split(/\s+/)
 
-  // ----------------------------------------------------
-  // 场景 A: 补全主命令 (只有一个 token 且未按空格)
-  // ----------------------------------------------------
-  if (tokens.length === 1 && !endsWithSpace) {
-    const prefix = tokens[0] || ''
-    const commandList = Object.keys(commands)
-    const matches = commandList.filter(cmd => cmd.startsWith(prefix))
+    // ----------------------------------------------------
+    // 场景 A: 补全主命令 (只有一个 token 且未按空格)
+    // ----------------------------------------------------
+    if (tokens.length === 1 && !endsWithSpace) {
+        const prefix = tokens[0] || ''
+        const commandList = Object.keys(commands)
+        const matches = commandList.filter(cmd => cmd.startsWith(prefix))
 
+        if (matches.length === 1) {
+            const match = matches[0]
+            if (match) {
+                inputCmd.value = `${match} `
+            }
+        } else if (matches.length > 1) {
+            const lcp = getLongestCommonPrefix(matches)
+            if (lcp.length > prefix.length) {
+                inputCmd.value = lcp
+            } else {
+                // 打印所有匹配命令候选
+                appendHistory(`guest@forestwork:${currentPathStr.value}$ ${rawCmd}`, 'input')
+                appendHistory(matches.sort().join('  '), 'output')
+            }
+        }
+        return
+    }
+
+    // ----------------------------------------------------
+    // 场景 B: 补全路径参数 (后续参数)
+    // ----------------------------------------------------
+    // 获取当前正在输入的最后一个参数片段
+    const currentToken = endsWithSpace ? '' : (tokens[tokens.length - 1] || '')
+
+    // 将路径解构为：父级目录路径 (dirPart) 与 文件名前缀 (filePrefix)
+    const lastSlashIndex = currentToken.lastIndexOf('/')
+    let dirPart = ''
+    let filePrefix = currentToken
+
+    if (lastSlashIndex !== -1) {
+        dirPart = currentToken.slice(0, lastSlashIndex + 1) // 保留末尾的 /
+        filePrefix = currentToken.slice(lastSlashIndex + 1)
+    }
+
+    // 寻址父级节点：如果 dirPart 为空则在当前目录找，否则去对应目录找
+    const parentNode = dirPart ? resolvePath(dirPart) : getCurrentNode()
+
+    if (!parentNode || parentNode.type !== 'dir' || !parentNode.children) {
+        return
+    }
+
+    // 提取子项并应用智能隐藏文件过滤
+    let entries = Object.keys(parentNode.children)
+
+    // 核心好品味：如果用户没显式敲 '.'，不主动提示隐藏文件
+    if (!filePrefix.startsWith('.')) {
+        entries = entries.filter(name => !name.startsWith('.'))
+    }
+
+    const matches = entries.filter(name => name.startsWith(filePrefix))
+
+    // 0 个匹配直接忽略
+    if (matches.length === 0) {
+        return
+    }
+
+    // 计算替换基准：当前命令除最后一个 token 外的前缀字符串
+    const baseCmd = endsWithSpace
+        ? rawCmd
+        : rawCmd.slice(0, rawCmd.length - currentToken.length)
+
+    // 单一匹配：直接推送到终点
     if (matches.length === 1) {
-      const match = matches[0]
-      if (match) {
-        inputCmd.value = `${match} `
-      }
-    } else if (matches.length > 1) {
-      const lcp = getLongestCommonPrefix(matches)
-      if (lcp.length > prefix.length) {
-        inputCmd.value = lcp
-      } else {
-        // 打印所有匹配命令候选
-        appendHistory(`guest@forestwork:${currentPathStr.value}$ ${rawCmd}`, 'input')
-        appendHistory(matches.sort().join('  '), 'output')
-      }
+        const match = matches[0]
+        if (!match) return
+
+        const childNode = parentNode.children[match]
+        const isDir = childNode?.type === 'dir'
+        const completedToken = `${dirPart}${match}${isDir ? '/' : ' '}`
+
+        inputCmd.value = `${baseCmd}${completedToken}`
     }
-    return
-  }
-
-  // ----------------------------------------------------
-  // 场景 B: 补全路径参数 (后续参数)
-  // ----------------------------------------------------
-  // 获取当前正在输入的最后一个参数片段
-  const currentToken = endsWithSpace ? '' : (tokens[tokens.length - 1] || '')
-  
-  // 将路径解构为：父级目录路径 (dirPart) 与 文件名前缀 (filePrefix)
-  const lastSlashIndex = currentToken.lastIndexOf('/')
-  let dirPart = ''
-  let filePrefix = currentToken
-
-  if (lastSlashIndex !== -1) {
-    dirPart = currentToken.slice(0, lastSlashIndex + 1) // 保留末尾的 /
-    filePrefix = currentToken.slice(lastSlashIndex + 1)
-  }
-
-  // 寻址父级节点：如果 dirPart 为空则在当前目录找，否则去对应目录找
-  const parentNode = dirPart ? resolvePath(dirPart) : getCurrentNode()
-
-  if (!parentNode || parentNode.type !== 'dir' || !parentNode.children) {
-    return
-  }
-
-  // 提取子项并应用智能隐藏文件过滤
-  let entries = Object.keys(parentNode.children)
-
-  // 核心好品味：如果用户没显式敲 '.'，不主动提示隐藏文件
-  if (!filePrefix.startsWith('.')) {
-    entries = entries.filter(name => !name.startsWith('.'))
-  }
-
-  const matches = entries.filter(name => name.startsWith(filePrefix))
-
-  // 0 个匹配直接忽略
-  if (matches.length === 0) {
-    return
-  }
-
-  // 计算替换基准：当前命令除最后一个 token 外的前缀字符串
-  const baseCmd = endsWithSpace 
-    ? rawCmd 
-    : rawCmd.slice(0, rawCmd.length - currentToken.length)
-
-  // 单一匹配：直接推送到终点
-  if (matches.length === 1) {
-    const match = matches[0]
-    if (!match) return
-
-    const childNode = parentNode.children[match]
-    const isDir = childNode?.type === 'dir'
-    const completedToken = `${dirPart}${match}${isDir ? '/' : ' '}`
-
-    inputCmd.value = `${baseCmd}${completedToken}`
-  } 
-  // 多匹配：计算公共前缀，若无更大前缀则打印候选列表
-  else {
-    const lcp = getLongestCommonPrefix(matches)
-    if (lcp.length > filePrefix.length) {
-      inputCmd.value = `${baseCmd}${dirPart}${lcp}`
-    } else {
-      // 像标准终端一样回显输入并列出候选项
-      appendHistory(`guest@forestwork:${currentPathStr.value}$ ${rawCmd}`, 'input')
-      const formatted = matches.sort().map(name => {
-        const isDir = parentNode.children?.[name]?.type === 'dir'
-        return isDir ? `${name}/` : name
-      })
-      appendHistory(formatted.join('  '), 'output')
+    // 多匹配：计算公共前缀，若无更大前缀则打印候选列表
+    else {
+        const lcp = getLongestCommonPrefix(matches)
+        if (lcp.length > filePrefix.length) {
+            inputCmd.value = `${baseCmd}${dirPart}${lcp}`
+        } else {
+            // 像标准终端一样回显输入并列出候选项
+            appendHistory(`guest@forestwork:${currentPathStr.value}$ ${rawCmd}`, 'input')
+            const formatted = matches.sort().map(name => {
+                const isDir = parentNode.children?.[name]?.type === 'dir'
+                return isDir ? `${name}/` : name
+            })
+            appendHistory(formatted.join('  '), 'output')
+        }
     }
-  }
 }
 
 const vfs = reactive<Record<string, VFSNode>>({
@@ -439,8 +441,8 @@ function appendHistory(text: string, type: HistoryLine['type'] = 'output') {
 // 4. 命令分发字典（Command Dispatcher）
 const commands: Record<string, (args: string[]) => void> = {
     help: () => {
-        appendHistory(`AVAILABLE DIRECTIVES:
-  ls [dir]           列出目錄清單
+        appendHistory(`目前擁有的指令集:
+  ls [-a] [dir]      列出目錄清單 (支援 -a 顯示隱藏項目)
   cd <dir>           切換工作目錄
   cat <file>         讀取文本文件
   open <image>       在視窗中預覽隱寫原圖
@@ -448,7 +450,8 @@ const commands: Record<string, (args: string[]) => void> = {
   submit <flag>      向驗證器提交 Flag
   scoreboard         檢視全場即時積分榜 (別名: top)
   clear              清除終端屏幕
-  whoami             顯示當前權限標記`, 'system')
+  whoami             顯示當前權限標記
+  whois [player]     查詢玩家解題檔案明細 (缺省為本人)`, 'system')
     },
 
     clear: () => {
@@ -457,6 +460,52 @@ const commands: Record<string, (args: string[]) => void> = {
 
     whoami: () => {
         appendHistory('guest@forestwork-node-01 (unprivileged)', 'output')
+    },
+
+    // ==========================================
+    // whois: 查询选手解题档案 (默认回退至当前操作员)
+    // ==========================================
+    whois: async (args) => {
+        // 核心好品味：如果没有传参，无缝降级为查询自己！
+        const target = args[0]?.trim() || CURRENT_OPERATOR
+
+        appendHistory(`[TELEMETRY] 尋轉關於 ${target} 的記錄...`, 'system')
+
+        try {
+            const res = await $fetch<any>('/api/ctf/whois', {
+                params: { operator: target }
+            })
+
+            if (!res || !res.found) {
+                appendHistory(`[-] 玩家 "${target}" 不存在、或尚未解出任何一道題目。`, 'error')
+                return
+            }
+
+            // 格式化输出卡片
+            appendHistory(`[玩家檔案]
+  玩家昵稱 : ${res.accountId}
+  目前名次 : #${res.rank}
+  目前總分 : ${res.totalScore} 分
+  解題題數 : ${res.solvesCount} 題
+
+  已解決的謎題:`, 'output')
+
+            if (res.solves.length === 0) {
+                appendHistory('  (目前沒有任何解題記錄)', 'system')
+                return
+            }
+
+            res.solves.forEach((s: any) => {
+                const timeStr = new Date(s.solvedAt).toLocaleTimeString()
+                const cat = `[${s.category}]`.padEnd(9, ' ')
+                const title = s.title.length > 16 ? s.title.slice(0, 15) + '…' : s.title.padEnd(16, ' ')
+                const pts = `(+${s.points} pts)`.padStart(11, ' ')
+
+                appendHistory(`  ${cat} ${title} ${pts}  @ ${timeStr}`, 'output')
+            })
+        } catch (err: any) {
+            appendHistory(`whois: failed to inspect operator: ${err.message || 'Network error'}`, 'error')
+        }
     },
 
     ls: (args) => {
