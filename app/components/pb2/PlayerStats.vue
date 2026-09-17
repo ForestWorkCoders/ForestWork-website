@@ -219,7 +219,7 @@ const top3Charts = computed(() => {
   <div class="px-4 md:px-6 mt-8 space-y-8 animate-fade-in pb-12">
     <!-- 加载骨架 -->
     <div v-if="pending" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-500" />
+      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 animate-spin text-gray-500" />
     </div>
 
     <template v-else-if="players && players.length > 0">
@@ -264,7 +264,7 @@ const top3Charts = computed(() => {
                   <VChart v-if="chart.option" :option="chart.option" class="w-full h-full" autoresize />
                   <template #fallback>
                     <div class="w-full h-full flex items-center justify-center">
-                      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+                      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
                     </div>
                   </template>
                 </ClientOnly>

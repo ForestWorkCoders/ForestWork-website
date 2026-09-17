@@ -71,13 +71,13 @@ useHead({
           title="Plazma Burst 2 General Rules"
         ></iframe>
           <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-[#18212f] z-0">
-            <UIcon name="i-lucide-refresh" class="w-8 h-8 text-gray-400 animate-spin" />
+            <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
           </div>
         </div>
 
         <div class="flex md:hidden flex-col items-center justify-center py-20 px-6 text-center bg-gray-50 dark:bg-[#18212f]">
           <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner">
-            <UIcon name="i-heroicons-document-magnifying-glass" class="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+            <UIcon name="i-lucide-search-alert" class="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
           </div>
           <h3 class="text-xl font-black text-gray-900 dark:text-white mb-3 tracking-wide">Read the rules on Mobile Devices</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
@@ -88,7 +88,7 @@ useHead({
             target="_blank" 
             color="emerald" 
             size="xl"
-            icon="i-heroicons-arrow-top-right-on-square"
+            icon="i-lucide-external-link"
             class="font-bold tracking-widest shadow-md hover:shadow-lg transition-shadow"
             :ui="{ rounded: 'rounded-full' }"
           >

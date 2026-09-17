@@ -84,7 +84,7 @@ useSeoMeta({
     </div>
 
     <div v-else-if="pending" class="min-h-screen flex items-center justify-center text-white">
-        <UIcon name="i-lucide-refresh" class="animate-spin w-8 h-8" />
+        <UIcon name="i-lucide-refresh-cw" class="animate-spin w-8 h-8" />
     </div>
 
     <div v-else

@@ -51,14 +51,14 @@ const mockMontages = [
           <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <img :src="stream.thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-              <UIcon name="i-heroicons-play-solid" class="w-12 h-12 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all drop-shadow-lg" />
+              <UIcon name="i-lucide-play" class="w-12 h-12 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all drop-shadow-lg" />
             </div>
             <div class="absolute top-3 left-3 px-2 py-1 rounded bg-black/70 backdrop-blur-sm flex items-center gap-1.5 text-xs font-bold text-white">
               <span :class="stream.platform === 'twitch' ? 'text-purple-400' : 'text-red-500'">●</span>
               {{ stream.platform === 'twitch' ? 'Twitch' : 'YouTube' }}
             </div>
             <div class="absolute bottom-3 left-3 px-2 py-1 rounded bg-red-600 text-white text-xs font-bold tracking-wider flex items-center gap-1">
-              <UIcon name="i-heroicons-users" class="w-3.5 h-3.5" /> {{ stream.viewers }}
+              <UIcon name="i-lucide-users" class="w-3.5 h-3.5" /> {{ stream.viewers }}
             </div>
           </div>
           <h3 class="font-bold text-gray-900 dark:text-gray-100 line-clamp-2 group-hover:text-amber-500 transition-colors">{{ stream.title }}</h3>
@@ -92,7 +92,7 @@ const mockMontages = [
     <section v-if="mockMontages.length > 0">
       <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <UIcon name="i-heroicons-bolt-solid" class="w-5 h-5 text-amber-500" />
+          <UIcon name="i-lucide-zap" class="w-5 h-5 text-amber-500" />
           精華短片 <span class="text-gray-400 dark:text-gray-500 font-normal text-sm ml-1">Shorts & Highlights</span>
         </h2>
       </div>
@@ -105,9 +105,9 @@ const mockMontages = [
             
             <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
               <span class="text-white text-[11px] font-bold tracking-wider flex items-center gap-1">
-                <UIcon name="i-heroicons-eye" class="w-3.5 h-3.5" /> {{ montage.views }}
+                <UIcon name="i-lucide-eye" class="w-3.5 h-3.5" /> {{ montage.views }}
               </span>
-              <UIcon name="i-heroicons-play-circle" class="w-6 h-6 text-white/80 group-hover:text-white transition-colors" />
+              <UIcon name="i-lucide-circle-play" class="w-6 h-6 text-white/80 group-hover:text-white transition-colors" />
             </div>
           </div>
           <h3 class="font-semibold text-xs md:text-sm text-gray-800 dark:text-gray-300 line-clamp-2 leading-snug group-hover:text-amber-500 transition-colors">{{ montage.title }}</h3>
