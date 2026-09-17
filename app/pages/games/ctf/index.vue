@@ -200,7 +200,11 @@ const vfs = reactive<Record<string, VFSNode>>({
     },
     'readme.txt': {
         type: 'file',
-        content: 'FORESTWORK CTF ENVIRONMENT\n輸入 "help" 獲取幫助。\n輸入 "ls challenges" 查看各類題目。\n你會發現，所有的flag開頭都是以"PBCTF"開頭的，試試PBCTF{TKU_4_Acc3pt1ng_Tut0r1aLs_traralela_tololora}。'
+        content: 'FORESTWORK CTF ENVIRONMENT\n輸入 "help" 獲取幫助。\n輸入 "ls challenges" 查看各類題目。\n你會發現，所有的flag開頭都是以"PBCTF"開頭的。'
+    },
+    '.flag_sample.txt': {
+        type: 'file',
+        content: 'PBCTF{TKU_4_Acc3pt1ng_Tut0r1aLs_B38694}'
     }
 })
 

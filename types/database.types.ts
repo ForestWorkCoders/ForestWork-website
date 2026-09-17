@@ -24,6 +24,7 @@ export type Database = {
           id: string
           initial_points: number
           is_active: boolean
+          is_case_insensitive: boolean
           min_points: number
           prompt: string
           title: string
@@ -37,6 +38,7 @@ export type Database = {
           id: string
           initial_points?: number
           is_active?: boolean
+          is_case_insensitive?: boolean
           min_points?: number
           prompt: string
           title: string
@@ -50,6 +52,7 @@ export type Database = {
           id?: string
           initial_points?: number
           is_active?: boolean
+          is_case_insensitive?: boolean
           min_points?: number
           prompt?: string
           title?: string
