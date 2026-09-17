@@ -320,7 +320,7 @@ async function hydrateChallenges() {
                                 content: val.replace(/\\n/g, '\n')
                             }
                         }
-                    } 
+                    }
                     // 场景 B: 嵌套对象形态（兼容兜底）
                     else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
                         childrenNodes[filename] = {
@@ -407,7 +407,13 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
 const inputCmd = ref('')
 const terminalRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
-const previewImage = ref<string | null>(null)
+
+interface PreviewMedia {
+    url: string
+    name: string
+    type: 'image' | 'video'
+}
+const activeMedia = ref<PreviewMedia | null>(null)
 
 interface HistoryLine {
     id: number
@@ -619,7 +625,7 @@ const commands: Record<string, (args: string[]) => void> = {
     open: (args) => {
         const target = args[0]?.trim()
         if (!target) {
-            appendHistory('open: missing file operand. Usage: open <image>', 'error')
+            appendHistory('open: missing file operand. Usage: open <media_file>', 'error')
             return
         }
 
@@ -640,16 +646,24 @@ const commands: Record<string, (args: string[]) => void> = {
             return
         }
 
-        // ★ 好品味防呆：验证是否属于浏览器可渲染的图像扩展名
+        // 媒体格式确定性嗅探
         const isImage = /\.(jpe?g|png|gif|webp|svg|bmp|ico)$/i.test(target)
-        if (!isImage) {
-            appendHistory(`open: ${target}: Not a viewable image format. Use 'download' instead.`, 'error')
+        const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(target)
+
+        if (!isImage && !isVideo) {
+            appendHistory(`open: ${target}: Unsupported media stream format. Use 'download' instead.`, 'error')
             return
         }
 
-        // 唤起弹窗
-        previewImage.value = node.artifactUrl
-        appendHistory(`[SYSTEM] Displaying artifact inspector for: ${target}`, 'system')
+        const fileName = target.split('/').pop() || target
+        // 唤起统一媒体检查器
+        activeMedia.value = {
+            url: node.artifactUrl,
+            name: fileName,
+            type: isVideo ? 'video' : 'image'
+        }
+
+        appendHistory(`[SYSTEM] Displaying artifact inspector for: ${target} [${isVideo ? 'VIDEO' : 'IMAGE'}]`, 'system')
     },
 
     download: (args) => {
@@ -856,27 +870,53 @@ function dismissMobileWarning() {
             </div>
         </main>
 
-        <!-- 原生隐写图片模态框保持原样 -->
-        <div v-if="previewImage"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
-            @click.self="previewImage = null">
-            <div class="max-w-xl w-full bg-[#161d27] border border-emerald-500/40 rounded p-4 text-slate-200">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-xs font-bold text-emerald-400">ARTIFACT_INSPECTOR // RAW_PREVIEW</span>
-                    <button @click="previewImage = null"
-                        class="text-slate-400 hover:text-white text-xs">[CLOSE_ESC]</button>
-                </div>
-                <div class="flex justify-center bg-black/60 p-4 border border-slate-800 rounded">
-                    <img :src="previewImage" class="max-h-[50vh] object-contain" alt="CTF Raw Artifact" />
-                </div>
-                <div class="mt-4 flex justify-between items-center text-xs text-slate-400">
-                    <span>Format: RAW_IMAGE_PASS</span>
-                    <button @click="triggerDownload('artifact.png')"
-                        class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-black font-bold rounded transition-colors">
-                        FETCH RAW BINARY
-                    </button>
-                </div>
-            </div>
+        <!-- ========================================== -->
+    <!-- 统一媒体工件检查器 (Artifact Inspector Modal) -->
+    <!-- ========================================== -->
+    <div 
+      v-if="activeMedia" 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 select-none"
+      @click.self="activeMedia = null"
+    >
+      <div class="relative max-w-4xl w-full bg-black/90 border border-emerald-500/40 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.2)] overflow-hidden flex flex-col">
+        <!-- 弹窗顶栏 (Unix 质感) -->
+        <div class="flex items-center justify-between px-4 py-2 bg-emerald-950/40 border-b border-emerald-500/30 font-mono text-xs text-emerald-400">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>INSPECTOR // {{ activeMedia.name }}</span>
+          </div>
+          <button 
+            type="button" 
+            class="text-emerald-500/60 hover:text-emerald-300 transition-colors uppercase font-bold"
+            @click="activeMedia = null"
+          >
+            [CLOSE ESC]
+          </button>
         </div>
+
+        <!-- 媒体核心视口 -->
+        <div class="p-2 flex items-center justify-center bg-black min-h-[200px] max-h-[80vh] overflow-auto">
+          <!-- 视频形态：带原生控制台、自动播放 -->
+          <video 
+            v-if="activeMedia.type === 'video'" 
+            :src="activeMedia.url" 
+            controls 
+            autoplay 
+            playsinline 
+            class="max-w-full max-h-[75vh] rounded object-contain border border-emerald-500/20"
+          >
+            Your browser does not support HTML5 video streaming.
+          </video>
+
+          <!-- 图像形态 -->
+          <img 
+            v-else 
+            :src="activeMedia.url" 
+            :alt="activeMedia.name" 
+            class="max-w-full max-h-[75vh] object-contain rounded"
+          />
+        </div>
+      </div>
+    </div>
     </div>
 </template>
