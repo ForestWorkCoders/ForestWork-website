@@ -1,46 +1,46 @@
-import { verifyKey } from 'discord-interactions'
+import crypto from 'node:crypto'
 
 export default defineEventHandler(async (event) => {
-  // 1. 严格提取安全凭证
+  // 1. 提取 Discord 头部
   const signature = getHeader(event, 'x-signature-ed25519')
   const timestamp = getHeader(event, 'x-signature-timestamp')
-  const rawBody = await readRawBody(event)
+  const rawBody = await readRawBody(event) // 纯 UTF-8 字符串
+  const publicKeyHex = process.env.DISCORD_PUBLIC_KEY
 
-  const publicKey = process.env.DISCORD_PUBLIC_KEY
-
-  if (!publicKey) {
-    console.error('[Discord Error]: DISCORD_PUBLIC_KEY is not configured.')
-    throw createError({ statusCode: 500, statusMessage: 'Missing Discord Public Key' })
+  if (!signature || !timestamp || !rawBody || !publicKeyHex) {
+    throw createError({ statusCode: 401, statusMessage: 'Bad request signature' })
   }
 
-  if (!signature || !timestamp || !rawBody) {
-    throw createError({ statusCode: 401, statusMessage: 'Missing signature headers or body' })
-  }
+  // 2. 构造 Node 原生 Ed25519 公钥 (对应 Python 的 VerifyKey)
+  const publicKey = crypto.createPublicKey({
+    key: Buffer.concat([
+      // 标准 Ed25519 DER 前缀 (12 字节)
+      Buffer.from('302a300506032b6570032100', 'hex'),
+      Buffer.from(publicKeyHex, 'hex')
+    ]),
+    format: 'der',
+    type: 'spki'
+  })
 
-  // 2. 密码学验签
-  const isValid = verifyKey(rawBody, signature, timestamp, publicKey)
+  // 3. 密码学校验：纯原生验证 (timestamp + rawBody)
+  const messageData = Buffer.from(timestamp + rawBody, 'utf-8')
+  const signatureBuffer = Buffer.from(signature, 'hex')
+
+  const isValid = crypto.verify(null, messageData, publicKey, signatureBuffer)
+
   if (!isValid) {
-    console.warn('[Discord Error]: Signature verification failed.')
     throw createError({ statusCode: 401, statusMessage: 'Invalid request signature' })
   }
 
-  // 3. 解析消息体
+  // 4. 解析数据并响应 PING
   const message = JSON.parse(rawBody)
 
-  // 4. 处理 Discord PING 握手 (type: 1)
   if (message.type === 1) {
-    // 显式锁死响应头，保证绝对是 application/json
     setHeader(event, 'content-type', 'application/json')
-    // 直接返回纯净对象（Nitro 会精准将其序列化为 {"type":1}）
-    return { type: 1 }
+    return { type: 1 } // 对应 Python 的 JsonResponse({'type': 1})
   }
 
-  // 5. 其他交互（Link Unfurling / Components 等）
+  // 兜底响应
   setHeader(event, 'content-type', 'application/json')
-  return {
-    type: 4,
-    data: {
-      content: '林間小鎮賽事網頁'
-    }
-  }
+  return { type: 1 }
 })
