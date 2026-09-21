@@ -7,6 +7,7 @@ import { handleCc } from './cc'
 import { handleChoice } from './choice'
 import { handleArrange } from './arrange'
 import { handleDemoPager } from './demo-pager'
+import { handleRollAdv } from './roll_adv'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -17,5 +18,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   cc: handleCc,
   choice: handleChoice,
   arrange: handleArrange,
-  pages: handleDemoPager
+  pages: handleDemoPager,
+  roll_adv: handleRollAdv
 }

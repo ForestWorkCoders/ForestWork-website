@@ -100,6 +100,24 @@ const diceCommands = [
         ]
     },
     {
+        name: 'roll_adv',
+        description: 'TRPG 骰子投擲 (支援 4d6k3 取高, 2d20kl 劣勢, 1d20+5 算式, 2 6d6 批量)',
+        options: [
+            {
+                name: 'expr',
+                description: '骰子表達式 (例: 4d6k3, 2d20kl+3, 1d4+1d6, 6 4d6k3)',
+                type: 3, // STRING
+                required: true
+            },
+            {
+                name: 'desc',
+                description: '檢定備註 (例: 力量檢定、敏捷豁免)',
+                type: 3, // STRING
+                required: false
+            }
+        ]
+    },
+    {
         name: 'pages',
         description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例'
     }
