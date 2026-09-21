@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
+import { buildPagerResponse } from '../../discord/commands/demo-pager'
 
 export default defineEventHandler(async (event) => {
   const signature = getHeader(event, 'x-signature-ed25519')
@@ -53,6 +54,27 @@ export default defineEventHandler(async (event) => {
     }
 
     return await handler(message, event)
+  }
+
+  if (message.type === 3) {
+    const customId = message.data?.custom_id || ''
+    setHeader(event, 'content-type', 'application/json')
+
+    // 匹配 pager 翻页事件: "pager:nav:<pageNumber>"
+    if (customId.startsWith('pager:nav:')) {
+      const targetPage = parseInt(customId.split(':')[2] || '1', 10)
+
+      // 好品味：返回 type: 7 (UPDATE_MESSAGE)，在原地就地更新消息！
+      return {
+        type: 7,
+        data: buildPagerResponse(targetPage)
+      }
+    }
+
+    return {
+      type: 4,
+      data: { content: '未知的交互組件。', flags: 64 }
+    }
   }
 
   return { type: 1 }

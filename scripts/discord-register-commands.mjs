@@ -98,6 +98,10 @@ const diceCommands = [
                 min_value: 2
             }
         ]
+    },
+    {
+        name: 'pages',
+        description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例'
     }
 ]
 
