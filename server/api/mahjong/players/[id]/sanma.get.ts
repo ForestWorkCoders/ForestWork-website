@@ -210,11 +210,11 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  console.log(`[WinStyles Debug]
-    區間目標場次數: ${scopedUuidSet.size}
-    匹配到的區間單局數 (scopedPlayerRounds): ${scopedPlayerRounds.length}
-    和牌總計: 立直=${riichiWins}, 默聽=${damaWins}, 副露=${fuloWins}
-  `)
+//   console.log(`[WinStyles Debug]
+//     區間目標場次數: ${scopedUuidSet.size}
+//     匹配到的區間單局數 (scopedPlayerRounds): ${scopedPlayerRounds.length}
+//     和牌總計: 立直=${riichiWins}, 默聽=${damaWins}, 副露=${fuloWins}
+//   `)
 
   // ====================================================================
   // 6.4 管線 B：計算「四維雷達圖 (Radar Stats)」(滾動取最近 100 / 20 局)

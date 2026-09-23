@@ -125,14 +125,45 @@ const diceCommands = [
 
 const cocCommands = []
 
+const mahjongCommands = [{
+    name: 'mahjong_pair',
+    description: '雀魂三麻均衡隨機分桌 (自動考量歷史碰面與座位均衡演算法)',
+    options: [
+        {
+            name: 'players',
+            description: '參賽選手的 ID 清單 (用逗號或空格隔開，必須為 3 的倍數)',
+            type: 3, // STRING
+            required: true
+        },
+        {
+            name: 'id_type',
+            description: '輸入的號碼類型 (可選，預設為好友碼)',
+            type: 3, // STRING
+            required: false,
+            choices: [
+                {
+                    name: '好友碼 (Friend ID - 遊戲內顯示之 8~9 位號碼)',
+                    value: 'friend'
+                },
+                {
+                    name: '帳號 ID (Account ID - 資料庫底層數字)',
+                    value: 'account'
+                }
+            ]
+        }
+    ]
+}]
+
 // 按 Guild 配置指令清单 (数据驱动，物理隔离)
 const guildConfigs = {
     // 林間小鎮
-    '510192195509157909': [...commonCommands, ...diceCommands],
+    '510192195509157909': [...commonCommands, ...diceCommands, ...mahjongCommands],
 
     // 血之秘儀
     '912673754696548365': [...commonCommands, ...diceCommands, ...cocCommands]
 }
+
+
 
 for (const [guildId, commands] of Object.entries(guildConfigs)) {
     console.log(`[+] 正在为 Guild [${guildId}] 同步 ${commands.length} 个指令...`)
