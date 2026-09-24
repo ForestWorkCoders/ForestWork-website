@@ -11,7 +11,7 @@ if (!APP_ID || !BOT_TOKEN) {
 const commonCommands = [
     { name: 'ping', description: '檢查網站與交互機器人運行狀態' },
     { name: 'site', description: '取得林間小鎮官方網站與重要入口連結' },
-    { name: 'pages', description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例'},
+    { name: 'pages', description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例' },
 ]
 
 // 跑团专有指令
@@ -122,6 +122,26 @@ const diceCommands = [
         name: '解答之书',
         description: '翻開《解答之書》，獲取命運對你心中疑惑的隨機啟示',
         options: [
+            {
+                name: 'question',
+                description: '你心中默想的問題 (可選)',
+                type: 3, // STRING
+                required: false
+            }
+        ]
+    },
+    {
+        name: '每日塔羅',
+        description: '抽取命運塔羅牌陣 (支援 1 至 10 張牌，預設為 3 張牌陣)',
+        options: [
+            {
+                name: 'count',
+                description: '抽取的卡牌張數 (1 ~ 10 張，預設為 3)',
+                type: 4, // INTEGER
+                required: false,
+                min_value: 1,  // ★ 協議層邊界防禦：最小 1 張
+                max_value: 10  // ★ 協議層邊界防禦：最大 10 張 (受限於 Discord Embed 配額)
+            },
             {
                 name: 'question',
                 description: '你心中默想的問題 (可選)',
