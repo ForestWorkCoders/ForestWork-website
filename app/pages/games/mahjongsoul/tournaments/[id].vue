@@ -1,4 +1,7 @@
 <script setup>
+import { buildTournamentDiscordEmbed } from '@/utils/mahjongDiscordEmbed'
+import { toComponentEmbedJson } from 'discord-component-embed';
+
 const route = useRoute()
 
 // ==========================================
@@ -66,15 +69,41 @@ const tabs = computed(() => {
     return baseTabs
 })
 
-
+// 1. 常规 SEO 覆写
 useSeoMeta({
-    title: () => tourney.value?.title
-        ? `${tourney.value.title} · ForestWork Mahjong`
-        : '賽事詳情 · ForestWork Mahjong',
+    title: () => tourney.value?.title ? `${tourney.value.title} · ForestWork Mahjong` : '賽事詳情',
     ogTitle: () => tourney.value?.title ?? 'ForestWork Mahjong Tournament',
-    description: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
-    ogDescription: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
-    ogImage: () => tourney.value?.imageUrl ?? 'https://forestwork.vercel.app/default-og.png'
+    description: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況與對局紀錄。`,
+    ogDescription: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況與對局紀錄。`,
+    ogImage: () => tourney.value?.imageUrl ?? 'https://i.imgur.com/cu2YAkn.png'
+})
+
+// 2. 动态组件树计算
+const embedPayload = computed(() => {
+  const title = tourney.value?.title || '林間小鎮賽事'
+  const formatText = tourney.value?.format === 'event' ? '趣味活動周' : '常規積分賽'
+  const desc = `賽事模式：**${formatText}**\n點擊下方按鈕直接查看即時排行榜、選手戰績與牌譜。`
+  const targetUrl = `https://forestwork.vercel.app/games/mahjongsoul/tournaments/${route.params.id}`
+  const image = tourney.value?.imageUrl || 'https://i.imgur.com/cu2YAkn.png'
+
+  return buildTournamentDiscordEmbed({
+    title,
+    description: desc,
+    matchUrl: targetUrl,
+    imageUrl: image
+  })
+})
+
+// 3. 核心：带上相同的 key 实施强力覆盖！
+useHead({
+  script: [
+    {
+      key: 'discord:component-embed',
+      id: 'discord:component-embed',
+      type: 'application/json',
+      innerHTML: () => JSON.stringify(embedPayload.value)
+    }
+  ]
 })
 </script>
 
