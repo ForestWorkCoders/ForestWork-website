@@ -135,16 +135,26 @@ const diceCommands = [
         description: '抽取命運塔羅牌陣 (支援 1 至 10 張牌，預設為 3 張牌陣)',
         options: [
             {
-                name: 'count',
-                description: '抽取的卡牌張數 (1 ~ 10 張，預設為 3)',
+                name: 'spread',
+                description: '選擇占卜牌陣 (可選，預設為經典時序三牌陣)',
                 type: 4, // INTEGER
                 required: false,
-                min_value: 1,  // ★ 協議層邊界防禦：最小 1 張
-                max_value: 10  // ★ 協議層邊界防禦：最大 10 張 (受限於 Discord Embed 配額)
+                choices: [
+                    { name: '🎴 單牌神諭 · 當下核心指引 (1 張)', value: 1 },
+                    { name: '☯️ 二元對立牌陣 · 明面與暗面 (2 張)', value: 2 },
+                    { name: '⏳ 經典時序牌陣 · 過去 / 現在 / 未來 (3 張)', value: 3 },
+                    { name: '🌍 四象元素牌陣 · 地水火風 (4 張)', value: 4 },
+                    { name: '⭐ 五要素核心牌陣 · 局勢與策略 (5 張)', value: 5 },
+                    { name: '✡️ 六方位牌陣 · 環境與全景 (6 張)', value: 6 },
+                    { name: '✨ 七星方位牌陣 · 內心與心態 (7 張)', value: 7 },
+                    { name: '🌀 曼陀羅牌陣 · 恐懼與潛意識 (8 張)', value: 8 },
+                    { name: '🪟 九宮格全瞻牌陣 · 全維度推演 (9 張)', value: 9 },
+                    { name: '⚔️ 凱爾特十字牌陣 · 權威十牌大陣 (10 張)', value: 10 }
+                ]
             },
             {
                 name: 'question',
-                description: '你心中默想的問題 (可選)',
+                description: '你心中默想或想要占卜的問題 (可選)',
                 type: 3, // STRING
                 required: false
             }
