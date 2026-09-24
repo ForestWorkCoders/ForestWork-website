@@ -5,12 +5,17 @@ import { toComponentEmbedJson } from 'discord-component-embed';
 const route = useRoute()
 
 // ==========================================
-// 1. 取得 雀魂 專屬賽事資料
+// 1a. 核心数据：主赛事元数据（必须稳固，保留 pending 与 error 供模板使用）
 // ==========================================
-const [{ data: tourney }, { data: dashboardRes }] = await Promise.all([
-  useFetch(`/api/mahjong/tournaments/${route.params.id}`),
-  useFetch(`/api/mahjong/tournaments/${route.params.id}/dashboard`)
-])
+const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournaments/${route.params.id}`)
+
+// ==========================================
+// 1b. 增强数据：安全拉取 Dashboard（即使后端挂掉，也不允许破坏 SSR）
+// ==========================================
+const { data: dashboardRes } = await useFetch(`/api/mahjong/tournaments/${route.params.id}/dashboard`, {
+    // 核心防御：即使接口返回 404 或 500，绝不中断 SSR 流程
+    default: () => null
+})
 
 // ==========================================
 // 2. 宣告所有 computed 賽制判斷
@@ -83,25 +88,32 @@ useSeoMeta({
 
 // 2. 动态组件树计算
 const embedPayload = computed(() => {
-  const title = tourney.value?.title || '林間小鎮賽事'
-  const targetUrl = `https://forestwork.vercel.app/games/mahjongsoul/tournaments/${tournamentId}`
-  const image = tourney.value?.imageUrl || 'https://i.imgur.com/cu2YAkn.png'
+    const title = tourney.value?.title || '林間小鎮賽事'
+    const targetUrl = `https://forestwork.vercel.app/games/mahjongsoul/tournaments/${route.params.id}`
+    const image = tourney.value?.imageUrl || 'https://i.imgur.com/cu2YAkn.png'
+    const formatText = computed(() => {
+        if (tourney.value?.format === 'event') return '趣味活動周'
+        if (tourney.value?.format === 'relay') return '隊伍接力賽'
+        if (tourney.value?.format === 'invitational') return '年度邀請賽'
+        return '常規積分賽'
+    })
 
-  // ★ 核心好品味：从 config.phases 中找到当前最具代表性的阶段 (优先 is_final，兜底取第一个)
-  const phases = dashboardRes.value?.config?.phases || []
-  const activePhase = phases.find(p => p.is_final) || phases[0]
-  const phaseKey = activePhase?.id || 'MAIN'
+    // 提取对应阶段的真实排行榜数据 (无论是个人赛还是接力赛)
+    let rawLeaderboard = []
+    if (dashboardRes.value?.data) {
+        const phases = dashboardRes.value?.config?.phases || []
+        const activePhase = phases.find(p => p.is_final) || phases[0]
+        const phaseKey = activePhase?.id || 'MAIN'
+        rawLeaderboard = dashboardRes.value?.data?.[phaseKey]?.leaderboard || []
+    }
 
-  // 提取对应阶段的真实排行榜数据 (无论是个人赛还是接力赛)
-  const rawLeaderboard = dashboardRes.value?.data?.[phaseKey]?.leaderboard || []
-
-  return buildTournamentDiscordEmbed({
-    title: title,
-    format: formatText.value,
-    matchUrl: targetUrl,
-    imageUrl: image,
-    leaderboard: rawLeaderboard
-  })
+    return buildTournamentDiscordEmbed({
+        title: title,
+        format: formatText.value,
+        matchUrl: targetUrl,
+        imageUrl: image,
+        leaderboard: rawLeaderboard
+    })
 })
 
 // 3. 核心：带上相同的 key 实施强力覆盖！

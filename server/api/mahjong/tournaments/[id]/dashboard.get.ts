@@ -66,11 +66,11 @@ async function processPlayerMatches(matches: any[], ruleData: any, config: any, 
 
                 if (p.id !== 1) {
                     if (!statsMap.has(p.id)) {
-                        statsMap.set(p.id, { 
-                            account_id: p.id, 
-                            name: playerName, 
-                            avatar: playerDict.get(p.id)?.avatar, 
-                            total: 0, played: 0, games: {} 
+                        statsMap.set(p.id, {
+                            account_id: p.id,
+                            name: playerName,
+                            avatar: playerDict.get(p.id)?.avatar,
+                            total: 0, played: 0, games: {}
                         })
                     }
                     const pStat = statsMap.get(p.id)!
@@ -227,12 +227,15 @@ export default defineEventHandler(async (event) => {
         .eq('tournament_bind_id', id)
         .order('end_time', { ascending: true })
 
-    const { data: ruleData } = await supabase
+    const { data: rawRule } = await supabase
         .schema('mahjong')
         .from('rules')
         .select('basepts, uma1, uma2, uma3, uma4')
         .eq('id', id)
-        .single()
+        .maybeSingle() // 建议使用 maybeSingle 防止 0 行时抛异常
+
+    // 默认规则兜底：防止因 rules 表无数据引发计算崩溃
+    const ruleData = rawRule || { basepts: 25000, uma1: 15, uma2: 5, uma3: -5, uma4: -15 }
 
     let config: any = { entity_type: 'player', columns: [], phases: [] }
 
