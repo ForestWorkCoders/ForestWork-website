@@ -7,7 +7,10 @@ const route = useRoute()
 // ==========================================
 // 1. 取得 雀魂 專屬賽事資料
 // ==========================================
-const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournaments/${route.params.id}`)
+const [{ data: tourney }, { data: dashboardRes }] = await Promise.all([
+  useFetch(`/api/mahjong/tournaments/${route.params.id}`),
+  useFetch(`/api/mahjong/tournaments/${route.params.id}/dashboard`)
+])
 
 // ==========================================
 // 2. 宣告所有 computed 賽制判斷
@@ -81,29 +84,36 @@ useSeoMeta({
 // 2. 动态组件树计算
 const embedPayload = computed(() => {
   const title = tourney.value?.title || '林間小鎮賽事'
-  const formatText = tourney.value?.format === 'event' ? '趣味活動周' : '常規積分賽'
-  const desc = `賽事模式：**${formatText}**\n點擊下方按鈕直接查看即時排行榜、選手戰績與牌譜。`
-  const targetUrl = `https://forestwork.vercel.app/games/mahjongsoul/tournaments/${route.params.id}`
+  const targetUrl = `https://forestwork.vercel.app/games/mahjongsoul/tournaments/${tournamentId}`
   const image = tourney.value?.imageUrl || 'https://i.imgur.com/cu2YAkn.png'
 
+  // ★ 核心好品味：从 config.phases 中找到当前最具代表性的阶段 (优先 is_final，兜底取第一个)
+  const phases = dashboardRes.value?.config?.phases || []
+  const activePhase = phases.find(p => p.is_final) || phases[0]
+  const phaseKey = activePhase?.id || 'MAIN'
+
+  // 提取对应阶段的真实排行榜数据 (无论是个人赛还是接力赛)
+  const rawLeaderboard = dashboardRes.value?.data?.[phaseKey]?.leaderboard || []
+
   return buildTournamentDiscordEmbed({
-    title,
-    description: desc,
+    title: title,
+    format: formatText.value,
     matchUrl: targetUrl,
-    imageUrl: image
+    imageUrl: image,
+    leaderboard: rawLeaderboard
   })
 })
 
 // 3. 核心：带上相同的 key 实施强力覆盖！
 useHead({
-  script: [
-    {
-      key: 'discord:component-embed',
-      id: 'discord:component-embed',
-      type: 'application/json',
-      innerHTML: () => JSON.stringify(embedPayload.value)
-    }
-  ]
+    script: [
+        {
+            key: 'discord:component-embed',
+            id: 'discord:component-embed',
+            type: 'application/json',
+            innerHTML: () => JSON.stringify(embedPayload.value).replace(/</g, '\\u003c')
+        }
+    ]
 })
 </script>
 
