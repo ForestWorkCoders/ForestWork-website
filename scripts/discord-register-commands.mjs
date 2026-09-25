@@ -1,6 +1,14 @@
 // scripts/discord-register-commands.mjs
 const APP_ID = process.env.DISCORD_APPLICATION_ID
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
+// scripts/discord-register-commands.mjs 中 tarot 選項：
+import { TAROT_SPREADS } from '../server/discord/assets/tarot-deck.ts'
+
+// 動態組裝 16 個下拉選單項
+const spreadChoices = Object.values(TAROT_SPREADS).map(s => ({
+  name: s.name,
+  value: s.id
+}))
 
 if (!APP_ID || !BOT_TOKEN) {
     console.error('[-] 缺少 APP_ID 或 BOT_TOKEN')
@@ -137,20 +145,9 @@ const diceCommands = [
             {
                 name: 'spread',
                 description: '選擇占卜牌陣 (可選，預設為經典時序三牌陣)',
-                type: 4, // INTEGER
+                type: 3, // INTEGER
                 required: false,
-                choices: [
-                    { name: '🎴 單牌神諭 · 當下核心指引 (1 張)', value: 1 },
-                    { name: '☯️ 二元對立牌陣 · 明面與暗面 (2 張)', value: 2 },
-                    { name: '⏳ 經典時序牌陣 · 過去 / 現在 / 未來 (3 張)', value: 3 },
-                    { name: '🌍 四象元素牌陣 · 地水火風 (4 張)', value: 4 },
-                    { name: '⭐ 五要素核心牌陣 · 局勢與策略 (5 張)', value: 5 },
-                    { name: '✡️ 六方位牌陣 · 環境與全景 (6 張)', value: 6 },
-                    { name: '✨ 七星方位牌陣 · 內心與心態 (7 張)', value: 7 },
-                    { name: '🌀 曼陀羅牌陣 · 恐懼與潛意識 (8 張)', value: 8 },
-                    { name: '🪟 九宮格全瞻牌陣 · 全維度推演 (9 張)', value: 9 },
-                    { name: '⚔️ 凱爾特十字牌陣 · 權威十牌大陣 (10 張)', value: 10 }
-                ]
+                choices: spreadChoices
             },
             {
                 name: 'question',
