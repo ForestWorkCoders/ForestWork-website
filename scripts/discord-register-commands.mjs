@@ -241,21 +241,19 @@ const cocCommands = [
     },
     {
         name: 'en',
-        description: '執行 CoC 7版技能幕間成長檢定 (成功則 1D10 增長)',
+        description: 'CoC 7版技能成長檢定 (支援自動同步出戰角色卡)',
         options: [
             {
                 name: 'skill',
-                description: '要進行成長檢定的技能名稱 (例如：偵察、聆聽)',
+                description: '指定要檢定的技能名稱 (自動讀取並更新出戰角色卡)',
                 type: 3, // STRING
-                required: true
+                required: false
             },
             {
-                name: 'value',
-                description: '當前技能數值 (1 ~ 99)',
+                name: 'target',
+                description: '手動指定技能基礎數值 (不連動角色卡)',
                 type: 4, // INTEGER
-                required: true,
-                min_value: 1,
-                max_value: 99
+                required: false
             }
         ]
     },
