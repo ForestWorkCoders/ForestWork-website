@@ -119,7 +119,7 @@ const diceCommands = [
         ]
     },
     {
-        name: '解答之书',
+        name: '解答之書',
         description: '翻開《解答之書》，獲取命運對你心中疑惑的隨機啟示',
         options: [
             {

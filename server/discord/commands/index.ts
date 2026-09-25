@@ -28,7 +28,7 @@ export const commandRegistry: Record<string, CommandHandler> = {
   pages: handleDemoPager,
   roll_adv: handleRollAdv,
   mahjong_pair: handleMahjongPair,
-  解答之书: handleBookOfAnswers,
+  解答之書: handleBookOfAnswers,
   每日塔羅: handleTarot,
   生日密碼: handleBirthday,
   insanity: handleInsanity,
