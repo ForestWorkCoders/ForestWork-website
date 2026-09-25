@@ -87,15 +87,15 @@ function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
 
 // 3. 統一解析相對變動 (+3, -5) 與絕對賦值 (12)
 function applyDeltaOrValue(current: number, input?: string): number {
-    if (!input) return current
-    const trimmed = input.trim()
-    if (trimmed.startsWith('+') || trimmed.startsWith('-')) {
-      const delta = parseInt(trimmed, 10)
-      return isNaN(delta) ? current : Math.max(0, current + delta)
-    }
-    const val = parseInt(trimmed, 10)
-    return isNaN(val) ? current : Math.max(0, val)
+  if (!input) return current
+  const trimmed = input.trim()
+  if (trimmed.startsWith('+') || trimmed.startsWith('-')) {
+    const delta = parseInt(trimmed, 10)
+    return isNaN(delta) ? current : Math.max(0, current + delta)
   }
+  const val = parseInt(trimmed, 10)
+  return isNaN(val) ? current : Math.max(0, val)
+}
 
 function buildCharacterBioEmbed(char: any) {
   const hp = char.hp ?? '?'
@@ -104,8 +104,8 @@ function buildCharacterBioEmbed(char: any) {
 
   return {
     title: `📖 調查員生平檔案：${char.name}`,
-    description: char.story && char.story.trim().length > 0 
-      ? char.story 
+    description: char.story && char.story.trim().length > 0
+      ? char.story
       : '*（該調查員目前尚未記錄任何生平背景故事。使用 `/card bio action: edit` 開始撰寫。）*',
     color: 0x9B59B6, // 神秘紫
     thumbnail: char.avatar_url ? { url: char.avatar_url } : undefined,
@@ -255,76 +255,94 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
         return { type: 4, data: { content: '❌ 無法獲取上傳的圖片檔案！', flags: 64 } }
       }
 
-      // 边界面向防守：限制 4.5MB
+      // 邊界防禦：嚴格限制圖片小於 4.5MB (防止突破 Vercel Payload 上限)
       if (attachment.size && attachment.size > 4.5 * 1024 * 1024) {
-        return { type: 4, data: { content: '⚠️ 圖片大小超過 4.5MB，請壓縮後重試！', flags: 64 } }
+        return {
+          type: 4,
+          data: { content: '⚠️ 圖片大小超過 4.5MB 限制，請壓縮後重試！', flags: 64 }
+        }
       }
 
-      const applicationId = interaction.application_id
-      const interactionToken = interaction.token
-
-      // ★★★ 核心好品味：将耗时的网络流转挂入后台，Serverless 不提前冻结！★★★
-      event.waitUntil((async () => {
-        try {
-          // 1. 抓取图片并转存到 Vercel Blob
-          const blobToken = process.env.BLOB_READ_WRITE_TOKEN
-          const res = await fetch(attachment.url)
-          if (!res.ok) throw new Error('無法從 Discord 下載圖片檔案')
-          const arrayBuffer = await res.arrayBuffer()
-          const buffer = Buffer.from(arrayBuffer)
-
-          const ext = attachment.filename?.split('.').pop() || 'png'
-          const pathname = `trpg-avatars/${callerId}/${Date.now()}.${ext}`
-
-          const blob = await put(pathname, buffer, {
-            access: 'public',
-            contentType: attachment.content_type || 'image/png',
-            token: blobToken
-          })
-
-          const uploadedUrl = blob.url
-
-          // 2. 写入 Supabase
-          let query = supabase.schema('trpg').from('characters').update({ avatar_url: uploadedUrl }).eq('discord_id', callerId)
-          if (targetName) query = query.eq('name', targetName)
-          else query = query.eq('is_active', true)
-
-          const { data: updated, error: dbError } = await query.select().maybeSingle()
-          if (dbError || !updated) throw new Error(dbError?.message || '查無匹配的出戰角色卡')
-
-          // 3. 通过 Discord 原生 Followup Webhook 回写终态卡片（无须 Bot Token！）
-          const followupUrl = `https://discord.com/api/v10/webhooks/${applicationId}/${interactionToken}/messages/@original`
-          await fetch(followupUrl, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              content: `🎨 已成功為調查員 **${updated.name}** 綁定永久立繪！`,
-              embeds: [buildCharacterEmbed(updated, uploadedUrl)]
-            })
-          })
-        } catch (err: any) {
-          console.error('[Async Avatar Pipeline Error]:', err)
-          // 报错时向用户回显失败信息
-          const followupUrl = `https://discord.com/api/v10/webhooks/${applicationId}/${interactionToken}/messages/@original`
-          await fetch(followupUrl, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              content: `❌ 上傳立繪失敗：${err?.message || '處理逾時或網路錯誤'}`
-            })
-          }).catch(() => { })
+      try {
+        const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+        if (!blobToken) {
+          return {
+            type: 4,
+            data: { content: '❌ 系統錯誤：服務端缺少 BLOB_READ_WRITE_TOKEN 配置！', flags: 64 }
+          }
         }
-      })())
 
-      // ★★★ 核心好品味：0.05 秒秒回 Type 5，瞬间击碎 3 秒熔断！★★★
-      return {
-        type: 5 // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE (通知 Discord 客户端进入思考中)
+        // A. 抓取 Discord 圖片 (約 100~200ms)
+        const res = await fetch(attachment.url)
+        if (!res.ok) throw new Error(`從 Discord 下載圖片失敗 (HTTP ${res.status})`)
+        const arrayBuffer = await res.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+
+        // B. 構造持久化路徑
+        const ext = attachment.filename?.split('.').pop() || 'png'
+        const pathname = `trpg-avatars/${callerId}/${Date.now()}.${ext}`
+
+        // C. 同步寫入 Vercel Blob (約 150~250ms)
+        const blob = await put(pathname, buffer, {
+          access: 'public',
+          contentType: attachment.content_type || 'image/png',
+          token: blobToken
+        })
+
+        imageUrl = blob.url
+      } catch (err: any) {
+        console.error('[Avatar Sync Upload Failed]:', err)
+        return {
+          type: 4,
+          data: { content: `❌ 圖片轉存失敗：${err?.message || '內部錯誤'}`, flags: 64 }
+        }
       }
     }
 
-    return {
-      type: 4,
-      data: { content: '⚠️ 請至少拖入一張圖片檔案，或在 url 參數填寫圖片網址！', flags: 64 }
+    if (!imageUrl) {
+      return {
+        type: 4,
+        data: { content: '⚠️ 請至少拖入一張圖片檔案，或在 url 參數填寫公開圖片網址！', flags: 64 }
+      }
+    }
+
+    // 2. 同步寫入 Supabase (約 80~120ms)
+    try {
+      let query = supabase.schema('trpg').from('characters').update({ avatar_url: imageUrl }).eq('discord_id', callerId)
+      if (targetName) query = query.ilike('name', `%${targetName}%`)
+      else query = query.eq('is_active', true)
+
+      const { data: updated, error: dbError } = await query.select().maybeSingle()
+
+      if (dbError) {
+        console.error('[Avatar DB Error]:', dbError)
+        return {
+          type: 4,
+          data: { content: `❌ 資料庫寫入失敗：${dbError.message}`, flags: 64 }
+        }
+      }
+
+      if (!updated) {
+        return {
+          type: 4,
+          data: { content: '⚠️ 找不到匹配的角色卡！請確認姓名或先使用 `/card create` 建立角色。', flags: 64 }
+        }
+      }
+
+      // 3. ★★★ 核心好品味：同步交付 Type 4，總耗時不到 500ms，直接回顯帶立繪的卡片！★★★
+      return {
+        type: 4,
+        data: {
+          content: `🎨 已成功為調查員 **${updated.name}** 綁定永久立繪！`,
+          embeds: [buildCharacterEmbed(updated, imageUrl)]
+        }
+      }
+    } catch (err: any) {
+      console.error('[Avatar DB Crash]:', err)
+      return {
+        type: 4,
+        data: { content: `💥 寫入資料庫時遭遇異常：${err?.message || '內部錯誤'}`, flags: 64 }
+      }
     }
   }
 
@@ -435,7 +453,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
       return { type: 4, data: { content: '⚠️ 請指定要刪除的角色名稱！', flags: 64 } }
     }
 
-    const { data:deletedRows, error } = await supabase
+    const { data: deletedRows, error } = await supabase
       .schema('trpg')
       .from('characters')
       .delete()
@@ -530,14 +548,14 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
       // 自動轉換別名 (例如 "力量" -> "STR")
       const canonical = inputAttr.toUpperCase() === 'STR' || inputAttr === '力量' ? 'STR'
         : inputAttr.toUpperCase() === 'CON' || inputAttr === '體質' ? 'CON'
-        : inputAttr.toUpperCase() === 'DEX' || inputAttr === '敏捷' ? 'DEX'
-        : inputAttr.toUpperCase() === 'APP' || inputAttr === '外貌' ? 'APP'
-        : inputAttr.toUpperCase() === 'POW' || inputAttr === '意志' ? 'POW'
-        : inputAttr.toUpperCase() === 'INT' || inputAttr === '智力' ? 'INT'
-        : inputAttr.toUpperCase() === 'SIZ' || inputAttr === '體型' ? 'SIZ'
-        : inputAttr.toUpperCase() === 'EDU' || inputAttr === '教育' ? 'EDU'
-        : inputAttr.toUpperCase() === 'LUK' || inputAttr === '幸運' ? 'LUK'
-        : inputAttr.toUpperCase()
+          : inputAttr.toUpperCase() === 'DEX' || inputAttr === '敏捷' ? 'DEX'
+            : inputAttr.toUpperCase() === 'APP' || inputAttr === '外貌' ? 'APP'
+              : inputAttr.toUpperCase() === 'POW' || inputAttr === '意志' ? 'POW'
+                : inputAttr.toUpperCase() === 'INT' || inputAttr === '智力' ? 'INT'
+                  : inputAttr.toUpperCase() === 'SIZ' || inputAttr === '體型' ? 'SIZ'
+                    : inputAttr.toUpperCase() === 'EDU' || inputAttr === '教育' ? 'EDU'
+                      : inputAttr.toUpperCase() === 'LUK' || inputAttr === '幸運' ? 'LUK'
+                        : inputAttr.toUpperCase()
 
       const attrs = { ...(char.attributes || {}) }
       const oldVal = attrs[canonical] || 0
@@ -591,13 +609,13 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     const nestedSubCommand = interaction.data?.options?.[0]?.options?.[0]?.name
     // 情況 2：如果是參數結構 (/card bio action:view)，動作名稱在 getSubOption('action')
     const actionParam = getSubOption('action')
-    
+
     // 歸一化判定當前動作（預設為 'view'）
     const action = nestedSubCommand === 'edit' || actionParam === 'edit' ? 'edit' : 'view'
-    
+
     // 提取目標角色姓名（自適應從內層或外層 options 抓取）
     const targetName = (
-      getSubOption('name') || 
+      getSubOption('name') ||
       interaction.data?.options?.[0]?.options?.[0]?.options?.find((o: any) => o.name === 'name')?.value
     )?.trim()
 
