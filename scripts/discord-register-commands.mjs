@@ -377,6 +377,12 @@ const cocCommands = [
                         required: false
                     },
                     {
+                        name: 'insanity',
+                        description: '設定精神異常症狀 (填寫 none 或 正常 可解除瘋狂)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
                         name: 'skill', // [3] ★★★ 就是這裡！必須是 3 (STRING)，絕不能是 1！★★★
                         description: '指定要修改的技能名稱 (例如：偵察、手槍)',
                         type: 3, // STRING

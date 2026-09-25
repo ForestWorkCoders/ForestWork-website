@@ -18,14 +18,20 @@ function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
   const attrs = char.attributes || {}
   const skills = char.skills || {}
   const displayAvatar = char.avatar_url || fallbackAvatar
-
   // 八围排版
   const attrText = BASE_ATTR_KEYS.map(k => `**${k}**: \`${attrs[k] || 0}\``).join(' | ')
+  const hasInsanity = Boolean(char.insanity && char.insanity.trim().length > 0)
+  const mentalStatusTag = hasInsanity 
+    ? `🔥 **精神狀態**: \`【${char.insanity}】\`` 
+    : `🟢 **精神狀態**: \`正常\``
+  
+  const mythosVal = Number(skills['克蘇魯神話'] || skills['克苏鲁神话'] || 0)
+  const maxSan = Math.max(0, 99 - mythosVal)
 
   const fields: any[] = [
     {
       name: '📌 當前生存狀態',
-      value: `❤️ **HP**: \`${char.hp}\` ｜ 🔮 **MP**: \`${char.mp}\` ｜ 🧠 **SAN**: \`${char.san}\``,
+      value: `❤️ **HP**: \`${char.hp}\` ｜ 🔮 **MP**: \`${char.mp}\` ｜ 🧠 **SAN**: \`${char.san} /${maxSan}\` ` + `*(神話: \`${mythosVal}%\`)*\n${mentalStatusTag}`,
       inline: false
     },
     {
@@ -72,9 +78,11 @@ function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
     })
   }
 
+  const embedColor = hasInsanity ? 0x9B59B6 : (char.is_active ? 0x2ECC71 : 0x3498DB)
+
   return {
     title: `📜 調查員檔案：${char.name}${char.is_active ? ' ⭐ [當前出戰]' : ''}`,
-    color: char.is_active ? 0x2ECC71 : 0x3498DB,
+    color: embedColor,
     thumbnail: displayAvatar ? { url: displayAvatar } : undefined,
     fields,
     footer: {
@@ -290,6 +298,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
         })
 
         imageUrl = blob.url
+
       } catch (err: any) {
         console.error('[Avatar Sync Upload Failed]:', err)
         return {
@@ -492,6 +501,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     const inputSkill = getSubOption('skill')?.trim()
     const inputAttr = getSubOption('attr')?.trim()
     const inputValue = getSubOption('value')
+    const inputInsanity = getSubOption('insanity')?.trim()
 
     // 1. 查出目標角色卡
     let query = supabase.schema('trpg').from('characters').select('*').eq('discord_id', callerId)
@@ -531,6 +541,19 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
       if (newMp !== char.mp) {
         updatePayload.mp = newMp
         changes.push(`🔮 **MP**: \`${char.mp}\` ➔ \`${newMp}\``)
+      }
+    }
+
+    // 處理精神狀態更新 (填寫 'none', 'clear', '正常' 均視為消除瘋狂)
+    if (inputInsanity !== undefined) {
+      const isClearing = ['none', 'clear', '正常', '無', '0', '无'].includes(inputInsanity.toLowerCase())
+      const finalInsanity = isClearing ? null : inputInsanity
+      updatePayload.insanity = finalInsanity
+      
+      if (finalInsanity) {
+        changes.push(`🐙 **精神異常**: \`【${finalInsanity}】\``)
+      } else {
+        changes.push(`✨ **精神狀態恢復正常**`)
       }
     }
 
