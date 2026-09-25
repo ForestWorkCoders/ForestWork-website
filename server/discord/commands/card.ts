@@ -82,6 +82,8 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
   // -------------------------------------------------------------
   // 子指令 1: /card create (彈出原生表單視窗)[cite: 7]
   // -------------------------------------------------------------
+  // server/discord/commands/card.ts 中的 create 分支：
+
   if (subCommand === 'create') {
     return {
       type: 9, // APPLICATION_MODAL
@@ -89,13 +91,14 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
         custom_id: 'trpg_card_create_modal',
         title: '建立 CoC 7版調查員角色卡',
         components: [
+          // 問題 1: 調查員姓名 (必填)
           {
-            type: 1, // ActionRow
+            type: 1,
             components: [
               {
-                type: 4, // TextInput
+                type: 4,
                 custom_id: 'char_name',
-                label: '調查員姓名',
+                label: '1. 調查員姓名 (必填)',
                 style: 1, // Short
                 min_length: 1,
                 max_length: 50,
@@ -104,16 +107,59 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
               }
             ]
           },
+          // 問題 2: 基礎八圍與幸運 (必填)
           {
             type: 1,
             components: [
               {
                 type: 4,
-                custom_id: 'raw_stats',
-                label: '屬性與技能數值 (可直接貼上跑團卡文字)',
+                custom_id: 'base_attrs',
+                label: '2. 基礎屬性八圍 + 幸運 (必填)',
                 style: 2, // Paragraph
                 required: true,
-                placeholder: '力量:60 體質:50 敏捷:70 意志:60 偵察:70 聆聽:60 閃避:35'
+                placeholder: '力量:60 體質:50 敏捷:70 外貌:50 意志:60 智力:70 體型:65 教育:80 幸運:50'
+              }
+            ]
+          },
+          // 問題 3: 調查與探索技能 (選填)
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'skills_investigation',
+                label: '3. 調查與感知類技能 (選填)',
+                style: 2, // Paragraph
+                required: false,
+                placeholder: '偵察:70 聆聽:60 心理學:50 圖書館:40 追蹤:20'
+              }
+            ]
+          },
+          // 問題 4: 戰鬥與生存行動 (選填)
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'skills_combat',
+                label: '4. 戰鬥、生存與行動類技能 (選填)',
+                style: 2, // Paragraph
+                required: false,
+                placeholder: '閃避:35 鬥毆:60 手槍:50 急救:40 隱密行動:40'
+              }
+            ]
+          },
+          // 問題 5: 社交、學識與其他技能 (選填)
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'skills_other',
+                label: '5. 社交、知識與自訂技能 (選填)',
+                style: 2, // Paragraph
+                required: false,
+                placeholder: '說服:50 話術:40 魅惑:30 母語:80 汽車駕駛:40'
               }
             ]
           }
@@ -261,20 +307,33 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
     ? `https://cdn.discordapp.com/avatars/${callerId}/${interaction.member.user.avatar}.png`
     : undefined
 
-  // 提取組件值
-  const rows = interaction.data?.components || []
-  const charName = rows[0]?.components?.[0]?.value?.trim()
-  const rawStats = rows[1]?.components?.[0]?.value?.trim() || ''
+  // ★ 好品味提取：將 ActionRows 拍平成強類型的 custom_id 鍵值字典，消除下標硬編碼
+  const fieldMap: Record<string, string> = {}
+  for (const row of interaction.data?.components || []) {
+    const comp = row.components?.[0]
+    if (comp?.custom_id) {
+      fieldMap[comp.custom_id] = comp.value?.trim() || ''
+    }
+  }
 
+  const charName = fieldMap.char_name
   if (!charName) {
     return { type: 4, data: { content: '⚠️ 角色名稱不得為空！', flags: 64 } }
   }
 
-  // 1. 純函數解析
-  const parsed = parseCharacterCard(rawStats)
+  // ★ 核心合流：將 4 個屬性與技能文字框優雅合併為一個標準文字區塊，直接送入解析器！
+  const combinedRawStats = [
+    fieldMap.base_attrs,
+    fieldMap.skills_investigation,
+    fieldMap.skills_combat,
+    fieldMap.skills_other
+  ].filter(Boolean).join('\n')
+
+  // 1. 純函數解析（原有的解析引擎完全不需要動）
+  const parsed = parseCharacterCard(combinedRawStats)
   const supabase = getSupabase()
 
-  // 2. 存入 Supabase (Upsert：同名覆蓋，並預設為活躍狀態)
+  // 2. 存入 Supabase (同名覆蓋，並設為活躍卡)
   const payload = {
     discord_id: callerId,
     name: charName,
@@ -286,7 +345,7 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
     skills: parsed.skills
   }
 
-  // 將其他卡片的 is_active 先重置
+  // 重置同用戶的其他卡片活躍狀態
   await supabase.schema('trpg').from('characters').update({ is_active: false }).eq('discord_id', callerId)
 
   // 寫入當前卡片
