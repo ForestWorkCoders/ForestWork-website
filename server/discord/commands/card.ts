@@ -1,26 +1,25 @@
 // server/discord/commands/card.ts
 import type { H3Event } from 'h3'
 import { createClient } from '@supabase/supabase-js'
+import { put } from '@vercel/blob'
+import { getInteractionOption } from '../utils'
 import { COC_SKILL_CATEGORIES, BASE_ATTR_KEYS } from '../assets/coc-skills'
 import { parseCharacterCard } from '../utils/cocParser'
-import { put } from '@vercel/blob'
 
-// 建立後端專用 Supabase 管理端客戶端（繞過無狀態 Webhook 缺少 Session 的限制）
+// 1. 获取 Supabase 管理端客户端
 function getSupabase() {
   const url = process.env.SUPABASE_URL || ''
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || ''
   return createClient(url, serviceKey)
 }
 
-/**
- * 格式化單張角色卡為精緻的 Discord Embed[cite: 6, 9]
- */
-function buildCharacterEmbed(char: any, userAvatar?: string) {
+// 2. 格式化单张角色卡为精美的 Discord Embed (完整防弹版，消灭 ReferenceError)
+function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
   const attrs = char.attributes || {}
   const skills = char.skills || {}
-  const displayAvatar = char.avatar_url || userAvatar
+  const displayAvatar = char.avatar_url || fallbackAvatar
 
-  // 1. 八圍排版
+  // 八围排版
   const attrText = BASE_ATTR_KEYS.map(k => `**${k}**: \`${attrs[k] || 0}\``).join(' | ')
 
   const fields: any[] = [
@@ -36,7 +35,7 @@ function buildCharacterEmbed(char: any, userAvatar?: string) {
     }
   ]
 
-  // 2. 11 大技能類別動態排版 (自動隱藏 0 點技能)[cite: 6, 9]
+  // 11 大技能分类排版
   let validSkillCount = 0
   for (const [catName, catSkills] of Object.entries(COC_SKILL_CATEGORIES)) {
     const matched: string[] = []
@@ -56,37 +55,32 @@ function buildCharacterEmbed(char: any, userAvatar?: string) {
   }
 
   return {
-
     title: `📜 調查員檔案：${char.name}${char.is_active ? ' ⭐ [當前出戰]' : ''}`,
     color: char.is_active ? 0x2ECC71 : 0x3498DB,
     thumbnail: displayAvatar ? { url: displayAvatar } : undefined,
     fields,
     footer: {
       text: `林間小鎮 TRPG · 共載入 ${validSkillCount} 項有效技能`,
-      icon_url: userAvatar ? { url: userAvatar } : 'https://i.imgur.com/cu2YAkn.png'
+      icon_url: fallbackAvatar
     },
     timestamp: new Date().toISOString()
   }
 }
 
-/**
- * 處理 /card 斜槓指令分流
- */
+// 3. 处理 /card 所有子命令分发
 export async function handleCardCommand(interaction: any, event: H3Event) {
   const subCommand = interaction.data?.options?.[0]?.name
   const subOptions = interaction.data?.options?.[0]?.options || []
 
   const getSubOption = (name: string) => subOptions.find((o: any) => o.name === name)?.value
   const callerId = interaction.member?.user?.id || interaction.user?.id
-  const avatar = interaction.member?.user?.avatar
+  const userDiscordAvatar = interaction.member?.user?.avatar
     ? `https://cdn.discordapp.com/avatars/${callerId}/${interaction.member.user.avatar}.png`
     : undefined
 
   // -------------------------------------------------------------
-  // 子指令 1: /card create (彈出原生表單視窗)[cite: 7]
+  // 子指令 1: /card create (原生弹窗，零 I/O 极速直出)
   // -------------------------------------------------------------
-  // server/discord/commands/card.ts 中的 create 分支：
-
   if (subCommand === 'create') {
     return {
       type: 9, // APPLICATION_MODAL
@@ -94,7 +88,6 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
         custom_id: 'trpg_card_create_modal',
         title: '建立 CoC 7版調查員角色卡',
         components: [
-          // 問題 1: 調查員姓名 (必填)
           {
             type: 1,
             components: [
@@ -102,15 +95,14 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
                 type: 4,
                 custom_id: 'char_name',
                 label: '1. 調查員姓名 (必填)',
-                style: 1, // Short
+                style: 1,
                 min_length: 1,
                 max_length: 50,
                 required: true,
-                placeholder: '例如：艾莉絲'
+                placeholder: '例如：莉莉絲'
               }
             ]
           },
-          // 問題 2: 基礎八圍與幸運 (必填)
           {
             type: 1,
             components: [
@@ -118,13 +110,12 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
                 type: 4,
                 custom_id: 'base_attrs',
                 label: '2. 基礎屬性八圍 + 幸運 (必填)',
-                style: 2, // Paragraph
+                style: 2,
                 required: true,
                 placeholder: '力量:60 體質:50 敏捷:70 外貌:50 意志:60 智力:70 體型:65 教育:80 幸運:50'
               }
             ]
           },
-          // 問題 3: 調查與探索技能 (選填)
           {
             type: 1,
             components: [
@@ -132,13 +123,12 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
                 type: 4,
                 custom_id: 'skills_investigation',
                 label: '3. 調查與感知類技能 (選填)',
-                style: 2, // Paragraph
+                style: 2,
                 required: false,
                 placeholder: '偵察:70 聆聽:60 心理學:50 圖書館:40 追蹤:20'
               }
             ]
           },
-          // 問題 4: 戰鬥與生存行動 (選填)
           {
             type: 1,
             components: [
@@ -146,13 +136,12 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
                 type: 4,
                 custom_id: 'skills_combat',
                 label: '4. 戰鬥、生存與行動類技能 (選填)',
-                style: 2, // Paragraph
+                style: 2,
                 required: false,
                 placeholder: '閃避:35 鬥毆:60 手槍:50 急救:40 隱密行動:40'
               }
             ]
           },
-          // 問題 5: 社交、學識與其他技能 (選填)
           {
             type: 1,
             components: [
@@ -160,9 +149,9 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
                 type: 4,
                 custom_id: 'skills_other',
                 label: '5. 社交、知識與自訂技能 (選填)',
-                style: 2, // Paragraph
+                style: 2,
                 required: false,
-                placeholder: '說服:50 話術:40 魅惑:30 母語:80 汽車駕駛:40'
+                placeholder: '說服:50 話術:40 魅惑:30 母語:80 自動車駕駛:40'
               }
             ]
           }
@@ -171,10 +160,119 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     }
   }
 
+  // 后续指令按需调用 Supabase，杜绝提前初始化
   const supabase = getSupabase()
 
   // -------------------------------------------------------------
-  // 子指令 2: /card view (查看當前活躍卡或指定卡片)[cite: 6, 9]
+  // 子指令 2: /card avatar (专属立绘绑定：Vercel Blob 永久托管)
+  // -------------------------------------------------------------
+  if (subCommand === 'avatar') {
+    const attachmentId = getSubOption('image')
+    let imageUrl = getSubOption('url')?.trim()
+    const targetName = getSubOption('name')?.trim()
+
+    // 情况 A：用户只传了 URL，耗时极短（<100ms），走同步极速通道
+    if (!attachmentId && imageUrl) {
+      let query = supabase.schema('trpg').from('characters').update({ avatar_url: imageUrl }).eq('discord_id', callerId)
+      if (targetName) query = query.eq('name', targetName)
+      else query = query.eq('is_active', true)
+
+      const { data: updated, error: dbError } = await query.select().maybeSingle()
+      if (dbError || !updated) {
+        return { type: 4, data: { content: `❌ 更新角色卡失敗：${dbError?.message || '查無相關角色卡'}`, flags: 64 } }
+      }
+
+      return {
+        type: 4,
+        data: {
+          content: `🎨 已成功為調查員 **${updated.name}** 綁定立繪！`,
+          embeds: [buildCharacterEmbed(updated, imageUrl)]
+        }
+      }
+    }
+
+    // 情况 B：用户上传了图片附件，耗时长，启动 Discord 原生 Deferred 异步通道！
+    if (attachmentId) {
+      const attachment = interaction.data?.resolved?.attachments?.[attachmentId]
+      if (!attachment?.url) {
+        return { type: 4, data: { content: '❌ 無法獲取上傳的圖片檔案！', flags: 64 } }
+      }
+
+      // 边界面向防守：限制 4.5MB
+      if (attachment.size && attachment.size > 4.5 * 1024 * 1024) {
+        return { type: 4, data: { content: '⚠️ 圖片大小超過 4.5MB，請壓縮後重試！', flags: 64 } }
+      }
+
+      const applicationId = interaction.application_id
+      const interactionToken = interaction.token
+
+      // ★★★ 核心好品味：将耗时的网络流转挂入后台，Serverless 不提前冻结！★★★
+      event.waitUntil((async () => {
+        try {
+          // 1. 抓取图片并转存到 Vercel Blob
+          const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+          const res = await fetch(attachment.url)
+          if (!res.ok) throw new Error('無法從 Discord 下載圖片檔案')
+          const arrayBuffer = await res.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+
+          const ext = attachment.filename?.split('.').pop() || 'png'
+          const pathname = `trpg-avatars/${callerId}/${Date.now()}.${ext}`
+
+          const blob = await put(pathname, buffer, {
+            access: 'public',
+            contentType: attachment.content_type || 'image/png',
+            token: blobToken
+          })
+
+          const uploadedUrl = blob.url
+
+          // 2. 写入 Supabase
+          let query = supabase.schema('trpg').from('characters').update({ avatar_url: uploadedUrl }).eq('discord_id', callerId)
+          if (targetName) query = query.eq('name', targetName)
+          else query = query.eq('is_active', true)
+
+          const { data: updated, error: dbError } = await query.select().maybeSingle()
+          if (dbError || !updated) throw new Error(dbError?.message || '查無匹配的出戰角色卡')
+
+          // 3. 通过 Discord 原生 Followup Webhook 回写终态卡片（无须 Bot Token！）
+          const followupUrl = `https://discord.com/api/v10/webhooks/${applicationId}/${interactionToken}/messages/@original`
+          await fetch(followupUrl, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: `🎨 已成功為調查員 **${updated.name}** 綁定永久立繪！`,
+              embeds: [buildCharacterEmbed(updated, uploadedUrl)]
+            })
+          })
+        } catch (err: any) {
+          console.error('[Async Avatar Pipeline Error]:', err)
+          // 报错时向用户回显失败信息
+          const followupUrl = `https://discord.com/api/v10/webhooks/${applicationId}/${interactionToken}/messages/@original`
+          await fetch(followupUrl, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: `❌ 上傳立繪失敗：${err?.message || '處理逾時或網路錯誤'}`
+            })
+          }).catch(() => { })
+        }
+      })())
+
+      // ★★★ 核心好品味：0.05 秒秒回 Type 5，瞬间击碎 3 秒熔断！★★★
+      return {
+        type: 5 // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE (通知 Discord 客户端进入思考中)
+      }
+    }
+
+    return {
+      type: 4,
+      data: { content: '⚠️ 請至少拖入一張圖片檔案，或在 url 參數填寫圖片網址！', flags: 64 }
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 子指令 3: /card view
   // -------------------------------------------------------------
   if (subCommand === 'view') {
     const targetName = getSubOption('name')?.trim()
@@ -201,12 +299,12 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
 
     return {
       type: 4,
-      data: { embeds: [buildCharacterEmbed(char, avatar)] }
+      data: { embeds: [buildCharacterEmbed(char, userDiscordAvatar)] }
     }
   }
 
   // -------------------------------------------------------------
-  // 子指令 3: /card list (列出用戶所有角色卡)
+  // 子指令 4: /card list
   // -------------------------------------------------------------
   if (subCommand === 'list') {
     const { data: list } = await supabase
@@ -246,7 +344,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
   }
 
   // -------------------------------------------------------------
-  // 子指令 4: /card switch (原子級切換當前出戰卡)
+  // 子指令 5: /card switch
   // -------------------------------------------------------------
   if (subCommand === 'switch') {
     const name = getSubOption('name')?.trim()
@@ -254,7 +352,6 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
       return { type: 4, data: { content: '⚠️ 請指定要切換的角色名稱！', flags: 64 } }
     }
 
-    // 調用在 Supabase 中預編譯的原子函數
     const { error } = await supabase.rpc('activate_character', {
       p_discord_id: callerId,
       p_character_name: name
@@ -267,13 +364,13 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     return {
       type: 4,
       data: {
-        content: `✅ 已將出戰角色成功切換為：**${name}**！後續 \`/cc\` 檢定將自動套用此卡數值。`
+        content: `✅ 已將出戰角色成功切換為：**${name}**！後續檢定將自動套用此卡數值。`
       }
     }
   }
 
   // -------------------------------------------------------------
-  // 子指令 5: /card delete (刪除角色卡)[cite: 7]
+  // 子指令 6: /card delete
   // -------------------------------------------------------------
   if (subCommand === 'delete') {
     const name = getSubOption('name')?.trim()
@@ -298,116 +395,16 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     }
   }
 
-  // -------------------------------------------------------------
-  // 子指令 6: /card avatar (設定角色專屬立繪)
-  // -------------------------------------------------------------
-  if (subCommand === 'avatar') {
-    const attachmentId = getSubOption('image')
-    let imageUrl = getSubOption('url')?.trim()
-    const targetName = getSubOption('name')?.trim()
-
-    // 1. 如果玩家上傳了附件檔案，立刻在記憶體中抓取並轉存到 Vercel Blob！
-    if (attachmentId) {
-      const attachment = interaction.data?.resolved?.attachments?.[attachmentId]
-      if (attachment?.url) {
-        // 邊界防禦：限制立繪大小不得超過 4.5MB (Vercel Serverless Payload 限制)
-        if (attachment.size && attachment.size > 4.5 * 1024 * 1024) {
-          return {
-            type: 4,
-            data: { content: '⚠️ 頭像圖片檔案過大，請上傳小於 4.5MB 的圖片！', flags: 64 }
-          }
-        }
-
-        try {
-          const blobToken = process.env.BLOB_READ_WRITE_TOKEN
-          if (!blobToken) {
-            console.error('[Vercel Blob Fatal]: BLOB_READ_WRITE_TOKEN is not defined in environment variables!')
-            return {
-              type: 4,
-              data: {
-                content: '❌ 系統錯誤：服務端未配置 Vercel Blob 存取憑證，請檢查專案 Storage 關聯狀態！',
-                flags: 64
-              }
-            }
-          }
-          
-          // A. 從 Discord 臨時 CDN 抓取二進位資料
-          const res = await fetch(attachment.url)
-          if (!res.ok) throw new Error('無法從 Discord 下載圖片檔案')
-          const arrayBuffer = await res.arrayBuffer()
-          const buffer = Buffer.from(arrayBuffer)
-
-          // B. 構造在 Vercel Blob 裡的持久化路徑
-          const ext = attachment.filename?.split('.').pop() || 'png'
-          const pathname = `trpg-avatars/${callerId}/${Date.now()}.${ext}`
-
-          // C. 直接寫入 Vercel Blob 公開儲存桶！
-          // (Vercel 會自動從環境變數讀取 BLOB_READ_WRITE_TOKEN)
-          const blob = await put(pathname, buffer, {
-            access: 'public',
-            contentType: attachment.content_type || 'image/png'
-          })
-
-          // D. 取得來自 https://ygca6ieapkscjk1p.public.blob.vercel-storage.com/... 的永久直鏈
-          imageUrl = blob.url
-        } catch (err: any) {
-          console.error('[Vercel Blob Avatar Error]:', err)
-          return {
-            type: 4,
-            data: { content: `❌ 圖片轉存至 Vercel Blob 失敗：${err?.message || '內部錯誤'}`, flags: 64 }
-          }
-        }
-      }
-    }
-
-    if (!imageUrl) {
-      return {
-        type: 4,
-        data: { content: '⚠️ 請至少上傳一張圖片檔案，或輸入一個有效的圖片網址！', flags: 64 }
-      }
-    }
-
-    // 2. 將產出的永久 URL 寫入 Supabase 核心表
-    let query = supabase.schema('trpg').from('characters').update({ avatar_url: imageUrl }).eq('discord_id', callerId)
-    if (targetName) {
-      query = query.eq('name', targetName)
-    } else {
-      query = query.eq('is_active', true)
-    }
-
-    const { data: updated, error: dbError } = await query.select().maybeSingle()
-
-    if (dbError || !updated) {
-      return {
-        type: 4,
-        data: { content: `❌ 更新角色卡失敗：${dbError?.message || '查無相關角色卡'}`, flags: 64 }
-      }
-    }
-
-    return {
-      type: 4,
-      data: {
-        content: `🎨 已成功為調查員 **${updated.name}** 綁定永久立繪 (託管於 Vercel Blob)！`,
-        embeds: [buildCharacterEmbed(updated, imageUrl)]
-      }
-    }
-  }
-
-  return { type: 4, data: { content: '未知子指令', flags: 64 } }
+  return { type: 4, data: { content: '⚠️ 未知子指令', flags: 64 } }
 }
 
-
-
-/**
- * 處理 Modal 提交後的持久化閉環 (Interaction Type 5)[cite: 7]
- */
+// 4. 处理 Modal 提交 (MODAL_SUBMIT)
 export async function handleCardCreateModal(interaction: any, event: H3Event) {
   const callerId = interaction.member?.user?.id || interaction.user?.id
-  const avatar = interaction.member?.user?.avatar
+  const userDiscordAvatar = interaction.member?.user?.avatar
     ? `https://cdn.discordapp.com/avatars/${callerId}/${interaction.member.user.avatar}.png`
     : undefined
 
-  // ★ 好品味提取：將 ActionRows 拍平成強類型的 custom_id 鍵值字典，消除下標硬編碼
   const fieldMap: Record<string, string> = {}
   for (const row of interaction.data?.components || []) {
     const comp = row.components?.[0]
@@ -421,7 +418,6 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
     return { type: 4, data: { content: '⚠️ 角色名稱不得為空！', flags: 64 } }
   }
 
-  // ★ 核心合流：將 4 個屬性與技能文字框優雅合併為一個標準文字區塊，直接送入解析器！
   const combinedRawStats = [
     fieldMap.base_attrs,
     fieldMap.skills_investigation,
@@ -429,11 +425,9 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
     fieldMap.skills_other
   ].filter(Boolean).join('\n')
 
-  // 1. 純函數解析（原有的解析引擎完全不需要動）
   const parsed = parseCharacterCard(combinedRawStats)
   const supabase = getSupabase()
 
-  // 2. 存入 Supabase (同名覆蓋，並設為活躍卡)
   const payload = {
     discord_id: callerId,
     name: charName,
@@ -445,10 +439,8 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
     skills: parsed.skills
   }
 
-  // 重置同用戶的其他卡片活躍狀態
   await supabase.schema('trpg').from('characters').update({ is_active: false }).eq('discord_id', callerId)
 
-  // 寫入當前卡片
   const { data: saved, error } = await supabase
     .schema('trpg')
     .from('characters')
@@ -467,7 +459,7 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
     type: 4,
     data: {
       content: `🎉 成功建立並啟用調查員 **${charName}**！`,
-      embeds: [buildCharacterEmbed(saved, avatar)]
+      embeds: [buildCharacterEmbed(saved, userDiscordAvatar)]
     }
   }
 }

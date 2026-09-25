@@ -48,7 +48,9 @@ export default defineEventHandler(async (event) => {
 
     try {
       if (commandName === 'card') {
-        return await handleCardCommand(message, event)
+        const responsePayload = await handleCardCommand(message, event)
+        console.log(`[Discord Card Response Delivered]: Type -> ${responsePayload?.type}`)
+        return responsePayload
       }
 
       const handler = commandRegistry[commandName]
