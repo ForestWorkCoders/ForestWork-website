@@ -70,14 +70,6 @@ const diceCommands = [
         ]
     },
     {
-        name: 'cc',
-        description: 'COC 1D100 技能檢定',
-        options: [
-            { name: 'target', description: '技能目標值', type: 4, required: true, min_value: 1, max_value: 100 },
-            { name: 'desc', description: '檢定項目名稱 (如 偵查、力量、聆聽)', type: 3, required: false }
-        ]
-    },
-    {
         name: 'choice',
         description: '在多個候選項中隨機抽取一項 (支援逗號或引號包含空格)',
         options: [
@@ -205,6 +197,45 @@ const cocCommands = [
                         value: 'mania'
                     }
                 ]
+            }
+        ]
+    },
+    {
+        name: 'cc',
+        description: '執行 CoC 7版技能對抗檢定 (支援獎懲骰與暗骰)',
+        options: [
+            {
+                name: 'value',
+                description: '檢定目標數值或技能值 (1 ~ 100)',
+                type: 4, // INTEGER
+                required: true,
+                min_value: 1,
+                max_value: 100
+            },
+            {
+                name: 'skill',
+                description: '技能名稱或檢定項目 (例如：偵察、聆聽、手槍)',
+                type: 3, // STRING
+                required: false
+            },
+            {
+                name: 'bonus',
+                description: '獎勵骰或懲罰骰 (可選)',
+                type: 4, // INTEGER
+                required: false,
+                choices: [
+                    { name: '🎁 獎勵骰 B2 (+2)', value: 2 },
+                    { name: '🎁 獎勵骰 B1 (+1)', value: 1 },
+                    { name: '🎲 標準檢定 (無獎懲)', value: 0 },
+                    { name: '⚠️ 懲罰骰 P1 (-1)', value: -1 },
+                    { name: '⚠️ 懲罰骰 P2 (-2)', value: -2 }
+                ]
+            },
+            {
+                name: 'secret',
+                description: '是否進行暗骰 (僅自己可見)',
+                type: 5, // BOOLEAN
+                required: false
             }
         ]
     }
