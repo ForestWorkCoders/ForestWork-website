@@ -67,7 +67,19 @@ function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
   }
 }
 
-// 3. 处理 /card 所有子命令分发
+// 3. 統一解析相對變動 (+3, -5) 與絕對賦值 (12)
+function applyDeltaOrValue(current: number, input?: string): number {
+    if (!input) return current
+    const trimmed = input.trim()
+    if (trimmed.startsWith('+') || trimmed.startsWith('-')) {
+      const delta = parseInt(trimmed, 10)
+      return isNaN(delta) ? current : Math.max(0, current + delta)
+    }
+    const val = parseInt(trimmed, 10)
+    return isNaN(val) ? current : Math.max(0, val)
+  }
+
+// 4. 处理 /card 所有子命令分发
 export async function handleCardCommand(interaction: any, event: H3Event) {
   const subCommand = interaction.data?.options?.[0]?.name
   const subOptions = interaction.data?.options?.[0]?.options || []
@@ -392,6 +404,125 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     return {
       type: 4,
       data: { content: `🗑️ 調查員 **${name}** 已被徹底清除。` }
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 子指令 7: /card edit (局部狀態微調與數值增減)
+  // -------------------------------------------------------------
+  if (subCommand === 'edit') {
+    const targetName = getSubOption('name')?.trim()
+    const inputHp = getSubOption('hp')
+    const inputSan = getSubOption('san')
+    const inputMp = getSubOption('mp')
+    const inputSkill = getSubOption('skill')?.trim()
+    const inputAttr = getSubOption('attr')?.trim()
+    const inputValue = getSubOption('value')
+
+    // 1. 查出目標角色卡
+    let query = supabase.schema('trpg').from('characters').select('*').eq('discord_id', callerId)
+    if (targetName) query = query.eq('name', targetName)
+    else query = query.eq('is_active', true)
+
+    const { data: char, error: fetchErr } = await query.maybeSingle()
+    if (fetchErr || !char) {
+      return {
+        type: 4,
+        data: { content: '❌ 找不到匹配的角色卡！請確認姓名或先使用 `/card create` 建立角色。', flags: 64 }
+      }
+    }
+
+    const changes: string[] = []
+    const updatePayload: Record<string, any> = {}
+
+    // 2. 處理核心狀態標量增減 (HP, SAN, MP)
+    if (inputHp !== undefined) {
+      const newHp = applyDeltaOrValue(char.hp, String(inputHp))
+      if (newHp !== char.hp) {
+        updatePayload.hp = newHp
+        changes.push(`❤️ **HP**: \`${char.hp}\` ➔ \`${newHp}\``)
+      }
+    }
+
+    if (inputSan !== undefined) {
+      const newSan = applyDeltaOrValue(char.san, String(inputSan))
+      if (newSan !== char.san) {
+        updatePayload.san = newSan
+        changes.push(`🧠 **SAN**: \`${char.san}\` ➔ \`${newSan}\``)
+      }
+    }
+
+    if (inputMp !== undefined) {
+      const newMp = applyDeltaOrValue(char.mp, String(inputMp))
+      if (newMp !== char.mp) {
+        updatePayload.mp = newMp
+        changes.push(`🔮 **MP**: \`${char.mp}\` ➔ \`${newMp}\``)
+      }
+    }
+
+    // 3. 處理特定技能修改
+    if (inputSkill && inputValue !== undefined) {
+      const skills = { ...(char.skills || {}) }
+      const oldVal = skills[inputSkill] || 0
+      skills[inputSkill] = Math.max(0, Number(inputValue))
+      updatePayload.skills = skills
+      changes.push(`🛠️ **技能【${inputSkill}】**: \`${oldVal}\` ➔ \`${inputValue}\``)
+    }
+
+    // 4. 處理八圍屬性修改
+    if (inputAttr && inputValue !== undefined) {
+      // 自動轉換別名 (例如 "力量" -> "STR")
+      const canonical = inputAttr.toUpperCase() === 'STR' || inputAttr === '力量' ? 'STR'
+        : inputAttr.toUpperCase() === 'CON' || inputAttr === '體質' ? 'CON'
+        : inputAttr.toUpperCase() === 'DEX' || inputAttr === '敏捷' ? 'DEX'
+        : inputAttr.toUpperCase() === 'APP' || inputAttr === '外貌' ? 'APP'
+        : inputAttr.toUpperCase() === 'POW' || inputAttr === '意志' ? 'POW'
+        : inputAttr.toUpperCase() === 'INT' || inputAttr === '智力' ? 'INT'
+        : inputAttr.toUpperCase() === 'SIZ' || inputAttr === '體型' ? 'SIZ'
+        : inputAttr.toUpperCase() === 'EDU' || inputAttr === '教育' ? 'EDU'
+        : inputAttr.toUpperCase() === 'LUK' || inputAttr === '幸運' ? 'LUK'
+        : inputAttr.toUpperCase()
+
+      const attrs = { ...(char.attributes || {}) }
+      const oldVal = attrs[canonical] || 0
+      attrs[canonical] = Math.max(0, Number(inputValue))
+      updatePayload.attributes = attrs
+      changes.push(`📊 **屬性【${canonical}】**: \`${oldVal}\` ➔ \`${inputValue}\``)
+    }
+
+    if (changes.length === 0) {
+      return {
+        type: 4,
+        data: {
+          content: '⚠️ 未檢測到任何有效的變更參數！請至少提供 `hp`、`san`、`mp` 或 `skill + value` 進行修改。',
+          flags: 64
+        }
+      }
+    }
+
+    // 5. 寫入 Supabase
+    const { data: updated, error: updateErr } = await supabase
+      .schema('trpg')
+      .from('characters')
+      .update(updatePayload)
+      .eq('id', char.id)
+      .select()
+      .single()
+
+    if (updateErr || !updated) {
+      return {
+        type: 4,
+        data: { content: `❌ 更新角色失敗：${updateErr?.message || '內部錯誤'}`, flags: 64 }
+      }
+    }
+
+    // 6. 回顯變動明細與更新後的完整 Embed
+    return {
+      type: 4,
+      data: {
+        content: `✏️ 調查員 **${updated.name}** 檔案變更已同步：\n${changes.join('\n')}`,
+        embeds: [buildCharacterEmbed(updated)]
+      }
     }
   }
 

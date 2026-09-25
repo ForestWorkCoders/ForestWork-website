@@ -352,6 +352,55 @@ const cocCommands = [
                         description: '指定角色姓名 (可選，預設為當前出戰卡)',
                         type: 3, // STRING
                         required: false
+                    },
+                ]
+            },
+            {
+                name: 'edit',
+                description: '修改當前出戰或指定調查員的狀態、屬性或技能',
+                type: 1, // ★ 子指令本身是 type: 1 (SUB_COMMAND)
+                options: [
+                    {
+                        name: 'hp', // [0]
+                        description: '調整體力值 (支援相對增減如 -3, +2 或絕對數值如 12)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'san', // [1]
+                        description: '調整理智值 (支援相對增減如 -5, +1 或絕對數值如 45)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'mp', // [2]
+                        description: '調整魔力值 (支援相對增減如 -2, +4 或絕對數值如 10)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'skill', // [3] ★★★ 就是這裡！必須是 3 (STRING)，絕不能是 1！★★★
+                        description: '指定要修改的技能名稱 (例如：偵察、手槍)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'attr', // [4]
+                        description: '指定要修改的八圍屬性 (例如：STR、敏捷)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'value', // [5]
+                        description: '賦予 skill 或 attr 的新數值 (整數)',
+                        type: 4, // INTEGER
+                        required: false
+                    },
+                    {
+                        name: 'name', // [6]
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
                     }
                 ]
             }
