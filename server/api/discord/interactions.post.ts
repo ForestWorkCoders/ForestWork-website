@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
 import { buildPagerResponse } from '../../discord/commands/demo-pager'
+import { handleCardCommand, handleCardCreateModal } from '../../discord/commands/card'
 
 export default defineEventHandler(async (event) => {
   const signature = getHeader(event, 'x-signature-ed25519')
@@ -45,15 +46,31 @@ export default defineEventHandler(async (event) => {
     const commandName = message.data.name
     setHeader(event, 'content-type', 'application/json')
 
-    const handler = commandRegistry[commandName]
-    if (!handler) {
+    try {
+      if (commandName === 'card') {
+        return await handleCardCommand(message, event)
+      }
+
+      const handler = commandRegistry[commandName]
+      if (handler) {
+        return await handler(message, event)
+      }
+      console.warn(`[Discord Warning]: 未註冊的指令名稱 -> ${commandName}`)
       return {
         type: 4,
-        data: { content: `⚠️ 未知的指令: /${commandName}` }
+        data: { content: `⚠️ 系統未註冊指令：\`/${commandName}\``, flags: 64 }
+      }
+    } catch (err: any) {
+      // ★ 黑色飛行記錄儀：把致命錯誤當場抓住並打進 Vercel 日誌！
+      console.error(`[Discord Fatal Error in /${commandName}]:`, err?.stack || err?.message || err)
+      return {
+        type: 4,
+        data: {
+          content: `💥 執行 \`/${commandName}\` 時後端拋出異常：\`${err?.message || '內部錯誤'}\`\n請檢查 Vercel 運行日誌。`,
+          flags: 64 // 僅觸發者可見，不污染群聊
+        }
       }
     }
-
-    return await handler(message, event)
   }
 
   if (message.type === 3) {
@@ -75,6 +92,14 @@ export default defineEventHandler(async (event) => {
       type: 4,
       data: { content: '未知的交互組件。', flags: 64 }
     }
+  }
+
+  if (message.type === 5) {
+    const customId = message.data?.custom_id
+    if (customId === 'trpg_card_create_modal') {
+      return await handleCardCreateModal(message, event)
+    }
+    return { type: 4, data: { content: '未處理的交互類型' } }
   }
 
   return { type: 1 }

@@ -9,7 +9,7 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst > app/types/database.types.ts",
+    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst,trpg > app/types/database.types.ts",
     "gartic-sync": "node --env-file=.env scripts/sync-gartic-manifest.js",
     "test-redirects": "node --env-file=.env scripts/verify-redirects.mjs",
     "discord-register-commands": "node --env-file=.env scripts/discord-register-commands.mjs"

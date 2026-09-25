@@ -270,6 +270,67 @@ const cocCommands = [
                 required: false
             }
         ]
+    },
+    {
+        name: 'card',
+        description: 'CoC 7版調查員角色卡管理系統',
+        options: [
+            {
+                name: 'create',
+                description: '填寫表單建立新調查員角色卡',
+                type: 1 // SUB_COMMAND
+            },
+            {
+                name: 'view',
+                description: '檢視調查員角色卡全息檔案',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'name',
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'user',
+                        description: '調閱伺服器其他玩家的角色卡 (可選)',
+                        type: 6, // USER
+                        required: false
+                    }
+                ]
+            },
+            {
+                name: 'list',
+                description: '列出自己擁有的所有調查員角色卡',
+                type: 1 // SUB_COMMAND
+            },
+            {
+                name: 'switch',
+                description: '切換當前出戰中的活躍角色卡',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'name',
+                        description: '要啟用的角色姓名',
+                        type: 3, // STRING
+                        required: true
+                    }
+                ]
+            },
+            {
+                name: 'delete',
+                description: '徹底清除指定的調查員角色卡',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'name',
+                        description: '要刪除的角色姓名',
+                        type: 3, // STRING
+                        required: true
+                    }
+                ]
+            }
+        ]
     }
 ]
 
