@@ -3,6 +3,7 @@ import type { H3Event } from 'h3'
 import { createClient } from '@supabase/supabase-js'
 import { COC_SKILL_CATEGORIES, BASE_ATTR_KEYS } from '../assets/coc-skills'
 import { parseCharacterCard } from '../utils/cocParser'
+import { put } from '@vercel/blob'
 
 // 建立後端專用 Supabase 管理端客戶端（繞過無狀態 Webhook 缺少 Session 的限制）
 function getSupabase() {
@@ -17,6 +18,7 @@ function getSupabase() {
 function buildCharacterEmbed(char: any, userAvatar?: string) {
   const attrs = char.attributes || {}
   const skills = char.skills || {}
+  const displayAvatar = char.avatar_url || userAvatar
 
   // 1. 八圍排版
   const attrText = BASE_ATTR_KEYS.map(k => `**${k}**: \`${attrs[k] || 0}\``).join(' | ')
@@ -54,13 +56,14 @@ function buildCharacterEmbed(char: any, userAvatar?: string) {
   }
 
   return {
+
     title: `📜 調查員檔案：${char.name}${char.is_active ? ' ⭐ [當前出戰]' : ''}`,
     color: char.is_active ? 0x2ECC71 : 0x3498DB,
-    thumbnail: userAvatar ? { url: userAvatar } : undefined,
+    thumbnail: displayAvatar ? { url: displayAvatar } : undefined,
     fields,
     footer: {
       text: `林間小鎮 TRPG · 共載入 ${validSkillCount} 項有效技能`,
-      icon_url: 'https://i.imgur.com/cu2YAkn.png'
+      icon_url: userAvatar ? { url: userAvatar } : 'https://i.imgur.com/cu2YAkn.png'
     },
     timestamp: new Date().toISOString()
   }
@@ -75,7 +78,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
 
   const getSubOption = (name: string) => subOptions.find((o: any) => o.name === name)?.value
   const callerId = interaction.member?.user?.id || interaction.user?.id
-  const avatar = interaction.member?.user?.avatar 
+  const avatar = interaction.member?.user?.avatar
     ? `https://cdn.discordapp.com/avatars/${callerId}/${interaction.member.user.avatar}.png`
     : undefined
 
@@ -295,15 +298,112 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     }
   }
 
+  // -------------------------------------------------------------
+  // 子指令 6: /card avatar (設定角色專屬立繪)
+  // -------------------------------------------------------------
+  if (subCommand === 'avatar') {
+    const attachmentId = getSubOption('image')
+    let imageUrl = getSubOption('url')?.trim()
+    const targetName = getSubOption('name')?.trim()
+
+    // 1. 如果玩家上傳了附件檔案，立刻在記憶體中抓取並轉存到 Vercel Blob！
+    if (attachmentId) {
+      const attachment = interaction.data?.resolved?.attachments?.[attachmentId]
+      if (attachment?.url) {
+        // 邊界防禦：限制立繪大小不得超過 4.5MB (Vercel Serverless Payload 限制)
+        if (attachment.size && attachment.size > 4.5 * 1024 * 1024) {
+          return {
+            type: 4,
+            data: { content: '⚠️ 頭像圖片檔案過大，請上傳小於 4.5MB 的圖片！', flags: 64 }
+          }
+        }
+
+        try {
+          const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+          if (!blobToken) {
+            console.error('[Vercel Blob Fatal]: BLOB_READ_WRITE_TOKEN is not defined in environment variables!')
+            return {
+              type: 4,
+              data: {
+                content: '❌ 系統錯誤：服務端未配置 Vercel Blob 存取憑證，請檢查專案 Storage 關聯狀態！',
+                flags: 64
+              }
+            }
+          }
+          
+          // A. 從 Discord 臨時 CDN 抓取二進位資料
+          const res = await fetch(attachment.url)
+          if (!res.ok) throw new Error('無法從 Discord 下載圖片檔案')
+          const arrayBuffer = await res.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+
+          // B. 構造在 Vercel Blob 裡的持久化路徑
+          const ext = attachment.filename?.split('.').pop() || 'png'
+          const pathname = `trpg-avatars/${callerId}/${Date.now()}.${ext}`
+
+          // C. 直接寫入 Vercel Blob 公開儲存桶！
+          // (Vercel 會自動從環境變數讀取 BLOB_READ_WRITE_TOKEN)
+          const blob = await put(pathname, buffer, {
+            access: 'public',
+            contentType: attachment.content_type || 'image/png'
+          })
+
+          // D. 取得來自 https://ygca6ieapkscjk1p.public.blob.vercel-storage.com/... 的永久直鏈
+          imageUrl = blob.url
+        } catch (err: any) {
+          console.error('[Vercel Blob Avatar Error]:', err)
+          return {
+            type: 4,
+            data: { content: `❌ 圖片轉存至 Vercel Blob 失敗：${err?.message || '內部錯誤'}`, flags: 64 }
+          }
+        }
+      }
+    }
+
+    if (!imageUrl) {
+      return {
+        type: 4,
+        data: { content: '⚠️ 請至少上傳一張圖片檔案，或輸入一個有效的圖片網址！', flags: 64 }
+      }
+    }
+
+    // 2. 將產出的永久 URL 寫入 Supabase 核心表
+    let query = supabase.schema('trpg').from('characters').update({ avatar_url: imageUrl }).eq('discord_id', callerId)
+    if (targetName) {
+      query = query.eq('name', targetName)
+    } else {
+      query = query.eq('is_active', true)
+    }
+
+    const { data: updated, error: dbError } = await query.select().maybeSingle()
+
+    if (dbError || !updated) {
+      return {
+        type: 4,
+        data: { content: `❌ 更新角色卡失敗：${dbError?.message || '查無相關角色卡'}`, flags: 64 }
+      }
+    }
+
+    return {
+      type: 4,
+      data: {
+        content: `🎨 已成功為調查員 **${updated.name}** 綁定永久立繪 (託管於 Vercel Blob)！`,
+        embeds: [buildCharacterEmbed(updated, imageUrl)]
+      }
+    }
+  }
+
   return { type: 4, data: { content: '未知子指令', flags: 64 } }
 }
+
+
 
 /**
  * 處理 Modal 提交後的持久化閉環 (Interaction Type 5)[cite: 7]
  */
 export async function handleCardCreateModal(interaction: any, event: H3Event) {
   const callerId = interaction.member?.user?.id || interaction.user?.id
-  const avatar = interaction.member?.user?.avatar 
+  const avatar = interaction.member?.user?.avatar
     ? `https://cdn.discordapp.com/avatars/${callerId}/${interaction.member.user.avatar}.png`
     : undefined
 

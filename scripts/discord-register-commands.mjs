@@ -329,6 +329,31 @@ const cocCommands = [
                         required: true
                     }
                 ]
+            },
+            {
+                name: 'avatar',
+                description: '設定當前出戰或指定調查員的立繪頭像',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'image',
+                        description: '直接拖曳上傳圖片 (自動轉存至永久雲端儲存)',
+                        type: 11, // ATTACHMENT
+                        required: false
+                    },
+                    {
+                        name: 'url',
+                        description: '或直接填寫公開圖片直鏈 (例如 Imgur)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'name',
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
+                    }
+                ]
             }
         ]
     }
