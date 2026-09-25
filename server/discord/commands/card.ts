@@ -79,6 +79,28 @@ function applyDeltaOrValue(current: number, input?: string): number {
     return isNaN(val) ? current : Math.max(0, val)
   }
 
+function buildCharacterBioEmbed(char: any) {
+  return {
+    title: `📖 調查員生平檔案：${char.name}`,
+    // ★ 核心：直接把用戶寫的原始文本塞進 description，原生解析 Markdown 與換行！
+    description: char.story || '*（該調查員目前尚未記錄任何生平背景故事。使用 `/card bio action: edit` 開始撰寫。）*',
+    color: 0x9B59B6, // 優雅的神秘紫
+    thumbnail: char.avatar_url ? { url: char.avatar_url } : undefined,
+    fields: [
+      {
+        name: '📌 基礎身份',
+        value: `❤️ **HP**: \`${char.hp}\` ｜ 🧠 **SAN**: \`${char.san}\` ｜ 狀態: \`${char.is_active ? '當前出戰' : '待命'}\``,
+        inline: false
+      }
+    ],
+    footer: {
+      text: '林間小鎮 TRPG · 調查員傳記紀錄室',
+      icon_url: '[https://i.imgur.com/cu2YAkn.png](https://i.imgur.com/cu2YAkn.png)'
+    },
+    timestamp: new Date().toISOString()
+  }
+}
+
 // 4. 处理 /card 所有子命令分发
 export async function handleCardCommand(interaction: any, event: H3Event) {
   const subCommand = interaction.data?.options?.[0]?.name
@@ -526,6 +548,77 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     }
   }
 
+  // -------------------------------------------------------------
+  // 子指令 8: /card bio (檢視或開啟彈窗編寫背景故事)
+  // -------------------------------------------------------------
+  if (subCommand === 'bio') {
+    const action = getSubOption('action')
+    const targetName = getSubOption('name')?.trim()
+
+    // 1. 若是 view 操作：直接查庫並回顯 Bio Embed
+    if (action === 'view') {
+      let query = supabase.schema('trpg').from('characters').select('*').eq('discord_id', callerId)
+      if (targetName) query = query.ilike('name', `%${targetName}%`)
+      else query = query.eq('is_active', true)
+
+      const { data: char, error } = await query.maybeSingle()
+      if (error || !char) {
+        return {
+          type: 4,
+          data: { content: '❌ 查無相關角色卡！請確認姓名或使用 `/card create` 建立角色。', flags: 64 }
+        }
+      }
+
+      return {
+        type: 4,
+        data: { embeds: [buildCharacterBioEmbed(char)] }
+      }
+    }
+
+    // 2. 若是 edit 操作：直接彈出一個 4000 字符的專用大文字框！
+    if (action === 'edit') {
+      // 先查出當前角色卡既有故事（若有），預填回輸入框
+      let query = supabase.schema('trpg').from('characters').select('name, story').eq('discord_id', callerId)
+      if (targetName) query = query.ilike('name', `%${targetName}%`)
+      else query = query.eq('is_active', true)
+
+      const { data: char } = await query.maybeSingle()
+      if (!char) {
+        return {
+          type: 4,
+          data: { content: '❌ 找不到要編輯故事的角色卡！請先使用 `/card create` 建立角色。', flags: 64 }
+        }
+      }
+
+      return {
+        type: 9, // APPLICATION_MODAL
+        data: {
+          // custom_id 把角色名字帶上，保持無狀態路由
+          custom_id: `trpg_bio_modal:${encodeURIComponent(char.name)}`,
+          title: `撰寫【${char.name}】的背景故事`,
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 4,
+                  custom_id: 'story_content',
+                  label: '角色生平背景 (支援 Discord Markdown 語法)',
+                  style: 2, // Paragraph
+                  min_length: 0,
+                  max_length: 4000, // ★ 頂格用滿 Discord 物理配額
+                  required: false,
+                  value: char.story || '', // 回填既有文本
+                  placeholder: '# 早期經歷\n出生於波士頓，熱愛研究古代文獻。\n\n> 「有些真相，永遠埋在泥土下會更好。」\n\n- 核心信念：追求知識\n- 重大創傷：曾目睹家族古宅的大火'
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+
   return { type: 4, data: { content: '⚠️ 未知子指令', flags: 64 } }
 }
 
@@ -591,6 +684,44 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
     data: {
       content: `🎉 成功建立並啟用調查員 **${charName}**！`,
       embeds: [buildCharacterEmbed(saved, userDiscordAvatar)]
+    }
+  }
+}
+
+/**
+ * 處理 Bio 表單提交持久化
+ */
+export async function handleCardBioModal(interaction: any, event: H3Event) {
+  const callerId = interaction.member?.user?.id || interaction.user?.id
+  const customId = interaction.data?.custom_id || ''
+  const charName = decodeURIComponent(customId.replace('trpg_bio_modal:', ''))
+
+  const storyContent = interaction.data?.components?.[0]?.components?.[0]?.value?.trim() || ''
+
+  const supabase = getSupabase()
+
+  // 更新該調查員的 story 欄位
+  const { data: updated, error } = await supabase
+    .schema('trpg')
+    .from('characters')
+    .update({ story: storyContent })
+    .eq('discord_id', callerId)
+    .eq('name', charName)
+    .select()
+    .single()
+
+  if (error || !updated) {
+    return {
+      type: 4,
+      data: { content: `❌ 儲存背景故事失敗：${error?.message || '內部錯誤'}`, flags: 64 }
+    }
+  }
+
+  return {
+    type: 4,
+    data: {
+      content: `🖋️ 已成功更新調查員 **${charName}** 的生平背景檔案！`,
+      embeds: [buildCharacterBioEmbed(updated)]
     }
   }
 }

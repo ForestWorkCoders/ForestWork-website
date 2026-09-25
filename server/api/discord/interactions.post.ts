@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
 import { buildPagerResponse } from '../../discord/commands/demo-pager'
-import { handleCardCommand, handleCardCreateModal } from '../../discord/commands/card'
+import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
 
 export default defineEventHandler(async (event) => {
   const signature = getHeader(event, 'x-signature-ed25519')
@@ -100,6 +100,9 @@ export default defineEventHandler(async (event) => {
     const customId = message.data?.custom_id
     if (customId === 'trpg_card_create_modal') {
       return await handleCardCreateModal(message, event)
+    }
+    if (customId.startsWith('trpg_bio_modal:')) {
+      return await handleCardBioModal(message, event)
     }
     return { type: 4, data: { content: '未處理的交互類型' } }
   }

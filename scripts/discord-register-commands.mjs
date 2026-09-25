@@ -403,6 +403,29 @@ const cocCommands = [
                         required: false
                     }
                 ]
+            },
+            {
+                name: 'bio',
+                description: '檢視或編輯調查員的生平背景故事 (支援 Markdown 排版)',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'action',
+                        description: '操作類型 (view: 檢視故事 ｜ edit: 開啟編輯視窗)',
+                        type: 3, // STRING
+                        required: true,
+                        choices: [
+                            { name: '檢視背景故事 (View)', value: 'view' },
+                            { name: '編寫/修改故事 (Edit)', value: 'edit' }
+                        ]
+                    },
+                    {
+                        name: 'name',
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
+                    }
+                ]
             }
         ]
     }
