@@ -13,6 +13,8 @@ import { handleBookOfAnswers } from './book-of-answers'
 import { handleTarot } from './tarot'
 import { handleBirthday } from './birthday'
 import { handleInsanity } from './insanity'
+import { handleCocGrowth } from './coc-growth'
+import { handleCocMake } from './coc-make'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -20,7 +22,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   ping: handlePing,
   site: handleSite,
   roll: handleRoll,
-  cc: handleCc,
   choice: handleChoice,
   arrange: handleArrange,
   pages: handleDemoPager,
@@ -29,5 +30,8 @@ export const commandRegistry: Record<string, CommandHandler> = {
   解答之书: handleBookOfAnswers,
   每日塔羅: handleTarot,
   生日密碼: handleBirthday,
-  insanity: handleInsanity
+  insanity: handleInsanity,
+  cc: handleCc,
+  en: handleCocGrowth,
+  coc_make: handleCocMake
 }

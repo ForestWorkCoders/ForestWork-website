@@ -238,6 +238,38 @@ const cocCommands = [
                 required: false
             }
         ]
+    },
+    {
+        name: 'en',
+        description: '執行 CoC 7版技能幕間成長檢定 (成功則 1D10 增長)',
+        options: [
+            {
+                name: 'skill',
+                description: '要進行成長檢定的技能名稱 (例如：偵察、聆聽)',
+                type: 3, // STRING
+                required: true
+            },
+            {
+                name: 'value',
+                description: '當前技能數值 (1 ~ 99)',
+                type: 4, // INTEGER
+                required: true,
+                min_value: 1,
+                max_value: 99
+            }
+        ]
+    },
+    {
+        name: 'coc_make',
+        description: '快速生成一組 CoC 7版調查員八圍屬性與幸運池',
+        options: [
+            {
+                name: 'secret',
+                description: '是否暗骰車卡 (僅自己可見)',
+                type: 5, // BOOLEAN
+                required: false
+            }
+        ]
     }
 ]
 
