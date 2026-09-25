@@ -37,6 +37,8 @@ function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
 
   // 11 大技能分类排版
   let validSkillCount = 0
+  const renderedSkills = new Set<string>()
+
   for (const [catName, catSkills] of Object.entries(COC_SKILL_CATEGORIES)) {
     const matched: string[] = []
     for (const sk of catSkills) {
@@ -52,6 +54,22 @@ function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
         inline: false
       })
     }
+  }
+
+  const customSkills: string[] = []
+  for (const [sk, val] of Object.entries(skills)) {
+    if (!renderedSkills.has(sk) && typeof val === 'number' && val > 0) {
+      customSkills.push(`${sk}: \`${val}\``)
+      validSkillCount++
+    }
+  }
+
+  if (customSkills.length > 0) {
+    fields.push({
+      name: '🌟 自訂與特殊技能',
+      value: customSkills.join(' ｜ '),
+      inline: false
+    })
   }
 
   return {
