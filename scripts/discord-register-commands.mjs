@@ -181,7 +181,34 @@ const diceCommands = [
     }
 ]
 
-const cocCommands = []
+const cocCommands = [
+    {
+        name: 'insanity',
+        description: '抽取 CoC 7版理智崩潰與瘋狂症狀 (支援症狀、恐懼症與狂熱症)',
+        options: [
+            {
+                name: 'type',
+                description: '選擇瘋狂類別 (可選，預設為短期/長期瘋狂症狀)',
+                type: 3, // STRING
+                required: false,
+                choices: [
+                    {
+                        name: '🧠 短期/長期瘋狂症狀 (1D10，含連鎖抽取)',
+                        value: 'full'
+                    },
+                    {
+                        name: '🕷️ 隨機恐懼症 Phobia (1D100)',
+                        value: 'phobia'
+                    },
+                    {
+                        name: '🔥 隨機狂熱症 Mania (1D100)',
+                        value: 'mania'
+                    }
+                ]
+            }
+        ]
+    }
+]
 
 const mahjongCommands = [{
     name: 'mahjong_pair',

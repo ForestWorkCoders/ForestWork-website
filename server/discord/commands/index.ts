@@ -12,6 +12,7 @@ import { handleMahjongPair } from './mahjong_pair'
 import { handleBookOfAnswers } from './book-of-answers'
 import { handleTarot } from './tarot'
 import { handleBirthday } from './birthday'
+import { handleInsanity } from './insanity'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -27,5 +28,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   mahjong_pair: handleMahjongPair,
   解答之书: handleBookOfAnswers,
   每日塔羅: handleTarot,
-  生日密碼: handleBirthday
+  生日密碼: handleBirthday,
+  insanity: handleInsanity
 }
