@@ -11,6 +11,7 @@ import { handleRollAdv } from './roll_adv'
 import { handleMahjongPair } from './mahjong_pair'
 import { handleBookOfAnswers } from './book-of-answers'
 import { handleTarot } from './tarot'
+import { handleBirthday } from './birthday'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -25,5 +26,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   roll_adv: handleRollAdv,
   mahjong_pair: handleMahjongPair,
   解答之书: handleBookOfAnswers,
-  每日塔羅: handleTarot
+  每日塔羅: handleTarot,
+  生日密碼: handleBirthday
 }

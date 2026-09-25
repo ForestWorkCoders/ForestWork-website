@@ -6,8 +6,8 @@ import { TAROT_SPREADS } from '../server/discord/assets/tarot-deck.ts'
 
 // 動態組裝 16 個下拉選單項
 const spreadChoices = Object.values(TAROT_SPREADS).map(s => ({
-  name: s.name,
-  value: s.id
+    name: s.name,
+    value: s.id
 }))
 
 if (!APP_ID || !BOT_TOKEN) {
@@ -154,6 +154,28 @@ const diceCommands = [
                 description: '你心中默想或想要占卜的問題 (可選)',
                 type: 3, // STRING
                 required: false
+            }
+        ]
+    },
+    {
+        name: '生日密碼',
+        description: '解密 366 天生日靈魂密碼與性格宿命',
+        options: [
+            {
+                name: 'month',
+                description: '出生月份 (1 ~ 12)',
+                type: 4, // INTEGER
+                required: true,
+                min_value: 1,
+                max_value: 12
+            },
+            {
+                name: 'day',
+                description: '出生日期 (1 ~ 31)',
+                type: 4, // INTEGER
+                required: true,
+                min_value: 1,
+                max_value: 31
             }
         ]
     }
