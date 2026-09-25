@@ -412,15 +412,26 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
       return { type: 4, data: { content: '⚠️ 請指定要刪除的角色名稱！', flags: 64 } }
     }
 
-    const { error } = await supabase
+    const { data:deletedRows, error } = await supabase
       .schema('trpg')
       .from('characters')
       .delete()
       .eq('discord_id', callerId)
       .eq('name', name)
+      .select()
 
     if (error) {
       return { type: 4, data: { content: `❌ 刪除失敗：${error.message}`, flags: 64 } }
+    }
+
+    if (!deletedRows || deletedRows.length === 0) {
+      return {
+        type: 4,
+        data: {
+          content: `⚠️ 刪除無效：閣下名下查無名為 **${name}** 的調查員！（你無法刪除其他玩家的角色卡）`,
+          flags: 64
+        }
+      }
     }
 
     return {
