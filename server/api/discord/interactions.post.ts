@@ -2,9 +2,10 @@ import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
 import { buildPagerResponse } from '../../discord/commands/demo-pager'
 import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
-import { renderQuasoLeaderboardPayload } from '../../discord/commands/leaderboard'
+import { renderCurseLeaderboardPayload } from '../../discord/commands/leaderboard'
 import { handleLinerBattleCommand, handleLinerBattleButton, handleLinerBattleModal } from '../../discord/commands/linerbattle'
 import { handleGiveQuasoContextMenu } from '../../discord/commands/quaso'
+import { renderQuasoLeaderboardPayload } from '../../discord/commands/leaderboard'
 
 export default defineEventHandler(async (event) => {
   const signature = getHeader(event, 'x-signature-ed25519')
@@ -109,6 +110,24 @@ export default defineEventHandler(async (event) => {
       return {
         type: 7,
         data: buildPagerResponse(targetPage)
+      }
+    }
+
+    if (customId === 'leaderboard_curse_switch') {
+      const selectedValue = message.data?.values?.[0] || '2026:count'
+      const [yearStr, modeStr] = selectedValue.split(':')
+      const targetYear = parseInt(yearStr || '2026', 10)
+      const targetMode = modeStr === 'ratio' ? 'ratio' : 'count'
+      
+      // 獲取當前點擊下拉選單的人的 ID (誰點就為誰顯示個人排位)
+      const clickerId = String(message.member?.user?.id || message.user?.id || '')
+
+      const payload = await renderCurseLeaderboardPayload(targetYear, targetMode, clickerId)
+
+      // ★★★ 核心好品味：回傳 type: 7 (UPDATE_MESSAGE)，無縫原地更新訊息，零刷屏！★★★
+      return {
+        type: 7,
+        data: payload
       }
     }
 
