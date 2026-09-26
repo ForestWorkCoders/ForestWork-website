@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
 import { buildPagerResponse } from '../../discord/commands/demo-pager'
 import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
+import { renderQuasoLeaderboardPayload } from '../../discord/commands/leaderboard'
 import { handleLinerBattleCommand, handleLinerBattleButton, handleLinerBattleModal } from '../../discord/commands/linerbattle'
 import { handleGiveQuasoContextMenu } from '../../discord/commands/quaso'
 
@@ -109,6 +110,13 @@ export default defineEventHandler(async (event) => {
         type: 7,
         data: buildPagerResponse(targetPage)
       }
+    }
+
+    if (customId === 'leaderboard_quaso_switch') {
+      const selectedMode = (message.data?.values?.[0] || 'received') as 'received' | 'sent'
+      const clickerId = String(message.member?.user?.id || message.user?.id || '')
+      const payload = await renderQuasoLeaderboardPayload(selectedMode, clickerId)
+      return { type: 7, data: payload }
     }
 
     return {

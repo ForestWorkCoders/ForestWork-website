@@ -11,61 +11,49 @@ function getSupabase() {
  */
 export async function handleGiveQuasoContextMenu(interaction: any, event: H3Event) {
   const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
+  const callerName = interaction.member?.nick || interaction.member?.user?.global_name || interaction.user?.username || '熱心群友'
   const targetId = String(interaction.data?.target_id || '')
 
+  // 從 resolved 記憶體直接取得目標真實名稱
+  const resolvedMember = interaction.data?.resolved?.members?.[targetId]
+  const resolvedUser = interaction.data?.resolved?.users?.[targetId]
+  const targetName = resolvedMember?.nick || resolvedUser?.global_name || resolvedUser?.username || '神秘群友'
+
   if (!callerId || !targetId) {
-    return {
-      type: 4,
-      data: { content: '❌ 無法解析贈送者或目標使用者身分。', flags: 64 }
-    }
+    return { type: 4, data: { content: '❌ 無法解析贈送者或目標身分。', flags: 64 } }
   }
 
   const supabase = getSupabase()
-
-  // 1. 呼叫在 Supabase 定義的原子儲存程序
   const { data: result, error } = await supabase.rpc('give_quaso', {
     p_giver_id: callerId,
+    p_giver_name: callerName,
     p_receiver_id: targetId,
+    p_receiver_name: targetName,
     p_amount: 1
   })
 
   if (error) {
-    console.error('[Quaso RPC Error]:', error)
-    return {
-      type: 4,
-      data: { content: `❌ 贈送失敗，資料庫異常：${error.message}`, flags: 64 }
-    }
+    return { type: 4, data: { content: `❌ 投遞失敗，資料庫異常：${error.message}`, flags: 64 } }
   }
 
-  // 2. 業務失敗 (例如：送給自己、今日額度已用光) ➔ 僅自己可見 (flags: 64)，不刷屏公屏
   if (!result?.success) {
-    return {
-      type: 4,
-      data: {
-        content: result?.message || '🛑 贈送失敗！',
-        flags: 64 // 僅點擊者本人看得到錯誤原因
-      }
-    }
+    return { type: 4, data: { content: result?.message || '🛑 投遞失敗！', flags: 64 } }
   }
 
-  // 3. 業務成功 ➔ 在公屏發布精美戰報，全伺服器見證！
   return {
     type: 4,
     data: {
       embeds: [{
-        title: '🥐 每日 Quaso 能量投遞！',
+        title: '🥐 Quaso 能量投遞成功！',
         description: [
-          `<@${callerId}> 贈送了 **1** 枚 🥐 給 <@${targetId}>！`,
+          `<@${callerId}> 投遞了 **1** 枚香脆的 🥐 給 <@${targetId}>！`,
           '',
-          `*「美味的 Quaso 代表著社群的肯定與羈絆。」*`,
+          `*「Quaso 代表著林間小鎮最純粹的敬意與羈絆。」*`,
           '',
-          `📊 <@${callerId}> 今日剩餘額度：\`${result.remaining}/3\` 枚`
+          `📊 <@${callerId}> 今日剩餘可用額度：\`${result.remaining}/3\` 枚`
         ].join('\n'),
-        color: 0xF39C12, // 溫暖的 Quaso 金黃色
-        footer: {
-          text: '林間小鎮 社交激勵系統 · 每日午夜自動刷新額度',
-          icon_url: 'https://i.imgur.com/cu2YAkn.png'
-        },
+        color: 0xE67E22, // 烘焙金黃色
+        footer: { text: '每日午夜 00:00 自動刷新額度 · 輸入 /leaderboard quaso 查看榜單' },
         timestamp: new Date().toISOString()
       }]
     }
