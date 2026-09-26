@@ -18,6 +18,7 @@ import { handleCocMake } from './coc-make'
 import { handleCardCommand } from './card'
 import { handleSc } from './sc'
 import { handleLeaderboardCommand } from './leaderboard'
+import { handleLinerBattleCommand } from './linerbattle'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -39,5 +40,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   en: handleCocGrowth,
   coc_make: handleCocMake,
   card: handleCardCommand,
-  leaderboard: handleLeaderboardCommand
+  leaderboard: handleLeaderboardCommand,
+  lb: handleLinerBattleCommand
 }

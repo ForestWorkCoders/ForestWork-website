@@ -512,7 +512,27 @@ const forestCommands = [
                 ]
             }
         ]
-    }]
+    },
+    {
+      name: 'lb',
+      description: 'LinerBattle 經典數列位差對決遊戲',
+      options: [
+        {
+          name: 'challenge',
+          description: '向指定玩家發起 10 位數生死對決',
+          type: 1, // SUB_COMMAND
+          options: [
+            {
+              name: 'target',
+              description: '選擇對決的目標玩家',
+              type: 6, // USER
+              required: true
+            }
+          ]
+        }
+      ]
+    }
+]
 
 // 按 Guild 配置指令清单 (数据驱动，物理隔离)
 const guildConfigs = {

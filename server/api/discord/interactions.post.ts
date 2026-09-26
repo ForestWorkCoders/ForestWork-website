@@ -2,6 +2,8 @@ import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
 import { buildPagerResponse } from '../../discord/commands/demo-pager'
 import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
+import { handleLinerBattleCommand, handleLinerBattleButton, handleLinerBattleModal } from '../../discord/commands/linerbattle'
+
 
 export default defineEventHandler(async (event) => {
   const signature = getHeader(event, 'x-signature-ed25519')
@@ -53,6 +55,12 @@ export default defineEventHandler(async (event) => {
         return responsePayload
       }
 
+      if (commandName === 'lb') {
+        const responsePayload = await handleLinerBattleCommand(message, event)
+        console.log(`[Discord Card Response Delivered]: Type -> ${responsePayload?.type}`)
+        return responsePayload
+      }
+
       const handler = commandRegistry[commandName]
       if (handler) {
         return await handler(message, event)
@@ -79,6 +87,10 @@ export default defineEventHandler(async (event) => {
     const customId = message.data?.custom_id || ''
     setHeader(event, 'content-type', 'application/json')
 
+    if (customId.startsWith('lb_accept:') || customId.startsWith('lb_input:')) {
+      return await handleLinerBattleButton(message, event)
+    }
+
     // 匹配 pager 翻页事件: "pager:nav:<pageNumber>"
     if (customId.startsWith('pager:nav:')) {
       const targetPage = parseInt(customId.split(':')[2] || '1', 10)
@@ -103,6 +115,9 @@ export default defineEventHandler(async (event) => {
     }
     if (customId.startsWith('trpg_bio_modal:')) {
       return await handleCardBioModal(message, event)
+    }
+    if (customId.startsWith('lb_modal:')) {
+      return await handleLinerBattleModal(message, event)
     }
     return { type: 4, data: { content: '未處理的交互類型' } }
   }
