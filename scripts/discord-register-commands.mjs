@@ -536,6 +536,10 @@ const forestCommands = [
           type: 1 // SUB_COMMAND
         }
       ]
+    },
+    {
+      name: '🥐 送 1 個 Quaso',
+      type: 2
     }
 ]
 
