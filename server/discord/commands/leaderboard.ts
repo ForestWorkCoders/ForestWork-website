@@ -10,118 +10,56 @@ function getSupabase() {
  * 構造單一複合下拉選單 ActionRow (好品味：狀態自包含，當前選中項自動高亮 default: true)
  */
 export function buildCurseLeaderboardComponents(currentYear: number, currentMode: 'count' | 'ratio') {
-  const currentKey = `${currentYear}:${currentMode}`
-
-  const options = [
-    {
-      label: '2026 年度 · 口吐芬芳次數榜',
-      value: '2026:count',
-      description: '查看 2026 年度累計口吐芬芳總次數排行',
-      emoji: { name: '🔢' },
-      default: currentKey === '2026:count'
-    },
-    {
-      label: '2026 年度 · 芬芳濃度百分比榜',
-      value: '2026:ratio',
-      description: '查看 2026 年度口吐芬芳/發言比率排行 (低門檻防噪)',
-      emoji: { name: '📊' },
-      default: currentKey === '2026:ratio'
-    },
-    {
-      label: '2025 歷史 · 次數排行榜',
-      value: '2025:count',
-      description: '查看 2025 歷史全年度口吐芬芳總量榮譽榜',
-      emoji: { name: '🏛️' },
-      default: currentKey === '2025:count'
-    },
-    {
-      label: '2025 歷史 · 百分比排行榜',
-      value: '2025:ratio',
-      description: '查看 2025 歷史全年度芬芳濃度排行',
-      emoji: { name: '📜' },
-      default: currentKey === '2025:ratio'
-    },
-    {
-      label: '2024 歷史 · 次數排行榜',
-      value: '2024:count',
-      description: '查看 2024 歷史全年度口吐芬芳總量榮譽榜',
-      emoji: { name: '🏛️' },
-      default: currentKey === '2024:count'
-    },
-    {
-      label: '2024 歷史 · 百分比排行榜',
-      value: '2024:ratio',
-      description: '查看 2024 歷史全年度芬芳濃度排行',
-      emoji: { name: '📜' },
-      default: currentKey === '2024:ratio'
-    },
-    {
-      label: '2023 歷史 · 次數排行榜',
-      value: '2023:count',
-      description: '查看 2023 歷史全年度口吐芬芳總量榮譽榜',
-      emoji: { name: '🏛️' },
-      default: currentKey === '2023:count'
-    },
-    {
-      label: '2023 歷史 · 百分比排行榜',
-      value: '2023:ratio',
-      description: '查看 2023 歷史全年度芬芳濃度排行',
-      emoji: { name: '📜' },
-      default: currentKey === '2023:ratio'
-    },
-    {
-      label: '2022 歷史 · 次數排行榜',
-      value: '2022:count',
-      description: '查看 2022 歷史全年度口吐芬芳總量榮譽榜',
-      emoji: { name: '🏛️' },
-      default: currentKey === '2022:count'
-    },
-    {
-      label: '2022 歷史 · 百分比排行榜',
-      value: '2022:ratio',
-      description: '查看 2022 歷史全年度芬芳濃度排行',
-      emoji: { name: '📜' },
-      default: currentKey === '2022:ratio'
-    },
-    {
-      label: '2021 歷史 · 次數排行榜',
-      value: '2021:count',
-      description: '查看 2021 歷史全年度口吐芬芳總量榮譽榜',
-      emoji: { name: '🏛️' },
-      default: currentKey === '2021:count'
-    },
-    {
-      label: '2021 歷史 · 百分比排行榜',
-      value: '2021:ratio',
-      description: '查看 2021 歷史全年度芬芳濃度排行',
-      emoji: { name: '📜' },
-      default: currentKey === '2021:ratio'
-    },
-    {
-      label: '2020 歷史 · 次數排行榜',
-      value: '2020:count',
-      description: '查看 2020 歷史全年度口吐芬芳總量榮譽榜',
-      emoji: { name: '🏛️' },
-      default: currentKey === '2020:count'
-    },
-    {
-      label: '2020 歷史 · 百分比排行榜',
-      value: '2020:ratio',
-      description: '查看 2020 歷史全年度芬芳濃度排行',
-      emoji: { name: '📜' },
-      default: currentKey === '2020:ratio'
-    }
-  ]
+  // 可擴充的歷史年份清單 (乾淨線性，可輕鬆排到 2020 年)
+  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020]
 
   return [
+    // ---------------------------------------------------------
+    // Row 0: 模式切換下拉選單 (custom_id 攜帶當前年份)
+    // ---------------------------------------------------------
     {
       type: 1, // ACTION_ROW
       components: [
         {
           type: 3, // STRING_SELECT
-          custom_id: 'leaderboard_curse_switch',
-          placeholder: '⚡ 點擊切換年份或排行榜模式...',
-          options
+          custom_id: `curse_switch_mode:${currentYear}`,
+          placeholder: '📊 選擇統計維度 (次數榜 / 濃度百分比)...',
+          options: [
+            {
+              label: '口吐芬芳次數榜',
+              value: 'count',
+              description: '按累計粗口總次數由高到低排名',
+              emoji: { name: '🔢' },
+              default: currentMode === 'count'
+            },
+            {
+              label: '芬芳濃度百分比榜',
+              value: 'ratio',
+              description: '按粗口佔發言總量之百分比排名 (低門檻防噪)',
+              emoji: { name: '📈' },
+              default: currentMode === 'ratio'
+            }
+          ]
+        }
+      ]
+    },
+    // ---------------------------------------------------------
+    // Row 1: 年份切換下拉選單 (custom_id 攜帶當前模式)
+    // ---------------------------------------------------------
+    {
+      type: 1, // ACTION_ROW
+      components: [
+        {
+          type: 3, // STRING_SELECT
+          custom_id: `curse_switch_year:${currentMode}`,
+          placeholder: '📅 選擇統計年度...',
+          options: availableYears.map(year => ({
+            label: `${year} 年度數據`,
+            value: String(year),
+            description: year === 2026 ? '當前活躍統計年度 (進行中)' : `${year} 歷史歸檔數據`,
+            emoji: { name: year === 2026 ? '⚡' : '🏛️' },
+            default: year === currentYear
+          }))
         }
       ]
     }

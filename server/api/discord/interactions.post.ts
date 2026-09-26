@@ -96,6 +96,7 @@ export default defineEventHandler(async (event) => {
 
   if (message.type === 3) {
     const customId = message.data?.custom_id || ''
+    const clickerId = String(message.member?.user?.id || message.user?.id || '')
     setHeader(event, 'content-type', 'application/json')
 
     if (customId.startsWith('lb_accept:') || customId.startsWith('lb_input:') || customId.startsWith('lb_cancel:')) {
@@ -113,18 +114,26 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    if (customId === 'leaderboard_curse_switch') {
-      const selectedValue = message.data?.values?.[0] || '2026:count'
-      const [yearStr, modeStr] = selectedValue.split(':')
-      const targetYear = parseInt(yearStr || '2026', 10)
-      const targetMode = modeStr === 'ratio' ? 'ratio' : 'count'
-      
-      // 獲取當前點擊下拉選單的人的 ID (誰點就為誰顯示個人排位)
-      const clickerId = String(message.member?.user?.id || message.user?.id || '')
+    if (customId.startsWith('curse_switch_mode:') || customId.startsWith('curse_switch_year:')) {
+      const selectedValue = message.data?.values?.[0] || ''
+      let targetYear: number
+      let targetMode: 'count' | 'ratio'
 
+      if (customId.startsWith('curse_switch_mode:')) {
+        // 操作者變更了「模式」➔ 從 custom_id 提取既有的年份
+        targetYear = parseInt(customId.replace('curse_switch_mode:', ''), 10) || new Date().getFullYear()
+        targetMode = (selectedValue === 'ratio' ? 'ratio' : 'count')
+      } else {
+        // 操作者變更了「年份」➔ 從 custom_id 提取既有的模式
+        const preservedMode = customId.replace('curse_switch_year:', '')
+        targetMode = (preservedMode === 'ratio' ? 'ratio' : 'count')
+        targetYear = parseInt(selectedValue, 10) || new Date().getFullYear()
+      }
+
+      // 執行核心渲染純函數
       const payload = await renderCurseLeaderboardPayload(targetYear, targetMode, clickerId)
 
-      // ★★★ 核心好品味：回傳 type: 7 (UPDATE_MESSAGE)，無縫原地更新訊息，零刷屏！★★★
+      // 原地刷新卡片 (type: 7 UPDATE_MESSAGE)
       return {
         type: 7,
         data: payload
