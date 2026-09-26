@@ -487,15 +487,25 @@ const forestCommands = [
         name: 'leaderboard',
         description: '林間小鎮各項社群活動與數據排行榜',
         options: [
-            // 子指令 1: curse (當前已完成的粗口榜)
+            // 子指令 1: curse (當前已完成的口吐芬芳榜)
             {
                 name: 'curse',
-                description: '查看年度粗口排行榜 (每年 1 月 1 日重置)',
+                description: '查看年度口吐芬芳排行榜',
                 type: 1, // SUB_COMMAND
                 options: [
                     {
+                        name: 'mode',
+                        description: '排行榜類型 (預設為次數榜)',
+                        type: 3, // STRING
+                        required: false,
+                        choices: [
+                            { name: '次數排行榜 (Count)', value: 'count' },
+                            { name: '百分比排行榜 (Percentage)', value: 'ratio' }
+                        ]
+                    },
+                    {
                         name: 'year',
-                        description: '查詢特定年份 (選填，預設為當前年份)',
+                        description: '查詢特定年份 (選填)',
                         type: 4, // INTEGER
                         required: false
                     }
