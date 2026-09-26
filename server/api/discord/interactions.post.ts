@@ -87,7 +87,7 @@ export default defineEventHandler(async (event) => {
     const customId = message.data?.custom_id || ''
     setHeader(event, 'content-type', 'application/json')
 
-    if (customId.startsWith('lb_accept:') || customId.startsWith('lb_input:')) {
+    if (customId.startsWith('lb_accept:') || customId.startsWith('lb_input:') || customId.startsWith('lb_cancel:')) {
       return await handleLinerBattleButton(message, event)
     }
 
