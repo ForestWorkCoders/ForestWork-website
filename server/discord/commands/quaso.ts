@@ -23,6 +23,16 @@ export async function handleGiveQuasoContextMenu(interaction: any, event: H3Even
     return { type: 4, data: { content: '❌ 無法解析贈送者或目標身分。', flags: 64 } }
   }
 
+  if (resolvedUser?.bot) {
+    return {
+      type: 4,
+      data: {
+        content: `🤖 **機器人拒絕了你的 Quaso！**\n*「代碼只喝機油，不吃高碳水牛角包。把你的愛留給活著的群友吧！」*`,
+        flags: 64 // 僅點擊者本人可見，不污染公屏
+      }
+    }
+  }
+
   const supabase = getSupabase()
   const { data: result, error } = await supabase.rpc('give_quaso', {
     p_giver_id: callerId,
