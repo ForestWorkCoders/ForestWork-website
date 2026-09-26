@@ -1,9 +1,29 @@
-// scripts/backfill-curse-2025.mjs
+// scripts/backfill-curse.mjs
 import { createClient } from '@supabase/supabase-js'
 
+// 1. 解析與驗證命令列傳入的年份參數
+const rawYear = process.argv[2]
+if (!rawYear || !/^\d{4}$/.test(rawYear)) {
+  console.error('❌ 請提供正確的 4 位數西元年份！')
+  console.error('👉 執行範例: node --env-file=.env scripts/backfill-curse.mjs 2024')
+  process.exit(1)
+}
+
+const TARGET_YEAR = parseInt(rawYear, 10)
+const NEXT_YEAR = TARGET_YEAR + 1
+
+// 2. 環境變數檢查
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
 const CHANNEL_ID = process.env.CURSE_TRACK_CHANNEL_ID
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+const SUPABASE_URL = process.env.SUPABASE_URL
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!DISCORD_BOT_TOKEN || !CHANNEL_ID || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ 缺少必要的環境變數，請確認 --env-file 檔案內容是否完整。')
+  process.exit(1)
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 // 粗口正則清單
 const CURSE_REGEX = /(fuck|shit|機掰|雞掰|78|靠邀|靠么|靠北|三小|殺小|3小|尛|你媽的|操|NMSL|CNMB|你媽逼|NMB|媽的|幹|E04|e04|屌|屄|幹你娘|操你媽|你媽死了|林老師勒|王八蛋|米蟲|賤貨|智障|敗類|白癡|北七|婊子|屎|下流|fk|fucking|fucker|nigga|niggas|nigger|老母|林北|林娘|白癡|智障|低能|腦殘|腦缺|腦癱|霍金|北七|87|靠杯|靠腰|靠夭|三洨|啥小|沙小|可悲|臥槽|窩操|王八蛋|wc|sb|傻逼|傻B|狗屎|去死|幹話|屁話|神經病|有病|皮炎|屁眼|p眼|迪克|nmsl|cnmb|nmb|死全家|死媽|死媽的|死你媽|死你全家|全家產|他喵的)/gi
@@ -23,16 +43,15 @@ function snowflakeToDate(id) {
   return new Date(timestamp).toISOString().split('T')[0]
 }
 
-async function runBackfill2025() {
-  console.log('🏛️ [Archive] 啟動 2022 全年度歷史數據歸檔引擎...')
+async function runBackfill(year) {
+  console.log(`🏛️ [Archive] 啟動 ${year} 全年度歷史數據歸檔引擎...`)
 
-  // ★ 好品味物理邊界：嚴格鎖定東八區 2025 年完整時間窗口
-  const START_SNOWFLAKE = dateToSnowflake('2020-01-01T00:00:00+08:00')
-  const END_SNOWFLAKE = dateToSnowflake('2021-01-01T00:00:00+08:00')
-  const TARGET_YEAR = 2020
+  // 嚴格鎖定東八區該年份的完整時間窗口 (從 1/1 00:00 到隔年 1/1 00:00)
+  const START_SNOWFLAKE = dateToSnowflake(`${year}-01-01T00:00:00+08:00`)
+  const END_SNOWFLAKE = dateToSnowflake(`${NEXT_YEAR}-01-01T00:00:00+08:00`)
 
-  console.log(`📍 起點 ID: ${START_SNOWFLAKE} (2020-01-01)`)
-  console.log(`🛑 終點 ID: ${END_SNOWFLAKE} (2021-01-01 截斷線)`)
+  console.log(`📍 起點 ID: ${START_SNOWFLAKE} (${year}-01-01)`)
+  console.log(`🛑 終點 ID: ${END_SNOWFLAKE} (${NEXT_YEAR}-01-01 截斷線)`)
 
   let lastId = START_SNOWFLAKE
   let totalMessagesProcessed = 0
@@ -79,9 +98,9 @@ async function runBackfill2025() {
     let batchNewestId = lastId
 
     for (const msg of messages) {
-      // ★★★ 核心安全防線：一旦消息時間邁入 2024 年，立刻終止！★★★
+      // 一旦消息時間跨入下一年，立即中斷
       if (BigInt(msg.id) >= BigInt(END_SNOWFLAKE)) {
-        console.log(`\n🛑 [Boundary Reached] 檢測到已抵達 2025-01-01 邊界訊息 (${msg.id})，立即安全剎車！`)
+        console.log(`\n🛑 [Boundary Reached] 檢測到抵達 ${NEXT_YEAR}-01-01 邊界訊息 (${msg.id})，立即安全剎車！`)
         isCompleted = true
         break
       }
@@ -112,12 +131,12 @@ async function runBackfill2025() {
       }
     }
 
-    // 原子累加至 Supabase (鎖定 TARGET_YEAR = 2024)
+    // 原子累加至 Supabase
     for (const [userId, data] of userBatchMap.entries()) {
       const { error: rpcErr } = await supabase.rpc('increment_curse_count', {
         p_user_id: userId,
         p_username: data.username,
-        p_year: TARGET_YEAR, // ★ 永遠只寫入 2024 分區
+        p_year: year,
         p_curse_delta: data.curseDelta,
         p_msg_delta: data.msgDelta
       })
@@ -133,10 +152,8 @@ async function runBackfill2025() {
     // 即時匯報進度
     const currentDate = snowflakeToDate(lastId)
     console.log(
-      `📊 [2024 歸檔進度] 日期: ${currentDate} | 累計處理: ${totalMessagesProcessed} 條 | 捕獲粗口: ${totalCurseDetected} 次`
+      `📊 [${year} 歸檔進度] 日期: ${currentDate} | 累計處理: ${totalMessagesProcessed} 條 | 捕獲粗口: ${totalCurseDetected} 次`
     )
-
-    // 注意：★ 這裡絕對沒有更新 trpg.sync_cursors 的代碼！絕不污染線上排程游標！
 
     if (messages.length < 100) {
       isCompleted = true
@@ -146,11 +163,11 @@ async function runBackfill2025() {
     await sleep(200) // 防禦節流
   }
 
-  console.log(`\n================ 2023 歸檔總結 ================`)
-  console.log(`✅ 掃描 2023 訊息總數: ${totalMessagesProcessed}`)
-  console.log(`✅ 捕獲 2023 粗口總數: ${totalCurseDetected}`)
-  console.log(`✅ 狀態: 成功永久歸檔至 2023 分區，線上 2024 游標毫髮無損`)
+  console.log(`\n================ ${year} 歸檔總結 ================`)
+  console.log(`✅ 掃描 ${year} 訊息總數: ${totalMessagesProcessed}`)
+  console.log(`✅ 捕獲 ${year} 粗口總數: ${totalCurseDetected}`)
+  console.log(`✅ 狀態: 成功永久歸檔至 ${year} 分區`)
   console.log(`==============================================`)
 }
 
-runBackfill2025().catch(console.error)
+runBackfill(TARGET_YEAR).catch(console.error)
