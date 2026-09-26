@@ -4,496 +4,520 @@ import type { H3Event } from 'h3'
 import { createClient } from '@supabase/supabase-js'
 
 function getSupabase() {
-    return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
+const MAX_HP = 100
+
 // -------------------------------------------------------------
-// 1. 核心演算法純函數 (位差傷害計算，零副作用)
+// 1. 純函數：生成 10 位數列與視覺血條
 // -------------------------------------------------------------
 
-/**
- * 產生 10 位純數字隨機字串 (例如 "4811023985")
- */
 export function generate10DigitSeq(): string {
-    return Array.from({ length: 10 }, () => crypto.randomInt(0, 10)).join('')
+  return Array.from({ length: 10 }, () => crypto.randomInt(0, 10)).join('')
 }
 
 /**
- * 計算位差傷害與回合扣血 (純數學運算)
+ * 繪製 ASCII 緊湊型血條 (例如: [██████░░░░] 60/100)
  */
-export function calculateLinerDamage(p1Seq: string, p2Seq: string, sysSeq: string) {
-    let p1Damage = 0
-    let p2Damage = 0
+export function renderHealthBar(hp: number, max: number = MAX_HP): string {
+  const clampedHp = Math.max(0, Math.min(max, hp))
+  const totalBars = 10
+  const filledBars = Math.round((clampedHp / max) * totalBars)
+  const emptyBars = totalBars - filledBars
+  const bar = '█'.repeat(filledBars) + '░'.repeat(emptyBars)
+  return `\`[${bar}]\` **${hp}**/${max}`
+}
 
-    for (let i = 0; i < 10; i++) {
-        const sysDigit = parseInt(sysSeq[i]!, 10)
-        const p1Digit = parseInt(p1Seq[i]!, 10)
-        const p2Digit = parseInt(p2Seq[i]!, 10)
+// -------------------------------------------------------------
+// 2. 核心演算法：Geoguessr 差額結算 + 精準命中回血 + 超載判定
+// -------------------------------------------------------------
 
-        p1Damage += Math.abs(p1Digit - sysDigit)
-        p2Damage += Math.abs(p2Digit - sysDigit)
+export interface RoundResolution {
+  p1Damage: number
+  p2Damage: number
+  p1Heal: number
+  p2Heal: number
+  p1ExactHits: number
+  p2ExactHits: number
+  damageMultiplier: number // 暴露實時倍率供卡片展示
+}
+
+export function calculateGeoguessrDamage(
+  p1Seq: string,
+  p2Seq: string,
+  sysSeq: string,
+  round: number
+): RoundResolution {
+  let p1Damage = 0
+  let p2Damage = 0
+  let p1Heal = 0
+  let p2Heal = 0
+  let p1ExactHits = 0
+  let p2ExactHits = 0
+
+  // ★ 好品味核心公式：前 2 回合 1.0x，自第 3 回合起每回合遞增 0.5x
+  const damageMultiplier = round <= 2 ? 1.0 : 1.0 + (round - 2) * 0.5
+
+  for (let i = 0; i < 10; i++) {
+    const sysDigit = parseInt(sysSeq[i]!, 10)
+    const p1Digit = parseInt(p1Seq[i]!, 10)
+    const p2Digit = parseInt(p2Seq[i]!, 10)
+
+    const err1 = Math.abs(p1Digit - sysDigit)
+    const err2 = Math.abs(p2Digit - sysDigit)
+
+    // 差額乘以動態狂暴倍率 (四捨五入取整)
+    if (err1 > err2) {
+      p1Damage += Math.round((err1 - err2) * damageMultiplier)
+    } else if (err2 > err1) {
+      p2Damage += Math.round((err2 - err1) * damageMultiplier)
     }
 
-    return { p1Damage, p2Damage }
+    // 精準命中回血 (回血保持原值，不乘倍率，避免數值膨脹)
+    if (err1 === 0) {
+      p1Heal += sysDigit
+      p1ExactHits++
+    }
+    if (err2 === 0) {
+      p2Heal += sysDigit
+      p2ExactHits++
+    }
+  }
+
+  return { p1Damage, p2Damage, p1Heal, p2Heal, p1ExactHits, p2ExactHits, damageMultiplier }
 }
 
 // -------------------------------------------------------------
-// 2. 卡片視圖組裝器 (完美復刻懷舊戰報排版)
+// 3. 卡片視圖組裝器
 // -------------------------------------------------------------
 
 export function buildLinerBattleEmbed(battle: any) {
-    const isFinished = battle.status === 'FINISHED'
-    const isWaitingInput = battle.status === 'WAITING_INPUT'
+  const isFinished = battle.status === 'FINISHED'
+  const isWaitingInput = battle.status === 'WAITING_INPUT'
 
-    // 回合進行中時，未結算前隱藏雙方具體數列
-    const p1SeqDisplay = isFinished ? battle.p1_seq : (battle.p1_seq ? '✅ 已提交 (保密中)' : '⏳ 等待輸入...')
-    const p2SeqDisplay = isFinished ? battle.p2_seq : (battle.p2_seq ? '✅ 已提交 (保密中)' : '⏳ 等待輸入...')
-    const sysSeqDisplay = isFinished ? `\`${battle.system_seq}\`` : '❓ (雙方提交後揭曉)'
+  const p1SeqDisplay = isFinished ? `\`${battle.p1_seq}\`` : (battle.p1_seq ? '✅ 已提交 (保密中)' : '⏳ 等待輸入...')
+  const p2SeqDisplay = isFinished ? `\`${battle.p2_seq}\`` : (battle.p2_seq ? '✅ 已提交 (保密中)' : '⏳ 等待輸入...')
+  const sysSeqDisplay = isFinished ? `\`${battle.system_seq}\`` : '❓ (雙方提交後揭曉)'
 
-    let outcomeText = ''
-    if (isFinished) {
-        if (battle.p1_hp <= 0 && battle.p2_hp <= 0) {
-            outcomeText = '\n\n⚖️ **雙方同歸於盡！平局！**'
-        } else if (battle.p1_hp <= 0) {
-            outcomeText = `\n\n🏆 **${battle.p2_name} 獲勝！**\n💀 ${battle.p1_name} 已陣亡。`
-        } else {
-            outcomeText = `\n\n🏆 **${battle.p1_name} 獲勝！**\n💀 ${battle.p2_name} 已陣亡。`
-        }
+  let outcomeText = ''
+  if (isFinished) {
+    if (battle.p1_hp <= 0 && battle.p2_hp <= 0) {
+      outcomeText = '\n\n⚖️ **雙方同歸於盡！平局！**'
+    } else if (battle.p1_hp <= 0) {
+      outcomeText = `\n\n🏆 **${battle.p2_name} 獲勝！**\n💀 ${battle.p1_name} 生命耗盡陣亡。`
+    } else {
+      outcomeText = `\n\n🏆 **${battle.p1_name} 獲勝！**\n💀 ${battle.p2_name} 生命耗盡陣亡。`
     }
+  }
 
-    const description = [
-        `⚔️ **${battle.p1_name}** vs **${battle.p2_name || '等待挑戰者...'}**`,
-        '',
-        `**系統數列**\n${sysSeqDisplay}`,
-        '',
-        `**P1 數列 (${battle.p1_name})** ｜ **目前血量**: \`${battle.p1_hp}\``,
-        `${p1SeqDisplay}`,
-        '',
-        `**P2 數列 (${battle.p2_name || '待定'})** ｜ **目前血量**: \`${battle.p2_hp}\``,
-        `${p2SeqDisplay}`,
-        outcomeText,
-        `\n\`LB=${battle.id}\` · 第 ${battle.round} 回合`
-    ].join('\n')
+  const currentMult = battle.round <= 2 ? 1.0 : 1.0 + (battle.round - 2) * 0.5
+  const multBadge = currentMult > 1.0 
+    ? `🔥 **[狂暴倍率生效中 · 傷害 ${currentMult}x！]**\n` 
+    : '🛡️ **[基礎對決階段 · 傷害 1.0x]**\n'
 
-    return {
-        title: '🎮 LinerBattle 數列對決',
-        description,
-        color: isFinished ? 0xE74C3C : (isWaitingInput ? 0x3498DB : 0xF1C40F),
-        footer: {
-            text: '林間小鎮 經典對決重製版 · 依據位差絕對值結算傷害',
-            icon_url: 'https://i.imgur.com/cu2YAkn.png'
-        },
-        timestamp: new Date().toISOString()
-    }
+  const description = [
+    multBadge,
+    `⚔️ **${battle.p1_name}** vs **${battle.p2_name || '等待挑戰者...'}**`,
+    '',
+    `**系統數列**\n${sysSeqDisplay}`,
+    '',
+    `**P1 (${battle.p1_name})**`,
+    `生命值: ${renderHealthBar(battle.p1_hp)}`,
+    `數列狀態: ${p1SeqDisplay}`,
+    '',
+    `**P2 (${battle.p2_name || '待定'})**`,
+    `生命值: ${renderHealthBar(battle.p2_hp)}`,
+    `數列狀態: ${p2SeqDisplay}`,
+    outcomeText,
+    `\n\`LB=${battle.id}\` · 第 ${battle.round} 回合`
+  ].join('\n')
+
+  return {
+    title: '🎮 LinerBattle 數列對決 (Geoguessr 規則版)',
+    description,
+    color: isFinished ? 0xE74C3C : (isWaitingInput ? 0x3498DB : 0xF1C40F),
+    footer: {
+      text: '位差差額承受傷害 · 精準命中獲取等額回血 · 上限 100 HP',
+      icon_url: 'https://i.imgur.com/cu2YAkn.png'
+    },
+    timestamp: new Date().toISOString()
+  }
 }
 
-/**
- * 根據對戰狀態動態構建按鈕組件
- */
 export function buildLinerBattleComponents(battle: any) {
-    if (battle.status === 'WAITING_ACCEPT') {
-        return [
-            {
-                type: 1, // ACTION_ROW
-                components: [
-                    {
-                        type: 2, // BUTTON
-                        custom_id: `lb_accept:${battle.id}`,
-                        label: '⚔️ 接受對決挑戰',
-                        style: 3 // SUCCESS (Green)
-                    },
-                    {
-                        type: 2, custom_id: `lb_cancel:${battle.id}`,
-                        label: '❌ 撤銷挑戰',
-                        style: 2 // SECONDARY (Grey)
-                    }
-                ]
-            }
+  if (battle.status === 'WAITING_ACCEPT') {
+    return [
+      {
+        type: 1,
+        components: [
+          { type: 2, custom_id: `lb_accept:${battle.id}`, label: '⚔️ 接受對決挑戰', style: 3 },
+          { type: 2, custom_id: `lb_cancel:${battle.id}`, label: '❌ 撤銷挑戰', style: 2 }
         ]
-    }
+      }
+    ]
+  }
 
-    if (battle.status === 'WAITING_INPUT') {
-        return [
-            {
-                type: 1,
-                components: [
-                    {
-                        type: 2,
-                        custom_id: `lb_input:${battle.id}`,
-                        label: '🔢 秘密輸入我的 10 位數列',
-                        style: 1 // PRIMARY (Blurple)
-                    },
-                    {
-                        type: 2, custom_id: `lb_cancel:${battle.id}`,
-                        label: '🏳️ 投降 / 放棄對決',
-                        style: 4 // DANGER (Red)
-                    }
-                ]
-            }
+  if (battle.status === 'WAITING_INPUT') {
+    return [
+      {
+        type: 1,
+        components: [
+          { type: 2, custom_id: `lb_input:${battle.id}`, label: '🔢 秘密輸入我的 10 位數列', style: 1 },
+          { type: 2, custom_id: `lb_cancel:${battle.id}`, label: '🏳️ 投降 / 放棄對決', style: 4 }
         ]
-    }
+      }
+    ]
+  }
 
-    // FINISHED 狀態不掛載按鈕
-    return []
+  return []
 }
 
 // -------------------------------------------------------------
-// 3. 指令入口: /lb challenge @user
+// 4. 指令入口: /lb challenge & /lb help
 // -------------------------------------------------------------
 
 export async function handleLinerBattleCommand(interaction: any, event: H3Event) {
-    const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
-    const callerName = interaction.member?.nick || interaction.member?.user?.global_name || interaction.user?.username || '調查員'
-    const subCommand = interaction.data?.options?.[0]?.name
-    const subOptions = interaction.data?.options?.[0]?.options || []
+  const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
+  const callerName = interaction.member?.nick || interaction.member?.user?.global_name || interaction.user?.username || '調查員'
+  const subCommand = interaction.data?.options?.[0]?.name
+  const subOptions = interaction.data?.options?.[0]?.options || []
 
-    if (subCommand === 'challenge') {
-        const targetUserId = subOptions.find((o: any) => o.name === 'target')?.value
-        if (!targetUserId) {
-            return { type: 4, data: { content: '⚠️ 請指定一位對決目標！', flags: 64 } }
-        }
+  // ★ 新增：規則說明指令 (/lb help)
+  if (subCommand === 'help') {
+    return {
+      type: 4,
+      data: {
+        embeds: [{
+          title: '📖 LinerBattle (數列對決) 遊戲規則說明',
+          description: [
+            '**【遊戲目標】**',
+            '雙方初始擁有 `100` 點生命值，透過猜測 10 位隨機數列進行位差博弈，先將對手生命削減至 0 者獲勝！',
+            '',
+            '**【核心結算機制】**',
+            '• **Geoguessr 差額傷害**：針對數列每一位（0~9），系統比對雙方與系統數字的誤差。只有**誤差較大的一方**會承受**雙方誤差之差值**的傷害！若誤差相同，則雙方均不受傷。',
+            '• **精準命中回血**：若在某一特定位置完全猜中系統數字（誤差為 0），閣下將**立即回復該數字等量之生命值**（例如猜中 9 回復 9 HP，生命上限 100）！',
+            '• **超載死鬥**：若大戰至第 4 回合仍未分勝負，將開啟超載狀態，所有位差傷害 **1.5 倍暴擊**！',
+            '• **動態狂暴倍率**：戰局拖延越久越危險！前 2 回合為 `1.0x` 基礎傷害；自第 3 回合起每回合提升 `+0.5x`（第 3 回合 `1.5x`、第 4 回合 `2.0x`、第 5 回合 `2.5x`...），差額傷害將呈指數級暴增！',
+            '',
+            '**【隱私與操作】**',
+            '點擊 `[🔢 秘密輸入我的 10 位數列]` 將彈出專屬輸入對話方塊，輸入完全保密，對手無法窺視。對局超過 10 分鐘無操作將自動作廢。'
+          ].join('\n'),
+          color: 0x9B59B6,
+          footer: { text: '林間小鎮 經典重製 · 純粹的博弈與數理交鋒' }
+        }]
+      }
+    }
+  }
 
-        if (targetUserId === callerId) {
-            return { type: 4, data: { content: '❌ 你不能挑戰你自己！請挑選另一位群友進行數列對決。', flags: 64 } }
-        }
-
-        const supabase = getSupabase()
-
-        // 建立新對戰記錄
-        const { data: battle, error } = await supabase
-            .schema('trpg')
-            .from('liner_battles')
-            .insert({
-                channel_id: String(interaction.channel_id || ''),
-                p1_id: callerId,
-                p1_name: callerName,
-                p2_id: targetUserId,
-                p2_name: '挑戰目標', // 接受時會刷新為真實暱稱
-                p1_hp: 100,
-                p2_hp: 100,
-                status: 'WAITING_ACCEPT'
-            })
-            .select()
-            .single()
-
-        if (error || !battle) {
-            console.error('[LB Create Error]:', error)
-            return { type: 4, data: { content: `❌ 發起對戰失敗：${error?.message || '內部錯誤'}`, flags: 64 } }
-        }
-
-        return {
-            type: 4,
-            data: {
-                content: `⚔️ <@${callerId}> 向 <@${targetUserId}> 發起了一場 **LinerBattle** 數列生死決鬥！`,
-                embeds: [buildLinerBattleEmbed(battle)],
-                components: buildLinerBattleComponents(battle)
-            }
-        }
+  if (subCommand === 'challenge') {
+    const targetUserId = subOptions.find((o: any) => o.name === 'target')?.value
+    if (!targetUserId) {
+      return { type: 4, data: { content: '⚠️ 請指定一位對決目標！', flags: 64 } }
+    }
+    if (targetUserId === callerId) {
+      return { type: 4, data: { content: '❌ 你不能挑戰你自己！', flags: 64 } }
     }
 
-    return { type: 4, data: { content: `⚠️ 未知的指令：${subCommand}`, flags: 64 } }
+    const supabase = getSupabase()
+    const { data: battle, error } = await supabase
+      .schema('trpg')
+      .from('liner_battles')
+      .insert({
+        channel_id: String(interaction.channel_id || ''),
+        p1_id: callerId,
+        p1_name: callerName,
+        p2_id: targetUserId,
+        p2_name: '挑戰目標',
+        p1_hp: 100,
+        p2_hp: 100,
+        status: 'WAITING_ACCEPT'
+      })
+      .select()
+      .single()
+
+    if (error || !battle) {
+      return { type: 4, data: { content: `❌ 發起對戰失敗：${error?.message}`, flags: 64 } }
+    }
+
+    return {
+      type: 4,
+      data: {
+        content: `⚔️ <@${callerId}> 向 <@${targetUserId}> 發起了一場 **LinerBattle** 數列生死對決！`,
+        embeds: [buildLinerBattleEmbed(battle)],
+        components: buildLinerBattleComponents(battle)
+      }
+    }
+  }
+
+  return { type: 4, data: { content: `⚠️ 未知指令：${subCommand}`, flags: 64 } }
 }
 
 // -------------------------------------------------------------
-// 4. 按鈕交互入口 (接受挑戰 / 打開輸入彈窗)
+// 5. 按鈕交互入口
 // -------------------------------------------------------------
 
 export async function handleLinerBattleButton(interaction: any, event: H3Event) {
-    const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
-    const callerName = interaction.member?.nick || interaction.member?.user?.global_name || interaction.user?.username || '調查員'
-    const customId = interaction.data?.custom_id || ''
-    const [action, battleIdStr] = customId.split(':')
-    const battleId = parseInt(battleIdStr, 10)
+  const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
+  const callerName = interaction.member?.nick || interaction.member?.user?.global_name || interaction.user?.username || '調查員'
+  const customId = interaction.data?.custom_id || ''
+  const [action, battleIdStr] = customId.split(':')
+  const battleId = parseInt(battleIdStr, 10)
 
-    const supabase = getSupabase()
-    const { data: battle, error } = await supabase
-        .schema('trpg')
-        .from('liner_battles')
-        .select('*')
-        .eq('id', battleId)
-        .maybeSingle()
+  const supabase = getSupabase()
+  const { data: battle, error } = await supabase
+    .schema('trpg')
+    .from('liner_battles')
+    .select('*')
+    .eq('id', battleId)
+    .maybeSingle()
 
-    if (error || !battle) {
-        return { type: 4, data: { content: '❌ 查無此對戰房間或對局已失效！', flags: 64 } }
+  if (error || !battle) {
+    return { type: 4, data: { content: '❌ 查無此對戰房間或對局已失效！', flags: 64 } }
+  }
+
+  // 惰性超時守衛 (10 分鐘)
+  const TIMEOUT_MS = 10 * 60 * 1000
+  const lastActiveTime = new Date(battle.updated_at || battle.created_at).getTime()
+  if ((Date.now() - lastActiveTime) > TIMEOUT_MS && battle.status !== 'FINISHED' && battle.status !== 'CANCELLED') {
+    await supabase.schema('trpg').from('liner_battles').update({ status: 'CANCELLED' }).eq('id', battleId)
+    return {
+      type: 7,
+      data: {
+        content: `⌛ 對決已超時！因超過 10 分鐘無操作，本場 LinerBattle (\`LB=${battle.id}\`) 已自動失效關閉。`,
+        embeds: [{ title: '🛑 LinerBattle 對決已超時', description: '閒置過久已被系統終止回收。', color: 0x95A5A6 }],
+        components: []
+      }
+    }
+  }
+
+  if (action === 'lb_cancel') {
+    if (callerId !== battle.p1_id && callerId !== battle.p2_id) {
+      return { type: 4, data: { content: '🛑 閣下並非本場對決成員！', flags: 64 } }
+    }
+    if (battle.status === 'FINISHED' || battle.status === 'CANCELLED') {
+      return { type: 4, data: { content: '⚠️ 該對決早已結束。', flags: 64 } }
     }
 
-    const TIMEOUT_MS = 10 * 60 * 1000 // 10 分鐘
-    const lastActiveTime = new Date(battle.updated_at || battle.created_at).getTime()
-    const isExpired = (Date.now() - lastActiveTime) > TIMEOUT_MS
+    await supabase.schema('trpg').from('liner_battles').update({ status: 'CANCELLED' }).eq('id', battleId)
+    const isWaitingAccept = battle.status === 'WAITING_ACCEPT'
+    const cancelMsg = isWaitingAccept
+      ? `🚫 <@${callerId}> 已撤銷本場挑戰。`
+      : `🏳️ <@${callerId}> 選擇了投降！本場對決終止。`
 
-    if (isExpired && battle.status !== 'FINISHED' && battle.status !== 'CANCELLED') {
-        await supabase
-            .schema('trpg')
-            .from('liner_battles')
-            .update({ status: 'CANCELLED' })
-            .eq('id', battleId)
+    return {
+      type: 7,
+      data: {
+        content: cancelMsg,
+        embeds: [{ title: '🛑 LinerBattle 對決已取消', description: `由 **${callerName}** 終止。\n代碼：\`LB=${battle.id}\``, color: 0x7F8C8D }],
+        components: []
+      }
+    }
+  }
 
-        return {
-            type: 7, // 原地更新卡片
-            data: {
-                content: `⌛ 對決已超時！因超過 10 分鐘無操作，本場 LinerBattle (\`LB=${battle.id}\`) 已自動失效關閉。`,
-                embeds: [{
-                    title: '🛑 LinerBattle 對決已超時',
-                    description: `本場對戰因閒置過久已被系統終止回收。`,
-                    color: 0x95A5A6
-                }],
-                components: [] // 清空所有按鈕
-            }
-        }
+  if (action === 'lb_accept') {
+    if (callerId !== battle.p2_id) {
+      return { type: 4, data: { content: '🛑 此挑戰並非發送給閣下！', flags: 64 } }
+    }
+    if (battle.status !== 'WAITING_ACCEPT') {
+      return { type: 4, data: { content: '⚠️ 該對決已被接受或進行中。', flags: 64 } }
     }
 
-    // -------------------------------------------------------------
-    // ★★★ 核心新增分支: 手動取消 / 投降 (lb_cancel) ★★★
-    // -------------------------------------------------------------
-    if (action === 'lb_cancel') {
-        // 只有 P1 或 P2 本人有權操作
-        if (callerId !== battle.p1_id && callerId !== battle.p2_id) {
-            return { type: 4, data: { content: '🛑 閣下並非本場對決成員，無權終止該局遊戲！', flags: 64 } }
-        }
+    const { data: updated, error: updateErr } = await supabase
+      .schema('trpg')
+      .from('liner_battles')
+      .update({
+        p2_name: callerName,
+        status: 'WAITING_INPUT',
+        system_seq: generate10DigitSeq()
+      })
+      .eq('id', battleId)
+      .select()
+      .single()
 
-        if (battle.status === 'FINISHED' || battle.status === 'CANCELLED') {
-            return { type: 4, data: { content: '⚠️ 該對決早已結束。', flags: 64 } }
-        }
-
-        // 更新為 CANCELLED
-        await supabase
-            .schema('trpg')
-            .from('liner_battles')
-            .update({ status: 'CANCELLED' })
-            .eq('id', battleId)
-
-        const isWaitingAccept = battle.status === 'WAITING_ACCEPT'
-        const cancelMsg = isWaitingAccept
-            ? `🚫 <@${callerId}> 已主動撤銷本場挑戰。` : `🏳️ <@${callerId}> 選擇了投降！本場 LinerBattle (\`LB=${battle.id}\`) 已被終止。`
-
-        return {
-            type: 7, // 原地更新公屏卡片
-            data: {
-                content: cancelMsg,
-                embeds: [{
-                    title: '🛑 LinerBattle 對決已取消',
-                    description: `本場對決已由 **${callerName}** 終止結算。\n房間代碼：\`LB=${battle.id}\``,
-                    color: 0x7F8C8D
-                }],
-                components: [] // 拔除按鈕
-            }
-        }
-    }
-    
-    // -----------------------------------------------------------
-    // 分支 A: 接受挑戰 (lb_accept)
-    // -----------------------------------------------------------
-    if (action === 'lb_accept') {
-        if (callerId !== battle.p2_id) {
-            return { type: 4, data: { content: '🛑 此挑戰並非發送給閣下，請勿代領對決！', flags: 64 } }
-        }
-
-        if (battle.status !== 'WAITING_ACCEPT') {
-            return { type: 4, data: { content: '⚠️ 該對決已被接受或已處於進行狀態。', flags: 64 } }
-        }
-
-        // 就地生成第一輪的系統數列
-        const initialSystemSeq = generate10DigitSeq()
-
-        const { data: updated, error: updateErr } = await supabase
-            .schema('trpg')
-            .from('liner_battles')
-            .update({
-                p2_name: callerName,
-                status: 'WAITING_INPUT',
-                system_seq: initialSystemSeq
-            })
-            .eq('id', battleId)
-            .select()
-            .single()
-
-        if (updateErr || !updated) {
-            return { type: 4, data: { content: `❌ 接受挑戰失敗：${updateErr?.message}`, flags: 64 } }
-        }
-
-        // ★ 就地更新公屏卡片
-        return {
-            type: 7, // UPDATE_MESSAGE
-            data: {
-                content: `⚔️ **${battle.p1_name}** vs **${callerName}** 的對決正式拉開帷幕！請雙方點擊按鈕秘密輸入數列！`,
-                embeds: [buildLinerBattleEmbed(updated)],
-                components: buildLinerBattleComponents(updated)
-            }
-        }
+    if (updateErr || !updated) {
+      return { type: 4, data: { content: `❌ 接受挑戰失敗：${updateErr?.message}`, flags: 64 } }
     }
 
-    // -----------------------------------------------------------
-    // 分支 B: 點擊輸入按鈕 ➔ 彈出 Modal (lb_input)
-    // -----------------------------------------------------------
-    if (action === 'lb_input') {
-        if (callerId !== battle.p1_id && callerId !== battle.p2_id) {
-            return { type: 4, data: { content: '🛑 閣下並非本場對局的參賽選手！', flags: 64 } }
-        }
+    return {
+      type: 7,
+      data: {
+        content: `⚔️ **${battle.p1_name}** vs **${callerName}** 的對決正式開始！請雙方秘密輸入數列！`,
+        embeds: [buildLinerBattleEmbed(updated)],
+        components: buildLinerBattleComponents(updated)
+      }
+    }
+  }
 
-        if (battle.status !== 'WAITING_INPUT') {
-            return { type: 4, data: { content: '⚠️ 當前對決不在數列輸入階段。', flags: 64 } }
-        }
-
-        // 檢查是否已提交過
-        const hasSubmitted = (callerId === battle.p1_id && battle.p1_seq) || (callerId === battle.p2_id && battle.p2_seq)
-        if (hasSubmitted) {
-            return { type: 4, data: { content: '✅ 閣下已經提交了本回合數列！請靜候對手提交完成。', flags: 64 } }
-        }
-
-        // ★ 彈出 Modal (僅自己可見)
-        return {
-            type: 9, // APPLICATION_MODAL
-            data: {
-                custom_id: `lb_modal:${battle.id}`,
-                title: `輸入 10 位數列 (LB=${battle.id})`,
-                components: [
-                    {
-                        type: 1,
-                        components: [
-                            {
-                                type: 4, // TEXT_INPUT
-                                custom_id: 'seq_input',
-                                label: '請輸入 10 位純數字 (例如: 1248961281)',
-                                style: 1, // Short
-                                min_length: 10,
-                                max_length: 10,
-                                required: true,
-                                placeholder: '1248961281'
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
+  if (action === 'lb_input') {
+    if (callerId !== battle.p1_id && callerId !== battle.p2_id) {
+      return { type: 4, data: { content: '🛑 閣下並非本場對局參賽者！', flags: 64 } }
+    }
+    if (battle.status !== 'WAITING_INPUT') {
+      return { type: 4, data: { content: '⚠️ 當前對決不在數列輸入階段。', flags: 64 } }
     }
 
-    return { type: 4, data: { content: '⚠️ 未知動作', flags: 64 } }
+    const hasSubmitted = (callerId === battle.p1_id && battle.p1_seq) || (callerId === battle.p2_id && battle.p2_seq)
+    if (hasSubmitted) {
+      return { type: 4, data: { content: '✅ 閣下已提交本輪數列！請靜候對手提交。', flags: 64 } }
+    }
+
+    return {
+      type: 9, // APPLICATION_MODAL
+      data: {
+        custom_id: `lb_modal:${battle.id}`,
+        title: `輸入 10 位數列 (LB=${battle.id})`,
+        components: [
+          {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                custom_id: 'seq_input',
+                label: '請輸入 10 位純數字 (例如: 1248961281)',
+                style: 1,
+                min_length: 10,
+                max_length: 10,
+                required: true,
+                placeholder: '1248961281'
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+
+  return { type: 4, data: { content: '⚠️ 未知動作', flags: 64 } }
 }
 
 // -------------------------------------------------------------
-// 5. Modal 提交處理 (寫入數列並在湊齊時原子結算)
+// 6. Modal 提交與 Geoguessr 差額傷害結算
 // -------------------------------------------------------------
 
 export async function handleLinerBattleModal(interaction: any, event: H3Event) {
-    const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
-    const customId = interaction.data?.custom_id || ''
-    const battleId = parseInt(customId.replace('lb_modal:', ''), 10)
-    const inputSeq = interaction.data?.components?.[0]?.components?.[0]?.value?.trim() || ''
+  const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
+  const customId = interaction.data?.custom_id || ''
+  const battleId = parseInt(customId.replace('lb_modal:', ''), 10)
+  const inputSeq = interaction.data?.components?.[0]?.components?.[0]?.value?.trim() || ''
 
-    // 格式校驗：必須是 10 位純數字
-    if (!/^\d{10}$/.test(inputSeq)) {
-        return { type: 4, data: { content: '❌ 輸入格式錯誤！必須是嚴格的 10 位純數字。', flags: 64 } }
-    }
+  if (!/^\d{10}$/.test(inputSeq)) {
+    return { type: 4, data: { content: '❌ 輸入格式錯誤！必須是嚴格的 10 位純數字。', flags: 64 } }
+  }
 
-    const supabase = getSupabase()
-    const { data: battle, error } = await supabase
-        .schema('trpg')
-        .from('liner_battles')
-        .select('*')
-        .eq('id', battleId)
-        .maybeSingle()
+  const supabase = getSupabase()
+  const { data: battle, error } = await supabase
+    .schema('trpg')
+    .from('liner_battles')
+    .select('*')
+    .eq('id', battleId)
+    .maybeSingle()
 
-    if (error || !battle) {
-        return { type: 4, data: { content: '❌ 對局已失效或查無此房間。', flags: 64 } }
-    }
+  if (error || !battle) {
+    return { type: 4, data: { content: '❌ 對局已失效或查無此房間。', flags: 64 } }
+  }
 
-    const isP1 = callerId === battle.p1_id
-    const isP2 = callerId === battle.p2_id
-    if (!isP1 && !isP2) {
-        return { type: 4, data: { content: '🛑 閣下不是本場參賽者！', flags: 64 } }
-    }
+  const isP1 = callerId === battle.p1_id
+  const isP2 = callerId === battle.p2_id
+  if (!isP1 && !isP2) {
+    return { type: 4, data: { content: '🛑 閣下非本場參賽者！', flags: 64 } }
+  }
 
-    // 記錄數列
-    const p1Seq = isP1 ? inputSeq : battle.p1_seq
-    const p2Seq = isP2 ? inputSeq : battle.p2_seq
+  const p1Seq = isP1 ? inputSeq : battle.p1_seq
+  const p2Seq = isP2 ? inputSeq : battle.p2_seq
 
-    // -----------------------------------------------------------
-    // 情況 1: 只有一人提交 ➔ 更新狀態，等待對手
-    // -----------------------------------------------------------
-    if (!p1Seq || !p2Seq) {
-        await supabase
-            .schema('trpg')
-            .from('liner_battles')
-            .update({
-                p1_seq: p1Seq,
-                p2_seq: p2Seq
-            })
-            .eq('id', battleId)
-
-        return {
-            type: 4,
-            data: {
-                content: `🔒 數列已安全接收！已成功提交數列 \`${inputSeq}\`，等待對手輸入完成後結算...`,
-                flags: 64 // 僅自己可見
-            }
-        }
-    }
-
-    // -----------------------------------------------------------
-    // 情況 2: 雙方皆已就位 ➔ 觸發原子傷害結算！
-    // -----------------------------------------------------------
-    const { p1Damage, p2Damage } = calculateLinerDamage(p1Seq, p2Seq, battle.system_seq)
-    const newP1Hp = battle.p1_hp - p1Damage
-    const newP2Hp = battle.p2_hp - p2Damage
-    const isGameOver = newP1Hp <= 0 || newP2Hp <= 0
-
-    const updatePayload: any = {
-        p1_seq: p1Seq,
-        p2_seq: p2Seq,
-        p1_hp: newP1Hp,
-        p2_hp: newP2Hp,
-        status: isGameOver ? 'FINISHED' : 'WAITING_INPUT'
-    }
-
-    // 若未結束，進入下一回合，清空數列並重刷系統數列
-    if (!isGameOver) {
-        updatePayload.round = battle.round + 1
-        updatePayload.p1_seq = null
-        updatePayload.p2_seq = null
-        updatePayload.system_seq = generate10DigitSeq()
-    }
-
-    const { data: finalBattle, error: updateErr } = await supabase
-        .schema('trpg')
-        .from('liner_battles')
-        .update(updatePayload)
-        .eq('id', battleId)
-        .select()
-        .single()
-
-    if (updateErr || !finalBattle) {
-        return { type: 4, data: { content: `❌ 結算失敗：${updateErr?.message}`, flags: 64 } }
-    }
-
-    // 構造結算戰報 Embed
-    const reportEmbed = {
-        title: '💥 LinerBattle 回合結算！',
-        description: [
-            `**系統數列**: \`${battle.system_seq}\``,
-            '',
-            `**P1 (${battle.p1_name})**: \`${p1Seq}\``,
-            `造成傷害: \`${p1Damage}\` ｜ 剩餘血量: \`${newP1Hp}\``,
-            '',
-            `**P2 (${battle.p2_name})**: \`${p2Seq}\``,
-            `造成傷害: \`${p2Damage}\` ｜ 剩餘血量: \`${newP2Hp}\``,
-            '',
-            isGameOver
-                ? (newP1Hp <= 0 && newP2Hp <= 0
-                    ? '⚖️ **雙方同歸於盡！平手！**'
-                    : (newP1Hp <= 0 ? `🏆 **${battle.p2_name} 獲勝！**\n💀 ${battle.p1_name} 已死亡。` : `🏆 **${battle.p1_name} 獲勝！**\n💀 ${battle.p2_name} 已死亡。`))
-                : `🔄 **雙方存活！已進入第 ${finalBattle.round} 回合，請繼續點擊按鈕輸入數列！**`
-        ].join('\n'),
-        color: isGameOver ? 0xE74C3C : 0x2ECC71,
-        footer: { text: `LB=${battle.id} · 回合結算完畢` }
-    }
-
-    // 告知提交者本人
+  // 情況 1: 僅一人提交
+  if (!p1Seq || !p2Seq) {
+    await supabase.schema('trpg').from('liner_battles').update({ p1_seq: p1Seq, p2_seq: p2Seq }).eq('id', battleId)
     return {
-        type: 4,
-        data: {
-            content: `💥 雙方數列提交完畢，已在頻道公屏完成結算！`,
-            embeds: [reportEmbed],
-            components: buildLinerBattleComponents(finalBattle)
-        }
+      type: 4,
+      data: {
+        content: `🔒 數列已安全接收！已成功提交數列 \`${inputSeq}\`，等待對手輸入完成後結算...`,
+        flags: 64
+      }
     }
+  }
+
+  // 情況 2: ★★★ 雙方數列就緒，執行 Geoguessr 差額運算 ★★★
+  const res = calculateGeoguessrDamage(p1Seq, p2Seq, battle.system_seq, battle.round)
+
+  // 結算生命值：減去受到的差額傷害，加上精準命中回血，上限鎖定 MAX_HP (100)
+  const newP1Hp = Math.min(MAX_HP, battle.p1_hp - res.p1Damage + res.p1Heal)
+  const newP2Hp = Math.min(MAX_HP, battle.p2_hp - res.p2Damage + res.p2Heal)
+  const isGameOver = newP1Hp <= 0 || newP2Hp <= 0
+
+  const multTitle = res.damageMultiplier > 1.0 
+    ? `⚡ **[第 ${battle.round} 回合 · 狂暴倍率 ${res.damageMultiplier}x 生效！]**\n` 
+    : `🛡️ **[第 ${battle.round} 回合 · 基礎 1.0x 傷害]**\n`
+
+  const updatePayload: any = {
+    p1_seq: p1Seq,
+    p2_seq: p2Seq,
+    p1_hp: newP1Hp,
+    p2_hp: newP2Hp,
+    status: isGameOver ? 'FINISHED' : 'WAITING_INPUT'
+  }
+
+  if (!isGameOver) {
+    updatePayload.round = battle.round + 1
+    updatePayload.p1_seq = null
+    updatePayload.p2_seq = null
+    updatePayload.system_seq = generate10DigitSeq()
+  }
+
+  const { data: finalBattle, error: updateErr } = await supabase
+    .schema('trpg')
+    .from('liner_battles')
+    .update(updatePayload)
+    .eq('id', battleId)
+    .select()
+    .single()
+
+  if (updateErr || !finalBattle) {
+    return { type: 4, data: { content: `❌ 結算失敗：${updateErr?.message}`, flags: 64 } }
+  }
+
+  // 構造回合戰報詳情
+  const p1StatusNote = [
+    res.p1Damage > 0 ? `承受差額傷害 \`-${res.p1Damage}\`` : '✨ 完勝對手 (未受傷)',
+    res.p1Heal > 0 ? `🎯 精準命中 ${res.p1ExactHits} 位 (\`+${res.p1Heal} HP\`)` : ''
+  ].filter(Boolean).join(' ｜ ')
+
+  const p2StatusNote = [
+    res.p2Damage > 0 ? `承受差額傷害 \`-${res.p2Damage}\`` : '✨ 完勝對手 (未受傷)',
+    res.p2Heal > 0 ? `🎯 精準命中 ${res.p2ExactHits} 位 (\`+${res.p2Heal} HP\`)` : ''
+  ].filter(Boolean).join(' ｜ ')
+
+  const reportEmbed = {
+    title: '💥 LinerBattle 回合結算戰報',
+    description: [
+      multTitle,
+      `**本輪系統數列**: \`${battle.system_seq}\``,
+      '',
+      `**P1 (${battle.p1_name})**: \`${p1Seq}\``,
+      `結算: ${p1StatusNote}`,
+      `生命: ${renderHealthBar(newP1Hp)}`,
+      '',
+      `**P2 (${battle.p2_name})**: \`${p2Seq}\``,
+      `結算: ${p2StatusNote}`,
+      `生命: ${renderHealthBar(newP2Hp)}`,
+      '',
+      isGameOver
+        ? (newP1Hp <= 0 && newP2Hp <= 0
+            ? '⚖️ **雙方同歸於盡！這是一場壯烈的平局！**'
+            : (newP1Hp <= 0 ? `🏆 **${battle.p2_name} 獲勝！**\n💀 ${battle.p1_name} 已死亡。` : `🏆 **${battle.p1_name} 獲勝！**\n💀 ${battle.p2_name} 已死亡。`))
+        : `🔄 **雙方存活！已進入第 ${finalBattle.round} 回合，請繼續點擊按鈕輸入數列！**`
+    ].join('\n'),
+    color: isGameOver ? 0xE74C3C : 0x2ECC71,
+    footer: { text: `LB=${battle.id} · Geoguessr 差額結算完畢` }
+  }
+
+  return {
+    type: 4,
+    data: {
+      content: `💥 雙方數列提交完畢，已在頻道公屏完成結算！`,
+      embeds: [reportEmbed],
+      components: buildLinerBattleComponents(finalBattle)
+    }
+  }
 }

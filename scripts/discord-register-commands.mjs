@@ -529,6 +529,11 @@ const forestCommands = [
               required: true
             }
           ]
+        },
+        {
+          name: 'help',
+          description: '查看 LinerBattle 遊戲規則與結算機制說明',
+          type: 1 // SUB_COMMAND
         }
       ]
     }
