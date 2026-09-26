@@ -286,7 +286,7 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
       color: isReceived ? 0xE67E22 : 0xF1C40F,
       footer: {
         text: '林間小鎮 社交激勵系統 · 對成員右鍵點選「Apps ➔ 🥐 送 1 個 Quaso」即可投遞',
-        icon_url: 'https://i.imgur.com/cu2YAkn.png'
+        // icon_url: 'https://i.imgur.com/cu2YAkn.png'
       },
       timestamp: new Date().toISOString()
     }],
