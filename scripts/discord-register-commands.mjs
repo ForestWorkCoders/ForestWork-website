@@ -434,22 +434,22 @@ const cocCommands = [
         ]
     },
     {
-      name: 'sc',
-      description: 'CoC 7版理智檢定 (自動判定、擲骰損失並扣除角色卡 SAN)',
-      options: [
-        {
-          name: 'exp',
-          description: '理智損失表達式 (格式：成功損失/失敗損失，例如：0/1d6, 1/1d4, 1/3)',
-          type: 3, // STRING
-          required: true
-        },
-        {
-          name: 'current',
-          description: '手動指定當前理智值 (選填，預設自動讀取出戰角色卡)',
-          type: 4, // INTEGER
-          required: false
-        }
-      ]
+        name: 'sc',
+        description: 'CoC 7版理智檢定 (自動判定、擲骰損失並扣除角色卡 SAN)',
+        options: [
+            {
+                name: 'exp',
+                description: '理智損失表達式 (格式：成功損失/失敗損失，例如：0/1d6, 1/1d4, 1/3)',
+                type: 3, // STRING
+                required: true
+            },
+            {
+                name: 'current',
+                description: '手動指定當前理智值 (選填，預設自動讀取出戰角色卡)',
+                type: 4, // INTEGER
+                required: false
+            }
+        ]
     }
 ]
 
@@ -482,10 +482,32 @@ const mahjongCommands = [{
     ]
 }]
 
+const forestCommands = [
+    {
+        name: 'leaderboard',
+        description: '林間小鎮各項社群活動與數據排行榜',
+        options: [
+            // 子指令 1: curse (當前已完成的粗口榜)
+            {
+                name: 'curse',
+                description: '查看年度粗口排行榜 (每年 1 月 1 日重置)',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'year',
+                        description: '查詢特定年份 (選填，預設為當前年份)',
+                        type: 4, // INTEGER
+                        required: false
+                    }
+                ]
+            }
+        ]
+    }]
+
 // 按 Guild 配置指令清单 (数据驱动，物理隔离)
 const guildConfigs = {
     // 林間小鎮
-    '510192195509157909': [...commonCommands, ...diceCommands, ...mahjongCommands],
+    '510192195509157909': [...commonCommands, ...diceCommands, ...mahjongCommands, ...forestCommands],
 
     // 血之秘儀
     '912673754696548365': [...commonCommands, ...diceCommands, ...cocCommands]
