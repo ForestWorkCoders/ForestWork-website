@@ -162,6 +162,8 @@ function handleTabComplete(e: KeyboardEvent) {
         return
     }
 
+    matches.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+
     // 计算替换基准：当前命令除最后一个 token 外的前缀字符串
     const baseCmd = endsWithSpace
         ? rawCmd
@@ -186,7 +188,7 @@ function handleTabComplete(e: KeyboardEvent) {
         } else {
             // 像标准终端一样回显输入并列出候选项
             appendHistory(`guest@forestwork:${currentPathStr.value}$ ${rawCmd}`, 'input')
-            const formatted = matches.sort().map(name => {
+            const formatted = matches.map(name => {
                 const isDir = parentNode.children?.[name]?.type === 'dir'
                 return isDir ? `${name}/` : name
             })
@@ -573,7 +575,7 @@ const commands: Record<string, (args: string[]) => void> = {
         }
 
         // 3. 核心好品味：基于数据结构过滤，而不是业务判断
-        let entries = Object.keys(targetNode.children)
+        let entries = Object.keys(targetNode.children || {})
 
         if (!showAll) {
             // 默认过滤掉所有以 . 开头的隐藏项
@@ -585,8 +587,10 @@ const commands: Record<string, (args: string[]) => void> = {
             return
         }
 
+        entries.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+
         // 格式化输出：目录追加 /，并保持排序
-        const formatted = entries.sort().map(name => {
+        const formatted = entries.map(name => {
             const isDir = targetNode.children?.[name]?.type === 'dir'
             return isDir ? `${name}/` : name
         })
