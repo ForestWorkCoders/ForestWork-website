@@ -12,6 +12,7 @@ interface VFSNode {
 }
 
 const CURRENT_OPERATOR = 'operator_10001'
+const knownChallengeIds = ref<Set<string>>(new Set())
 
 // ==========================================
 // 1. 历史命令栈状态（Command History Buffer）
@@ -286,20 +287,24 @@ function getCurrentNode(): VFSNode {
 // ==========================================
 async function hydrateChallenges(): Promise<string[]> {
     try {
-        // ★ 带上当前操作员身份
         const data = await $fetch<any[]>('/api/ctf/challenges', {
             params: { operator: CURRENT_OPERATOR }
         })
-        if (!data || !vfs['challenges']?.children) return []
+        if (!data || !vfs['challenges']) return []
 
+        // ★ 核心好品味：水合前彻底清空旧挂载，消灭任何 HMR 或旧迭代残留的脏目录！
+        vfs['challenges'].children = {}
         const challengesRoot = vfs['challenges'].children
         const loadedIds: string[] = []
 
         data.forEach((c) => {
-            const dirName = c.id
-            loadedIds.push(dirName)
-            const cleanPrompt = (c.prompt || c.description || '').replace(/\\n/g, '\n')
+            // 防呆校验：禁止空 ID 或只有斜杠的非法题目
+            if (!c.id || typeof c.id !== 'string') return
+            
+            const cleanId = c.id.trim().replace(/^\/+|\/+$/g, '') // 剥离首尾多余斜杠
+            loadedIds.push(cleanId)
 
+            const cleanPrompt = (c.prompt || c.description || '').replace(/\\n/g, '\n')
             const childrenNodes: Record<string, VFSNode> = {
                 'prompt.txt': {
                     type: 'file',
@@ -307,78 +312,65 @@ async function hydrateChallenges(): Promise<string[]> {
                 }
             }
 
-            if (c.files && typeof c.files === 'object') {
-                for (const [filename, val] of Object.entries(c.files)) {
-                    if (typeof val === 'string') {
-                        const trimmedVal = val.trim()
-                        if (/\.url$/i.test(filename)) {
-                            childrenNodes[filename] = { type: 'file', content: trimmedVal, artifactUrl: trimmedVal, isBinary: false }
-                        } else if (/^https?:\/\//i.test(trimmedVal)) {
-                            childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: trimmedVal }
-                        } else {
-                            childrenNodes[filename] = { type: 'file', content: val.replace(/\\n/g, '\n') }
-                        }
-                    } else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
-                        childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: (val as any).artifact_url }
+            // 通用 mkdir -p 算法向下穿透
+            const segments = cleanId.split('/')
+            let currentCursor = challengesRoot // 每次迭代必须严格从根游标出发！
+
+            for (let i = 0; i < segments.length - 1; i++) {
+                const seg = segments[i]
+                if (!currentCursor[seg] || currentCursor[seg].type !== 'dir') {
+                    currentCursor[seg] = {
+                        type: 'dir',
+                        children: {}
                     }
                 }
+                currentCursor = currentCursor[seg].children!
             }
 
-            data.forEach((c) => {
-                const cleanPrompt = (c.prompt || c.description || '').replace(/\\n/g, '\n')
-
-                // 1. 构建该关卡节点专属的文件与物料
-                const childrenNodes: Record<string, VFSNode> = {
-                    'prompt.txt': {
-                        type: 'file',
-                        content: `[${c.title}]\nCATEGORY: ${c.category}\nCURRENT_VALUE: ${c.current_points} pts\nSOLVES: ${c.solve_count}\n\n${cleanPrompt}`
-                    }
-                }
-
-                if (c.files && typeof c.files === 'object') {
-                    for (const [filename, val] of Object.entries(c.files)) {
-                        if (typeof val === 'string') {
-                            const trimmedVal = val.trim()
-                            const isHttp = /^https?:\/\//i.test(trimmedVal)
-                            const isUrlShortcut = /\.url$/i.test(filename)
-
-                            if (isUrlShortcut) {
-                                childrenNodes[filename] = { type: 'file', content: trimmedVal, artifactUrl: trimmedVal, isBinary: false }
-                            } else if (isHttp) {
-                                childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: trimmedVal }
-                            } else {
-                                childrenNodes[filename] = { type: 'file', content: val.replace(/\\n/g, '\n') }
-                            }
-                        } else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
-                            childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: (val as any).artifact_url }
-                        }
-                    }
-                }
-
-                // 2. ★ 核心好品味：通用 mkdir -p 算法，原生支持任意深度嵌套（如 week-9/part-1）
-                const segments = c.id.split('/')
-                let currentCursor = challengesRoot
-
-                // 逐级向下穿透，中间不存在的父目录自动创建
-                for (let i = 0; i < segments.length - 1; i++) {
-                    const seg = segments[i]
-                    if (!currentCursor[seg] || currentCursor[seg].type !== 'dir') {
-                        currentCursor[seg] = {
-                            type: 'dir',
-                            children: {}
-                        }
-                    }
-                    currentCursor = currentCursor[seg].children!
-                }
-
-                // 将实际关卡挂载在路径的最末端叶子节点上
-                const leafName = segments[segments.length - 1]
+            const leafName = segments[segments.length - 1]
+            if (!currentCursor[leafName] || currentCursor[leafName].type !== 'dir') {
                 currentCursor[leafName] = {
                     type: 'dir',
                     children: childrenNodes
                 }
-            })
+            } else {
+                currentCursor[leafName].children = {
+                    ...currentCursor[leafName].children,
+                    ...childrenNodes
+                }
+            }
+
+            // 遍历 files，智能分流当前目录与父目录
+            if (c.files && typeof c.files === 'object') {
+                for (const [rawFilename, val] of Object.entries(c.files)) {
+                    const isParentTarget = rawFilename.startsWith('../')
+                    const cleanName = isParentTarget ? rawFilename.slice(3) : rawFilename
+                    
+                    // 挂载目标容器
+                    const targetContainer = isParentTarget ? currentCursor : currentCursor[leafName].children!
+
+                    if (typeof val === 'string') {
+                        const trimmedVal = val.trim()
+                        const isHttp = /^https?:\/\//i.test(trimmedVal)
+                        const isUrlShortcut = /\.url$/i.test(cleanName)
+
+                        if (isUrlShortcut) {
+                            targetContainer[cleanName] = { type: 'file', content: trimmedVal, artifactUrl: trimmedVal, isBinary: false }
+                        } else if (isHttp) {
+                            targetContainer[cleanName] = { type: 'file', isBinary: true, artifactUrl: trimmedVal }
+                        } else {
+                            targetContainer[cleanName] = { type: 'file', content: val.replace(/\\n/g, '\n') }
+                        }
+                    } else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
+                        targetContainer[cleanName] = { type: 'file', isBinary: true, artifactUrl: (val as any).artifact_url }
+                    }
+                }
+            }
         })
+
+        if (knownChallengeIds.value.size === 0) {
+            knownChallengeIds.value = new Set(loadedIds)
+        }
 
         return loadedIds
     } catch (err: any) {
@@ -768,8 +760,6 @@ const commands: Record<string, (args: string[]) => void> = {
         appendHistory('[VALIDATING] Dispatching cryptographic token sequence...', 'system')
 
         try {
-            // 记录提交前已有的题目列表
-            const beforeIds = Object.keys(vfs['challenges']?.children || {})
 
             const res = await $fetch<{ success: boolean; message: string }>('/api/ctf/submit', {
                 method: 'POST',
@@ -778,14 +768,17 @@ const commands: Record<string, (args: string[]) => void> = {
 
             if (res.success) {
                 appendHistory(`[+] ${res.message}`, 'success')
+                
+                // ★ 重新拉取最新关卡列表
+                const currentIds = await hydrateChallenges()
+                
+                // ★ 核心好品味：严格比对权威集合中「未曾出现过」的全新关卡！
+                const newlyUnlocked = currentIds.filter(id => !knownChallengeIds.value.has(id))
 
-                // ★ 核心好品味：重新同步数据，感知新关卡
-                const afterIds = await hydrateChallenges()
-
-                // 找出差集：新解锁的关卡！
-                const newSectors = afterIds.filter(id => !beforeIds.includes(id))
-                newSectors.forEach(newId => {
+                newlyUnlocked.forEach(newId => {
                     appendHistory(`[SYSTEM] ⚠️ CLEARANCE UPGRADED: New sector discovered: /challenges/${newId}`, 'system')
+                    // 动态并入已知集合，杜绝未来任何二次误报
+                    knownChallengeIds.value.add(newId)
                 })
             } else {
                 appendHistory(`[-] ${res.message}`, 'error')
