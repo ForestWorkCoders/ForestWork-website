@@ -1,4 +1,6 @@
-export type Json =
+Need to install the following packages:
+supabase@2.118.0
+Ok to proceed? (y) export type Json =
   | string
   | number
   | boolean
@@ -26,6 +28,7 @@ export type Database = {
           is_active: boolean
           is_case_insensitive: boolean
           min_points: number
+          prerequisite_id: string | null
           prompt: string
           title: string
         }
@@ -40,6 +43,7 @@ export type Database = {
           is_active?: boolean
           is_case_insensitive?: boolean
           min_points?: number
+          prerequisite_id?: string | null
           prompt: string
           title: string
         }
@@ -54,10 +58,26 @@ export type Database = {
           is_active?: boolean
           is_case_insensitive?: boolean
           min_points?: number
+          prerequisite_id?: string | null
           prompt?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       solves: {
         Row: {
@@ -107,11 +127,27 @@ export type Database = {
           initial_points: number | null
           is_active: boolean | null
           min_points: number | null
+          prerequisite_id: string | null
           prompt: string | null
           solve_count: number | null
           title: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leaderboard: {
         Row: {
@@ -554,6 +590,31 @@ export type Database = {
       }
     }
     Functions: {
+      get_player_meetup_frequency: {
+        Args: { p_start_time?: string; p_tournament_id?: string }
+        Returns: {
+          meet_up_count: number
+          player1: number
+          player1_name: string
+          player2: number
+          player2_name: string
+        }[]
+      }
+      get_player_recent_ranks: {
+        Args: { matches_count?: number; p_player_id: number }
+        Returns: number[]
+      }
+      get_seat_frequency: {
+        Args: { p_start_time?: string; p_tournament_id?: string }
+        Returns: {
+          account_id: number
+          east: number
+          mahjong_username: string
+          north: number
+          south: number
+          west: number
+        }[]
+      }
       get_tournament_match_stats: {
         Args: { t_id: string }
         Returns: {
@@ -1090,232 +1151,54 @@ export type Database = {
       }
     }
     Views: {
-      overall_rankings_2023: {
-        Row: {
-          account_id: number | null
-          first_place_count: number | null
-          first_place_percentage: number | null
-          nickname: string | null
-          second_place_count: number | null
-          second_place_percentage: number | null
-          third_place_count: number | null
-          third_place_percentage: number | null
-        }
-        Relationships: []
-      }
-      overall_rankings_2024: {
-        Row: {
-          account_id: number | null
-          first_place_count: number | null
-          first_place_percentage: number | null
-          nickname: string | null
-          second_place_count: number | null
-          second_place_percentage: number | null
-          third_place_count: number | null
-          third_place_percentage: number | null
-        }
-        Relationships: []
-      }
-      overall_rankings_2025: {
-        Row: {
-          account_id: number | null
-          first_place_count: number | null
-          first_place_percentage: number | null
-          nickname: string | null
-          second_place_count: number | null
-          second_place_percentage: number | null
-          third_place_count: number | null
-          third_place_percentage: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      available_months: { Args: { league: string }; Returns: string[] }
-      count_tables: { Args: { league: string }; Returns: number }
-      fetch_game_results: {
-        Args: { game_id: number; league_month: string; league_year: string }
+      get_quaso_leaderboard: {
+        Args: { p_limit?: number; p_mode: string }
         Returns: {
-          adjusted_east_point_diff: number
-          adjusted_south_point_diff: number
-          adjusted_west_point_diff: number
-          east_nickname: string
-          east_score: number
-          game_end_time: string
-          south_nickname: string
-          south_score: number
-          uuid: string
-          west_nickname: string
-          west_score: number
-        }[]
-      }
-      fetch_group_season: {
-        Args: { season_param: number }
-        Returns: {
-          defender_name: string
-          defender_score: number
-          diff_100000_striker: number
-          diff_midfield_defender: number
-          diff_striker_midfield: number
-          finals: boolean
-          match: string
-          midfield_name: string
-          midfield_score: number
-          season: number
-          striker_name: string
-          striker_score: number
-          team_name: string
-        }[]
-      }
-      fetch_league_participants: {
-        Args: { league_month: string; league_year: string }
-        Returns: {
-          discord_id: number
-          discord_username: string
-          game_1: number
-          game_10: number
-          game_11: number
-          game_12: number
-          game_13: number
-          game_14: number
-          game_15: number
-          game_16: number
-          game_2: number
-          game_3: number
-          game_4: number
-          game_5: number
-          game_6: number
-          game_7: number
-          game_8: number
-          game_9: number
-          profile_img: string
-          rank: number
-          rank_label: string
           total: number
+          user_id: string
+          username: string
         }[]
       }
-      fetch_league_participants_new: {
-        Args: { league_month: string; league_year: number }
-        Returns: {
-          discord_username: string
-          game_1: number
-          game_10: number
-          game_11: number
-          game_12: number
-          game_13: number
-          game_14: number
-          game_15: number
-          game_16: number
-          game_2: number
-          game_3: number
-          game_4: number
-          game_5: number
-          game_6: number
-          game_7: number
-          game_8: number
-          game_9: number
-          participation_count: number
-          profile_img: string
-          rank: number
-          rank_label: string
-          total: number
-        }[]
-      }
-      fwmp_rankings: {
-        Args: { league_schema: string }
-        Returns: {
-          april: number
-          august: number
-          discord_username: string
-          february: number
-          january: number
-          july: number
-          june: number
-          march: number
-          may: number
-          november: number
-          october: number
-          profile_img: string
-          rank: number
-          september: number
-          total: number
-        }[]
-      }
-      get_adjusted_point_diff: {
+      give_quaso: {
         Args: {
-          east_score: number
-          south_score: number
-          team: string
-          west_score: number
+          p_amount: number
+          p_giver_id: string
+          p_giver_name: string
+          p_receiver_id: string
+          p_receiver_name: string
         }
-        Returns: number
+        Returns: Json
       }
-      get_available_months: {
-        Args: { year: number }
-        Returns: {
-          month: string
-          month_number: number
-        }[]
-      }
-      get_discord_ids: { Args: never; Returns: string[] }
-      get_individual_records_new: {
-        Args: never
-        Returns: {
-          month: number
-          year: number
-        }[]
-      }
-      get_participants: {
-        Args: never
-        Returns: {
-          discord_id: number
-          discord_username: string
-          mahjongsoul_id: number
-          mahjongsoul_name: string
-          profile_img: string
-        }[]
-      }
-      get_player_meetup_frequency: {
-        Args: never
-        Returns: {
-          meet_up_count: number
-          player1: number
-          player1_name: string
-          player2: number
-          player2_name: string
-        }[]
-      }
-      get_player_recent_ranks: {
-        Args: { matches_count: number; p_player_id: number }
-        Returns: number[]
-      }
-      get_seat_frequency: {
-        Args: never
-        Returns: {
-          account_id: number
-          east: number
-          mahjong_username: string
-          south: number
-          west: number
-        }[]
-      }
-      get_team_data: {
-        Args: { season_param: string }
-        Returns: {
-          defender: string
-          hex_color: number
-          leader: number
-          midfield: string
-          season: number
-          striker: string
-          substitude: string
-          team_name: string
-        }[]
-      }
-      update_user_data: {
-        Args: { new_pfp: string; new_username: string; user_id: number }
+      increment_curse_count: {
+        Args: {
+          p_curse_delta: number
+          p_msg_delta: number
+          p_user_id: string
+          p_username: string
+          p_year: number
+        }
         Returns: undefined
       }
+      update_user_data:
+        | {
+            Args: {
+              p_new_pfp?: string
+              p_new_username: string
+              p_user_id: number
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_new_pfp?: string
+              p_new_username: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
     }
     Enums: {
       [_ in never]: never

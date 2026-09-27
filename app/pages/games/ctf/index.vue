@@ -282,18 +282,22 @@ function getCurrentNode(): VFSNode {
 // ==========================================
 // 动态关卡数据水合引擎 (支持多文本文件与代码注入)
 // ==========================================
-async function hydrateChallenges() {
+async function hydrateChallenges(): Promise<string[]> {
     try {
-        const data = await $fetch<any[]>('/api/ctf/challenges')
-        if (!data || !vfs['challenges']?.children) return
+        // ★ 带上当前操作员身份
+        const data = await $fetch<any[]>('/api/ctf/challenges', {
+            params: { operator: CURRENT_OPERATOR }
+        })
+        if (!data || !vfs['challenges']?.children) return []
 
         const challengesRoot = vfs['challenges'].children
+        const loadedIds: string[] = []
 
         data.forEach((c) => {
             const dirName = c.id
+            loadedIds.push(dirName)
             const cleanPrompt = (c.prompt || c.description || '').replace(/\\n/g, '\n')
 
-            // 1. 初始化目录节点，内置题面
             const childrenNodes: Record<string, VFSNode> = {
                 'prompt.txt': {
                     type: 'file',
@@ -301,61 +305,83 @@ async function hydrateChallenges() {
                 }
             }
 
-            // 2. 核心好品味：单一事实源！纯文本代码与二进制附件全由 files 统领, 智能感知纯代码、扁平 URL 与嵌套附件对象
             if (c.files && typeof c.files === 'object') {
                 for (const [filename, val] of Object.entries(c.files)) {
                     if (typeof val === 'string') {
                         const trimmedVal = val.trim()
-                        const isHttp = /^https?:\/\//i.test(trimmedVal)
-                        const isUrlShortcut = /\.url$/i.test(filename)
-
-                        // ★ 核心好品味：如果是 .url 快捷方式，它是纯文本！允许 cat 查看，也允许 open 唤起
-                        if (isUrlShortcut) {
-                            childrenNodes[filename] = {
-                                type: 'file',
-                                content: trimmedVal,       // 填入纯文本，cat 时直接打印这行 URL！
-                                artifactUrl: trimmedVal,   // 记录直链，open 时直接弹射！
-                                isBinary: false            // 绝非二进制！
-                            }
-                        } 
-                        // 其他普通的 http 外链（图片、视频、zip、bin）保持为二进制物料
-                        else if (isHttp) {
-                            childrenNodes[filename] = {
-                                type: 'file',
-                                isBinary: true,
-                                artifactUrl: trimmedVal
-                            }
-                        } 
-                        // 本地纯文本/代码
-                        else {
-                            childrenNodes[filename] = {
-                                type: 'file',
-                                content: val.replace(/\\n/g, '\n')
-                            }
+                        if (/\.url$/i.test(filename)) {
+                            childrenNodes[filename] = { type: 'file', content: trimmedVal, artifactUrl: trimmedVal, isBinary: false }
+                        } else if (/^https?:\/\//i.test(trimmedVal)) {
+                            childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: trimmedVal }
+                        } else {
+                            childrenNodes[filename] = { type: 'file', content: val.replace(/\\n/g, '\n') }
                         }
-                    } 
-                    // 兼容旧的嵌套对象结构
-                    else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
-                        childrenNodes[filename] = {
-                            type: 'file',
-                            isBinary: true,
-                            artifactUrl: (val as any).artifact_url
-                        }
+                    } else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
+                        childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: (val as any).artifact_url }
                     }
                 }
             }
 
-            // 👈 那个恶心的 if (c.artifact_url) 已经被彻底抹杀！
+            data.forEach((c) => {
+                const cleanPrompt = (c.prompt || c.description || '').replace(/\\n/g, '\n')
 
-            challengesRoot[dirName] = {
-                type: 'dir',
-                children: childrenNodes
-            }
+                // 1. 构建该关卡节点专属的文件与物料
+                const childrenNodes: Record<string, VFSNode> = {
+                    'prompt.txt': {
+                        type: 'file',
+                        content: `[${c.title}]\nCATEGORY: ${c.category}\nCURRENT_VALUE: ${c.current_points} pts\nSOLVES: ${c.solve_count}\n\n${cleanPrompt}`
+                    }
+                }
+
+                if (c.files && typeof c.files === 'object') {
+                    for (const [filename, val] of Object.entries(c.files)) {
+                        if (typeof val === 'string') {
+                            const trimmedVal = val.trim()
+                            const isHttp = /^https?:\/\//i.test(trimmedVal)
+                            const isUrlShortcut = /\.url$/i.test(filename)
+
+                            if (isUrlShortcut) {
+                                childrenNodes[filename] = { type: 'file', content: trimmedVal, artifactUrl: trimmedVal, isBinary: false }
+                            } else if (isHttp) {
+                                childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: trimmedVal }
+                            } else {
+                                childrenNodes[filename] = { type: 'file', content: val.replace(/\\n/g, '\n') }
+                            }
+                        } else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
+                            childrenNodes[filename] = { type: 'file', isBinary: true, artifactUrl: (val as any).artifact_url }
+                        }
+                    }
+                }
+
+                // 2. ★ 核心好品味：通用 mkdir -p 算法，原生支持任意深度嵌套（如 week-9/part-1）
+                const segments = c.id.split('/')
+                let currentCursor = challengesRoot
+
+                // 逐级向下穿透，中间不存在的父目录自动创建
+                for (let i = 0; i < segments.length - 1; i++) {
+                    const seg = segments[i]
+                    if (!currentCursor[seg] || currentCursor[seg].type !== 'dir') {
+                        currentCursor[seg] = {
+                            type: 'dir',
+                            children: {}
+                        }
+                    }
+                    currentCursor = currentCursor[seg].children!
+                }
+
+                // 将实际关卡挂载在路径的最末端叶子节点上
+                const leafName = segments[segments.length - 1]
+                currentCursor[leafName] = {
+                    type: 'dir',
+                    children: childrenNodes
+                }
+            })
         })
 
-        appendHistory('[SYSTEM] OS booted successfully.', 'system')
+        return loadedIds
     } catch (err: any) {
         appendHistory(`[WARN] Failed to sync challenges: ${err.message || 'Offline mode'}`, 'error')
+        return []
     }
 }
 
@@ -738,6 +764,9 @@ const commands: Record<string, (args: string[]) => void> = {
         appendHistory('[VALIDATING] Dispatching cryptographic token sequence...', 'system')
 
         try {
+            // 记录提交前已有的题目列表
+            const beforeIds = Object.keys(vfs['challenges']?.children || {})
+
             const res = await $fetch<{ success: boolean; message: string }>('/api/ctf/submit', {
                 method: 'POST',
                 body: { flag: rawFlag }
@@ -745,6 +774,15 @@ const commands: Record<string, (args: string[]) => void> = {
 
             if (res.success) {
                 appendHistory(`[+] ${res.message}`, 'success')
+
+                // ★ 核心好品味：重新同步数据，感知新关卡
+                const afterIds = await hydrateChallenges()
+
+                // 找出差集：新解锁的关卡！
+                const newSectors = afterIds.filter(id => !beforeIds.includes(id))
+                newSectors.forEach(newId => {
+                    appendHistory(`[SYSTEM] ⚠️ CLEARANCE UPGRADED: New sector discovered: /challenges/${newId}`, 'system')
+                })
             } else {
                 appendHistory(`[-] ${res.message}`, 'error')
             }
@@ -820,7 +858,7 @@ function triggerDownload(url: string, filename?: string) {
 function openExternalTab(rawUrl: string) {
     if (!rawUrl) return
     let dest = rawUrl.trim()
-    
+
     // 协议安全补齐：防止相对路径污染
     if (!/^https?:\/\//i.test(dest)) {
         dest = `https://${dest}`
@@ -921,52 +959,40 @@ function dismissMobileWarning() {
         </main>
 
         <!-- ========================================== -->
-    <!-- 统一媒体工件检查器 (Artifact Inspector Modal) -->
-    <!-- ========================================== -->
-    <div 
-      v-if="activeMedia" 
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 select-none"
-      @click.self="activeMedia = null"
-    >
-      <div class="relative max-w-4xl w-full bg-black/90 border border-emerald-500/40 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.2)] overflow-hidden flex flex-col">
-        <!-- 弹窗顶栏 (Unix 质感) -->
-        <div class="flex items-center justify-between px-4 py-2 bg-emerald-950/40 border-b border-emerald-500/30 font-mono text-xs text-emerald-400">
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>INSPECTOR // {{ activeMedia.name }}</span>
-          </div>
-          <button 
-            type="button" 
-            class="text-emerald-500/60 hover:text-emerald-300 transition-colors uppercase font-bold"
-            @click="activeMedia = null"
-          >
-            [CLOSE ESC]
-          </button>
-        </div>
+        <!-- 统一媒体工件检查器 (Artifact Inspector Modal) -->
+        <!-- ========================================== -->
+        <div v-if="activeMedia"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 select-none"
+            @click.self="activeMedia = null">
+            <div
+                class="relative max-w-4xl w-full bg-black/90 border border-emerald-500/40 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.2)] overflow-hidden flex flex-col">
+                <!-- 弹窗顶栏 (Unix 质感) -->
+                <div
+                    class="flex items-center justify-between px-4 py-2 bg-emerald-950/40 border-b border-emerald-500/30 font-mono text-xs text-emerald-400">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>INSPECTOR // {{ activeMedia.name }}</span>
+                    </div>
+                    <button type="button"
+                        class="text-emerald-500/60 hover:text-emerald-300 transition-colors uppercase font-bold"
+                        @click="activeMedia = null">
+                        [CLOSE ESC]
+                    </button>
+                </div>
 
-        <!-- 媒体核心视口 -->
-        <div class="p-2 flex items-center justify-center bg-black min-h-[200px] max-h-[80vh] overflow-auto">
-          <!-- 视频形态：带原生控制台、自动播放 -->
-          <video 
-            v-if="activeMedia.type === 'video'" 
-            :src="activeMedia.url" 
-            controls 
-            autoplay 
-            playsinline 
-            class="max-w-full max-h-[75vh] rounded object-contain border border-emerald-500/20"
-          >
-            Your browser does not support HTML5 video streaming.
-          </video>
+                <!-- 媒体核心视口 -->
+                <div class="p-2 flex items-center justify-center bg-black min-h-[200px] max-h-[80vh] overflow-auto">
+                    <!-- 视频形态：带原生控制台、自动播放 -->
+                    <video v-if="activeMedia.type === 'video'" :src="activeMedia.url" controls autoplay playsinline
+                        class="max-w-full max-h-[75vh] rounded object-contain border border-emerald-500/20">
+                        Your browser does not support HTML5 video streaming.
+                    </video>
 
-          <!-- 图像形态 -->
-          <img 
-            v-else 
-            :src="activeMedia.url" 
-            :alt="activeMedia.name" 
-            class="max-w-full max-h-[75vh] object-contain rounded"
-          />
+                    <!-- 图像形态 -->
+                    <img v-else :src="activeMedia.url" :alt="activeMedia.name"
+                        class="max-w-full max-h-[75vh] object-contain rounded" />
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
     </div>
 </template>
