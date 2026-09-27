@@ -12,14 +12,6 @@ interface VFSNode {
     children?: Record<string, VFSNode>
 }
 
-// 核心数据结构：当前 Discord 登录选手档案
-interface UserProfile {
-    id: string
-    username: string
-    global_name: string | null
-    avatar: string | null
-}
-
 // ★ 核心好品味：操作员 ID 动态派生，彻底消灭 operator_10001 桩代码！
 const currentOperatorId = computed(() => currentUser.value?.id || '')
 const knownChallengeIds = ref<Set<string>>(new Set())
@@ -30,6 +22,39 @@ const promptUser = computed(() => {
 })
 
 const promptPrefix = computed(() => `${promptUser.value}@forestwork:${currentPathStr.value}$`)
+
+// ★ 核心好品味：計算終端視覺列寬（ASCII=1, CJK/全形=2）
+function getVisualWidth(str: string): number {
+    let width = 0
+    for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i)
+        // 涵蓋全形標點、日文假名、CJK 統一表意漢字等雙倍寬度區間
+        if (
+            (code >= 0x1100 && code <= 0x115F) ||
+            (code >= 0x2E80 && code <= 0xA4CF) ||
+            (code >= 0xAC00 && code <= 0xD7A3) ||
+            (code >= 0xF900 && code <= 0xFAFF) ||
+            (code >= 0xFE10 && code <= 0xFE19) ||
+            (code >= 0xFE30 && code <= 0xFE6F) ||
+            (code >= 0xFF00 && code <= 0xFF60) ||
+            (code >= 0xFFE0 && code <= 0xFFE6)
+        ) {
+            width += 2
+        } else {
+            width += 1
+        }
+    }
+    return width
+}
+
+// 根據視覺寬度補齊空格（取代原生長度 padEnd，防止撐破終端排版）
+function padEndVisual(str: string, targetWidth: number): string {
+    const vWidth = getVisualWidth(str)
+    if (vWidth >= targetWidth) {
+        return str
+    }
+    return str + ' '.repeat(targetWidth - vWidth)
+}
 
 // ==========================================
 // 1. 历史命令栈状态（Command History Buffer）
@@ -407,13 +432,6 @@ interface ScoreboardEntry {
     lastSolve: string
 }
 
-const mockScoreboard: ScoreboardEntry[] = [
-    { rank: 1, user: 'Klm1200', solved: 4, score: 1450, lastSolve: '12m ago' },
-    { rank: 2, user: 'Devil_Smile', solved: 3, score: 1100, lastSolve: '34m ago' },
-    { rank: 3, user: 'guest_942', solved: 2, score: 600, lastSolve: '1h ago' },
-    { rank: 4, user: 'you (guest)', solved: 0, score: 0, lastSolve: '--' }
-]
-
 // 好品味：纯字符填充排版，数值右对齐，文本左对齐，绝不依赖脆弱的 \t
 function formatScoreboard(entries: ScoreboardEntry[]): string {
     if (entries.length === 0) {
@@ -443,7 +461,7 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
 
     const rows = entries.map(item => {
         const rankStr = `#${item.rank}`.padStart(W_RANK)
-        const userStr = item.user.padEnd(W_USER)
+        const userStr = padEndVisual(item.user, W_USER)
         const solvedStr = String(item.solved).padStart(W_SOLVED)
         const scoreStr = `${item.score} pts`.padStart(W_SCORE)
         const timeStr = item.lastSolve.padEnd(W_TIME)
