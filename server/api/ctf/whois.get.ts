@@ -111,12 +111,21 @@ export default defineEventHandler(async (event) => {
 
   const computedScore = solves.reduce((sum, item) => sum + item.points, 0)
 
+  const rawRank: any = rankEntry
+
+  // 優先以純淨 Handle 作為主標識，若無則降級為 operator_後四位
+  const operatorHandle = rawRank?.username || rawRank?.user || `operator_${String(targetAccountId).slice(-4)}`
+  
+  // 社交暱稱僅作為備註展示
+  const displayNickname = rawRank?.nickname || operatorHandle
+
   return {
     found: true,
-    accountId: rankEntry?.account_id || `operator_${String(targetAccountId).slice(-4)}`,
-    rank: rankEntry ? rankEntry.rank : '-',
-    totalScore: rankEntry ? rankEntry.total_points : computedScore,
-    solvesCount: rankEntry ? rankEntry.solves_count : solves.length,
+    // 前端「玩家昵稱」印這個：格式化為 handle (nickname) 或直接展示
+    accountId: displayNickname !== operatorHandle ? `${operatorHandle} (${displayNickname})` : operatorHandle,
+    rank: rawRank?.rank ?? '-',
+    totalScore: rawRank?.score ?? rawRank?.total_points ?? computedScore,
+    solvesCount: rawRank?.solved ?? rawRank?.solves_count ?? solves.length,
     solves
   }
 })

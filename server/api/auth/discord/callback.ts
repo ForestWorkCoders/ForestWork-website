@@ -69,25 +69,33 @@ export default defineEventHandler(async (event) => {
     ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
     : `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIndex}.png`
 
+  const rawUsername = String(user.username || '').trim().toLowerCase()
+  const rawNickname = user.global_name ? String(user.global_name).trim() : rawUsername
+
   // 3. ★ 核心好品味：无状态客户端直连，就地 UPSERT 进全站公用的 participant_data！
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-  await supabase
-    .schema('public')
+  const { error: upsertError } = await supabase
     .from('participant_data')
     .upsert({
-      discord_id: user.id, // bigint
-      discord_username: user.global_name || user.username,
+      account_id: user.id,
+      discord_id: user.id,
+      discord_username: rawUsername, // ★ 永遠、純粹是唯一 handle（如 eaglepb2）
+      discord_nickname: rawNickname, // ★ 真正的社交暱稱獨立入庫（如 鷹の紅石指令部）
       profile_img: avatarUrl
     }, {
       onConflict: 'discord_id'
     })
 
+  if (upsertError) {
+    console.warn('[AUTH] Participant upsert warning:', upsertError.message)
+  }
+
   // 4. 签发轻量 HttpOnly Cookie
   const sessionToken = sealSessionData({
     id: user.id,
-    username: user.username,
-    global_name: user.global_name,
+    username: rawUsername,
+    global_name: rawNickname,
     avatar: avatarUrl
   })
 

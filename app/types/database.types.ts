@@ -151,10 +151,15 @@ export type Database = {
         Row: {
           account_id: string | null
           last_solve: string | null
+          last_solve_at: string | null
+          nickname: string | null
           rank: number | null
           score: number | null
           solved: number | null
+          solves_count: number | null
+          total_points: number | null
           user: string | null
+          username: string | null
         }
         Relationships: []
       }
@@ -1130,18 +1135,21 @@ export type Database = {
       participant_data: {
         Row: {
           discord_id: number
+          discord_nickname: string | null
           discord_username: string
           id: number
           profile_img: string | null
         }
         Insert: {
           discord_id: number
+          discord_nickname?: string | null
           discord_username: string
           id?: number
           profile_img?: string | null
         }
         Update: {
           discord_id?: number
+          discord_nickname?: string | null
           discord_username?: string
           id?: number
           profile_img?: string | null
