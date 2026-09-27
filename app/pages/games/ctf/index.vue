@@ -506,17 +506,35 @@ const commands: Record<string, (args: string[]) => void> = {
   clear              清除終端屏幕
   whoami             顯示當前權限標記
   whois [player]     查詢玩家解題檔案明細 (缺省為本人)
-  login              Discord登入`, 'system')
+  login              Discord登入
+  logout             登出當前操作員會話`, 'system')
     },
 
     clear: () => {
         history.value = []
     },
 
+    // ★ 核心好品味：已登入使用者前置攔截，杜絕無意義跳轉！
     login: () => {
+        if (currentUser.value) {
+            appendHistory(`[!] You are already logged in as "${promptUser.value}".`, 'system')
+            appendHistory(`[SYSTEM] Type "logout" or use the header menu to sign out first.`, 'system')
+            return
+        }
+
         appendHistory('[SYSTEM] Redirecting to Discord authorization uplink...', 'system')
-        // ★ 核心好品味：呼叫全站統一的登入管線，精準傳遞當前 /games/ctf 路徑！
         triggerDiscordLogin()
+    },
+
+    // ★ 核心好品味：在終端機內補齊登出閉環指令！
+    logout: () => {
+        if (!currentUser.value) {
+            appendHistory('[-] No active operator session detected.', 'error')
+            return
+        }
+        appendHistory('[SYSTEM] Terminating active operator session...', 'system')
+        // 呼叫全域登出跳轉，登出後回彈當前 CTF 頁面
+        window.location.href = `/api/auth/logout?redirect=${encodeURIComponent(window.location.pathname)}`
     },
 
     whoami: () => {

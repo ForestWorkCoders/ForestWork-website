@@ -12,6 +12,163 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  ctf: {
+    Tables: {
+      challenges: {
+        Row: {
+          category: string
+          created_at: string
+          decay_solves: number
+          files: Json
+          flag_hash: string
+          id: string
+          initial_points: number
+          is_active: boolean
+          is_case_insensitive: boolean
+          min_points: number
+          prerequisite_id: string | null
+          prompt: string
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          decay_solves?: number
+          files?: Json
+          flag_hash: string
+          id: string
+          initial_points?: number
+          is_active?: boolean
+          is_case_insensitive?: boolean
+          min_points?: number
+          prerequisite_id?: string | null
+          prompt: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          decay_solves?: number
+          files?: Json
+          flag_hash?: string
+          id?: string
+          initial_points?: number
+          is_active?: boolean
+          is_case_insensitive?: boolean
+          min_points?: number
+          prerequisite_id?: string | null
+          prompt?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solves: {
+        Row: {
+          account_id: number
+          challenge_id: string
+          id: number
+          solved_at: string
+        }
+        Insert: {
+          account_id: number
+          challenge_id: string
+          id?: number
+          solved_at?: string
+        }
+        Update: {
+          account_id?: number
+          challenge_id?: string
+          id?: number
+          solved_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solves_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solves_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      challenge_points: {
+        Row: {
+          category: string | null
+          current_points: number | null
+          decay_solves: number | null
+          files: Json | null
+          id: string | null
+          initial_points: number | null
+          is_active: boolean | null
+          min_points: number | null
+          prerequisite_id: string | null
+          prompt: string | null
+          solve_count: number | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboard: {
+        Row: {
+          account_id: string | null
+          last_solve: string | null
+          rank: number | null
+          score: number | null
+          solved: number | null
+          user: string | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   mahjong: {
     Tables: {
       fwmp_configs: {
@@ -996,6 +1153,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_quaso_leaderboard: {
+        Args: { p_limit?: number; p_mode: string }
+        Returns: {
+          total: number
+          user_id: string
+          username: string
+        }[]
+      }
+      give_quaso: {
+        Args: {
+          p_amount: number
+          p_giver_id: string
+          p_giver_name: string
+          p_receiver_id: string
+          p_receiver_name: string
+        }
+        Returns: Json
+      }
+      increment_curse_count: {
+        Args: {
+          p_curse_delta: number
+          p_msg_delta: number
+          p_user_id: string
+          p_username: string
+          p_year: number
+        }
+        Returns: undefined
+      }
       update_user_data:
         | {
             Args: {
@@ -1026,42 +1211,186 @@ export type Database = {
       characters: {
         Row: {
           attributes: Json
+          avatar_url: string | null
           created_at: string
           discord_id: number
           hp: number
           id: string
+          insanity: string | null
           is_active: boolean
           mp: number
           name: string
           san: number
           skills: Json
+          story: string | null
           updated_at: string
         }
         Insert: {
           attributes?: Json
+          avatar_url?: string | null
           created_at?: string
           discord_id: number
           hp?: number
           id?: string
+          insanity?: string | null
           is_active?: boolean
           mp?: number
           name: string
           san?: number
           skills?: Json
+          story?: string | null
           updated_at?: string
         }
         Update: {
           attributes?: Json
+          avatar_url?: string | null
           created_at?: string
           discord_id?: number
           hp?: number
           id?: string
+          insanity?: string | null
           is_active?: boolean
           mp?: number
           name?: string
           san?: number
           skills?: Json
+          story?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      curse_stats: {
+        Row: {
+          count: number
+          total_messages: number
+          updated_at: string | null
+          user_id: string
+          username: string | null
+          year: number
+        }
+        Insert: {
+          count?: number
+          total_messages?: number
+          updated_at?: string | null
+          user_id: string
+          username?: string | null
+          year: number
+        }
+        Update: {
+          count?: number
+          total_messages?: number
+          updated_at?: string | null
+          user_id?: string
+          username?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
+      liner_battles: {
+        Row: {
+          channel_id: string
+          created_at: string | null
+          id: number
+          message_id: string | null
+          p1_hp: number
+          p1_id: string
+          p1_name: string
+          p1_seq: string | null
+          p2_hp: number
+          p2_id: string | null
+          p2_name: string | null
+          p2_seq: string | null
+          round: number
+          status: string
+          system_seq: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          id?: number
+          message_id?: string | null
+          p1_hp?: number
+          p1_id: string
+          p1_name: string
+          p1_seq?: string | null
+          p2_hp?: number
+          p2_id?: string | null
+          p2_name?: string | null
+          p2_seq?: string | null
+          round?: number
+          status?: string
+          system_seq?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          id?: number
+          message_id?: string | null
+          p1_hp?: number
+          p1_id?: string
+          p1_name?: string
+          p1_seq?: string | null
+          p2_hp?: number
+          p2_id?: string | null
+          p2_name?: string | null
+          p2_seq?: string | null
+          round?: number
+          status?: string
+          system_seq?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      quaso_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          give_date: string
+          giver_id: string
+          giver_name: string
+          id: number
+          receiver_id: string
+          receiver_name: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string | null
+          give_date?: string
+          giver_id: string
+          giver_name: string
+          id?: number
+          receiver_id: string
+          receiver_name: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          give_date?: string
+          giver_id?: string
+          giver_name?: string
+          id?: number
+          receiver_id?: string
+          receiver_name?: string
+        }
+        Relationships: []
+      }
+      sync_cursors: {
+        Row: {
+          channel_id: string
+          last_message_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id: string
+          last_message_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string
+          last_message_id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1073,6 +1402,14 @@ export type Database = {
       activate_character: {
         Args: { p_character_name: string; p_discord_id: number }
         Returns: undefined
+      }
+      get_quaso_leaderboard: {
+        Args: { p_limit?: number; p_mode: string }
+        Returns: {
+          total: number
+          user_id: string
+          username: string
+        }[]
       }
     }
     Enums: {
@@ -1202,6 +1539,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  ctf: {
+    Enums: {},
+  },
   mahjong: {
     Enums: {
       relay_role: [
