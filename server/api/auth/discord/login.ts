@@ -8,6 +8,17 @@ export default defineEventHandler((event) => {
   }
 
   const query = getQuery(event)
+  const referer = getHeader(event, 'referer')
+
+  // ★ 核心好品味：優先取 query.redirect，缺省則從 Referer 提取 pathname，最後才兜底 /
+  let targetPath = query.redirect
+  if (!targetPath && referer) {
+    try {
+      targetPath = new URL(referer).pathname
+    } catch {
+      targetPath = '/'
+    }
+  }
   const returnTo = sanitizeRedirect(query.redirect)
 
   const authUrl = new URL('https://discord.com/oauth2/authorize')

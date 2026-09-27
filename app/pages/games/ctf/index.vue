@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, nextTick, onMounted } from 'vue'
-const { user: currentUser } = useAuth()
+const { user: currentUser, login: triggerDiscordLogin } = useAuth()
 
 // 1. 核心数据结构：虚拟文件系统（VFS 树形结构）
 interface VFSNode {
@@ -515,8 +515,8 @@ const commands: Record<string, (args: string[]) => void> = {
 
     login: () => {
         appendHistory('[SYSTEM] Redirecting to Discord authorization uplink...', 'system')
-        // 复用我们上一轮写好的原生弹射器！
-        window.location.href = '/api/auth/discord/login'
+        // ★ 核心好品味：呼叫全站統一的登入管線，精準傳遞當前 /games/ctf 路徑！
+        triggerDiscordLogin()
     },
 
     whoami: () => {
