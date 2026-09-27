@@ -1,6 +1,4 @@
-Need to install the following packages:
-supabase@2.118.0
-Ok to proceed? (y) export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -152,10 +150,12 @@ export type Database = {
       leaderboard: {
         Row: {
           account_id: number | null
-          last_solve_time: string | null
+          avatar_url: string | null
+          last_solve_at: string | null
           rank: number | null
           solves_count: number | null
-          total_score: number | null
+          total_points: number | null
+          username: string | null
         }
         Relationships: []
       }

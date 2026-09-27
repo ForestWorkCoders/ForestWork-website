@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, nextTick, onMounted } from 'vue'
+const { user: currentUser } = useAuth()
 
 // 1. 核心数据结构：虚拟文件系统（VFS 树形结构）
 interface VFSNode {
@@ -11,8 +12,24 @@ interface VFSNode {
     children?: Record<string, VFSNode>
 }
 
-const CURRENT_OPERATOR = 'operator_10001'
+// 核心数据结构：当前 Discord 登录选手档案
+interface UserProfile {
+    id: string
+    username: string
+    global_name: string | null
+    avatar: string | null
+}
+
+// ★ 核心好品味：操作员 ID 动态派生，彻底消灭 operator_10001 桩代码！
+const currentOperatorId = computed(() => currentUser.value?.id || '')
 const knownChallengeIds = ref<Set<string>>(new Set())
+
+const promptUser = computed(() => {
+    if (!currentUser.value) return 'guest'
+    return currentUser.value.username
+})
+
+const promptPrefix = computed(() => `${promptUser.value}@forestwork:${currentPathStr.value}$`)
 
 // ==========================================
 // 1. 历史命令栈状态（Command History Buffer）
@@ -118,7 +135,7 @@ function handleTabComplete(e: KeyboardEvent) {
                 inputCmd.value = lcp
             } else {
                 // 打印所有匹配命令候选
-                appendHistory(`guest@forestwork:${currentPathStr.value}$ ${rawCmd}`, 'input')
+                appendHistory(`${promptPrefix.value} ${rawCmd}`, 'input')
                 appendHistory(matches.sort().join('  '), 'output')
             }
         }
@@ -188,7 +205,7 @@ function handleTabComplete(e: KeyboardEvent) {
             inputCmd.value = `${baseCmd}${dirPart}${lcp}`
         } else {
             // 像标准终端一样回显输入并列出候选项
-            appendHistory(`guest@forestwork:${currentPathStr.value}$ ${rawCmd}`, 'input')
+            appendHistory(`${promptPrefix.value} ${rawCmd}`, 'input')
             const formatted = matches.map(name => {
                 const isDir = parentNode.children?.[name]?.type === 'dir'
                 return isDir ? `${name}/` : name
@@ -288,7 +305,7 @@ function getCurrentNode(): VFSNode {
 async function hydrateChallenges(): Promise<string[]> {
     try {
         const data = await $fetch<any[]>('/api/ctf/challenges', {
-            params: { operator: CURRENT_OPERATOR }
+            params: { operator: currentOperatorId.value }
         })
         if (!data || !vfs['challenges']) return []
 
@@ -300,7 +317,7 @@ async function hydrateChallenges(): Promise<string[]> {
         data.forEach((c) => {
             // 防呆校验：禁止空 ID 或只有斜杠的非法题目
             if (!c.id || typeof c.id !== 'string') return
-            
+
             const cleanId = c.id.trim().replace(/^\/+|\/+$/g, '') // 剥离首尾多余斜杠
             loadedIds.push(cleanId)
 
@@ -345,7 +362,7 @@ async function hydrateChallenges(): Promise<string[]> {
                 for (const [rawFilename, val] of Object.entries(c.files)) {
                     const isParentTarget = rawFilename.startsWith('../')
                     const cleanName = isParentTarget ? rawFilename.slice(3) : rawFilename
-                    
+
                     // 挂载目标容器
                     const targetContainer = isParentTarget ? currentCursor : currentCursor[leafName].children!
 
@@ -484,19 +501,30 @@ const commands: Record<string, (args: string[]) => void> = {
   cat <file>         讀取文本文件
   open <image>       在視窗中預覽隱寫原圖
   download <file>    下載未損壞的原始二進制文件
-  submit <flag>      向驗證器提交 Flag
+  submit <flag>      向驗證器提交 Flag，需先登入Discord
   scoreboard         檢視全場即時積分榜 (別名: top)
   clear              清除終端屏幕
   whoami             顯示當前權限標記
-  whois [player]     查詢玩家解題檔案明細 (缺省為本人)`, 'system')
+  whois [player]     查詢玩家解題檔案明細 (缺省為本人)
+  login              Discord登入`, 'system')
     },
 
     clear: () => {
         history.value = []
     },
 
+    login: () => {
+        appendHistory('[SYSTEM] Redirecting to Discord authorization uplink...', 'system')
+        // 复用我们上一轮写好的原生弹射器！
+        window.location.href = '/api/auth/discord/login'
+    },
+
     whoami: () => {
-        appendHistory('guest@forestwork-node-01 (unprivileged)', 'output')
+        if (currentUser.value) {
+            appendHistory(`OPERATOR: ${currentUser.value.global_name || currentUser.value.username} (ID: ${currentUser.value.id})`, 'output')
+        } else {
+            appendHistory('OPERATOR: Anonymous Guest. Type \'login\' to authenticate.', 'output')
+        }
     },
 
     // ==========================================
@@ -504,7 +532,7 @@ const commands: Record<string, (args: string[]) => void> = {
     // ==========================================
     whois: async (args) => {
         // 核心好品味：如果没有传参，无缝降级为查询自己！
-        const target = args[0]?.trim() || CURRENT_OPERATOR
+        const target = args[0]?.trim() || currentOperatorId.value
 
         appendHistory(`[TELEMETRY] 尋轉關於 ${target} 的記錄...`, 'system')
 
@@ -751,6 +779,13 @@ const commands: Record<string, (args: string[]) => void> = {
     },
 
     submit: async (args) => {
+
+        if (!currentUser.value) {
+            appendHistory("[-] ACCESS DENIED: Authentication required to register flag.", 'error')
+            appendHistory("[SYSTEM] Type 'login' to authenticate via Discord uplink.", 'system')
+            return
+        }
+
         const rawFlag = args.join(' ').trim().replace(/^["']|["']$/g, '')
         if (!rawFlag) {
             appendHistory('submit: missing flag payload. Usage: submit <FLAG{...}>', 'error')
@@ -768,10 +803,10 @@ const commands: Record<string, (args: string[]) => void> = {
 
             if (res.success) {
                 appendHistory(`[+] ${res.message}`, 'success')
-                
+
                 // ★ 重新拉取最新关卡列表
                 const currentIds = await hydrateChallenges()
-                
+
                 // ★ 核心好品味：严格比对权威集合中「未曾出现过」的全新关卡！
                 const newlyUnlocked = currentIds.filter(id => !knownChallengeIds.value.has(id))
 
@@ -803,7 +838,7 @@ function handleExecute() {
     historyIdx.value = -1
     inputDraft.value = ''
 
-    appendHistory(`guest@forestwork:${currentPathStr.value}$ ${line}`, 'input')
+    appendHistory(`${promptPrefix.value} ${line}`, 'input')
 
     // 核心修复：安全提取首词，用卫语句斩杀 undefined
     const tokens = line.split(/\s+/)
@@ -870,9 +905,10 @@ function openExternalTab(rawUrl: string) {
     document.body.removeChild(link)
 }
 
-onMounted(() => {
+onMounted(async () => {
     focusInput()
-    hydrateChallenges()
+
+    await hydrateChallenges()
 
     // 纯原生精确匹配：屏幕宽度 < 768px 或具备移动端触控特征
     if (window.matchMedia('(max-width: 768px)').matches) {
@@ -945,7 +981,7 @@ function dismissMobileWarning() {
             <!-- 命令行输入条保持在最底端 -->
             <div class="shrink-0 flex items-center gap-2 mt-2 pt-2 border-t border-slate-800/80">
                 <span class="text-emerald-400 font-bold text-xs sm:text-sm whitespace-nowrap select-none">
-                    guest@forestwork:{{ currentPathStr }}$
+                    {{ promptPrefix }}
                 </span>
                 <input ref="inputRef" v-model="inputCmd" @keydown.enter="handleExecute"
                     @keydown.tab.prevent="handleTabComplete" @keydown.up.prevent="handleHistoryUp"
