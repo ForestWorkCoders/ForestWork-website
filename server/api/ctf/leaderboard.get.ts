@@ -19,9 +19,10 @@ export default defineEventHandler(async (event) => {
 
   return (data || []).map((row: any) => ({
     rank: row.rank,
-    user: row.user,
-    solved: row.solved,
-    score: row.score,
+    username: row.username || row.user || 'anonymous',
+    user: row.username || row.user || 'anonymous',
+    solved: row.solved ?? row.solves_count ?? 0,
+    score: row.score ?? row.total_points ?? 0,
     lastSolve: row.last_solve || row.last_solve_at || null
   }))
 })

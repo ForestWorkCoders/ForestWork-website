@@ -25,9 +25,10 @@ const promptPrefix = computed(() => `${promptUser.value}@forestwork:${currentPat
 
 // ★ 核心好品味：計算終端視覺列寬（ASCII=1, CJK/全形=2）
 function getVisualWidth(str: string): number {
+    const safeStr = String(str || '')
     let width = 0
-    for (let i = 0; i < str.length; i++) {
-        const code = str.charCodeAt(i)
+    for (let i = 0; i < safeStr.length; i++) {
+        const code = safeStr.charCodeAt(i)
         // 涵蓋全形標點、日文假名、CJK 統一表意漢字等雙倍寬度區間
         if (
             (code >= 0x1100 && code <= 0x115F) ||
@@ -48,12 +49,13 @@ function getVisualWidth(str: string): number {
 }
 
 // 根據視覺寬度補齊空格（取代原生長度 padEnd，防止撐破終端排版）
-function padEndVisual(str: string, targetWidth: number): string {
-    const vWidth = getVisualWidth(str)
+function padEndVisual(str: string | undefined | null, targetWidth: number): string {
+    const safeStr = String(str || '')
+    const vWidth = getVisualWidth(safeStr)
     if (vWidth >= targetWidth) {
-        return str
+        return safeStr
     }
-    return str + ' '.repeat(targetWidth - vWidth)
+    return safeStr + ' '.repeat(targetWidth - vWidth)
 }
 
 // ★ 核心好品味：斯巴達式定長 19 位時間戳 (YYYY-MM-DD HH:mm:ss)，消滅一切 locale 抖動！
@@ -455,7 +457,7 @@ interface ScoreboardEntry {
 
 // 好品味：纯字符填充排版，数值右对齐，文本左对齐，绝不依赖脆弱的 \t
 function formatScoreboard(entries: ScoreboardEntry[]): string {
-    if (entries.length === 0) {
+    if (!Array.isArray(entries) || entries.length === 0) {
         return '(no standings recorded for active cycle)'
     }
 
@@ -482,11 +484,11 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
 
     const rows = entries.map(item => {
         const rankStr = `#${item.rank}`.padStart(W_RANK)
-        // ★ 核心收斂：優先取標準的 username，徹底告別 user 欄位依賴！
-        const userStr = padEndVisual(item.username, W_USER)
-        const solvedStr = String(item.solved ?? item.solves_count).padStart(W_SOLVED)
-        const scoreStr = `${item.score ?? item.total_points} pts`.padStart(W_SCORE)
-        const timeStr = formatTimestamp(item.lastSolve).padEnd(W_TIME)
+        const rawUsername = item.username || item.user || 'anonymous'
+        const userStr = padEndVisual(rawUsername, W_USER)
+        const solvedStr = String(item.solved ?? item.solves_count ?? 0).padStart(W_SOLVED)
+        const scoreStr = `${item.score ?? item.total_points ?? 0} pts`.padStart(W_SCORE)
+        const timeStr = formatTimestamp(item.lastSolve || item.last_solve).padEnd(W_TIME)
         return `${rankStr}  ${userStr}  ${solvedStr}  ${scoreStr}  ${timeStr}`
     })
 
