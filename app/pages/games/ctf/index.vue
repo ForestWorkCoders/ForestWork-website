@@ -987,6 +987,90 @@ onMounted(async () => {
 function dismissMobileWarning() {
     showMobileWarning.value = false
 }
+
+// ==========================================
+// 1. 常规 SEO / 社交平台基石兜底 (Twitter Card & Open Graph)
+// ==========================================
+useSeoMeta({
+  title: 'FORESTWORK // CTF 終端控制台 · 極客解密挑戰賽',
+  ogTitle: 'FORESTWORK // VIRTUAL_CTF_CONSOLE',
+  description: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
+  ogDescription: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
+  ogImage: 'https://i.imgur.com/cu2YAkn.png', // 可替换为专用的 CTF 终端预览横幅
+  ogUrl: 'https://forestwork.vercel.app/games/ctf',
+  twitterCard: 'summary_large_image',
+  // 终端专属翡翠绿 (#10B981)
+  themeColor: '#10B981'
+})
+
+// ==========================================
+// 2. Discord Component Embed 专属结构体
+// ==========================================
+const ctfDiscordEmbedPayload = {
+  component: {
+    type: 17, // 主容器 Container[cite: 1]
+    accent_color: 1096065, // #10B981 翡翠绿 (HEX 转十进制整数)
+    spoiler: false,
+    components: [
+      {
+        type: 9, // Section 块[cite: 1]
+        components: [
+          {
+            type: 10, // Text 终端字符说明[cite: 1]
+            content: [
+              '# FORESTWORK // CTF MAINFRAME',
+              '`STATUS: ONLINE` · `ENV: POSIX_VFS_SANDBOX`',
+              '',
+              '**【全系統挑戰已上線】**',
+              '• 支援指令: `ls`, `cat`, `open`, `download`, `submit`, `whois`',
+              '• 涵蓋領域: 隱寫術 (Stego) / 逆向 (Reverse) / 密碼學 / Web',
+              '• 賽制特性: 即時分數衰減機制 · Discord 帳號認證綁定',
+              '',
+              '> *「敲下你的第一行指令，奪取屬於你的 Flag。」*'
+            ].join('\n')
+          }
+        ],
+        accessory: {
+          type: 11, // Thumbnail 挂件[cite: 1]
+          media: {
+            url: 'https://i.imgur.com/mfcQRXw.png' // 终端或林间专属 Logo 图标
+          }
+        }
+      },
+      {
+        type: 14, // 视觉分割线[cite: 1]
+        spacing: 1,
+        divider: true
+      },
+      {
+        type: 1, // Action Row 操作按钮容器[cite: 1]
+        components: [
+          {
+            type: 2,
+            style: 5, // Link Button[cite: 1]
+            label: '接入終端 (Launch Shell)',
+            emoji: { name: '💻' },
+            url: 'https://forestwork.vercel.app/games/ctf'
+          },
+        ]
+      }
+    ]
+  }
+}
+
+// ==========================================
+// 3. 声明式注入并彻底覆写根节点
+// ==========================================
+useHead({
+  script: [
+    {
+      key: 'discord:component-embed', // 核心好品味：与 app.vue 相同 key 实施强力覆盖[cite: 1]
+      id: 'discord:component-embed',
+      type: 'application/json',
+      innerHTML: () => JSON.stringify(ctfDiscordEmbedPayload).replace(/</g, '\\u003c') // 安全防爆转义[cite: 1]
+    }
+  ]
+})
 </script>
 
 <template>
