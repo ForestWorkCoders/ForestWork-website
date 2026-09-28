@@ -22,8 +22,6 @@ export default defineEventHandler(async (event) => {
     user: row.user,
     solved: row.solved,
     score: row.score,
-    lastSolve: row.last_solve 
-      ? new Date(row.last_solve).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-      : '--'
+    lastSolve: row.last_solve || row.last_solve_at || null
   }))
 })

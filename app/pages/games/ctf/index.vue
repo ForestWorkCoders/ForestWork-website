@@ -56,6 +56,23 @@ function padEndVisual(str: string, targetWidth: number): string {
     return str + ' '.repeat(targetWidth - vWidth)
 }
 
+// ★ 核心好品味：斯巴達式定長 19 位時間戳 (YYYY-MM-DD HH:mm:ss)，消滅一切 locale 抖動！
+function formatTimestamp(isoStr?: string | null): string {
+    if (!isoStr) return '--'
+    const d = new Date(isoStr)
+    if (isNaN(d.getTime())) return '--'
+
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const year = d.getFullYear()
+    const month = pad(d.getMonth() + 1)
+    const day = pad(d.getDate())
+    const hours = pad(d.getHours())
+    const mins = pad(d.getMinutes())
+    const secs = pad(d.getSeconds())
+
+    return `${year}-${month}-${day} ${hours}:${mins}:${secs}`
+}
+
 // ==========================================
 // 1. 历史命令栈状态（Command History Buffer）
 // ==========================================
@@ -426,10 +443,14 @@ async function hydrateChallenges(): Promise<string[]> {
 // ==========================================
 interface ScoreboardEntry {
     rank: number
-    user: string
-    solved: number
-    score: number
-    lastSolve: string
+    username: string    // 新標準 SSOT 欄位
+    user?: string       // 舊代碼相容別名
+    solved: number      // 已解題數
+    solves_count?: number // 資料庫別名相容
+    score: number       // 當前動態衰減總分
+    total_points?: number // 資料庫別名相容
+    lastSolve: string   // 19 位定長時間戳 (YYYY-MM-DD HH:mm:ss)
+    last_solve?: string // 資料庫別名相容
 }
 
 // 好品味：纯字符填充排版，数值右对齐，文本左对齐，绝不依赖脆弱的 \t
@@ -443,7 +464,7 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
     const W_USER = 16
     const W_SOLVED = 8
     const W_SCORE = 9
-    const W_TIME = 10
+    const W_TIME = 19
 
     const header =
         'RANK'.padStart(W_RANK) + '  ' +
@@ -461,10 +482,11 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
 
     const rows = entries.map(item => {
         const rankStr = `#${item.rank}`.padStart(W_RANK)
-        const userStr = padEndVisual(item.user, W_USER)
-        const solvedStr = String(item.solved).padStart(W_SOLVED)
-        const scoreStr = `${item.score} pts`.padStart(W_SCORE)
-        const timeStr = item.lastSolve.padEnd(W_TIME)
+        // ★ 核心收斂：優先取標準的 username，徹底告別 user 欄位依賴！
+        const userStr = padEndVisual(item.username, W_USER)
+        const solvedStr = String(item.solved ?? item.solves_count).padStart(W_SOLVED)
+        const scoreStr = `${item.score ?? item.total_points} pts`.padStart(W_SCORE)
+        const timeStr = formatTimestamp(item.lastSolve).padEnd(W_TIME)
         return `${rankStr}  ${userStr}  ${solvedStr}  ${scoreStr}  ${timeStr}`
     })
 
@@ -597,12 +619,12 @@ const commands: Record<string, (args: string[]) => void> = {
             }
 
             res.solves.forEach((s: any) => {
-                const timeStr = new Date(s.solvedAt).toLocaleTimeString()
-                const cat = `[${s.category}]`.padEnd(9, ' ')
-                const title = s.title.length > 16 ? s.title.slice(0, 15) + '…' : s.title.padEnd(16, ' ')
-                const pts = `(+${s.points} pts)`.padStart(11, ' ')
-
-                appendHistory(`  ${cat} ${title} ${pts}  @ ${timeStr}`, 'output')
+                const catStr = `[${s.category}]`.padEnd(8)
+                const titleStr = padEndVisual(s.title, 20)
+                const ptsStr = `(+${s.points} pts)`.padStart(11)
+                // ★ 核心修復：使用統一的定長時間戳！
+                const timeStr = formatTimestamp(s.solvedAt)
+                appendHistory(`  ${catStr}  ${titleStr}  ${ptsStr}  @ ${timeStr}`, 'output')
             })
         } catch (err: any) {
             appendHistory(`whois: failed to inspect operator: ${err.message || 'Network error'}`, 'error')

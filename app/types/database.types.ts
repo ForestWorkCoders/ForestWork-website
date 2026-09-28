@@ -158,7 +158,6 @@ export type Database = {
           solved: number | null
           solves_count: number | null
           total_points: number | null
-          user: string | null
           username: string | null
         }
         Relationships: []
