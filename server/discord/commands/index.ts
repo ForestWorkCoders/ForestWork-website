@@ -19,6 +19,7 @@ import { handleCardCommand } from './card'
 import { handleSc } from './sc'
 import { handleLeaderboardCommand } from './leaderboard'
 import { handleLinerBattleCommand } from './linerbattle'
+import { handleDumpIds } from './dump-id'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -41,5 +42,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   coc_make: handleCocMake,
   card: handleCardCommand,
   leaderboard: handleLeaderboardCommand,
-  lb: handleLinerBattleCommand
+  lb: handleLinerBattleCommand,
+  dump_ids: handleDumpIds
 }
