@@ -34,7 +34,7 @@ export async function handleGiveQuasoContextMenu(interaction: any, event: H3Even
   }
 
   const supabase = getSupabase()
-  const { data: result, error } = await supabase.rpc('give_quaso', {
+  const { data: result, error } = await supabase.schema('trpg').rpc('give_quaso', {
     p_giver_id: callerId,
     p_giver_name: callerName,
     p_receiver_id: targetId,

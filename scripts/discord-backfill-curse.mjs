@@ -133,7 +133,7 @@ async function runBackfill(year) {
 
     // 原子累加至 Supabase
     for (const [userId, data] of userBatchMap.entries()) {
-      const { error: rpcErr } = await supabase.rpc('increment_curse_count', {
+      const { error: rpcErr } = await supabase.schema('trpg').rpc('increment_curse_count', {
         p_user_id: userId,
         p_username: data.username,
         p_year: year,

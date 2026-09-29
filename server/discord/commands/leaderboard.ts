@@ -219,7 +219,7 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
   const isReceived = mode === 'received'
 
   // 1. 呼叫 Postgres 聚合 RPC 拿前 10 名
-  const { data: topList, error } = await supabase.rpc('get_quaso_leaderboard', {
+  const { data: topList, error } = await supabase.schema('trpg').rpc('get_quaso_leaderboard', {
     p_mode: mode,
     p_limit: 10
   })
