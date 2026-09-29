@@ -119,7 +119,7 @@ const presets = computed<DatePreset[]>(() => {
     const rolling12 = getRolling12Months()
 
     return [
-        { id: 'all', label: '生涯全部', start: careerBounds.start, end: careerBounds.end },
+        { id: 'all', label: '生涯全部', start: '', end: '' },
         { id: 'recent_1y', label: '近12個月', start: rolling12.start, end: rolling12.end },
         { id: '2026', label: '2026全年', start: '2026-01', end: '2026-12' },
         { id: '2025', label: '2025全年', start: '2025-01', end: '2025-12' },
@@ -129,7 +129,7 @@ const presets = computed<DatePreset[]>(() => {
 })
 
 const activePresetId = computed(() => {
-    if (!dateRange.start || !dateRange.end) return 'all'
+    if (!dateRange.start && !dateRange.end) return 'all'
     const hit = presets.value.find(p => p.start === dateRange.start && p.end === dateRange.end)
     return hit ? hit.id : 'custom'
 })
@@ -166,10 +166,7 @@ watch(statsData, (newData) => {
     careerBounds.start = newData.careerBounds.start
     careerBounds.end = newData.careerBounds.end
 
-    if (!dateRange.start || !dateRange.end) {
-        dateRange.start = newData.careerBounds.start
-        dateRange.end = newData.careerBounds.end
-    }
+    // 如果是選手初次載入且未指定區間，保持 dateRange 為空（即默認查生涯全部）
 }, { immediate: true })
 
 // ==========================================
@@ -760,7 +757,8 @@ const achievements = ref([
 
             <!-- 牌譜屋風格大牌明細 -->
             <div v-if="currentMajorHand" class="space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <!-- 左側：標題與得失點數 -->
                     <div class="flex items-baseline gap-2">
                         <span class="text-xl font-black font-mono"
                             :class="majorHandMode === 'win' ? 'text-primary-600 dark:text-primary-400' : 'text-rose-500'">
@@ -770,7 +768,18 @@ const achievements = ref([
                             ({{ currentMajorHand.score.toLocaleString() }}點)
                         </span>
                     </div>
-                    <span class="text-xs text-gray-400 font-mono">{{ currentMajorHand.date }}</span>
+
+                    <!-- ★★★ 右側：對局時間 + 官方牌譜重播直達按鈕 ★★★ -->
+                    <div class="flex items-center gap-3 font-mono text-xs">
+                        <span class="text-gray-400">{{ currentMajorHand.date }}</span>
+
+                        <UButton v-if="currentMajorHand.paipuId"
+                            :to="`https://game.maj-soul.com/1/?paipu=${currentMajorHand.paipuId}`" target="_blank"
+                            size="xs" color="secondary" variant="soft" icon="i-heroicons-arrow-top-right-on-square"
+                            class="font-mono text-gray-700 dark:text-gray-300 hover:text-primary-500">
+                            觀看牌譜
+                        </UButton>
+                    </div>
                 </div>
 
                 <!-- 役種 3 欄式方陣 (對齊牌譜屋排版) -->
@@ -778,7 +787,6 @@ const achievements = ref([
                     <div v-for="(yaku, idx) in currentMajorHand.yakus" :key="idx"
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800/60">
                         <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
-                        <!-- ★ 好品味：優先使用後端格式化好的 label (役滿 / 雙倍役滿 / N 番) -->
                         <span class="font-bold" :class="[
                             yaku.isYakuman ? 'text-amber-500 font-black' : (majorHandMode === 'win' ? 'text-primary-500' : 'text-rose-400')
                         ]">

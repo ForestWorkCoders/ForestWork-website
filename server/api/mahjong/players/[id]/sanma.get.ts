@@ -310,7 +310,9 @@ export default defineEventHandler(async (event) => {
     const mySeat = uuidSeatMap.get(r.paipu_id)
     if (mySeat === undefined) return
 
-    const deltaScores = Array.isArray(r.delta_scores) ? r.delta_scores : []
+    const deltaScores = Array.isArray(r.delta_scores) 
+      ? r.delta_scores 
+      : (typeof r.delta_scores === 'string' ? JSON.parse(r.delta_scores || '[]') : [])
     const riichiStatus = Array.isArray(r.riichi_status) ? r.riichi_status : []
     const fuloStatus = Array.isArray(r.fulo_status) ? r.fulo_status : []
     const drawTenpai = Array.isArray(r.draw_tenpai) ? r.draw_tenpai : []
@@ -355,48 +357,68 @@ export default defineEventHandler(async (event) => {
 
     // 放銃判定 (榮和且放銃座是我)
     if (r.won_type === 'ron' && r.ron_seat === mySeat) {
+      // 1. 核心恢復：放銃計數累加 (消滅放銃率為 0 的 Bug)
       dealInCount++
-      const lost = Math.abs(Number(deltaScores[mySeat]) || 0)
-      totalDealInScore += lost
 
-      // 放銃時自身姿態
+      // 2. 核心恢復：放銃時自身姿態分流
       if (isMyRiichi) dealInSelfRiichi++
       else if (isMyFulo) dealInSelfFulo++
       else dealInSelfMenzen++
 
-      // 放銃至對手姿態
+      // 3. 提取贏家座與殺傷力
       const winnerSeat = r.won_seat
+      const winnerGain = winnerSeat !== null && winnerSeat !== undefined 
+        ? Math.max(0, Number(deltaScores[winnerSeat]) || 0) 
+        : Math.abs(Number(deltaScores[mySeat]) || 0)
+
+      // 4. 核心恢復：累計失分 (以單張手牌實際得點累加，避免一炮雙響失分重複翻倍)
+      totalDealInScore += winnerGain
+
+      // 5. 核心恢復：放銃至對象姿態分流
       if (winnerSeat !== null && winnerSeat !== undefined) {
         if (riichiStatus[winnerSeat] === 1) dealInToRiichi++
         else if (fuloStatus[winnerSeat] === 1) dealInToFulo++
         else dealInToDama++
       }
 
-      // ★ 順手追蹤最近最大痛銃
-      if (lost > maxDealInScore) {
-        maxDealInScore = lost
+      // 6. 最大痛銃追蹤 (以單張手牌殺傷力為準，精準鎖定 33000 役滿)
+      if (winnerGain > maxDealInScore) {
+        maxDealInScore = winnerGain
         maxDealInRound = r
       }
     }
   })
 
+  console.log(`[Major DealIn Debug] 
+    候選單局總數: ${scopedPlayerRounds.length}, 
+    最大痛銃得分: ${maxDealInScore}, 
+    最大痛銃局ID: ${maxDealInRound?.id}, 
+    牌譜UUID: ${maxDealInRound?.paipu_id}
+  `)
+
   // 格式化大牌資料包
-  const formatMajorHand = (targetRound: any, isDealIn: boolean) => {
+ const formatMajorHand = (targetRound: any, isDealIn: boolean) => {
     if (!targetRound) return null
     const mySeat = uuidSeatMap.get(targetRound.paipu_id)!
-    const deltaScores = Array.isArray(targetRound.delta_scores) ? targetRound.delta_scores : []
-    const rawScore = Number(deltaScores[isDealIn ? targetRound.won_seat : mySeat]) || 0
-    const score = Math.abs(rawScore)
+    const deltaScores = Array.isArray(targetRound.delta_scores) 
+      ? targetRound.delta_scores 
+      : (typeof targetRound.delta_scores === 'string' ? JSON.parse(targetRound.delta_scores || '[]') : [])
+
+    // 和牌看自己得點，痛銃看擊中自己的贏家得點 (若有總失點可取 Math.abs(deltaScores[mySeat]))
+    const winnerSeat = targetRound.won_seat
+    const handScore = isDealIn && winnerSeat !== null && winnerSeat !== undefined
+      ? Math.abs(Number(deltaScores[winnerSeat]) || 0)
+      : Math.abs(Number(deltaScores[mySeat]) || 0)
 
     const yakus = parseWonYaku(targetRound.won_yaku, yakuMap)
     const totalHan = yakus.reduce((sum, y) => sum + y.han, 0)
-    const title = getHandTitle(totalHan, score, yakus)
+    const title = getHandTitle(totalHan, handScore, yakus)
     const date = matchDateMap.get(targetRound.paipu_id) || '未知時間'
 
     return {
       paipuId: targetRound.paipu_id,
       date,
-      score,
+      score: handScore, // 33,000 點
       totalHan,
       title,
       yakus
