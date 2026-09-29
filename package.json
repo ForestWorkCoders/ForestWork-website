@@ -12,7 +12,8 @@
     "update:database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst,trpg,ctf > app/types/database.types.ts",
     "url:redirects": "node --env-file=.env scripts/verify-redirects.mjs",
     "discord:register-commands": "node --env-file=.env scripts/discord-register-commands.mjs",
-    "gartic:sync": "node --env-file=.env scripts/sync-gartic-manifest.js",
+    "gartic:split": "node scripts/garticPhone-split-album.mjs",
+    "gartic:sync": "node --env-file=.env scripts/garticPhone-sync-manifest.js",
     "ctf:hash": "node scripts/hash-flag.mjs"
   },
   "dependencies": {
