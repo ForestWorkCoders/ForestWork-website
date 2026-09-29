@@ -230,8 +230,8 @@ export default defineEventHandler(async (event) => {
   })
 
   // 5. 最近 20 場走勢
-  const recent20 = eligibleMatches.slice(0, 20).reverse()
-  const recentRanks = recent20.map(m => calculateMatchRankAndScore(m).rank)
+  const recent30 = eligibleMatches.slice(0, 30).reverse()
+  const recentRanks = recent30.map(m => calculateMatchRankAndScore(m).rank)
 
   // ==========================================
   // 6. 單局資料 (paipu_rounds) 分流提純

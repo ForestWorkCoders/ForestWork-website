@@ -232,16 +232,23 @@ const pieOption = computed(() => {
     }
 })
 
-// 6.2 最近 20 場走勢
+// 6.2 最近 50 場走勢 (通欄展開，高密度點陣微調)
 const lineOption = computed(() => {
     const ranks = statsData.value?.recentRanks || []
     return {
-        tooltip: { trigger: 'axis', formatter: '第 {b} 場: 第 {c} 位' },
-        grid: { left: '40', right: '20', top: '20', bottom: '30' },
+        tooltip: {
+            trigger: 'axis',
+            formatter: '第 {b} 場: 第 {c} 位',
+            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+            borderColor: '#374151',
+            textStyle: { color: '#f3f4f6', fontSize: 12 }
+        },
+        grid: { left: '40', right: '30', top: '25', bottom: '30' },
         xAxis: {
             type: 'category',
             data: Array.from({ length: ranks.length }, (_, i) => i + 1),
-            axisLine: { lineStyle: { color: '#374151' } }
+            axisLine: { lineStyle: { color: '#374151' } },
+            axisLabel: { color: '#9ca3af', fontSize: 11 }
         },
         yAxis: {
             type: 'value',
@@ -249,17 +256,31 @@ const lineOption = computed(() => {
             min: 1,
             max: 3,
             interval: 1,
-            axisLabel: { formatter: (v: number) => v === 1 ? '1位' : v === 2 ? '2位' : '3位' },
+            axisLabel: {
+                formatter: (v: number) => v === 1 ? '1位' : v === 2 ? '2位' : '3位',
+                color: '#9ca3af',
+                fontSize: 11
+            },
             splitLine: { lineStyle: { color: '#1f2937' } }
         },
         series: [{
             data: ranks,
             type: 'line',
-            smooth: true,
-            symbolSize: 8,
+            smooth: 0.25, // 微平滑，避免過度彎曲
+            showSymbol: true,
+            symbolSize: 6, // 點多時自動收縮點徑，保持乾淨
             itemStyle: { color: '#3b82f6' },
-            lineStyle: { width: 3, color: '#3b82f6' },
-            areaStyle: { color: 'rgba(59, 130, 246, 0.1)' }
+            lineStyle: { width: 2.5, color: '#3b82f6' },
+            areaStyle: {
+                color: {
+                    type: 'linear',
+                    x: 0, y: 0, x2: 0, y2: 1,
+                    colorStops: [
+                        { offset: 0, color: 'rgba(59, 130, 246, 0.25)' },
+                        { offset: 1, color: 'rgba(59, 130, 246, 0.0)' }
+                    ]
+                }
+            }
         }]
     }
 })
@@ -612,12 +633,18 @@ const achievements = ref([
             </div>
         </div>
 
-        <!-- 3. 宏觀趨勢區 (順位分佈餅圖 + 近20場折線圖) -->
+        <!-- 3. 選手宏觀畫像區：左側順位分佈圓環 + 右側四維作風雷達 (幾何對稱雙雄) -->
         <div v-if="selectedPlayerId" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                    {{ currentPlayer?.label }} · 累計順位戰績
-                </h2>
+            <!-- 左：累計順位分佈 -->
+            <div
+                class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3 mb-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">累計順位戰績 · Rank Distribution</h2>
+                        <p class="text-xs text-gray-500">所選區間內一位、二位、三位分佈佔比</p>
+                    </div>
+                </div>
+
                 <div class="h-72 w-full flex items-center justify-center">
                     <ClientOnly>
                         <VChart v-if="pieOption" :option="pieOption" class="w-full h-full" autoresize />
@@ -628,13 +655,19 @@ const achievements = ref([
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                    最近 20 場順位趨勢
-                </h2>
+            <!-- 右：四維作風雷達圖 -->
+            <div
+                class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3 mb-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">四維選手畫像 · Performance Radar</h2>
+                        <p class="text-xs text-gray-500">攻 / 速 / 防 (滾動近100局) · 運 (近20局)</p>
+                    </div>
+                </div>
+
                 <div class="h-72 w-full flex items-center justify-center">
                     <ClientOnly>
-                        <VChart v-if="lineOption" :option="lineOption" class="w-full h-full" autoresize />
+                        <VChart v-if="radarOption" :option="radarOption" class="w-full h-full" autoresize />
                         <template #fallback>
                             <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
                         </template>
@@ -688,7 +721,30 @@ const achievements = ref([
             </div>
         </div>
 
-        <!-- 5 最常同桌宿敵榜 (對齊牌譜屋圖 7，支援點擊直接切換視角) -->
+        <!-- 5. 宏觀時序走勢區：近30戰順位走勢 (通欄獨佔，舒展呈現) -->
+        <div v-if="selectedPlayerId"
+            class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">近期競技走勢 · Recent Form</h2>
+                    <UBadge color="primary" variant="subtle" size="xs">近 30 戰 (Recent 30 Matches)</UBadge>
+                </div>
+                <div class="text-xs text-gray-500 font-mono">
+                    最新場次在右側，1位為波峰，3位為谷底
+                </div>
+            </div>
+
+            <div class="h-64 w-full flex items-center justify-center">
+                <ClientOnly>
+                    <VChart v-if="lineOption" :option="lineOption" class="w-full h-full" autoresize />
+                    <template #fallback>
+                        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
+                    </template>
+                </ClientOnly>
+            </div>
+        </div>
+
+        <!-- 6. 最常同桌宿敵榜 (對齊牌譜屋圖 7，支援點擊直接切換視角) -->
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
@@ -727,7 +783,7 @@ const achievements = ref([
             </div>
         </div>
 
-        <!-- 4.6 高光時刻與痛銃名冊 (對齊牌譜屋圖 6) -->
+        <!-- 7. 高光時刻與痛銃名冊 (對齊牌譜屋圖 6) -->
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm space-y-4">
             <div
@@ -802,28 +858,7 @@ const achievements = ref([
             </div>
         </div>
 
-        <!-- 6. 四維作風雷達圖 (滾動近100局) -->
-        <div v-if="selectedPlayerId"
-            class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">四維選手畫像 · Performance Radar</h2>
-                    <p class="text-xs text-gray-500">攻 / 速 / 防 (近100局) · 運 (近20局)</p>
-                </div>
-                <UBadge color="primary" variant="subtle" size="xs">Rolling 100 Kyoku</UBadge>
-            </div>
-
-            <div class="h-72 w-full flex items-center justify-center">
-                <ClientOnly>
-                    <VChart v-if="radarOption" :option="radarOption" class="w-full h-full" autoresize />
-                    <template #fallback>
-                        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
-                    </template>
-                </ClientOnly>
-            </div>
-        </div>
-
-        <!-- 7. 榮譽與成就 -->
+        <!-- 8. 榮譽與成就 -->
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                 <div>
