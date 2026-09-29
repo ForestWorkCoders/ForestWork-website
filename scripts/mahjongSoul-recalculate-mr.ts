@@ -16,7 +16,8 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
   process.exit(1)
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY
+const supabase = createClient(process.env.SUPABASE_URL!, supabaseKey!)
 
 // ==========================================
 // 1. 三麻天鳳桌均 Elo 核心算子
