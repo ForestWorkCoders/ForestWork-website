@@ -61,12 +61,6 @@ export default defineEventHandler(async (event) => {
     .eq('discord_id', discordIdStr as unknown as number)
     .maybeSingle()
 
-  console.log(`[Mahjong Auth Probe] 
-    SQL 比對 Discord ID: "${discordIdStr}"
-    資料庫命中結果: ${JSON.stringify(participant)}
-    資料庫錯誤: ${error?.message || '無'}
-  `)
-
   if (error || !participant) {
     return {
       loggedIn: true,
