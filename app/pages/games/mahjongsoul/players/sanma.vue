@@ -187,7 +187,9 @@ const basic = computed(() => statsData.value?.basicStats || {
     drawTenpaiRate: 0,
     avgWinScore: 0,
     avgDealInScore: 0,
-    avgWinTurn: 0
+    avgWinTurn: 0,
+    mrRating: '未定級（N/A）',
+    mrLabel: '當前賽季'
 })
 
 // 預設檢視模式：'win' (最大和牌) 或 'dealIn' (最近大銃)
@@ -627,8 +629,8 @@ const achievements = ref([
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-gray-800/40 p-3 rounded-lg border border-gray-100 dark:border-gray-800/80">
-                    <div class="text-xs text-gray-400">天梯等級</div>
-                    <div class="text-lg font-bold text-primary-500 mt-1">MR Rating</div>
+                    <div class="text-xs text-gray-400">天梯等級 ({{ basic.mrLabel }})</div>
+                    <div class="text-lg font-bold text-primary-500 mt-1">{{ basic.mrRating }}</div>
                 </div>
             </div>
         </div>

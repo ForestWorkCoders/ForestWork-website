@@ -434,6 +434,28 @@ export default defineEventHandler(async (event) => {
   // 安全計算百分比助手
   const calcPct = (num: number, den: number) => den > 0 ? Number(((num / den) * 100).toFixed(2)) : 0
 
+  // ==========================================
+  // 7. MR 天梯等級提取 (自適應當前與歷史歸檔)
+  // ==========================================
+  let targetYear = new Date().getFullYear();
+  let mrLabel = '2026 賽季'
+
+  // 1. 如果使用者選中了單一年份 (如 2024 或 2025)
+  if (startMonth && endMonth && startMonth.slice(0, 4) === endMonth.slice(0, 4)) {
+    targetYear = Number(startMonth.slice(0, 4))
+    mrLabel = targetYear === 2026 ? '2026 賽季' : `${targetYear} 結算`
+  }
+
+  const { data: mrRow } = await supabase
+    .schema('mahjong')
+    .from('player_yearly_mr')
+    .select('mr_points')
+    .eq('account_id', accountId)
+    .eq('year', targetYear)
+    .maybeSingle()
+
+  const displayMr = mrRow?.mr_points ?? null
+
   const basicStats = {
     matchesCount: filteredMatches.length,
     totalRounds,
@@ -449,7 +471,9 @@ export default defineEventHandler(async (event) => {
     drawTenpaiRate: calcPct(drawTenpaiRoundCount, drawRoundCount),
     avgWinScore: winCount > 0 ? Math.round(totalWinScore / winCount) : 0,
     avgDealInScore: dealInCount > 0 ? Math.round(totalDealInScore / dealInCount) : 0,
-    avgWinTurn: winCount > 0 ? Number((totalWinTurns / winCount).toFixed(2)) : 0
+    avgWinTurn: winCount > 0 ? Number((totalWinTurns / winCount).toFixed(2)) : 0,
+    mrRating: displayMr !== null ? `${displayMr} 分` : '未定級 (N/A)',
+    mrLabel
   }
 
   // ====================================================================
@@ -537,7 +561,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // ==========================================
-  // 7. 回傳閉環數據合約
+  // 8. 回傳閉環數據合約
   // ==========================================
   return {
     careerBounds: { start: earliestYear, end: latestYear },

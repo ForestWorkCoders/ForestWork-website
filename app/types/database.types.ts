@@ -400,21 +400,56 @@ export type Database = {
           account_id: number
           discord_id: number | null
           id: number
+          mr_points: number
           nickname: string
         }
         Insert: {
           account_id: number
           discord_id?: number | null
           id?: number
+          mr_points?: number
           nickname: string
         }
         Update: {
           account_id?: number
           discord_id?: number | null
           id?: number
+          mr_points?: number
           nickname?: string
         }
         Relationships: []
+      }
+      player_yearly_mr: {
+        Row: {
+          account_id: number
+          created_at: string | null
+          matches_played: number
+          mr_points: number
+          year: number
+        }
+        Insert: {
+          account_id: number
+          created_at?: string | null
+          matches_played?: number
+          mr_points?: number
+          year: number
+        }
+        Update: {
+          account_id?: number
+          created_at?: string | null
+          matches_played?: number
+          mr_points?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_yearly_mr_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+        ]
       }
       rules: {
         Row: {
