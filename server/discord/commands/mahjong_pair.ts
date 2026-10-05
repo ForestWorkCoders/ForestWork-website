@@ -271,7 +271,7 @@ export async function handleMahjongPair(interaction: any, event: H3Event) {
       `> 東家: **${names[0]}** (\`${exportIds[0]}\`)\n` +
       `> 南家: **${names[1]}** (\`${exportIds[1]}\`)\n` +
       `> 西家: **${names[2]}** (\`${exportIds[2]}\`)\n` +
-      `> *(歷史碰撞: {${rawF1}, ${rawF2},${rawF3}})*`
+      `> *(歷史碰撞: {${rawF1}, ${rawF2}, ${rawF3}})*`
     )
 
     // 通道 B: 外部表格粘貼專用純數字行
