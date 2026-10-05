@@ -40,10 +40,12 @@ export async function handleRoll(interaction: any, event: H3Event) {
   const content = `🎲 **${desc}**：\`${count}D${faces}\`${keepText}\n` +
     `* **投擲明細**: \`${rollListStr}\`\n` +
     `* **最終結果**: **\`${total}\`**`
-    
+
     return {
       type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-      data: { content },
-      flags: isSecret ? 64 : undefined
+      data: { 
+        content: content,
+        flags: isSecret ? 64 : 0 // 64 = EPHEMERAL (僅自己可見)
+      },
     }
 }

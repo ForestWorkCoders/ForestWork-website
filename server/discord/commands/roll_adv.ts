@@ -131,7 +131,6 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
 
   return {
     type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-    data: { content },
-    flags: isSecret ? 64 : undefined
+    data: { content: content, flags: isSecret ? 64 : 0 },
   }
 }
