@@ -1,8 +1,25 @@
-// server/discord/commands/roll.ts
+// server/discord/commands/roll.ts 完整重構版：
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
 import { getInteractionOption } from '../utils'
-import { getSupabase } from '~~/server/utils/supabase';
+import { getSupabase } from '~~/server/utils/supabase'
+
+/**
+ * 斯巴達式 Discord 訊息發送小助手 (專供向指定子區投遞戰報)
+ */
+async function postDiscordMessage(channelId: string, content: string) {
+  const token = process.env.DISCORD_BOT_TOKEN
+  if (!token) return
+
+  await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bot ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ content })
+  }).catch((err) => console.error('[Discord Sync Error]:', err))
+}
 
 /**
  * 带有 Keep (kh/kl) / Drop (dh/dl) 修饰符的标准 Dice 词法解析器
@@ -10,7 +27,6 @@ import { getSupabase } from '~~/server/utils/supabase';
 function evaluateDiceExpression(expression: string): { total: number; breakdown: string } {
   const clean = expression.replace(/\s+/g, '').toLowerCase()
 
-  // 正则匹配项：[+/-]? ( [count]d[faces][modifier] | [constant] )
   const termRegex = /([+-]?)(?:(?:(\d*)d(\d+)(?:(kh|kl|dh|dl|k|d)(\d*))?)|(\d+))/g
   let match: RegExpExecArray | null
 
@@ -25,22 +41,18 @@ function evaluateDiceExpression(expression: string): { total: number; breakdown:
     const prefix = sign === -1 ? ' - ' : breakdownParts.length > 0 ? ' + ' : ''
 
     if (constantStr !== undefined) {
-      // 1. 常量项 (如 +5 或 -2)
       const val = parseInt(constantStr, 10)
       total += sign * val
       breakdownParts.push(`${prefix}${val}`)
     } else if (diceFacesStr !== undefined) {
-      // 2. 骰子项 (如 4d6k3, 2d20kl, 1d100)
       const count = Math.min(50, Math.max(1, diceCountStr ? parseInt(diceCountStr, 10) : 1))
       const faces = Math.min(1000, Math.max(1, parseInt(diceFacesStr, 10)))
 
-      // 物理摇骰
       const rawRolls: number[] = []
       for (let i = 0; i < count; i++) {
         rawRolls.push(crypto.randomInt(1, faces + 1))
       }
 
-      // 解析 Keep / Drop 命中索引
       const indexed = rawRolls.map((val, idx) => ({ idx, val }))
       let keptIndices = new Set<number>(indexed.map(item => item.idx))
 
@@ -49,46 +61,38 @@ function evaluateDiceExpression(expression: string): { total: number; breakdown:
         const safeNum = Math.min(count, Math.max(1, modNum))
 
         if (modType === 'k' || modType === 'kh') {
-          // 保留最高 N 颗
           indexed.sort((a, b) => b.val - a.val)
           keptIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
         } else if (modType === 'kl') {
-          // 保留最低 N 颗
           indexed.sort((a, b) => a.val - b.val)
           keptIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
         } else if (modType === 'dl' || modType === 'd') {
-          // 丢弃最低 N 颗
           indexed.sort((a, b) => a.val - b.val)
           const dropIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
           keptIndices = new Set(rawRolls.map((_, i) => i).filter(i => !dropIndices.has(i)))
         } else if (modType === 'dh') {
-          // 丢弃最高 N 颗
           indexed.sort((a, b) => b.val - a.val)
           const dropIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
           keptIndices = new Set(rawRolls.map((_, i) => i).filter(i => !dropIndices.has(i)))
         }
       }
 
-      // 统计命中点数之和与明细格式化（这里的作用域严格闭合）
-      // 统计命中点数之和与明细格式化
       let diceSum = 0
       const formattedRolls = rawRolls.map((val, i) => {
         if (keptIndices.has(i)) {
           diceSum += val
-          return `**${val}**` // 保留的点数：加粗强调
+          return `**${val}**`
         }
-        return `~~${val}~~`   // 丢弃的点数：删除线划掉
+        return `~~${val}~~`
       })
 
       total += sign * diceSum
 
       const modLabel = modType ? `${modType}${modCountStr || ''}` : ''
-      // 让 count + faces + modLabel 保持代码等宽字体，点数列表在外面使用 Markdown 表现层
       breakdownParts.push(`${prefix}\`${count}d${faces}${modLabel}\` [${formattedRolls.join(', ')}]`)
     }
   }
 
-  // 函数顶层确定性返回：类型严格吻合 { total: number; breakdown: string }
   return {
     total,
     breakdown: breakdownParts.join('') || '0'
@@ -98,9 +102,42 @@ function evaluateDiceExpression(expression: string): { total: number; breakdown:
 export async function handleRollAdv(interaction: any, event: H3Event) {
   const exprInput = getInteractionOption<string>(interaction, 'expr')?.trim() || '1d100'
   const desc = getInteractionOption<string>(interaction, 'desc') || '擲骰'
-  const isSecret = getInteractionOption<boolean>(interaction, 'secret')
+  const isSecret = Boolean(getInteractionOption<boolean>(interaction, 'secret'))
+  const channelType = interaction.channel?.type
+  const currentChannelId = String(interaction.channel_id)
+  const callerId = String(interaction.member?.user?.id || interaction.user?.id)
 
-  // 多组批量投掷：如 "6 4d6k3"
+  let gmThreadId: string | null = null
+
+  // ========================================================================
+  // ★ 核心好品味：若在公開子區內，並發「登記玩家」與「取得 GM 暗骰子區 ID」
+  // ========================================================================
+  if (channelType === 11) {
+    const supabase = getSupabase()
+    const [roomRes] = await Promise.all([
+      // 查詢當前子區是否屬於某個活躍跑團房間
+      supabase
+        .schema('trpg')
+        .from('room_sessions')
+        .select('gm_thread_id')
+        .eq('main_thread_id', currentChannelId)
+        .eq('status', 'ACTIVE')
+        .maybeSingle(),
+      // 記錄參團玩家身分
+      supabase.rpc('record_room_player', {
+        p_main_thread_id: currentChannelId,
+        p_player_id: callerId
+      })
+    ])
+
+    if (roomRes.data?.gm_thread_id) {
+      gmThreadId = roomRes.data.gm_thread_id
+    }
+  }
+
+  // ========================================================================
+  // 情況 A：多組批量投擲 (如 "6 4d6k3")
+  // ========================================================================
   const multiMatch = exprInput.match(/^(\d+)\s+([0-9a-zA-Z+\-\s]+)$/)
 
   if (multiMatch && multiMatch[1] && multiMatch[2]) {
@@ -113,39 +150,47 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
       results.push(`* **#${i + 1}**: **\`${total}\`** ← \`${breakdown}\``)
     }
 
+    const content = `🎲 **${desc}**：重複投擲 \`${repeatCount}\` 次 (\`${subExpr}\`)\n` + results.join('\n')
+
+    // ★★★ 核心同步：若是暗骰且存在 GM 私密子區，推播完整戰報！★★★
+    if (isSecret && gmThreadId) {
+      await postDiscordMessage(
+        gmThreadId,
+        `🕵️ **【批量暗骰報告】** 來自主線 <#${currentChannelId}>\n> 調查員: <@${callerId}>\n> 備註: **${desc}**\n${results.join('\n')}`
+      )
+    }
+
     return {
       type: 4,
       data: {
-        content: `🎲 **${desc}**：重複投擲 \`${repeatCount}\` 次 (\`${subExpr}\`)\n` + results.join('\n')
-      },
-      flags: 64
+        content,
+        flags: isSecret ? 64 : undefined
+      }
     }
-
   }
 
-  // 如果當前是在某個跑團主線子區內擲骰，將擲骰者自動納入參團名單！
-  const channelType = interaction.channel?.type
-  if (channelType === 11) {
-    const currentChannelId = String(interaction.channel_id)
-    const callerId = String(interaction.member?.user?.id || interaction.user?.id)
-
-    // 異步打點，不阻塞投骰的主線回應
-    const supabase = getSupabase()
-    await supabase.rpc('record_room_player', {
-      p_main_thread_id: currentChannelId,
-      p_player_id: callerId
-    })
-  }
-
-  // 单组投掷
+  // ========================================================================
+  // 情況 B：單組常規投擲
+  // ========================================================================
   const { total, breakdown } = evaluateDiceExpression(exprInput)
 
   const content = `🎲 **${desc}**：\`${exprInput}\`\n` +
     `* **明細**: ${breakdown}\n` +
     `* **最終結果**: **\`${total}\`**`
 
+  // ★★★ 核心同步：若是暗骰且存在 GM 私密子區，推播完整戰報！★★★
+  if (isSecret && gmThreadId) {
+    await postDiscordMessage(
+      gmThreadId,
+      `🕵️ **【暗骰報告】** 來自主線 <#${currentChannelId}>\n> 調查員: <@${callerId}>\n> 檢定: **${desc}** (\`${exprInput}\`)\n> 明細: ${breakdown}\n> 結果: **\`${total}\`**`
+    )
+  }
+
   return {
-    type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-    data: { content: content, flags: isSecret ? 64 : 0 },
+    type: 4,
+    data: {
+      content,
+      flags: isSecret ? 64 : undefined
+    }
   }
 }
