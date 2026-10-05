@@ -9,7 +9,7 @@ export async function handleRoll(interaction: any, event: H3Event) {
   const desc = getInteractionOption<string>(interaction, 'desc') || '擲骰'
   const keepMode = getInteractionOption<string>(interaction, 'keep')
   const keepCountRaw = getInteractionOption<number>(interaction, 'keep_count')
-  const isSecret = getInteractionOption<boolean>(interaction, 'secret') || false
+  const isSecret = getInteractionOption<boolean>(interaction, 'secret')
 
   // 1. 密码学级别随机掷骰
   const rolls: number[] = []
@@ -40,17 +40,10 @@ export async function handleRoll(interaction: any, event: H3Event) {
   const content = `🎲 **${desc}**：\`${count}D${faces}\`${keepText}\n` +
     `* **投擲明細**: \`${rollListStr}\`\n` +
     `* **最終結果**: **\`${total}\`**`
-
-  if (isSecret) {
+    
     return {
       type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
       data: { content },
-      flags: 64
+      flags: isSecret ? 64 : undefined
     }
-  } else {
-    return {
-      type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-      data: { content }
-    }
-  }
 }

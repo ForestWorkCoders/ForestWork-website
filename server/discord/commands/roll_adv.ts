@@ -97,7 +97,7 @@ function evaluateDiceExpression(expression: string): { total: number; breakdown:
 export async function handleRollAdv(interaction: any, event: H3Event) {
   const exprInput = getInteractionOption<string>(interaction, 'expr')?.trim() || '1d100'
   const desc = getInteractionOption<string>(interaction, 'desc') || '擲骰'
-  const isSecret = getInteractionOption<boolean>(interaction, 'secret') || false
+  const isSecret = getInteractionOption<boolean>(interaction, 'secret')
 
   // 多组批量投掷：如 "6 4d6k3"
   const multiMatch = exprInput.match(/^(\d+)\s+([0-9a-zA-Z+\-\s]+)$/)
@@ -112,23 +112,14 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
       results.push(`* **#${i + 1}**: **\`${total}\`** ← \`${breakdown}\``)
     }
 
-    if (isSecret) {
-      return {
-        type: 4,
-        data: {
-          content: `🎲 **${desc}**：重複投擲 \`${repeatCount}\` 次 (\`${subExpr}\`)\n` + results.join('\n')
-        },
-        flags: 64
-      }
+    return {
+      type: 4,
+      data: {
+        content: `🎲 **${desc}**：重複投擲 \`${repeatCount}\` 次 (\`${subExpr}\`)\n` + results.join('\n')
+      },
+      flags: 64
     }
-    else {
-      return {
-        type: 4,
-        data: {
-          content: `🎲 **${desc}**：重複投擲 \`${repeatCount}\` 次 (\`${subExpr}\`)\n` + results.join('\n')
-        }
-      }
-    }
+
   }
 
   // 单组投掷
@@ -139,7 +130,8 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
     `* **最終結果**: **\`${total}\`**`
 
   return {
-    type: 4,
-    data: { content }
+    type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
+    data: { content },
+    flags: isSecret ? 64 : undefined
   }
 }
