@@ -112,7 +112,7 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
   // ========================================================================
   // ★ 核心好品味：若在公開子區內，並發「登記玩家」與「取得 GM 暗骰子區 ID」
   // ========================================================================
-  if (channelType === 11) {
+  if (channelType === 12) {
     const supabase = getSupabase()
     const [roomRes] = await Promise.all([
       // 查詢當前子區是否屬於某個活躍跑團房間
