@@ -2,6 +2,7 @@
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
 import { getInteractionOption } from '../utils'
+import { getSupabase } from '~~/server/utils/supabase';
 
 /**
  * 带有 Keep (kh/kl) / Drop (dh/dl) 修饰符的标准 Dice 词法解析器
@@ -120,6 +121,20 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
       flags: 64
     }
 
+  }
+
+  // 如果當前是在某個跑團主線子區內擲骰，將擲骰者自動納入參團名單！
+  const channelType = interaction.channel?.type
+  if (channelType === 11) {
+    const currentChannelId = String(interaction.channel_id)
+    const callerId = String(interaction.member?.user?.id || interaction.user?.id)
+
+    // 異步打點，不阻塞投骰的主線回應
+    const supabase = getSupabase()
+    await supabase.rpc('record_room_player', {
+      p_main_thread_id: currentChannelId,
+      p_player_id: callerId
+    })
   }
 
   // 单组投掷
