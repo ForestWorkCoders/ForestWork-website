@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
 
         if (commandName === 'room') {
           const responsePayload = await handleRoomCommand(message)
-          console.log(`[Discord Room Response Delivered]: Type -> ${responsePayload?.type}`)
+          console.log(`[Discord room Response Delivered]: Type -> ${responsePayload?.type}`)
           return responsePayload
         }
       }
