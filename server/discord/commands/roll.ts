@@ -37,7 +37,7 @@ export async function handleRoll(interaction: any, event: H3Event) {
 
   // 如果當前是在某個跑團主線子區內擲骰，將擲骰者自動納入參團名單！
   const channelType = interaction.channel?.type
-  if (channelType === 11) {
+  if (channelType === 11 || channelType === 12) {
     const currentChannelId = String(interaction.channel_id)
     const callerId = String(interaction.member?.user?.id || interaction.user?.id)
 
