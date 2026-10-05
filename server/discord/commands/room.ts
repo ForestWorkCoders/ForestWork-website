@@ -3,6 +3,7 @@ import { getSupabase } from '../../utils/supabase'
 
 // ★★★ 核心門禁：跑團房間管理專屬身分組 ID ★★★
 const REQUIRED_ROOM_ROLE_ID = '919954440709087252'
+const REQUIRED_PARENT_CHANNEL_ID = '1556515164252278904'
 
 /**
  * 斯巴達式 Discord REST API 內部調用器
@@ -43,6 +44,16 @@ async function handleOpen(interaction: any, subOptions: any[]) {
   const callerId = String(interaction.member?.user?.id || interaction.user?.id)
   const title = getOptionValue<string>(subOptions, 'title') || '未命名模組'
   const coGmId = getOptionValue<string>(subOptions, 'co_gm')
+
+  if (channelId !== REQUIRED_PARENT_CHANNEL_ID) {
+    return {
+      type: 4,
+      data: {
+        content: `🛑 **位置錯誤**：開房指令 \`/room open\` 僅限於在專屬跑團大廳 <#${REQUIRED_PARENT_CHANNEL_ID}> 執行！`,
+        flags: 64 // 僅自己可見
+      }
+    }
+  }
 
   try {
     // ------------------------------------------------------------------------
@@ -175,7 +186,7 @@ async function handleAddGm(interaction: any, subOptions: any[]) {
 }
 
 // ============================================================================
-// 子指令 3: 結案存檔 (/room close)
+// 子指令 3: 結案存檔 (/room close) —— ★ 100% 同步交卷，物理鎖死雙子區！
 // ============================================================================
 async function handleClose(interaction: any, subOptions: any[]) {
   const currentChannelId = String(interaction.channel_id)
@@ -184,47 +195,80 @@ async function handleClose(interaction: any, subOptions: any[]) {
 
   const supabase = getSupabase()
 
+  // 1. 取得當前房間 (支援在 main_thread 或 gm_thread 敲指令結案)
   const { data: room, error } = await supabase
     .schema('trpg')
     .from('room_sessions')
     .select('*')
     .or(`main_thread_id.eq.${currentChannelId},gm_thread_id.eq.${currentChannelId}`)
-    .eq('status', 'ACTIVE')
     .maybeSingle()
 
   if (error || !room) {
-    return { type: 4, data: { content: '❌ 當前頻道不是一個進行中的跑團房間子區！', flags: 64 } }
+    return {
+      type: 4,
+      data: { content: '❌ 當前頻道不是一個進行中的跑團房間子區！', flags: 64 }
+    }
   }
 
+  if (room.status === 'ARCHIVED') {
+    const closedDate = room.ended_at ? room.ended_at.split('T')[0] : '先前'
+    return {
+      type: 4,
+      data: {
+        content: `⚠️ **請勿重複結案**：本模組【${room.room_name}】已於 \`${closedDate}\` 結案歸檔！\n> 當前為歷史只讀存檔，無需再次執行關閉。`,
+        flags: 64
+      }
+    }
+  }
+
+  // 2. 權限檢查：必須由本房間已登記的 GM 執行結團
   if (!room.gm_ids.includes(callerId)) {
-    return { type: 4, data: { content: '🛑 閣下不是本房間的 GM，無權執行結團存檔！', flags: 64 } }
+    return {
+      type: 4,
+      data: { content: '🛑 閣下不是本房間的 GM，無權執行結團存檔！', flags: 64 }
+    }
   }
 
-  // 1. 狀態凍結落庫
-  await supabase
-    .schema('trpg')
-    .from('room_sessions')
-    .update({
-      status: 'ARCHIVED',
-      summary: summary,
-      ended_at: new Date().toISOString()
-    })
-    .eq('id', room.id)
-
-  // 2. 並發鎖定並歸檔兩個子區
+  // --------------------------------------------------------------------------
+  // 階段 1：並發更新資料庫 + 物理鎖死兩個子區 (耗時 ~350ms)
+  // ★ 核心好品味：全部顯式 await，絕不在 Serverless 留下懸空調用！
+  // --------------------------------------------------------------------------
   const lockAndArchiveThread = async (threadId: string) => {
     try {
-      await discordApi(`/channels/${threadId}`, 'PATCH', { archived: true, locked: true })
+      await discordApi(`/channels/${threadId}`, 'PATCH', {
+        archived: true,
+        locked: true
+      })
     } catch (e: any) {
       console.error(`[Thread Lock Failed for ${threadId}]:`, e.message)
     }
   }
 
+  
+
   await Promise.all([
+    // 任務 A: 資料庫狀態凍結
+    supabase
+      .schema('trpg')
+      .from('room_sessions')
+      .update({
+        status: 'ARCHIVED',
+        summary: summary,
+        ended_at: new Date().toISOString()
+      })
+      .eq('id', room.id),
+
+    // 任務 B: 鎖死並歸檔主線私密包廂
     lockAndArchiveThread(room.main_thread_id),
+
+    // 任務 C: 鎖死並歸檔 GM 暗骰箱
     lockAndArchiveThread(room.gm_thread_id)
   ])
 
+  const gms = (room.gm_ids || []).map((id: string) => `<@${id}>`).join(' ')
+  // --------------------------------------------------------------------------
+  // 階段 2：同步交付結案戰報大卡片 (Type 4)
+  // --------------------------------------------------------------------------
   const playersText = room.player_ids && room.player_ids.length > 0
     ? room.player_ids.map((id: string) => `<@${id}>`).join(' ')
     : '無其他參團玩家 *(僅 GM 測試或全員無擲骰)*'
@@ -236,9 +280,9 @@ async function handleClose(interaction: any, subOptions: any[]) {
         `🏁 **【跑團正式完結存檔】**`,
         `> 模組: **${room.room_name}**`,
         `> 結案簡報: *${summary}*`,
-        `> 主持團隊: ${room.gm_ids.map((id: string) => `<@${id}>`).join(' ')}`,
+        `> 主持團隊: ${gms}`,
         `> 參團成員: ${playersText}`,
-        `*(主線與暗骰子區已自動鎖定歸檔，輸入 \`/room archive\` 可隨時檢索調閱)*`
+        `*(主線與暗骰子區已物理上鎖封存，輸入 \`/room archive\` 可隨時檢索調閱)*`
       ].join('\n')
     }
   }
