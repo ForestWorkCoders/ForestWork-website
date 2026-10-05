@@ -1,10 +1,6 @@
 // server/discord/commands/leaderboard.ts
 import type { H3Event } from 'h3'
-import { createClient } from '@supabase/supabase-js'
-
-function getSupabase() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
+import { getSupabase } from '../../utils/supabase'
 
 /**
  * 構造單一複合下拉選單 ActionRow (好品味：狀態自包含，當前選中項自動高亮 default: true)

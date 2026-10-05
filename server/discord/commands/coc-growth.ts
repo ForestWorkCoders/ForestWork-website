@@ -1,14 +1,8 @@
 // server/discord/commands/en.ts
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
-import { createClient } from '@supabase/supabase-js'
 import { getInteractionOption } from '../utils'
-
-function getSupabase() {
-  const url = process.env.SUPABASE_URL || ''
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || ''
-  return createClient(url, serviceKey)
-}
+import { getSupabase } from '../../utils/supabase'
 
 const d100 = () => crypto.randomInt(1, 101)
 const d10 = () => crypto.randomInt(1, 11)

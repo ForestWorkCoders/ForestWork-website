@@ -1,11 +1,7 @@
 // server/discord/commands/linerbattle.ts
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
-import { createClient } from '@supabase/supabase-js'
-
-function getSupabase() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
+import { getSupabase } from '../../utils/supabase'
 
 const MAX_HP = 100
 

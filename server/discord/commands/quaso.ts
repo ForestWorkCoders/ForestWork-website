@@ -1,10 +1,6 @@
 // server/discord/commands/quaso.ts
 import type { H3Event } from 'h3'
-import { createClient } from '@supabase/supabase-js'
-
-function getSupabase() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
+import { getSupabase } from '../../utils/supabase'
 
 /**
  * 處理 Discord 右鍵上下文選單: [🥐 送 1 個 Quaso]
