@@ -10,26 +10,35 @@ interface DiscordUser {
 }
 
 // 核心：必须是 export default defineEventHandler，不要加括号调用，不要改名字！
+// server/api/giveaway/pull.post.ts
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const pollUrl = String(body?.pollUrl || '').trim()
-  const answerId = Number(body?.answerId) || 1
 
   if (!pollUrl) {
     throw createError({ statusCode: 400, statusMessage: '缺少 Discord 消息链接' })
   }
 
-  const match = pollUrl.match(/channels\/(\d+)\/(\d+)\/(\d+)/)
+  // 1. 好品味正则：同时提取 channelId、messageId 与末尾可选的 #选项编号 (例如 .../14786264606#2)
+  const match = pollUrl.match(/channels\/\d+\/(\d+)\/(\d+)(?:[#?](?:answer=|opt=)?(\d+))?/)
   if (!match) {
     throw createError({ statusCode: 400, statusMessage: '非法的 Discord 消息链接格式' })
   }
-  const [, , channelId, messageId] = match
+
+  // 干净解构出三个物理坐标
+  const [, channelId, messageId, urlAnswerId] = match
+
+  // 2. 核心优雅管道：显式入参 > URL Hash 锚点 > 默认第 1 项
+  const answerId = Number(body?.answerId) || Number(urlAnswerId) || 1
 
   const botToken = process.env.DISCORD_BOT_TOKEN
   if (!botToken) {
     throw createError({ statusCode: 500, statusMessage: '服务端未配置 DISCORD_BOT_TOKEN' })
   }
 
+  // ========================================================================
+  // 以下分页拉取逻辑保持原样，无需修改任何一行！
+  // ========================================================================
   const votersMap = new Map<string, { id: string; name: string; avatarUrl?: string }>()
   let lastId: string | null = null
   let hasMore = true
@@ -70,7 +79,7 @@ export default defineEventHandler(async (event) => {
 
   const candidates = Array.from(votersMap.values())
   if (candidates.length === 0) {
-    throw createError({ statusCode: 400, statusMessage: '当前 Poll 没有任何玩家参与投票' })
+    throw createError({ statusCode: 400, statusMessage: `该投票选项 (#${answerId}) 没有任何玩家参与` })
   }
 
   return { candidates }

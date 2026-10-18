@@ -32,6 +32,8 @@ const SLICE_COLORS = [
     '#f59e0b', '#10b981', '#06b6d4', '#6366f1'
 ]
 
+
+
 // 浏览器端 CSPRNG 均匀取模无偏索引
 const secureRandomInt = (max: number): number => {
     const array = new Uint32Array(1)
@@ -110,26 +112,28 @@ const drawWheel = (angle: number) => {
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
 
 // 阶段 1：拉取并初始化奖池
-const handlePull = async () => {
-    if (!pollUrl.value || isSpinning.value) return
-    loading.value = true
-    currentWinner.value = null
-    currentWinnerIndex.value = null
-    winnersHistory.value = []
+const selectedAnswerId = ref(1)
 
-    try {
-        const res = await $fetch<{ candidates: Candidate[] }>('/api/giveaway/pull', {
-            method: 'POST',
-            body: { pollUrl: pollUrl.value }
-        })
-        pool.value = res.candidates
-        await nextTick()
-        drawWheel(currentAngle)
-    } catch (err: any) {
-        alert(err?.data?.statusMessage || err?.message || '拉取名单失败')
-    } finally {
-        loading.value = false
-    }
+const handlePull = async () => {
+  if (!pollUrl.value || isSpinning.value) return
+  loading.value = true
+  // ... 清空状态
+  try {
+    const res = await $fetch<{ candidates: Candidate[] }>('/api/giveaway/pull', {
+      method: 'POST',
+      body: { 
+        pollUrl: pollUrl.value,
+        answerId: selectedAnswerId.value // 透传选项编号
+      }
+    })
+    pool.value = res.candidates
+    await nextTick()
+    drawWheel(currentAngle)
+  } catch (err: any) {
+    alert(err?.data?.statusMessage || err?.message || '拉取名单失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 // 阶段 2：执行单次抽取
@@ -207,15 +211,45 @@ const commitAndRemoveWinner = () => {
 
         <!-- 阶段 1：名单拉取面板 -->
         <UCard>
-            <div class="flex flex-col sm:flex-row gap-3">
-                <UInput v-model="pollUrl" class="flex-1" placeholder="https://discord.com/channels/.../.../..."
-                    icon="i-heroicons-link" :disabled="isSpinning || loading" />
-                <UButton color="primary" :loading="loading" :disabled="!pollUrl || isSpinning"
-                    icon="i-heroicons-arrow-down-tray" @click="handlePull">
-                    第一步：拉取名单
-                </UButton>
-            </div>
-        </UCard>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <UInput
+          v-model="pollUrl"
+          class="flex-1"
+          placeholder="https://discord.com/channels/.../.../... (支持在末尾加 #2 指定选项)"
+          icon="i-heroicons-link"
+          :disabled="isSpinning || loading"
+        />
+
+        <!-- 极简选项序号选择器 -->
+        <USelect
+          v-model="selectedAnswerId"
+          :items="[
+            { label: '选项 1 (默认)', value: 1 },
+            { label: '选项 2', value: 2 },
+            { label: '选项 3', value: 3 },
+            { label: '选项 4', value: 4 },
+            { label: '选项 5', value: 5 },
+            { label: '选项 6', value: 6 },
+            { label: '选项 7', value: 7 },
+            { label: '选项 8', value: 8 },
+            { label: '选项 9', value: 9 },
+            { label: '选项 10', value: 10 }
+          ]"
+          class="w-36"
+          :disabled="isSpinning || loading"
+        />
+
+        <UButton
+          color="primary"
+          :loading="loading"
+          :disabled="!pollUrl || isSpinning"
+          icon="i-heroicons-arrow-down-tray"
+          @click="handlePull"
+        >
+          第一步：拉取名单
+        </UButton>
+      </div>
+    </UCard>
 
         <!-- 阶段 2：转盘与连环抽取控制台 -->
         <div v-if="pool.length > 0 || winnersHistory.length > 0"
