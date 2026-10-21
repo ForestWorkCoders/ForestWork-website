@@ -63,7 +63,15 @@ export default defineNuxtConfig({
 
     // 3. Gartic Phone 旧站重定向（301 永久重定向）
     '/gartic_phone': { redirect: { to: '/games/garticphone', statusCode: 301 } },
-    '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } }
+    '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } },
+
+    // 4. Discord 站内嵌套允许（CSP + XFO）
+    '/activities/**': {
+      headers: {
+        'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com",
+        'X-Frame-Options': 'ALLOWALL'
+      }
+    }
   },
 
   compatibilityDate: '2026-06-30',
