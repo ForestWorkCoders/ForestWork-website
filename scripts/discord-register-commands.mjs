@@ -15,6 +15,11 @@ if (!APP_ID || !BOT_TOKEN) {
     process.exit(1)
 }
 
+const headers = {
+    Authorization: `Bot ${BOT_TOKEN}`,
+    'Content-Type': 'application/json'
+}
+
 // 通用基础指令
 const commonCommands = [
     { name: 'ping', description: '檢查網站與交互機器人運行狀態' },
@@ -666,6 +671,15 @@ const forestCommands = [
     }
 ]
 
+const globalActivityEntryPointCommand = [
+    {
+        name: 'play', // 指令名称，只能包含小写字母、数字，无空格 (例如: play, sandbox, launch)
+        description: '啟動林間小鎮選手技能評定沙盒',
+        type: 4, // ★ 核心契约：4 代表 PRIMARY_ENTRY_POINT
+        handler: 2 // ★ 核心好品味：2 代表 DISCORD_LAUNCH_ACTIVITY，客户端原地启动，不走后端网络中转
+    }
+]
+
 // 按 Guild 配置指令清单 (数据驱动，物理隔离)
 const guildConfigs = {
     // 林間小鎮
@@ -676,21 +690,38 @@ const guildConfigs = {
 }
 
 
-
-for (const [guildId, commands] of Object.entries(guildConfigs)) {
-    console.log(`[+] 正在为 Guild [${guildId}] 同步 ${commands.length} 个指令...`)
-    const res = await fetch(`https://discord.com/api/v10/applications/${APP_ID}/guilds/${guildId}/commands`, {
+async function sync() {
+    // 阶段 1：向全局同步活动入口
+    console.log(`[+] 正在注册全局活动主入口指令...`)
+    const globalRes = await fetch(`https://discord.com/api/v10/applications/${APP_ID}/commands`, {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bot ${BOT_TOKEN}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(commands)
+        headers,
+        body: JSON.stringify(globalActivityEntryPointCommand)
     })
 
-    if (res.ok) {
-        console.log(`[✔] Guild [${guildId}] 同步成功:`, commands.map(c => `/${c.name}`).join(', '))
+    if (globalRes.ok) {
+        const data = await globalRes.json()
+        console.log(`[✔] 全局活动主入口注册成功:`, data.map(c => `/${c.name} (type: ${c.type})`).join(', '))
     } else {
-        console.error(`[-] Guild [${guildId}] 注册失败:`, await res.text())
+        console.error(`[-] 全局注册失败:`, await globalRes.text())
+        process.exit(1)
+    }
+
+    // 阶段 2：向各个 Guild 同步专属业务指令
+    for (const [guildId, commands] of Object.entries(guildConfigs)) {
+        console.log(`[+] 正在向 Guild [${guildId}] 同步 ${commands.length} 个业务指令...`)
+        const guildRes = await fetch(`https://discord.com/api/v10/applications/${APP_ID}/guilds/${guildId}/commands`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(commands)
+        })
+
+        if (guildRes.ok) {
+            console.log(`[✔] Guild [${guildId}] 业务指令同步成功`)
+        } else {
+            console.error(`[-] Guild [${guildId}] 注册失败:`, await guildRes.text())
+        }
     }
 }
+
+sync()
