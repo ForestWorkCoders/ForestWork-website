@@ -229,129 +229,150 @@ onUnmounted(() => {
     <!-- 视图 1：VALORANT VCT 风格 10 槽位选拔大厅 (SELECTION HUB) -->
     <!-- ================================================================= -->
     <div v-if="viewMode === 'hub'" class="relative z-10 flex-1 flex flex-col h-full overflow-hidden">
-      <!-- 顶部工业风横幅 -->
-      <header class="shrink-0 w-full px-5 py-3 flex items-center justify-between border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
-        <!-- 左上角：跳出至 ForestWork 官方主站 -->
-        <div class="flex items-center gap-3">
-          <a
-            href="https://forestwork.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group flex items-center gap-2 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
-            title="開啟林間小鎮官方網站"
-          >
-            <span class="text-xs font-mono font-bold text-emerald-400 group-hover:-translate-x-0.5 transition-transform">←</span>
-            <span class="text-xs font-black tracking-widest uppercase text-zinc-200 group-hover:text-white font-mono">
-              FORESTWORK.OS
-            </span>
-            <span class="text-[10px] text-zinc-500 group-hover:text-emerald-400 font-mono">↗</span>
-          </a>
-          <!-- ★ 核心修改 1：地名更新为 NORWAY，字系微调 -->
-          <span class="hidden sm:inline-block text-[11px] font-mono text-zinc-500 uppercase tracking-widest pl-2 border-l border-zinc-800">
-            SECTOR // NORWAY
-          </span>
+      
+      <!-- ================================================================= -->
+      <!-- 状态 A：极度矮屏待机引导终端 (H < 330px 时由 CSS 自动激活) -->
+      <!-- ================================================================= -->
+      <section class="compact-standby-view w-full h-full flex flex-col justify-between p-4 bg-[#090a0f] font-mono select-none">
+        <!-- 终端顶栏状态 -->
+        <div class="flex items-center justify-between text-xs border-b border-zinc-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span class="text-amber-400 font-bold tracking-wider">FW_OS // STANDBY_MODE</span>
+          </div>
+          <span class="text-[10px] text-zinc-500">RES_LIMIT: CRITICAL</span>
         </div>
 
-        <!-- 顶栏中央主标题 -->
-        <div class="text-center">
-          <h1 class="text-base sm:text-xl font-black tracking-[0.25em] text-white uppercase font-mono">
-            CHOOSE YOUR TRIAL
-          </h1>
-          <p class="text-[9px] tracking-widest text-emerald-400 font-mono">選手實力評定沙盒 // 10 SLOTS MATRIX</p>
+        <!-- 终端核心提示：引导玩家点击全屏/展开抽屉 -->
+        <div class="my-auto py-2">
+          <div class="text-xs text-emerald-400 font-bold tracking-widest uppercase mb-1">
+            &gt; SYSTEM_HALT: VIEWPORT_GEOMETRY_RESTRICTED
+          </div>
+          <p class="text-[11px] text-zinc-300 leading-relaxed max-w-xl">
+            目前視窗高度受限，無法展開 10 槽位選手評定矩陣。<br>
+            請點擊下方控制列的 <span class="text-white font-bold bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700">⤢ 展開 / 全螢幕</span> 按鈕以解除戰術限制。
+          </p>
         </div>
 
-        <!-- 右侧元数据指示 -->
-        <div class="flex items-center gap-3 font-mono text-xs">
-          <div class="flex items-center gap-1.5 text-zinc-400">
+        <!-- 终端底栏跑码提示 -->
+        <div class="text-[10px] text-zinc-600 flex justify-between items-center pt-2 border-t border-zinc-900">
+          <span class="animate-pulse">&gt; WAITING_FOR_DISPLAY_EXPANSION_</span>
+          <span>DISCORD_EMBED_SEC_01</span>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 状态 B：标准 10 槽位战术大厅 (H >= 330px 时正常展示) -->
+      <!-- ================================================================= -->
+      <div class="normal-hub-view flex-1 flex flex-col h-full overflow-hidden">
+        <!-- 顶部工业风横幅 -->
+        <header class="shrink-0 w-full px-5 py-2.5 flex items-center justify-between border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
+          <!-- 左上角：跳出至主站 -->
+          <div class="flex items-center gap-3">
+            <a
+              href="https://forestwork.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex items-center gap-2 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
+              title="開啟林間小鎮官方網站"
+            >
+              <span class="text-xs font-mono font-bold text-emerald-400 group-hover:-translate-x-0.5 transition-transform">←</span>
+              <span class="text-xs font-black tracking-widest uppercase text-zinc-200 group-hover:text-white font-mono whitespace-nowrap">
+                FORESTWORK.OS
+              </span>
+              <span class="text-[10px] text-zinc-500 group-hover:text-emerald-400 font-mono">↗</span>
+            </a>
+          </div>
+
+          <!-- 顶栏中央主标题 (★ 核心修复：锁死 whitespace-nowrap，彻底消灭折成 3 行的丑态！) -->
+          <div class="text-center px-2">
+            <h1 class="text-xs sm:text-base md:text-lg font-black tracking-[0.2em] text-white uppercase font-mono whitespace-nowrap">
+              CHOOSE YOUR TRIAL
+            </h1>
+            <p class="text-[8px] sm:text-[9px] tracking-widest text-emerald-400 font-mono whitespace-nowrap hidden sm:block">
+              選手實力評定沙盒 // 10 SLOTS MATRIX
+            </p>
+          </div>
+
+          <!-- 右侧元数据指示 -->
+          <div class="flex items-center gap-2 font-mono text-xs whitespace-nowrap">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span class="text-[10px] tracking-wider">SYS: ONLINE</span>
+            <span class="text-[10px] text-zinc-400 tracking-wider hidden sm:inline">SYS: ONLINE</span>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <!-- 
-        ★ 核心修改 2：彻底消灭截断！
-        1. 移除 aspect-[3/4]；
-        2. 采用 grid-cols-5 grid-rows-2 h-full，让两行卡片死死锁在容器剩余可用高度内；
-        3. p-3 sm:p-4 减少边缘浪费，留足垂直净空。
-      -->
-      <main class="flex-1 min-h-0 w-full max-w-7xl mx-auto p-3 sm:p-4 flex flex-col overflow-hidden">
-        <div class="grid grid-cols-2 sm:grid-cols-5 grid-rows-5 sm:grid-rows-2 gap-2.5 sm:gap-3 w-full h-full min-h-0">
-          <div
-            v-for="slot in TRIAL_SLOTS"
-            :key="slot.id"
-            @click="launchSlot(slot)"
-            :class="[
-              'group relative flex flex-col justify-between p-2.5 sm:p-3 rounded-sm border transition-all duration-150 select-none overflow-hidden h-full min-h-0',
-              slot.status === 'ready'
-                ? 'bg-[#10131a] hover:bg-[#151a24] border-zinc-800 cursor-pointer hover:shadow-lg'
-                : 'bg-[#0c0d12]/50 border-zinc-900/80 opacity-50 cursor-not-allowed'
-            ]"
-            :style="slot.status === 'ready' ? { '--slot-accent': slot.accentColor } : {}"
-          >
-            <!-- 槽位工业边角装饰标记 -->
-            <div class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-zinc-600 group-hover:border-emerald-400 transition-colors" />
-            <div class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-zinc-600 group-hover:border-emerald-400 transition-colors" />
+        <!-- 10 槽位卡片网格容器 -->
+        <main class="flex-1 min-h-0 w-full max-w-7xl mx-auto p-2.5 sm:p-4 flex flex-col overflow-hidden">
+          <div class="grid grid-cols-2 sm:grid-cols-5 grid-rows-5 sm:grid-rows-2 gap-2 sm:gap-3 w-full h-full min-h-0">
+            <div
+              v-for="slot in TRIAL_SLOTS"
+              :key="slot.id"
+              @click="launchSlot(slot)"
+              :class="[
+                'group relative flex flex-col justify-between p-2 sm:p-3 rounded-sm border transition-all duration-150 select-none overflow-hidden h-full min-h-0',
+                slot.status === 'ready'
+                  ? 'bg-[#10131a] hover:bg-[#151a24] border-zinc-800 cursor-pointer hover:shadow-lg'
+                  : 'bg-[#0c0d12]/50 border-zinc-900/80 opacity-50 cursor-not-allowed'
+              ]"
+              :style="slot.status === 'ready' ? { '--slot-accent': slot.accentColor } : {}"
+            >
+              <!-- 边角标记 -->
+              <div class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-zinc-600 group-hover:border-emerald-400 transition-colors" />
+              <div class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-zinc-600 group-hover:border-emerald-400 transition-colors" />
 
-            <!-- 卡片头部：编号与战术代号 -->
-            <div class="shrink-0 flex justify-between items-start font-mono z-10 leading-tight">
-              <span
-                class="text-[11px] font-black transition-colors"
-                :style="{ color: slot.status === 'ready' ? slot.accentColor : '#71717a' }"
-              >
-                // {{ slot.index }}
-              </span>
-              <div class="text-right">
-                <div class="text-[10px] sm:text-[11px] font-bold tracking-wider text-zinc-200 group-hover:text-white">
-                  {{ slot.title }}
-                </div>
-                <div class="text-[8px] text-zinc-500 tracking-tight uppercase truncate max-w-[80px] sm:max-w-none">
-                  {{ slot.category }}
+              <!-- 卡片头部 -->
+              <div class="shrink-0 flex justify-between items-start font-mono z-10 leading-tight">
+                <span
+                  class="text-[10px] sm:text-[11px] font-black transition-colors"
+                  :style="{ color: slot.status === 'ready' ? slot.accentColor : '#71717a' }"
+                >
+                  // {{ slot.index }}
+                </span>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-[11px] font-bold tracking-wider text-zinc-200 group-hover:text-white truncate max-w-[80px] sm:max-w-none">
+                    {{ slot.title }}
+                  </div>
+                  <div class="text-[7px] sm:text-[8px] text-zinc-500 tracking-tight uppercase truncate max-w-[70px] sm:max-w-none">
+                    {{ slot.category }}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 卡片中部：图标与状态徽章 (弹性适应高度，绝不撑大卡片) -->
-            <div class="flex-1 min-h-0 flex flex-col items-center justify-center py-1 overflow-hidden relative">
-              <div
-                class="text-2xl sm:text-3xl font-black font-mono transition-transform duration-200 group-hover:scale-110 select-none"
-                :style="{ color: slot.status === 'ready' ? slot.accentColor : '#3f3f46' }"
-              >
-                {{ slot.status === 'ready' ? '⚡' : '🔒' }}
+              <!-- 卡片中部 -->
+              <div class="flex-1 min-h-0 flex flex-col items-center justify-center py-0.5 overflow-hidden relative">
+                <div
+                  class="text-xl sm:text-2xl font-black font-mono transition-transform duration-200 group-hover:scale-110 select-none"
+                  :style="{ color: slot.status === 'ready' ? slot.accentColor : '#3f3f46' }"
+                >
+                  {{ slot.status === 'ready' ? '⚡' : '🔒' }}
+                </div>
+                <span
+                  v-if="slot.status === 'ready'"
+                  class="mt-0.5 px-1.5 py-0.2 text-[7px] sm:text-[8px] font-mono tracking-widest uppercase rounded border font-semibold"
+                  :style="{
+                    backgroundColor: `${slot.accentColor}15`,
+                    color: slot.accentColor,
+                    borderColor: `${slot.accentColor}40`
+                  }"
+                >
+                  DEPLOYABLE
+                </span>
               </div>
 
-              <!-- 状态徽章 -->
-              <span
-                v-if="slot.status === 'ready'"
-                class="mt-1 px-1.5 py-0.5 text-[8px] font-mono tracking-widest uppercase rounded border font-semibold"
-                :style="{
-                  backgroundColor: `${slot.accentColor}15`,
-                  color: slot.accentColor,
-                  borderColor: `${slot.accentColor}40`
-                }"
-              >
-                DEPLOYABLE
-              </span>
-              <span
-                v-else
-                class="mt-1 px-1.5 py-0.5 text-[8px] font-mono tracking-widest uppercase bg-zinc-900 text-zinc-600 border border-zinc-800 rounded"
-              >
-                CLASSIFIED
-              </span>
-            </div>
-
-            <!-- 卡片底部：PERSONAL BEST 与战绩数值 -->
-            <div class="shrink-0 pt-1.5 border-t border-zinc-800/80 font-mono z-10 leading-tight">
-              <div class="text-[8px] tracking-widest text-zinc-500 uppercase">
-                PERSONAL BEST
-              </div>
-              <div class="text-xs sm:text-sm font-black tracking-tight text-zinc-200 group-hover:text-white transition-colors">
-                {{ slot.bestScore }}
+              <!-- 卡片底栏 -->
+              <div class="shrink-0 pt-1 border-t border-zinc-800/80 font-mono z-10 leading-tight">
+                <div class="text-[7px] sm:text-[8px] tracking-widest text-zinc-500 uppercase">
+                  PB
+                </div>
+                <div class="text-[11px] sm:text-xs font-black tracking-tight text-zinc-200 group-hover:text-white transition-colors">
+                  {{ slot.bestScore }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
+
     </div>
 
     <!-- ================================================================= -->
@@ -416,3 +437,28 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* 
+  ★ 核心物理力学：
+  在高度 < 330px 时（极端矮视口），无条件压制正常网格，瞬间切入战术待机引导终端！
+  不需要任何一行 JS，不产生任何计算开销。
+*/
+@media (max-height: 329px) {
+  .normal-hub-view {
+    display: none !important;
+  }
+  .compact-standby-view {
+    display: flex !important;
+  }
+}
+
+@media (min-height: 330px) {
+  .compact-standby-view {
+    display: none !important;
+  }
+  .normal-hub-view {
+    display: flex !important;
+  }
+}
+</style>
