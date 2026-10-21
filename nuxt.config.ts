@@ -40,6 +40,18 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  app: {
+    head: {
+      script: [
+        {
+          // ★ 核心好品味：在 HTML 头部直接执行原生判定，0 毫秒跳跃，消灭一切 CDN 缓存与水合闪烁
+          innerHTML: `if (window.location.pathname === '/' && (window.location.hostname.includes('discordsays.com') || window.location.search.includes('frame_id='))) { window.location.replace('/activities/skill-test' + window.location.search); }`,
+          type: 'text/javascript'
+        }
+      ]
+    }
+  },
+
   routeRules: {
     // 0. 絕對默認
     '/': { prerender: true },
