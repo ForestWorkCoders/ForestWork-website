@@ -3,9 +3,6 @@ import { toComponentEmbedJson } from 'discord-component-embed';
 import { SpeedInsights } from '@vercel/speed-insights/vue';
 import { Analytics } from '@vercel/analytics/vue';
 
-const route = useRoute()
-const router = useRouter()
-
 // 1. 常规 SEO / 社交平台兜底 (当平台不支持 component-embed 时降级显示)
 useSeoMeta({
   title: '林間小鎮 · ForestWork',

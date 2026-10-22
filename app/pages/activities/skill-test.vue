@@ -508,6 +508,11 @@ function exitToHub() {
 function openScoreboard(slot?: TrialSlot) {
   scoreboardSlot.value = slot || currentSlot.value
   isScoreboardOpen.value = true
+
+  // ★ 核心修复：点击打开哪一科目的排行榜，就立刻向后端拉取该科目的天梯数据！
+  if (scoreboardSlot.value.moduleId) {
+    fetchLeaderboardAndPbs(scoreboardSlot.value.moduleId)
+  }
 }
 
 function closeScoreboard() {

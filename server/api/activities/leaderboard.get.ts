@@ -1,5 +1,6 @@
 // server/api/activities/leaderboard.get.ts
-import { serverSupabaseClient } from '#supabase/server'
+// ★ 1. 改为使用 serverSupabaseServiceRole[cite: 27]
+import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -10,7 +11,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid moduleId' })
   }
 
-  const supabase = await serverSupabaseClient(event)
+  // ★ 2. 使用服务角色客户端，彻底免疫跨 Schema 查询时的权限拦截！[cite: 27]
+  const supabase = serverSupabaseServiceRole(event)
 
   // 1. 抓取该模块全球排名前 50 强 (由 trpg.v_skill_leaderboard 提供)
   const leaderboardPromise = supabase
@@ -21,9 +23,9 @@ export default defineEventHandler(async (event) => {
     .order('global_rank', { ascending: true })
     .limit(50)
 
-  // 2. 如果提供了 discordId，顺手捞出该选手在全部 10 个槽位的个人最佳分 (PB)
+  // 2. 顺手捞出该选手在全部 10 个槽位的个人最佳分 (PB)
   let pbPromise: PromiseLike<any> = Promise.resolve({ data: [] })
-  if (rawDiscordId && /^\d+$/.test(rawDiscordId)) {
+  if (rawDiscordId && /^\d+\$/.test(rawDiscordId)) {
     pbPromise = supabase
       .schema('trpg')
       .from('v_skill_personal_bests')
@@ -34,6 +36,7 @@ export default defineEventHandler(async (event) => {
   const [leaderboardRes, pbRes] = await Promise.all([leaderboardPromise, pbPromise])
 
   if (leaderboardRes.error) {
+    console.error('[-] Leaderboard Query Error:', leaderboardRes.error.message)
     throw createError({ statusCode: 500, statusMessage: `Leaderboard Query Failed: ${leaderboardRes.error.message}` })
   }
 
