@@ -26,7 +26,7 @@ export interface SkillModuleInstance {
   // ★ 核心升级：render 允许直接接收 elapsed（从对局开始计算的绝对毫秒数）
   render(ctx: CanvasRenderingContext2D, now: number, elapsed?: number): void
 
-  onPointerDown?(x: number, y: number, now: number): void
+  onPointerDown?(x: number, y: number, now: number, button?: number): void
   onPointerMove?(x: number, y: number): void
   onPointerLeave?(): void
 
