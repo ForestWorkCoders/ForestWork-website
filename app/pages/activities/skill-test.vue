@@ -27,6 +27,71 @@ definePageMeta({
 
 const currentDiscordId = ref<string>('10001')
 
+async function initDiscordSdkAsync() {
+  try {
+    const rawClientId = (useRuntimeConfig().public as Record<string, unknown>).discordClientId
+    const clientId = typeof rawClientId === 'string' && rawClientId.trim().length > 0
+      ? rawClientId.trim()
+      : '311484597248720907'
+
+    const discordSdk = new DiscordSDK(clientId)
+
+    // 1. 等待 Discord 客户端环境就绪 (带 2.5s 熔断保护)
+    await Promise.race([
+      discordSdk.ready(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('SDK Handshake Timeout')), 2500))
+    ])
+
+    // 2. ★ 核心好品味：发起静默授权，获取当前选手临时 Code
+    let authCode: string | null = null
+    try {
+      // 优先尝试静默授权 (prompt: 'none')，用户完全无感
+      const authResult = await discordSdk.commands.authorize({
+        client_id: clientId,
+        response_type: 'code',
+        state: '',
+        prompt: 'none',
+        scope: ['identify']
+      })
+      authCode = authResult.code
+    } catch {
+      // 若首次使用静默失败，降级拉起客户端就地授权抽屉 (无需跳出 iframe)
+      const consentResult = await discordSdk.commands.authorize({
+        client_id: clientId,
+        response_type: 'code',
+        state: '',
+        prompt: 'none',
+        scope: ['identify']
+      })
+      authCode = consentResult.code
+    }
+
+    // 3. 向后端交换真实凭证
+    if (authCode) {
+      const authRes = await $fetch<{
+        success: boolean
+        user: { id: string; username: string; global_name: string; avatar: string }
+      }>('/api/activities/auth', {
+        method: 'POST',
+        body: { code: authCode }
+      })
+
+      if (authRes.success && authRes.user) {
+        // ★ 核心达成：将当前操作员 ID 绑定为选手真正的 Discord Snowflake！
+        currentDiscordId.value = authRes.user.id
+        console.log(`[Activity Auth] 选手识别成功: ${authRes.user.global_name} (${authRes.user.id})`)
+
+        // 立即根据真实身份重新拉取个人最佳战绩 (PB)
+        fetchLeaderboardAndPbs(currentSlot.value.moduleId ?? 1)
+      }
+    }
+  } catch (err) {
+    // 本地开发浏览器运行或非 Discord 环境时的健壮降级
+    console.warn('[Activity Auth] 非 Discord 客户端或授权降级，使用沙盒身份:', err)
+    currentDiscordId.value = '10001'
+  }
+}
+
 // 真实天梯榜单数据 (替换死板的 MOCK_LEADERBOARD)
 interface ApiLeaderboardItem {
   global_rank: number
@@ -454,6 +519,7 @@ onMounted(() => {
   }
 
   fetchLeaderboardAndPbs(1)
+  initDiscordSdkAsync()
 })
 
 onUnmounted(() => {
