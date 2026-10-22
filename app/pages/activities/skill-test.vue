@@ -35,15 +35,37 @@ async function initDiscordSdkAsync() {
       ? rawClientId.trim()
       : '311484597248720907'
 
+    // ★★★ 核心加固：物理同步 frame_id，彻底封杀 'frame_id query param is not defined' ★★★
+    if (import.meta.client) {
+      const searchParams = new URLSearchParams(window.location.search)
+      const route = useRoute()
+
+      // 如果 window.location.search 丢失，但 Vue Router 的 route.query 里有 frame_id：
+      if (!searchParams.has('frame_id') && route.query.frame_id) {
+        const restoredUrl = new URL(window.location.href)
+        for (const [k, v] of Object.entries(route.query)) {
+          if (typeof v === 'string') restoredUrl.searchParams.set(k, v)
+        }
+        // 瞬间同步回浏览器原生地址栏，满足 DiscordSDK 构造函数的物理预期！
+        window.history.replaceState(null, '', restoredUrl.toString())
+      }
+
+      // 如果两者全都没有，说明这根本不是 Discord 客户端环境（例如独立浏览器直接打开）
+      const finalSearchParams = new URLSearchParams(window.location.search)
+      if (!finalSearchParams.has('frame_id') && !window.location.hostname.includes('discordsays.com')) {
+        throw new Error('ENV_STANDALONE: Non-Discord environment')
+      }
+    }
+
+    // 此时 window.location.search 中 100% 存在 frame_id，构造函数安全通过！
     const discordSdk = new DiscordSDK(clientId)
 
-    // 1. 放宽握手超时至 8 秒（避免因 1000ms 跨洋延迟被误杀）
+    // 后续握手与静默授权保持不变...
     await Promise.race([
       discordSdk.ready(),
       new Promise((_, reject) => setTimeout(() => reject(new Error('SDK_TIMEOUT: Discord ready() took > 8s')), 8000))
     ])
 
-    // 2. 发起静默授权
     const { code } = await discordSdk.commands.authorize({
       client_id: clientId,
       response_type: 'code',
@@ -52,11 +74,8 @@ async function initDiscordSdkAsync() {
       scope: ['identify']
     })
 
-    if (!code) {
-      throw new Error('AUTH_EMPTY: Discord did not return code')
-    }
+    if (!code) throw new Error('AUTH_EMPTY: Discord did not return code')
 
-    // 3. 向后端换票
     const authRes = await $fetch<{
       success: boolean
       user: { id: string; username: string; global_name: string; avatar: string }
@@ -70,11 +89,8 @@ async function initDiscordSdkAsync() {
       currentOperatorDisplay.value = authRes.user.global_name || authRes.user.username
       console.log(`[Activity Auth] 選手就位: ${currentOperatorDisplay.value} (${authRes.user.id})`)
       fetchLeaderboardAndPbs(currentSlot.value.moduleId ?? 1)
-    } else {
-      throw new Error('AUTH_FAILED: Invalid server response')
     }
   } catch (err: any) {
-    // ★ 核心好品味：把真正的罪魁祸首直接暴露在界面上，消灭一切猜测！
     const errMsg = err?.data?.statusMessage || err?.message || 'UNKNOWN_ERROR'
     console.error('[Activity Auth Error]:', err)
 

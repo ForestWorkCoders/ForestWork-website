@@ -1,5 +1,6 @@
 // server/api/activities/auth.post.ts
 import { serverSupabaseClient } from '#supabase/server'
+import { sealSessionData } from '../../utils/session'
 
 interface AuthBody {
   code?: string
@@ -84,9 +85,17 @@ export default defineEventHandler(async (event) => {
     console.warn('[Activity Auth] Participant名册写入跳过:', err.message)
   }
 
+  const authTicket = sealSessionData({
+    id: user.id,
+    username: rawUsername,
+    global_name: rawNickname,
+    avatar: avatarUrl
+  })
+
   // 5. 吐出纯净的操作员会话实体
   return {
     success: true,
+    authTicket,
     user: {
       id: String(user.id),
       username: rawUsername,

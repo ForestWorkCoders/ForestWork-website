@@ -1,4 +1,17 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "frame_id"
+        }
+      ],
+      "destination": "/activities/skill-test"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/sync-curse",
