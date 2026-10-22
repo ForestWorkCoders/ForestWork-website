@@ -24,6 +24,54 @@ definePageMeta({
   ]
 })
 
+
+const currentDiscordId = ref<string>('10001')
+
+// 真实天梯榜单数据 (替换死板的 MOCK_LEADERBOARD)
+interface ApiLeaderboardItem {
+  global_rank: number
+  discord_id: string
+  operator_name: string
+  avatar_url: string
+  score: number
+  rating: string
+  created_at: string
+}
+
+const liveLeaderboard = ref<ApiLeaderboardItem[]>([])
+const isLeaderboardLoading = ref(false)
+
+async function fetchLeaderboardAndPbs(targetModuleId: number) {
+  isLeaderboardLoading.value = true
+  try {
+    const res = await $fetch<{
+      success: boolean
+      leaderboard: ApiLeaderboardItem[]
+      personalBests: Record<number, number>
+    }>('/api/activities/leaderboard', {
+      params: {
+        moduleId: targetModuleId,
+        discordId: currentDiscordId.value
+      }
+    })
+
+    if (res.success) {
+      liveLeaderboard.value = res.leaderboard
+
+      // 动态水合大厅 10 个槽位的真实 PB 分数
+      for (const slot of TRIAL_SLOTS) {
+        if (slot.moduleId && res.personalBests[slot.moduleId] !== undefined) {
+          slot.bestScore = res.personalBests[slot.moduleId]!.toLocaleString()
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Leaderboard] 真实数据拉取降级:', err)
+  } finally {
+    isLeaderboardLoading.value = false
+  }
+}
+
 // ==========================================
 // 1. 核心视图状态机 (三态单一事实源)
 // ==========================================
@@ -280,6 +328,23 @@ function tick(now: number) {
 
   if ((hasTimeLimit && elapsed >= moduleDuration) || activeModule.isCompleted) {
     isFinished.value = true
+    if (currentSlot.value.moduleId) {
+      $fetch('/api/activities/submit', {
+        method: 'POST',
+        body: {
+          discordId: currentDiscordId.value,
+          moduleId: currentSlot.value.moduleId,
+          score: score.value,
+          rating: activeSummary.value.rating,
+          metrics: activeSummary.value.metrics
+        }
+      }).then(() => {
+        // 提交成功后立刻重新拉取天梯与最新 PB
+        fetchLeaderboardAndPbs(currentSlot.value.moduleId!)
+      }).catch((err) => {
+        console.error('[Submit] 成绩写入失败:', err)
+      })
+    }
     return
   }
 
@@ -387,6 +452,8 @@ onMounted(() => {
   if (Number.isFinite(queryMod) && queryMod > 0) {
     activateModule(queryMod)
   }
+
+  fetchLeaderboardAndPbs(1)
 })
 
 onUnmounted(() => {
@@ -767,28 +834,34 @@ onUnmounted(() => {
                   <span class="col-span-2">RANK</span>
                   <span class="col-span-5">OPERATOR</span>
                   <span class="col-span-3 text-right">SCORE</span>
-                  <span class="col-span-2 text-right">DATE</span>
+                  <span class="col-span-2 text-right">TIME</span>
                 </div>
+
+                <!-- 真实列表渲染 -->
                 <div
-                  v-for="entry in [
-                    { rank: 1, operator: 'Klm1200', score: '15,320', date: 'TODAY' },
-                    { rank: 2, operator: 'Chronicle', score: '14,850', date: 'YESTERDAY' },
-                    { rank: 3, operator: 'TenZ', score: '13,910', date: '3D AGO' },
-                    { rank: 4, operator: 'You (Guest)', score: score.toLocaleString(), date: 'CURRENT' },
-                    { rank: 5, operator: 'starekingz', score: '11,200', date: '5D AGO' }
-                  ]"
-                  :key="entry.rank"
+                  v-for="entry in liveLeaderboard"
+                  :key="entry.discord_id"
                   :class="[
-                    'grid grid-cols-12 items-center text-xs px-2 py-1 rounded',
-                    entry.operator.includes('You')
+                    'grid grid-cols-12 items-center text-xs px-2 py-1 rounded transition-colors',
+                    entry.discord_id === currentDiscordId
                       ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold'
                       : 'text-zinc-300'
                   ]"
                 >
-                  <span class="col-span-2 font-black italic text-zinc-500">#{{ entry.rank }}</span>
-                  <span class="col-span-5 truncate">{{ entry.operator }}</span>
-                  <span class="col-span-3 text-right font-black text-zinc-100">{{ entry.score }}</span>
-                  <span class="col-span-2 text-right text-[10px] text-zinc-500">{{ entry.date }}</span>
+                  <span class="col-span-2 font-black italic text-zinc-500">#{{ entry.global_rank }}</span>
+                  <span class="col-span-5 truncate flex items-center gap-1.5">
+                    <img :src="entry.avatar_url" class="w-3.5 h-3.5 rounded-full" alt="" />
+                    <span>{{ entry.operator_name }}</span>
+                  </span>
+                  <span class="col-span-3 text-right font-black text-zinc-100">{{ entry.score.toLocaleString() }}</span>
+                  <span class="col-span-2 text-right text-[10px] text-zinc-500">
+                    {{ new Date(entry.created_at).toLocaleDateString() }}
+                  </span>
+                </div>
+
+                <!-- 空态提示 -->
+                <div v-if="liveLeaderboard.length === 0" class="text-center py-4 text-xs text-zinc-600">
+                  // 暫無戰績記錄 · 等待首位特工登頂
                 </div>
               </div>
             </div>
