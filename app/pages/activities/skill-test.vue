@@ -131,9 +131,9 @@ async function fetchLeaderboardAndPbs(targetModuleId: number) {
       liveLeaderboard.value = res.leaderboard
 
       // 动态水合大厅 10 个槽位的真实 PB 分数
-      for (const slot of TRIAL_SLOTS) {
+      for (const slot of TRIAL_SLOTS.value) {
         if (slot.moduleId && res.personalBests[slot.moduleId] !== undefined) {
-          slot.bestScore = res.personalBests[slot.moduleId]!.toLocaleString()
+          slot.bestScore = Number(res.personalBests[slot.moduleId]).toLocaleString()
         }
       }
     }
@@ -188,7 +188,7 @@ function shareScore() {
   }
 }
 
-const TRIAL_SLOTS: TrialSlot[] = [
+const TRIAL_SLOTS = ref<TrialSlot[]>([
   { id: 1, index: '01', title: 'PRECISION', code: 'MOD_AIM_01', category: 'TARGET ACQUISITION', status: 'ready', moduleId: 1, bestScore: '---', accentColor: '#10B981' },
   { id: 2, index: '02', title: 'DUAL AXIS', code: 'MOD_CTRL_02', category: 'MOTOR COORDINATION', status: 'ready', moduleId: 2, bestScore: '---', accentColor: '#38BDF8' },
   { id: 3, index: '03', title: 'TRAIL LINK', code: 'MOD_SCAN_03', category: 'COGNITIVE SEQUENCE', status: 'ready', moduleId: 3, bestScore: '---', accentColor: '#FACC15' },
@@ -199,7 +199,7 @@ const TRIAL_SLOTS: TrialSlot[] = [
   { id: 8, index: '08', title: 'RAPID STRAFE', code: 'SYS_LOCK_08', category: 'SPATIAL AGILITY', status: 'locked', bestScore: '---', accentColor: '#52525B' },
   { id: 9, index: '09', title: 'CHRONO TAP', code: 'MOD_CPS_09', category: 'TEMPORAL CADENCE', status: 'ready', moduleId: 9, bestScore: '---', accentColor: '#06B6D4' },
   { id: 10, index: '10', title: 'OVERCLOCK', code: 'SYS_LOCK_10', category: 'LIMITER BREAKTHROUGH', status: 'locked', bestScore: '---', accentColor: '#52525B' }
-]
+])
 
 // ==========================================
 // 2. 三列战术简报数据契约 (VALORANT 3-COLUMNS BRIEFING)
@@ -286,7 +286,7 @@ const DEFAULT_BRIEFING: ModuleBriefing = {
   ]
 }
 
-const currentSlot = ref<TrialSlot>(TRIAL_SLOTS[0]!)
+const currentSlot = ref<TrialSlot>(TRIAL_SLOTS.value[0]!)
 const currentBriefing = computed<ModuleBriefing>(() => {
   return MODULE_BRIEFINGS[currentSlot.value.moduleId ?? 1] ?? DEFAULT_BRIEFING
 })
@@ -299,7 +299,7 @@ const score = ref(0)
 const remainingTime = ref(60.0)
 const isFinished = ref(false)
 const isScoreboardOpen = ref(false)
-const scoreboardSlot = ref<TrialSlot>(TRIAL_SLOTS[0]!)
+const scoreboardSlot = ref<TrialSlot>(TRIAL_SLOTS.value[0]!)
 
 const defaultModule = new Module1Precision()
 const modules: Record<number, SkillModuleInstance> = {
@@ -491,7 +491,7 @@ function launchSlot(slot: TrialSlot) {
 }
 
 function activateModule(targetId: number) {
-  const slot = TRIAL_SLOTS.find(s => s.id === targetId && s.status === 'ready')
+  const slot = TRIAL_SLOTS.value.find(s => s.id === targetId && s.status === 'ready')
   if (slot) {
     openBriefing(slot)
     return true
