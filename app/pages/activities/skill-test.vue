@@ -163,19 +163,59 @@ interface TrialSlot {
 
 const settlementTab = ref<'summary' | 'ranking'>('summary')
 
+const playerRankBadge = computed<string>(() => {
+  // 如果尚未拉取到天梯或当前是沙盒账号，给出基础倍率
+  if (liveLeaderboard.value.length === 0 || !currentDiscordId.value) {
+    return 'x2.00'
+  }
+
+  // 在真实排行榜中匹配当前选手的最高战绩
+  const myEntry = liveLeaderboard.value.find(e => e.discord_id === currentDiscordId.value)
+
+  if (myEntry) {
+    if (myEntry.global_rank === 1) return '👑 #1 GLOBAL'
+    if (myEntry.global_rank === 2) return '🥈 #2 RANK'
+    if (myEntry.global_rank === 3) return '🥉 #3 RANK'
+    if (myEntry.global_rank <= 10) return `TOP 10 (#${myEntry.global_rank})`
+    return `RANK #${myEntry.global_rank}`
+  }
+
+  // 检查是否创下个人最佳 (NEW PB)
+  const currentBestNum = Number(String(currentSlot.value.bestScore).replace(/,/g, ''))
+  if (Number.isFinite(currentBestNum) && score.value > currentBestNum) {
+    return '★ NEW PB'
+  }
+
+  return 'x1.50'
+})
+
+// 2. 战术结算数据汇总 (将真实排位注入指标胶囊)
 const activeSummary = computed<ModuleResultSummary>(() => {
-  if (activeModule.getResultSummary) {
-    return activeModule.getResultSummary()
+  // 提取子模块的原生结算数据
+  const baseSummary = activeModule.getResultSummary
+    ? activeModule.getResultSummary()
+    : {
+        rating: score.value >= 12000 ? 'FLAWLESS ACE' : score.value >= 8000 ? 'COMBAT READY' : 'STANDARD CADENCE',
+        metrics: [
+          { value: '100%', label: 'ACCURACY', badge: 'x2.00' },
+          { value: `${remainingTime.value.toFixed(1)}s`, label: 'PACE' },
+          { value: `${score.value}`, label: 'SCORE' },
+          { value: '0', label: 'PENALTIES' }
+        ]
+      }
+
+  // ★ 核心好品味：把推导出的真实全服位次，动态注入到第 1 根核心指标立柱的金色徽标中！
+  const dynamicMetrics = [...baseSummary.metrics]
+  if (dynamicMetrics[0]) {
+    dynamicMetrics[0] = {
+      ...dynamicMetrics[0],
+      badge: playerRankBadge.value // 替换原本写死的 x2.00，让胶囊呈现真实名次！
+    }
   }
 
   return {
-    rating: score.value >= 12000 ? 'FLAWLESS ACE' : score.value >= 8000 ? 'COMBAT READY' : 'STANDARD CADENCE',
-    metrics: [
-      { value: '100%', label: 'ACCURACY', badge: 'x2.00' },
-      { value: `${(remainingTime.value).toFixed(1)}s`, label: 'PACE' },
-      { value: `${score.value}`, label: 'SCORE' },
-      { value: '0', label: 'PENALTIES' }
-    ]
+    rating: baseSummary.rating,
+    metrics: dynamicMetrics
   }
 })
 
@@ -833,8 +873,13 @@ onUnmounted(() => {
               <div class="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
                 COMBAT SCORE
               </div>
-              <div class="text-xs font-bold tracking-widest text-[#ef4444]">
-                BEST {{ currentSlot.bestScore }}
+              <div class="flex items-center justify-center gap-2 pt-1 font-mono">
+                <span class="px-2 py-0.5 text-[10px] font-black bg-[#d4af37] text-black rounded-sm shadow-sm uppercase">
+                  {{ playerRankBadge }}
+                </span>
+                <span class="text-xs font-bold tracking-widest text-[#ef4444]">
+                  BEST {{ currentSlot.bestScore }}
+                </span>
               </div>
             </div>
 
