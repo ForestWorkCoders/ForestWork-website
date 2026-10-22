@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
 
   // 3. 选手身份提取与防护 (支持本地调试兜底)
   let rawDiscordId = String(body?.discordId || '').trim()
-  if (!/^\d{17,20}\$/.test(rawDiscordId)) {
+  if (!/^\d{17,20}$/.test(rawDiscordId)) {
     if (process.env.NODE_ENV !== 'production') {
       rawDiscordId = '10001' // 开发环境沙盒测试账号
     } else {

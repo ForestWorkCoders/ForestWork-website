@@ -16,8 +16,13 @@ export default defineEventHandler(async (event) => {
   const clientId = process.env.DISCORD_CLIENT_ID || process.env.DISCORD_APPLICATION_ID
   const clientSecret = process.env.DISCORD_CLIENT_SECRET
 
-  if (!clientId || !clientSecret) {
-    throw createError({ statusCode: 500, statusMessage: 'Server configuration error: missing Discord OAuth credentials.' })
+  if (!clientId) {
+    console.error('[-] Missing DISCORD_CLIENT_ID or DISCORD_APPLICATION_ID')
+    throw createError({ statusCode: 500, statusMessage: 'CONFIG_ERR: Missing DISCORD_APPLICATION_ID' })
+  }
+  if (!clientSecret) {
+    console.error('[-] Missing DISCORD_CLIENT_SECRET on Vercel Environment Variables')
+    throw createError({ statusCode: 500, statusMessage: 'CONFIG_ERR: Missing DISCORD_CLIENT_SECRET' })
   }
 
   // 1. 向 Discord 交换 access_token
