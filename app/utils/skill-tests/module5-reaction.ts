@@ -32,6 +32,7 @@ export class Module5Reaction implements SkillModuleInstance {
   id = 5
   title = '5-Stage Reaction // 綜合反應時基準'
   isCompleted = false
+  durationMs = 0
 
   private context!: SkillGameContext
   private stepIndex = 0

@@ -13,7 +13,7 @@ export class Module3Trail implements SkillModuleInstance {
   title = 'Number Trail // 數字路徑追蹤'
 
   private context!: SkillGameContext
-  private readonly durationMs = 60000
+  readonly durationMs = 60000
 
   private expectedNumber = 1
   private nextSpawnNumber = 1

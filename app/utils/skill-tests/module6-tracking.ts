@@ -15,6 +15,8 @@ interface TrackingTarget {
 export class Module6Tracking implements SkillModuleInstance {
   id = 6
   title = 'Smooth Tracking // 平滑跟槍測定'
+  // 遵循公开接口规范
+  readonly durationMs = 60000
 
   private context!: SkillGameContext
   private tickAccumulator = 0
@@ -66,7 +68,6 @@ export class Module6Tracking implements SkillModuleInstance {
     t.targetSpeed = this.rand(180, 420)
   }
 
-  // ★ 核心契约：接收宿主换算后的归一化逻辑坐标
   onPointerMove(x: number, y: number) {
     this.mouseX = x
     this.mouseY = y
@@ -103,31 +104,33 @@ export class Module6Tracking implements SkillModuleInstance {
     const cursorDistSq = (this.mouseX - t.x) ** 2 + (this.mouseY - t.y) ** 2
     this.isOnTarget = cursorDistSq <= t.r * t.r
 
-    // 4. 60Hz 独立时钟步长累加器 (每 16.6667ms 判定一次)
+    // 4. 60Hz 独立时钟步长累加器 (每 16.6667ms 严格判定一次)
     const TICK_MS = 1000 / 60
     this.tickAccumulator += dt * 1000
 
     while (this.tickAccumulator >= TICK_MS) {
       if (this.isOnTarget) {
-        // ★ 每个命中 Tick 奖励 4 分 (满分 14,400 分，无飘字粒子，无性能损耗)
         this.context.addScore(4)
       }
       this.tickAccumulator -= TICK_MS
     }
   }
 
-  render(ctx: CanvasRenderingContext2D, now: number) {
+  // ★ 核心修复：直接使用入参 elapsed，纯函数式判定，坚决杜绝时钟漂移！
+  render(ctx: CanvasRenderingContext2D, now: number, elapsed: number = 0) {
     const t = this.target
 
-    // 前 30 秒绘制导引参考虚线
-    ctx.beginPath()
-    ctx.moveTo(t.x, t.y)
-    ctx.lineTo(t.destX, t.destY)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
-    ctx.lineWidth = 1.5
-    ctx.setLineDash([4, 6])
-    ctx.stroke()
-    ctx.setLineDash([])
+    // ★ 严格判定：当 elapsed < 30000ms（前 30 秒）时绘制导引虚线，30.0s 瞬间彻底隐形！
+    if (elapsed < 30000) {
+      ctx.beginPath()
+      ctx.moveTo(t.x, t.y)
+      ctx.lineTo(t.destX, t.destY)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
+      ctx.lineWidth = 1.5
+      ctx.setLineDash([4, 6])
+      ctx.stroke()
+      ctx.setLineDash([])
+    }
 
     // 跟踪主圆环
     ctx.beginPath()

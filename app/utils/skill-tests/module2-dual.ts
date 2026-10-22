@@ -26,7 +26,7 @@ export class Module2Dual implements SkillModuleInstance {
   title = 'Dual Controller // 雙軸協調測驗'
 
   private context!: SkillGameContext
-  private readonly durationMs = 60000
+  readonly durationMs = 60000
 
   private splitX = 400
   private keys = {

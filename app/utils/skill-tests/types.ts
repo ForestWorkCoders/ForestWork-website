@@ -18,15 +18,15 @@ export interface SkillGameContext {
 export interface SkillModuleInstance {
   id: number
   title: string
-  // ★ 新增：允许模块向宿主汇报是否已提前完成流程 (如 Module 5 跑完 5 关)
+  readonly durationMs?: number
   isCompleted?: boolean
 
   init(ctx: SkillGameContext): void
   update(dt: number, now: number, elapsed: number): void
-  render(ctx: CanvasRenderingContext2D, now: number): void
+  // ★ 核心升级：render 允许直接接收 elapsed（从对局开始计算的绝对毫秒数）
+  render(ctx: CanvasRenderingContext2D, now: number, elapsed?: number): void
 
   onPointerDown?(x: number, y: number, now: number): void
-  // ★ 新增：归一化指针移动与离开事件 (专供 Module 6 跟枪等连续输入场景)
   onPointerMove?(x: number, y: number): void
   onPointerLeave?(): void
 

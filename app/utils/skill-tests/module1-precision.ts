@@ -15,7 +15,7 @@ export class Module1Precision implements SkillModuleInstance {
   private context!: SkillGameContext
   private circles: Circle[] = []
   private nextSpawnTime = 0
-  private readonly durationMs = 60000
+  readonly durationMs = 60000
 
   init(context: SkillGameContext) {
     this.context = context
