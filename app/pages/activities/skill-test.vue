@@ -10,7 +10,33 @@ import { Module5Reaction } from '~/utils/skill-tests/module5-reaction'
 import { Module6Tracking } from '~/utils/skill-tests/module6-tracking'
 import { Module9Cps } from '~/utils/skill-tests/module9-cps'
 
-definePageMeta({ layout: false })
+definePageMeta({
+  layout: false,
+  middleware: [
+    (to) => {
+      // 1. 本地开发环境 (npm run dev) 绝对放行，绝不阻碍本地热重载调试
+      if (import.meta.dev) return
+
+      // 2. 开发者线上排查逃生门：允许通过 ?debug=1 强制在外部浏览器调试
+      if (to.query.debug === '1') return
+
+      // 3. 核心指纹检查：Discord Activity 启动时必须由客户端注入 frame_id
+      const hasFrameId = typeof to.query.frame_id === 'string' && to.query.frame_id.length > 0
+
+      // 4. 客户端环境补充检测：是否运行在 Discord 专属代理域名下
+      const isDiscordHost = import.meta.client && window.location.hostname.includes('discordsays.com')
+
+      // 若两项物理指纹皆无，直接宣判该路由不存在，抛出标准 404
+      if (!hasFrameId && !isDiscordHost) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Page Not Found',
+          fatal: true
+        })
+      }
+    }
+  ]
+})
 
 const viewMode = ref<'hub' | 'playing'>('hub')
 
