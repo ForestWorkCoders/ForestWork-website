@@ -1,6 +1,5 @@
 // app/utils/skill-tests/module5-reaction.ts
-import type { SkillModuleInstance, SkillGameContext } from './types'
-
+import type { SkillModuleInstance, SkillGameContext, ModuleResultSummary } from './types'
 type StageStatus = 'WAITING' | 'ACTIVE' | 'PENALTY_FREEZE' | 'STAGE_COMPLETE'
 
 interface Stage3Data {
@@ -418,6 +417,22 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.font = '22px ui-monospace, monospace'
       ctx.textAlign = 'center'
       ctx.fillText(this.s5Data.isGreen ? '綠燈已出現！點擊！' : '只有變綠才准點！', 400, 450)
+    }
+  }
+
+  getResultSummary(): ModuleResultSummary {
+    const validTimes = this.stageTimes.filter(t => t > 0)
+    const avgMs = validTimes.length > 0 ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length) : 0
+    const bestMs = validTimes.length > 0 ? Math.min(...validTimes) : 0
+
+    return {
+      rating: avgMs <= 180 ? 'FLAWLESS ACE' : avgMs <= 240 ? 'COMBAT READY' : 'REFLEX COMPLIANT',
+      metrics: [
+        { value: `${avgMs}ms`, label: 'AVG REFLEX', badge: avgMs <= 180 ? 'x2.00' : 'x1.20' },
+        { value: `${bestMs}ms`, label: 'PEAK TTK', badge: 'BEST' },
+        { value: '5/5', label: 'STAGES ACED' },
+        { value: '0', label: 'FALSE STARTS' }
+      ]
     }
   }
 

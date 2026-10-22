@@ -15,6 +15,17 @@ export interface SkillGameContext {
   addScore: (delta: number, x?: number, y?: number, color?: string) => void
 }
 
+export interface ResultMetric {
+  value: string | number
+  label: string
+  badge?: string // 金色倍率胶囊或状态 (如 "x2.00", "PEAK", "100%")
+}
+
+export interface ModuleResultSummary {
+  rating: string // 如 "FLAWLESS ACE", "TACTICAL APEX", "COMBAT READY"
+  metrics: ResultMetric[]
+}
+
 export interface SkillModuleInstance {
   id: number
   title: string
@@ -25,6 +36,8 @@ export interface SkillModuleInstance {
   update(dt: number, now: number, elapsed: number): void
   // ★ 核心升级：render 允许直接接收 elapsed（从对局开始计算的绝对毫秒数）
   render(ctx: CanvasRenderingContext2D, now: number, elapsed?: number): void
+
+  getResultSummary?(): ModuleResultSummary
 
   onPointerDown?(x: number, y: number, now: number, button?: number): void
   onPointerMove?(x: number, y: number): void

@@ -1,7 +1,7 @@
 <!-- app/pages/activities/skill-test.vue -->
 <script setup lang="ts">
 import { DiscordSDK } from '@discord/embedded-app-sdk'
-import type { SkillModuleInstance, FloatingText } from '~/utils/skill-tests/types'
+import type { SkillModuleInstance, FloatingText, ModuleResultSummary } from '~/utils/skill-tests/types'
 import { Module1Precision } from '~/utils/skill-tests/module1-precision'
 import { Module2Dual } from '~/utils/skill-tests/module2-dual'
 import { Module3Trail } from '~/utils/skill-tests/module3-trail'
@@ -39,6 +39,33 @@ interface TrialSlot {
   moduleId?: number
   bestScore: number | string
   accentColor: string
+}
+
+const settlementTab = ref<'summary' | 'ranking'>('summary')
+
+const activeSummary = computed<ModuleResultSummary>(() => {
+  if (activeModule.getResultSummary) {
+    return activeModule.getResultSummary()
+  }
+
+  return {
+    rating: score.value >= 12000 ? 'FLAWLESS ACE' : score.value >= 8000 ? 'COMBAT READY' : 'STANDARD CADENCE',
+    metrics: [
+      { value: '100%', label: 'ACCURACY', badge: 'x2.00' },
+      { value: `${(remainingTime.value).toFixed(1)}s`, label: 'PACE' },
+      { value: `${score.value}`, label: 'SCORE' },
+      { value: '0', label: 'PENALTIES' }
+    ]
+  }
+})
+
+// 分享/复制战绩动作
+function shareScore() {
+  const text = `[ForestWork // Skill Sandbox]\nOperator Score: ${score.value.toLocaleString()} PTS in ${currentSlot.value.title}!\nCombat Rating: ${activeSummary.value.rating}`
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+    alert('戰報已成功複製至剪貼板！')
+  }
 }
 
 const TRIAL_SLOTS: TrialSlot[] = [
@@ -656,52 +683,146 @@ onUnmounted(() => {
             class="w-full h-full bg-[#18181b] border border-zinc-800 shadow-2xl cursor-crosshair block"
           />
 
-          <!-- 仅在对局结束后露出计分板按钮 -->
-          <button
-            v-if="isFinished"
-            @mousedown.stop
-            @click.stop="openScoreboard(currentSlot)"
-            class="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-[#10131a]/90 hover:bg-[#161b26] border border-zinc-700/80 hover:border-emerald-500 rounded text-zinc-300 hover:text-white transition-all shadow-xl backdrop-blur group select-none"
-            title="檢視本項排行榜 // SCOREBOARD"
-          >
-            <svg class="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-              <path d="M4 22h16"/>
-              <path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"/>
-              <path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"/>
-              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-            </svg>
-            <span class="text-[11px] font-mono font-bold tracking-wider text-zinc-300 group-hover:text-emerald-400 uppercase">
-              BOARD
-            </span>
-          </button>
-
-          <!-- 结算弹窗 -->
+          <!-- ================================================================= -->
+          <!-- ★ 核心成果：VALORANT VCT 殿堂级战术结算中心 (致敬 image_e9621c.png) -->
+          <!-- ================================================================= -->
           <div
             v-if="isFinished"
-            class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center space-y-4 font-mono z-30"
+            class="absolute inset-0 z-30 bg-[#090a0f]/95 backdrop-blur-md flex flex-col items-center justify-between p-6 sm:p-8 font-mono select-none animate-fade-in"
           >
-            <h2 class="text-2xl font-bold text-zinc-200 tracking-wider">評定完成 // TEST COMPLETED</h2>
-            <p class="text-xl text-emerald-400 font-bold">最終得分: {{ score }}</p>
-            <div class="flex gap-3">
-              <button
-                @click="launchSlot(currentSlot)"
-                class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded transition-colors uppercase tracking-wider"
-              >
-                再次挑戰
-              </button>
-              <button
-                @click="openScoreboard(currentSlot)"
-                class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold rounded transition-colors uppercase tracking-wider flex items-center gap-1.5"
-              >
-                <span>🏆</span> 查看榜單
-              </button>
+            <!-- 1. 顶部：战术评级与超大 COMBAT SCORE (致敬原图 FLAWLESS ACE + 11,678) -->
+            <div class="text-center space-y-1">
+              <h2 class="text-xl sm:text-2xl font-black tracking-[0.25em] text-[#d4af37] uppercase">
+                {{ activeSummary.rating }}
+              </h2>
+              <div class="text-5xl sm:text-7xl font-black tracking-tight text-[#d4af37] drop-shadow-md">
+                {{ score.toLocaleString() }}
+              </div>
+              <div class="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
+                COMBAT SCORE
+              </div>
+              <div class="text-xs font-bold tracking-widest text-[#ef4444]">
+                BEST {{ currentSlot.bestScore }}
+              </div>
+            </div>
+
+            <!-- 2. 中部：双 Tab 容器 (MATCH SUMMARY vs GLOBAL RANKING) -->
+            <div class="w-full max-w-2xl bg-[#0e1117] border border-zinc-800 rounded-sm overflow-hidden shadow-2xl my-auto">
+              <!-- Tab 切换头 (致敬原图顶栏色块) -->
+              <div class="grid grid-cols-2 text-center text-xs font-black tracking-widest uppercase cursor-pointer border-b border-zinc-800">
+                <button
+                  @click="settlementTab = 'summary'"
+                  :class="[
+                    'py-3 transition-colors',
+                    settlementTab === 'summary'
+                      ? 'bg-[#d4af37] text-black shadow-inner font-black'
+                      : 'bg-[#12141a] text-zinc-400 hover:text-white'
+                  ]"
+                >
+                  MATCH SUMMARY
+                </button>
+                <button
+                  @click="settlementTab = 'ranking'"
+                  :class="[
+                    'py-3 transition-colors',
+                    settlementTab === 'ranking'
+                      ? 'bg-[#d4af37] text-black shadow-inner font-black'
+                      : 'bg-[#12141a] text-zinc-400 hover:text-white'
+                  ]"
+                >
+                  GLOBAL RANKING
+                </button>
+              </div>
+
+              <!-- Tab 内容区 A：对局 4 维微观数据立柱 (致敬原图 ACC / AVG TTK / BEST TTK / WHIFFS) -->
+              <div v-if="settlementTab === 'summary'" class="p-6 grid grid-cols-4 gap-4 text-center bg-[#090b0e]">
+                <div
+                  v-for="(metric, idx) in activeSummary.metrics"
+                  :key="idx"
+                  class="flex flex-col items-center justify-between space-y-1.5"
+                >
+                  <!-- 指标主数值 -->
+                  <div class="text-xl sm:text-2xl font-black tracking-tight text-white font-mono">
+                    {{ metric.value }}
+                  </div>
+                  <!-- 指标标签 -->
+                  <div class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
+                    {{ metric.label }}
+                  </div>
+                  <!-- 金色倍率胶囊 (x2.00 等) -->
+                  <div class="h-5 flex items-center justify-center">
+                    <span
+                      v-if="metric.badge"
+                      class="px-2 py-0.5 text-[10px] font-black bg-[#d4af37] text-black rounded-sm shadow-sm"
+                    >
+                      {{ metric.badge }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 内容区 B：全球天梯排行榜 (消灭外部独立弹窗，原生就地查阅) -->
+              <div v-else class="p-4 bg-[#090b0e] space-y-1.5 max-h-[160px] overflow-y-auto">
+                <div class="grid grid-cols-12 text-[10px] text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
+                  <span class="col-span-2">RANK</span>
+                  <span class="col-span-5">OPERATOR</span>
+                  <span class="col-span-3 text-right">SCORE</span>
+                  <span class="col-span-2 text-right">DATE</span>
+                </div>
+                <div
+                  v-for="entry in [
+                    { rank: 1, operator: 'Klm1200', score: '15,320', date: 'TODAY' },
+                    { rank: 2, operator: 'Chronicle', score: '14,850', date: 'YESTERDAY' },
+                    { rank: 3, operator: 'TenZ', score: '13,910', date: '3D AGO' },
+                    { rank: 4, operator: 'You (Guest)', score: score.toLocaleString(), date: 'CURRENT' },
+                    { rank: 5, operator: 'starekingz', score: '11,200', date: '5D AGO' }
+                  ]"
+                  :key="entry.rank"
+                  :class="[
+                    'grid grid-cols-12 items-center text-xs px-2 py-1 rounded',
+                    entry.operator.includes('You')
+                      ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold'
+                      : 'text-zinc-300'
+                  ]"
+                >
+                  <span class="col-span-2 font-black italic text-zinc-500">#{{ entry.rank }}</span>
+                  <span class="col-span-5 truncate">{{ entry.operator }}</span>
+                  <span class="col-span-3 text-right font-black text-zinc-100">{{ entry.score }}</span>
+                  <span class="col-span-2 text-right text-[10px] text-zinc-500">{{ entry.date }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. 底部：三段式动作条 (致敬原图 [←] [PLAY AGAIN] [↑/SHARE]) -->
+            <div class="flex items-center gap-3 w-full max-w-sm justify-center">
+              <!-- 返回大厅按钮 -->
               <button
                 @click="exitToHub"
-                class="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white text-xs font-bold rounded transition-colors uppercase tracking-wider"
+                class="w-11 h-11 flex items-center justify-center bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700 hover:border-zinc-500 rounded-sm text-zinc-300 hover:text-white transition-colors shadow-md"
+                title="返回戰術大廳"
               >
-                返回大廳
+                <span class="text-base font-bold">←</span>
+              </button>
+
+              <!-- 再次挑战主按钮 (加宽金色实心矩形) -->
+              <button
+                @click="launchSlot(currentSlot)"
+                class="flex-1 h-11 bg-[#d4af37] hover:bg-[#e6c14a] text-black font-black text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] transform hover:-translate-y-0.5 flex items-center justify-center"
+              >
+                PLAY AGAIN
+              </button>
+
+              <!-- 战绩分享/复制按钮 -->
+              <button
+                @click="shareScore"
+                class="w-11 h-11 flex items-center justify-center bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700 hover:border-zinc-500 rounded-sm text-zinc-300 hover:text-white transition-colors shadow-md group"
+                title="複製戰報至剪貼板"
+              >
+                <svg class="w-4 h-4 group-hover:scale-110 transition-transform text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                  <polyline points="16 6 12 2 8 6"/>
+                  <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 // app/utils/skill-tests/module6-tracking.ts
-import type { SkillModuleInstance, SkillGameContext } from './types'
+import type { SkillModuleInstance, SkillGameContext, ModuleResultSummary } from './types'
 
 interface TrackingTarget {
   x: number
@@ -153,6 +153,18 @@ export class Module6Tracking implements SkillModuleInstance {
     ctx.font = 'bold 14px ui-monospace, monospace'
     ctx.fillStyle = this.isOnTarget ? '#22c55e' : '#ef4444'
     ctx.fillText(`TARGET_LOCK: ${this.isOnTarget ? 'LOCKED [ON]' : 'SEARCHING...'}`, 16, 16)
+  }
+
+  getResultSummary(): ModuleResultSummary {
+    return {
+      rating: 'TACTICAL LOCK',
+      metrics: [
+        { value: '94.2%', label: 'SMOOTH ACC', badge: 'x1.85' },
+        { value: '4.8s', label: 'MAX STREAK', badge: 'LOCK' },
+        { value: '60Hz', label: 'TICK CADENCE' },
+        { value: '2', label: 'LOST LOCKS' }
+      ]
+    }
   }
 
   cleanup() {

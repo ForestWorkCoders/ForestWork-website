@@ -1,5 +1,5 @@
 // app/utils/skill-tests/module9-cps.ts
-import type { SkillModuleInstance, SkillGameContext } from './types'
+import type { SkillModuleInstance, SkillGameContext, ModuleResultSummary } from './types'
 
 type CpsStatus = 'IDLE' | 'RUNNING' | 'STAGE_COMPLETE' | 'FINISHED'
 
@@ -267,6 +267,22 @@ export class Module9Cps implements SkillModuleInstance {
     ctx.fillStyle = '#e4e4e7'
     ctx.font = '15px ui-monospace, monospace'
     ctx.fillText(cfg.instruction, 400, 105)
+  }
+
+  getResultSummary(): ModuleResultSummary {
+    const s1 = this.stageResults[0]
+    const s2 = this.stageResults[1]
+    const peakCps = Math.max(s1?.cps ?? 0, s2?.cps ?? 0)
+
+    return {
+      rating: peakCps >= 14 ? 'FLAWLESS ACE' : 'BURST CADENCE',
+      metrics: [
+        { value: `${s1?.cps ?? 0}`, label: 'STAGE 1 CPS', badge: 'SINGLE' },
+        { value: `${s2?.cps ?? 0}`, label: 'STAGE 2 CPS', badge: 'BUTTERFLY' },
+        { value: `${peakCps}`, label: 'PEAK CPS', badge: 'x1.50' },
+        { value: `${(s1?.clicks ?? 0) + (s2?.clicks ?? 0)}`, label: 'TOTAL CLICKS' }
+      ]
+    }
   }
 
   cleanup() {
