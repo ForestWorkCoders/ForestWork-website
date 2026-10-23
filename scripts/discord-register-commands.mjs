@@ -624,6 +624,28 @@ const forestCommands = [
                         ]
                     }
                 ]
+            },
+            {
+                name: 'skill',
+                description: '查看選手實力評定沙盒 (Skill Benchmark) 10 槽位天梯排行榜',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'module',
+                        description: '指定科目編號 (1-10，預設為 01. PRECISION)',
+                        type: 4, // INTEGER
+                        required: false,
+                        choices: [
+                            { name: '01. PRECISION (定位瞄準)', value: 1 },
+                            { name: '02. DUAL AXIS (雙軸協調)', value: 2 },
+                            { name: '03. TRAIL LINK (序列反應)', value: 3 },
+                            { name: '04. ODD PAIR (落單辨識)', value: 4 },
+                            { name: '05. REACTION (神經反應)', value: 5 },
+                            { name: '06. APEX TRACK (動態跟槍)', value: 6 },
+                            { name: '09. CHRONO TAP (極限 CPS)', value: 9 }
+                        ]
+                    }
+                ]
             }
         ]
     },
