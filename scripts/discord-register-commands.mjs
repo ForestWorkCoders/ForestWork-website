@@ -642,6 +642,7 @@ const forestCommands = [
                             { name: '04. ODD PAIR (落單辨識)', value: 4 },
                             { name: '05. REACTION (神經反應)', value: 5 },
                             { name: '06. APEX TRACK (動態跟槍)', value: 6 },
+                            { name: '08. PIANO CADENCE (鋼琴色塊)', value: 8 },
                             { name: '09. CHRONO TAP (極限 CPS)', value: 9 }
                         ]
                     }

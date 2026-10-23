@@ -26,6 +26,12 @@ export interface ModuleResultSummary {
   metrics: ResultMetric[]
 }
 
+export interface SkillModuleInitParams {
+  canvas: HTMLCanvasElement
+  ctx: CanvasRenderingContext2D
+  addScore: (delta: number, x?: number, y?: number, color?: string) => void
+}
+
 export interface SkillModuleInstance {
   id: number
   title: string
