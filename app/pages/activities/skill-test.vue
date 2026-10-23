@@ -130,6 +130,8 @@ async function fetchLeaderboardAndPbs(targetModuleId: number) {
     if (res.success) {
       liveLeaderboard.value = res.leaderboard
 
+      console.log(`[PB Hydration] 选手 ${currentDiscordId.value} 的 PB 字典:`, res.personalBests)
+
       // 动态水合大厅 10 个槽位的真实 PB 分数
       for (const slot of TRIAL_SLOTS.value) {
         if (slot.moduleId && res.personalBests[slot.moduleId] !== undefined) {
@@ -195,14 +197,14 @@ const activeSummary = computed<ModuleResultSummary>(() => {
   const baseSummary = activeModule.getResultSummary
     ? activeModule.getResultSummary()
     : {
-        rating: score.value >= 12000 ? 'FLAWLESS ACE' : score.value >= 8000 ? 'COMBAT READY' : 'STANDARD CADENCE',
-        metrics: [
-          { value: '100%', label: 'ACCURACY', badge: 'x2.00' },
-          { value: `${remainingTime.value.toFixed(1)}s`, label: 'PACE' },
-          { value: `${score.value}`, label: 'SCORE' },
-          { value: '0', label: 'PENALTIES' }
-        ]
-      }
+      rating: score.value >= 12000 ? 'FLAWLESS ACE' : score.value >= 8000 ? 'COMBAT READY' : 'STANDARD CADENCE',
+      metrics: [
+        { value: '100%', label: 'ACCURACY', badge: 'x2.00' },
+        { value: `${remainingTime.value.toFixed(1)}s`, label: 'PACE' },
+        { value: `${score.value}`, label: 'SCORE' },
+        { value: '0', label: 'PENALTIES' }
+      ]
+    }
 
   // ★ 核心好品味：把推导出的真实全服位次，动态注入到第 1 根核心指标立柱的金色徽标中！
   const dynamicMetrics = [...baseSummary.metrics]
@@ -440,6 +442,19 @@ function tick(now: number) {
 
   if ((hasTimeLimit && elapsed >= moduleDuration) || activeModule.isCompleted) {
     isFinished.value = true
+
+    // ★ 核心好品味：本地即时乐观更新 PB，0 毫秒响应，不等网络回包！
+    const currentBestNum = Number(String(currentSlot.value.bestScore).replace(/,/g, '')) || 0
+    if (score.value > currentBestNum) {
+      currentSlot.value.bestScore = score.value.toLocaleString()
+      // 同步更新大厅列表对应的 slot 引用
+      const targetSlot = TRIAL_SLOTS.value.find(s => s.id === currentSlot.value.id)
+      if (targetSlot) {
+        targetSlot.bestScore = score.value.toLocaleString()
+      }
+    }
+
+    // 正式提交入库
     if (currentSlot.value.moduleId) {
       $fetch('/api/activities/submit', {
         method: 'POST',
@@ -451,7 +466,7 @@ function tick(now: number) {
           metrics: activeSummary.value.metrics
         }
       }).then(() => {
-        // 提交成功后立刻重新拉取天梯与最新 PB
+        // 提交成功后重新拉取权威天梯并校准全槽位 PB
         fetchLeaderboardAndPbs(currentSlot.value.moduleId!)
       }).catch((err) => {
         console.error('[Submit] 成绩写入失败:', err)
@@ -1039,7 +1054,7 @@ onUnmounted(() => {
               <span>{{ entry.operator_name }}</span>
             </span>
             <span class="col-span-3 text-right font-black font-mono text-zinc-100">{{ entry.score.toLocaleString()
-              }}</span>
+            }}</span>
             <span class="col-span-2 text-right text-[10px] text-zinc-500">
               {{ new Date(entry.created_at).toLocaleDateString() }}
             </span>
