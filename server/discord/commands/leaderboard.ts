@@ -312,7 +312,7 @@ export async function handleLeaderboardCommand(interaction: any, event: H3Event)
       data: payload
     }
   }
-  
+
   if (subCommand === 'quaso') {
     const mode = subOptions.find((o: any) => o.name === 'mode')?.value || 'received'
     const payload = await renderQuasoLeaderboardPayload(mode, callerId)
@@ -454,28 +454,42 @@ export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: 
   // 3. 查詢當前呼叫者在該科目的個人歷史最佳戰績 (PB)
   let personalBlock = ''
   if (viewerId) {
-    const { data: myPb } = await supabase
-      .schema('trpg')
-      .from('v_skill_personal_bests')
-      .select('best_score, achieved_at')
-      .eq('module_id', mod.id)
-      .eq('discord_id', viewerId)
-      .maybeSingle()
+    let myRank: number | null = null
+    let myScore: number | null = null
+    let myRating: string = 'COMBAT READY'
 
-    if (myPb && myPb.best_score) {
-      // 順帶計算該選手的即時排名
-      const { count: higherCount } = await supabase
+    // ① 第一優先：如果在剛剛拉取的前 10 強中，直接內存命中！0 次額外網路請求！
+    const inTopEntry = topList?.find(item => String(item.discord_id) === String(viewerId))
+    if (inTopEntry) {
+      myRank = inTopEntry.global_rank
+      myScore = inTopEntry.score
+      myRating = inTopEntry.rating || 'COMBAT READY'
+    } 
+    // ② 第二優先：若未進入前 10 強，直接向 v_skill_leaderboard 單表反查該選手的全服權威位次
+    else {
+      const { data: myRankEntry, error: rankErr } = await supabase
         .schema('trpg')
-        .from('v_skill_personal_bests')
-        .select('*', { count: 'exact', head: true })
+        .from('v_skill_leaderboard')
+        .select('global_rank, score, rating')
         .eq('module_id', mod.id)
-        .gt('best_score', myPb.best_score)
+        .eq('discord_id', String(viewerId))
+        .maybeSingle()
 
-      const myRank = (higherCount || 0) + 1
+      if (rankErr) {
+        console.error('[-] 個人戰術檔案反查異常:', rankErr.message)
+      } else if (myRankEntry) {
+        myRank = myRankEntry.global_rank
+        myScore = myRankEntry.score
+        myRating = myRankEntry.rating || 'COMBAT READY'
+      }
+    }
+
+    // 格式化輸出個人檔案
+    if (myScore !== null && myRank !== null) {
       personalBlock = [
         '',
         '--- **你的戰術檔案 // PERSONAL RECORD** ---',
-        `個人最高: \`${Number(myPb.best_score).toLocaleString()} PTS\` · 全服位次: **#${myRank}**`
+        `個人最佳: \`${myScore.toLocaleString()} PTS\` · 全服位次: **#${myRank}** \`[${myRating}]\``
       ].join('\n')
     } else {
       personalBlock = [
