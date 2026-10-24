@@ -29,7 +29,7 @@ definePageMeta({
 const currentDiscordId = ref<string>('10001')
 const currentOperatorDisplay = ref<string>('CONNECTING...')
 
-  // ★ 1. 提升为组件作用域变量，供全页面交互调用
+// ★ 1. 提升为组件作用域变量，供全页面交互调用
 let discordSdkInstance: DiscordSDK | null = null
 
 // ★ 2. 核心好品味：双模外链穿透器（Discord 客户端走 RPC，普通浏览器走 window.open）
@@ -430,6 +430,10 @@ function handlePointerLeave() {
 }
 
 function handleKeyDown(e: KeyboardEvent) {
+  if (isFinished.value) {
+    return
+  }
+
   if (e.code === 'Escape') {
     if (isScoreboardOpen.value) {
       closeScoreboard()
@@ -473,6 +477,10 @@ function tick(now: number) {
 
   if ((hasTimeLimit && elapsed >= moduleDuration) || activeModule.isCompleted) {
     isFinished.value = true
+
+    if (activeModule) {
+      activeModule.isCompleted = true
+    }
 
     // ★ 核心好品味：本地即时乐观更新 PB，0 毫秒响应，不等网络回包！
     const currentBestNum = Number(String(currentSlot.value.bestScore).replace(/,/g, '')) || 0
@@ -669,7 +677,8 @@ onUnmounted(() => {
         <header
           class="shrink-0 w-full px-5 py-2.5 flex items-center justify-between border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
           <div class="flex items-center gap-3">
-            <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer" @click.prevent="openExternalUrl('https://forestwork.vercel.app/')"
+            <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer"
+              @click.prevent="openExternalUrl('https://forestwork.vercel.app/')"
               class="group flex items-center gap-2 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
               title="開啟林間小鎮官方網站">
               <span
