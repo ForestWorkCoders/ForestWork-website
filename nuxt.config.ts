@@ -83,7 +83,11 @@ export default defineNuxtConfig({
     '/gartic_phone': { redirect: { to: '/games/garticphone', statusCode: 301 } },
     '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } },
 
-    // 4. Discord 站内嵌套允许（CSP + XFO）
+    // 4. CTF 旧站重定向（301 永久重定向）
+    '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 302 } },
+    '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 302 } },
+
+    // 5. Discord 站内嵌套允许（CSP + XFO）
     '/activities/**': {
       headers: {
         'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com",
