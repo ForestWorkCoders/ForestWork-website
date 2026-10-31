@@ -18,7 +18,9 @@ export default defineNuxtConfig({
     ],
     // 排除纯内部 API 端点，防止泄露给搜索引擎
     exclude: [
-      '/api/**'
+      '/api/**',
+      '/activities/**',
+      '/tools/giveaway'
     ]
   },
 
