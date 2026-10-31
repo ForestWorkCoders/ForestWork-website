@@ -204,51 +204,69 @@ const colors: ColorToken[] = [
                             class="font-bold text-[#4C7766]">x</code> 為標誌圖案的物理高度。任何文字或圖像元素均不得侵入此區域。
                     </p>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                        <!-- 1. 橫向組合 (Horizontal Lockup) -->
+                        <!-- 1. 橫向組合 (英文 / Horizontal Lockup EN) -->
                         <div
                             class="bg-gray-50 dark:bg-[#12141A] border border-gray-200 dark:border-zinc-800 p-5 rounded-xl space-y-4 flex flex-col justify-between">
-                            <!-- Logo 预览框：与 Header 左上角结构镜像对齐 -->
+                            <!-- 预览框：添加 overflow-hidden 与 px-4 防御移动端溢出 -->
                             <div
-                                class="h-28 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm">
-                                <div class="flex items-center gap-2">
-                                    <UColorModeImage light="/brand/svg/logo-dark.svg"
-                                        dark="/brand/svg/logo-light.svg" alt="ForestWork Horizontal Lockup"
-                                        class="h-8 w-auto" />
-                                    <span
-                                        class="font-bold text-lg text-gray-900 dark:text-white font-sans tracking-tight">ForestWork</span>
+                                class="h-32 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
+                                <div class="flex items-center justify-center gap-2.5 max-w-full">
+                                    <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                        alt="Emblem" class="h-7 sm:h-8 w-auto shrink-0" />
+                                    <!-- 🟢 防御性约束：max-w-[65%] + object-contain 彻底消灭移动端破框 -->
+                                    <UColorModeImage light="/brand/svg/text-en-dark.svg"
+                                        dark="/brand/svg/text-en-light.svg" alt="Forest Work"
+                                        class="h-4 sm:h-5 w-auto max-w-[65%] object-contain" />
                                 </div>
                             </div>
-
-                            <!-- 元数据说明 -->
                             <div class="space-y-1">
-                                <div class="text-xs font-mono font-bold text-gray-400 uppercase">橫向組合 (Horizontal
-                                    Lockup)</div>
+                                <div class="text-xs font-mono font-bold text-gray-400 uppercase">橫向組合 - 英文 (Horizontal
+                                    Lockup EN)</div>
                                 <div class="text-xs text-gray-600 dark:text-gray-300">數位顯示最小高度：45px</div>
                             </div>
                         </div>
 
-                        <!-- 2. 直向組合 (Vertical Lockup) -->
+                        <!-- 2. 🟢 新增：橫向組合 (中文 / Horizontal Lockup ZH) -->
                         <div
                             class="bg-gray-50 dark:bg-[#12141A] border border-gray-200 dark:border-zinc-800 p-5 rounded-xl space-y-4 flex flex-col justify-between">
-                            <!-- Logo 预览框：1:1 还原直向图形 + 中英文名排版 (或直接挂载竖版 SVG) -->
                             <div
-                                class="h-28 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-3 shadow-sm">
-                                <!-- 如果你有导出的竖版 SVG/PNG，可以直接用 <UColorModeImage src="/brand/forestwork_vertical_logo.svg" /> 替换 -->
-                                <div class="flex flex-col items-center justify-center text-center space-y-1">
-                                    <UColorModeImage light="/brand/svg/logo-dark.svg"
-                                        dark="/brand/svg/logo-light.svg" alt="ForestWork Emblem"
-                                        class="h-10 w-auto" />
-                                    <div class="leading-none text-gray-900 dark:text-white flex flex-col items-center">
-                                        <span class="text-xs font-bold tracking-wider">林間小鎮</span>
-                                        <span
-                                            class="text-[9px] font-mono tracking-tight text-gray-500 dark:text-gray-400 mt-0.5">ForestWork</span>
+                                class="h-32 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
+                                <div class="flex items-center justify-center gap-2.5 max-w-full">
+                                    <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                        alt="Emblem" class="h-7 sm:h-8 w-auto shrink-0" />
+                                    <!-- 中文横向字标 -->
+                                    <UColorModeImage light="/brand/svg/text-zh-dark.svg"
+                                        dark="/brand/svg/text-zh-light.svg" alt="林間小鎮"
+                                        class="h-5 sm:h-6 w-auto max-w-[65%] object-contain" />
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-xs font-mono font-bold text-gray-400 uppercase">橫向組合 - 中文 (Horizontal
+                                    Lockup ZH)</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-300">數位顯示最小高度：45px</div>
+                            </div>
+                        </div>
+
+                        <!-- 3. 直向組合 (雙語 / Vertical Lockup) -->
+                        <div
+                            class="bg-gray-50 dark:bg-[#12141A] border border-gray-200 dark:border-zinc-800 p-5 rounded-xl space-y-4 flex flex-col justify-between">
+                            <div
+                                class="h-44 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
+                                <div class="flex flex-col items-center justify-center space-y-2.5 max-w-full">
+                                    <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                        alt="ForestWork Emblem" class="h-14 sm:h-16 w-auto shrink-0" />
+                                    <div class="flex flex-col items-center justify-center space-y-1 max-w-full">
+                                        <UColorModeImage light="/brand/svg/text-zh-dark.svg"
+                                            dark="/brand/svg/text-zh-light.svg" alt="林間小鎮"
+                                            class="h-4 sm:h-5 w-auto max-w-full object-contain" />
+                                        <UColorModeImage light="/brand/svg/text-en-dark.svg"
+                                            dark="/brand/svg/text-en-light.svg" alt="Forest Work"
+                                            class="h-1 sm:h-2 w-auto max-w-full object-contain" />
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- 元数据说明 -->
                             <div class="space-y-1">
                                 <div class="text-xs font-mono font-bold text-gray-400 uppercase">直向組合 (Vertical Lockup)
                                 </div>
@@ -256,15 +274,14 @@ const colors: ColorToken[] = [
                             </div>
                         </div>
 
-                        <!-- 3. 純圖案 (Symbol Only) -->
+                        <!-- 4. 純圖案 (Symbol Only) -->
                         <div
                             class="bg-gray-50 dark:bg-[#12141A] border border-gray-200 dark:border-zinc-800 p-5 rounded-xl space-y-4 flex flex-col justify-between">
                             <!-- Logo 预览框：纯 Emblem 图案 -->
                             <div
                                 class="h-28 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm">
-                                <UColorModeImage light="/brand/svg/logo-dark.svg"
-                                    dark="/brand/svg/logo-light.svg" alt="ForestWork Symbol Only"
-                                    class="h-10 w-auto" />
+                                <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                    alt="ForestWork Symbol Only" class="h-10 w-auto" />
                             </div>
 
                             <!-- 元数据说明 -->
