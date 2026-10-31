@@ -30,13 +30,14 @@
     "discord-component-embed": "^0.2.1",
     "echarts": "^6.1.0",
     "markdown-it": "^14.3.0",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.3",
     "reveal.js": "^6.0.2",
     "tailwindcss": "^4.3.2",
     "vue-echarts": "^8.0.1"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.16.0",
+    "@nuxtjs/sitemap": "^9.1.0",
     "@supabase/supabase-js": "^2.116.0",
     "@types/node": "^26.5.1",
     "eslint": "^10.7.0",

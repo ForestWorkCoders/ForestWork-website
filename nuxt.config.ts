@@ -3,8 +3,24 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@nuxtjs/supabase'
+    '@nuxtjs/supabase',
+    '@nuxtjs/sitemap'
   ],
+
+  site: {
+    url: 'https://forestwork.vercel.app'
+  },
+
+  sitemap: {
+    // 自动整合 Nitro 动态 URL 来源
+    sources: [
+      '/api/__sitemap__/urls'
+    ],
+    // 排除纯内部 API 端点，防止泄露给搜索引擎
+    exclude: [
+      '/api/**'
+    ]
+  },
 
   devtools: {
     enabled: true
