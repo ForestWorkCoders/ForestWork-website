@@ -1,0 +1,197 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    margin: 0;
+    background-color: #F5F5F5
+}
+
+a {
+    color: currentColor;
+    text-decoration: none;
+    border-bottom: 1px dotted
+}
+
+.border {
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex: 0 0 30%;
+    -ms-flex: 0 0 30%;
+    flex: 0 0 30%;
+    margin: 1em auto;
+    max-width: 100%
+}
+
+@media screen and (max-width:900px) {
+    .border {
+        -webkit-flex: 0 0 50%;
+        -ms-flex: 0 0 50%;
+        flex: 0 0 50%;
+        margin: .5em auto
+    }
+}
+
+.border h2 {
+    font-weight: 300;
+    margin: 0
+}
+
+header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 3rem
+}
+
+.logo_settings {
+    display: block;
+    margin-right: 1rem;
+    width: 60px
+}
+
+.title_name {
+    font-size: 2.75rem;
+    font-weight: lighter;
+    margin: 0
+}
+
+.box {
+    display: grid;
+    gap: 3rem;
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
+    list-style-type: none;
+    margin: 0 auto;
+    max-width: 1400px;
+    padding: 0
+}
+
+@media screen and (max-width:1300px) {
+    .box {
+        grid-template-columns: repeat(2, minmax(300px, 1fr))
+    }
+}
+
+@media screen and (max-width:850px) {
+    .box {
+        grid-template-columns: 5px 2fr 5px
+    }
+
+    .box>li {
+        gap: 0;
+        grid-column: 2
+    }
+}
+
+.border {
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex: 0 0 30%;
+    -ms-flex: 0 0 30%;
+    flex: 0 0 30%;
+    margin: 1em auto;
+    max-width: 100%
+}
+
+@media screen and (max-width:900px) {
+    .border {
+        -webkit-flex: 0 0 50%;
+        -ms-flex: 0 0 50%;
+        flex: 0 0 50%;
+        margin: .5em auto
+    }
+}
+
+.author_thumbnail {
+    -webkit-flex-basis: 100px;
+    -ms-flex-preferred-size: 100px;
+    flex-basis: 100px;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    text-align: center;
+    height: 100px;
+    width: 100px;
+}
+
+.quote_box {
+    padding-bottom: 1.25em;
+}
+
+.quote_content {
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 8px 0 0 0;
+    padding-right: 2em;
+    text-align: left;
+}
+
+.quote_author {
+    text-align: right;
+    font-weight: 300;
+}
+
+/* Credit to https://epicbootstrap.com/snippets/footer-basic */
+footer {
+    height: 150px;
+    flex-shrink: 0;
+}
+
+footer ul a {
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+footer ul a:hover {
+    opacity: 1;
+}
+
+footer .social {
+    text-align: center;
+    padding-bottom: 25px;
+}
+
+footer .social>a {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+    text-align: center;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    margin: 0 8px;
+    color: inherit;
+    opacity: 0.75;
+}
+
+footer .social>a:hover {
+    opacity: 0.9;
+}
+
+footer .copyright {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 0;
+}
+
+.list-inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

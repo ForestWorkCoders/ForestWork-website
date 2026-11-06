@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<head>
+	<!--Javascript Go!-->
+	<script src="js/components/head.js"></script>
+	<!--神说，这些剧本没办法模块化 所以没办法 awa-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.6.0/umd/popper.min.js"></script>
+	<!--上标题！-->
+	<title>林間小鎮 ForestWork</title>
+</head>
+
+<body>
+	<div>
+		<video id="videoBG" autoplay muted loop>
+			<source src="videos/404.mp4" type="video/mp4">
+			Your browser does not support the video tag.
+		</video>
+	</div>
+
+	<div id="centerLOGO">
+		<img src="images/404/404.svg" width="90%" height="80%" alt="" />
+	</div>
+</body>
+
+</html>
