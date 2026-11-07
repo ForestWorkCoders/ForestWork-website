@@ -2,37 +2,22 @@
 const route = useRoute()
 
 // ==========================================
-// 1. 取得基本資料 (第一個 await 必須在最前面)
+// 1. 取得基本資料
 // ==========================================
 const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournaments/${route.params.id}`)
 
 // ==========================================
-// 2. 宣告所有 computed 賽制判斷 (馬上宣告，避免後面找不到)
+// 2. 宣告所有 computed 賽制判斷
 // ==========================================
 const isEvent = computed(() => {
     return tourney.value?.format === 'event'
 })
 
 // ==========================================
-// 3. 取得 Content (第二個 await，依賴前面的 isEvent)
+// 3. 取得 Content URL (★ 只負責解析出網址，不要在這裡下載檔案！)
 // ==========================================
-// 我們呼叫上一動剛寫好的魔法 API，它會回傳注入好玩家大頭貼的 JSON
-// ★ 新增：全站通用的 Markdown 網址解析器
 const contentUrl = computed(() => {
-    const rawConfig = tourney.value?.phase_configs
-    if (!rawConfig) return null
-
-    let parsed = {}
-    if (typeof rawConfig === 'string') {
-        try { parsed = JSON.parse(rawConfig) } catch (e) { }
-    } else if (typeof rawConfig === 'object') {
-        parsed = rawConfig
-    }
-
-    console.log('Parsed Content URL:', parsed.content_url)
-
-    // 只要你的 JSON 裡面有設定 content_url，所有賽事都能讀到！
-    return parsed.content_url || null
+    return tourney.value?.content_url || null
 })
 
 // ==========================================
@@ -48,23 +33,19 @@ const breadcrumbLinks = computed(() => {
         {
             label: '賽事大廳 · Tournaments',
             icon: 'i-lucide-trophy',
-            to: '/games/mahjongsoul' // 假設你的賽事列表頁在這裡
+            to: '/games/mahjongsoul' 
         },
         {
-            // 如果還在載入中，顯示佔位符；載入完成後顯示賽事簡稱或標題
             label: tourney.value?.title || '載入中...',
             icon: 'i-lucide-swords',
-            // 當前頁面不需要給 to，因為就在這一頁
         }
     ]
 })
 
-
 // ==========================================
-// 5. 定義下方的導覽標籤 (★ 必須放在檔案最下方 ★)
+// 5. 定義下方的導覽標籤
 // ==========================================
 const tabs = computed(() => {
-
     const baseTabs = [
         { label: '賽事資訊 · Information', slot: 'info' },
         { label: '賽事結果 · Result', slot: 'result' },
@@ -72,12 +53,11 @@ const tabs = computed(() => {
         { label: '直播記錄 · VODs', slot: 'vods' }
     ]
 
-    // 記得用可選串連 (?.) 因為初始載入時 tourney 可能是 null
     if (tourney.value?.format === 'invitational') {
         return [
-            baseTabs[0], // info
+            baseTabs[0],
             { label: '參賽資格 · Prerequisites', slot: 'prereq' },
-            ...baseTabs.slice(1) // result, stats, vods
+            ...baseTabs.slice(1)
         ]
     }
     if (tourney.value?.format === 'relay') {
@@ -88,8 +68,6 @@ const tabs = computed(() => {
         ]
     }
 
-    // 如果是特殊賽事 (Event)，如果你想隱藏某些 Tab (例如 Player Stats)，可以在這裡操作
-    // 例如：過濾掉 key 為 stats 的標籤
     if (isEvent.value) {
         return baseTabs.filter(tab => tab.slot !== 'stats')
     }
@@ -193,8 +171,7 @@ const tabs = computed(() => {
                         }
                     }">
                         <template #info>
-                            <div
-                                class="bg-white/90 dark:bg-[#1a1b26] w-full h-[600px] mt-2 rounded-lg flex items-center justify-center">
+                            <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in pb-12">
                                 <TournamentsInfo :content-url="contentUrl" />
                             </div>
                         </template>
@@ -232,3 +209,19 @@ const tabs = computed(() => {
         </div>
     </div>
 </template>
+
+<!-- <style scoped>
+/* 讓滾動條好看一點，這是我最後一次在乎你的 UI 細節 */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-emerald-500;
+}
+</style> -->

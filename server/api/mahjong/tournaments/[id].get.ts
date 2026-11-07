@@ -52,5 +52,6 @@ export default defineEventHandler(async (event) => {
     dnfThreshold: tourney.dnfThreshold,
     format: tourney.format,
     created_at: tourney.created_at,
+    content_url: tourney.content_url
   }
 })
