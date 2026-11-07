@@ -10,15 +10,45 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "14.5"
   }
   mahjong: {
     Tables: {
+      fwmp_configs: {
+        Row: {
+          month: number
+          points_map: Json | null
+          tournament_bind_id: string
+          year: number
+        }
+        Insert: {
+          month: number
+          points_map?: Json | null
+          tournament_bind_id: string
+          year: number
+        }
+        Update: {
+          month?: number
+          points_map?: Json | null
+          tournament_bind_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fwmp_configs_tournament_bind_id_fkey"
+            columns: ["tournament_bind_id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           east_id: number
           east_score: number
           end_time: string
+          group_tag: string | null
           id: number
           north_id: number | null
           north_score: number | null
@@ -35,6 +65,7 @@ export type Database = {
           east_id: number
           east_score: number
           end_time: string
+          group_tag?: string | null
           id?: number
           north_id?: number | null
           north_score?: number | null
@@ -51,6 +82,7 @@ export type Database = {
           east_id?: number
           east_score?: number
           end_time?: string
+          group_tag?: string | null
           id?: number
           north_id?: number | null
           north_score?: number | null
@@ -67,6 +99,13 @@ export type Database = {
           {
             foreignKeyName: "matches_east_id_fkey"
             columns: ["east_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "matches_north_id_fkey"
+            columns: ["north_id"]
             isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["account_id"]
@@ -94,6 +133,39 @@ export type Database = {
           },
         ]
       }
+      paipu_yaku_dict: {
+        Row: {
+          created_at: string
+          fan: number | null
+          id: number
+          name_chs: string
+          name_chs_t: string
+          name_en: string
+          name_jp: string
+          name_kr: string
+        }
+        Insert: {
+          created_at?: string
+          fan?: number | null
+          id?: number
+          name_chs: string
+          name_chs_t: string
+          name_en: string
+          name_jp: string
+          name_kr: string
+        }
+        Update: {
+          created_at?: string
+          fan?: number | null
+          id?: number
+          name_chs?: string
+          name_chs_t?: string
+          name_en?: string
+          name_jp?: string
+          name_kr?: string
+        }
+        Relationships: []
+      }
       participants: {
         Row: {
           account_id: number
@@ -115,29 +187,85 @@ export type Database = {
         }
         Relationships: []
       }
+      rules: {
+        Row: {
+          basepts: number
+          id: string
+          oka: number
+          returnpts: number
+          uma1: number
+          uma2: number
+          uma3: number
+          uma4: number | null
+        }
+        Insert: {
+          basepts?: number
+          id?: string
+          oka?: number
+          returnpts?: number
+          uma1?: number
+          uma2?: number
+          uma3?: number
+          uma4?: number | null
+        }
+        Update: {
+          basepts?: number
+          id?: string
+          oka?: number
+          returnpts?: number
+          uma1?: number
+          uma2?: number
+          uma3?: number
+          uma4?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rules_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
+          content_url: string | null
           created_at: string | null
-          icon: string | null
+          dnfThreshold: number | null
+          format: string
+          icon: string
           id: string
+          organizer: string | null
+          phase_configs: Json | null
           region: string | null
           tier: string | null
           title: string
           updates_at: string
         }
         Insert: {
+          content_url?: string | null
           created_at?: string | null
-          icon?: string | null
+          dnfThreshold?: number | null
+          format?: string
+          icon?: string
           id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
           region?: string | null
           tier?: string | null
           title: string
           updates_at: string
         }
         Update: {
+          content_url?: string | null
           created_at?: string | null
-          icon?: string | null
+          dnfThreshold?: number | null
+          format?: string
+          icon?: string
           id?: string
+          organizer?: string | null
+          phase_configs?: Json | null
           region?: string | null
           tier?: string | null
           title?: string
@@ -145,15 +273,104 @@ export type Database = {
         }
         Relationships: []
       }
+      tourney_players: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: number
+          role: Database["mahjong"]["Enums"]["relay_role"]
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id: number
+          role: Database["mahjong"]["Enums"]["relay_role"]
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: number
+          role?: Database["mahjong"]["Enums"]["relay_role"]
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "tourney_players_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "tourney_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tourney_teams: {
+        Row: {
+          created_at: string
+          id: string
+          logo: string | null
+          name: string
+          notes: string | null
+          tournament_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name: string
+          notes?: string | null
+          tournament_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name?: string
+          notes?: string | null
+          tournament_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourney_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      monthly_player_ranks: {
+        Row: {
+          account_id: number | null
+          month: number | null
+          points: number | null
+          tournament_bind_id: string | null
+          year: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      relay_role:
+        | "Senpo"
+        | "Jiho"
+        | "Chuken"
+        | "Fukusho"
+        | "Taisho"
+        | "Substitute"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -565,7 +782,16 @@ export type CompositeTypes<
 
 export const Constants = {
   mahjong: {
-    Enums: {},
+    Enums: {
+      relay_role: [
+        "Senpo",
+        "Jiho",
+        "Chuken",
+        "Fukusho",
+        "Taisho",
+        "Substitute",
+      ],
+    },
   },
   public: {
     Enums: {},

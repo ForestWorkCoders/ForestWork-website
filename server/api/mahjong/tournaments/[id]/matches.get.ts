@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { calculateMahjongPoints } from '~~/server/utils/mahjongScoreEngine'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -17,6 +18,13 @@ export default defineEventHandler(async (event) => {
 
   if (matchErr) throw createError({ statusCode: 500, statusMessage: matchErr.message })
   if (!matches || matches.length === 0) return []
+
+  const { data: ruleData } = await supabase
+    .schema('mahjong') // 假設你建在 mahjong schema
+    .from('rules')
+    .select('basepts, uma1, uma2, uma3, uma4')
+    .eq('id', id)
+    .single()
 
   // 2. 玩家字典建置 (The String Cast Magic)
   const accountIds = new Set<number>()
@@ -73,22 +81,7 @@ export default defineEventHandler(async (event) => {
 
     const players = rawPlayers.map(p => {
       const rank = getRank(p.score)
-      let pts = 0
-
-      if (isSanma) {
-        // ★ 三麻計分邏輯 ★
-        // 依照你的公式： (得分 / 1000) + Uma(15, 0, -15) 
-        // 備註：如果你的基底是 35000 返點，公式應該是 (score - 35000)/1000 + uma，這裡我先依照標準實作，你可以自由微調
-        const basePts = (p.score - 35000) / 1000 
-        const uma = rank === 1 ? 15 : rank === 2 ? 0 : -15
-        pts = basePts + uma
-      } else {
-        // ★ 四麻計分邏輯 ★
-        const basePts = (p.score - 25000) / 1000
-        // 標準雀魂 Uma (15, 5, -5, -15)，請依照你的賽規修改
-        const uma = rank === 1 ? 15 : rank === 2 ? 5 : rank === 3 ? -5 : -15
-        pts = basePts + uma
-      }
+      const pts = calculateMahjongPoints(p.score, rank, isSanma, ruleData)
 
       return {
         seat: p.seat,

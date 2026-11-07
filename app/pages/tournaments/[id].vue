@@ -1,16 +1,113 @@
 <script setup>
 const route = useRoute()
 
-// 唯一的 API 呼叫：取得賽事基本資訊 (Hero Section 使用)
+// ==========================================
+// 1. 取得基本資料 (第一個 await 必須在最前面)
+// ==========================================
 const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournaments/${route.params.id}`)
 
-// 定義下方的導覽標籤
-const tabs = [
-    { label: '賽事資訊 · Information', slot: 'info' },
-    { label: '賽事結果 · Result', slot: 'result' },
-    { label: '玩家數據 · Player Stats', slot: 'stats' },
-    { label: '直播記錄 · VODs', slot: 'vods' }
-]
+// ==========================================
+// 2. 宣告所有 computed 賽制判斷 (馬上宣告，避免後面找不到)
+// ==========================================
+const isModernInvitational = computed(() => {
+    // 1. 如果不是邀請賽，直接 false
+    if (tourney.value?.format !== 'invitational') return false
+
+    // 2. 獲取賽事的建立年份
+    const year = tourney.value?.created_at ? new Date(tourney.value.created_at).getFullYear() : 0
+
+    // 3. 判斷是否跨過 2025 分水嶺
+    return year >= 2025
+})
+
+const isRelay = computed(() => {
+    return tourney.value?.format === 'relay'
+})
+
+const isEvent = computed(() => {
+    return tourney.value?.format === 'event'
+})
+
+// ==========================================
+// 3. 取得 Content (第二個 await，依賴前面的 isEvent)
+// ==========================================
+// 我們呼叫上一動剛寫好的魔法 API，它會回傳注入好玩家大頭貼的 JSON
+// ★ 新增：全站通用的 Markdown 網址解析器
+const contentUrl = computed(() => {
+    const rawConfig = tourney.value?.phase_configs
+    if (!rawConfig) return null
+
+    let parsed = {}
+    if (typeof rawConfig === 'string') {
+        try { parsed = JSON.parse(rawConfig) } catch (e) {}
+    } else if (typeof rawConfig === 'object') {
+        parsed = rawConfig
+    }
+
+    // 只要你的 JSON 裡面有設定 content_url，所有賽事都能讀到！
+    return parsed.content_url || null
+})
+
+// ==========================================
+// 4. 動態麵包屑導航
+// ==========================================
+const breadcrumbLinks = computed(() => {
+    return [
+        {
+            label: '首頁 · Home',
+            icon: 'i-lucide-home',
+            to: '/'
+        },
+        {
+            label: '賽事大廳 · Tournaments',
+            icon: 'i-lucide-trophy',
+            to: '/games/mahjongsoul' // 假設你的賽事列表頁在這裡
+        },
+        {
+            // 如果還在載入中，顯示佔位符；載入完成後顯示賽事簡稱或標題
+            label: tourney.value?.title || '載入中...',
+            icon: 'i-lucide-swords',
+            // 當前頁面不需要給 to，因為就在這一頁
+        }
+    ]
+})
+
+
+// ==========================================
+// 5. 定義下方的導覽標籤 (★ 必須放在檔案最下方 ★)
+// ==========================================
+const tabs = computed(() => {
+
+    const baseTabs = [
+        { label: '賽事資訊 · Information', slot: 'info' },
+        { label: '賽事結果 · Result', slot: 'result' },
+        { label: '玩家數據 · Player Stats', slot: 'stats' },
+        { label: '直播記錄 · VODs', slot: 'vods' }
+    ]
+
+    // 記得用可選串連 (?.) 因為初始載入時 tourney 可能是 null
+    if (tourney.value?.format === 'invitational') {
+        return [
+            baseTabs[0], // info
+            { label: '參賽資格 · Prerequisites', slot: 'prereq' },
+            ...baseTabs.slice(1) // result, stats, vods
+        ]
+    }
+    if (tourney.value?.format === 'relay') {
+        return [
+            baseTabs[0],
+            { label: '參賽隊伍 · Teams', slot: 'teams' },
+            ...baseTabs.slice(1)
+        ]
+    }
+
+    // 如果是特殊賽事 (Event)，如果你想隱藏某些 Tab (例如 Player Stats)，可以在這裡操作
+    // 例如：過濾掉 key 為 stats 的標籤
+    if (isEvent.value) {
+        return baseTabs.filter(tab => tab.slot !== 'stats')
+    }
+    return baseTabs
+})
 </script>
 
 <template>
@@ -28,6 +125,18 @@ const tabs = [
         <div class="min-h-screen bg-black/50 backdrop-blur-sm pt-20 pb-12">
 
             <UContainer class="max-w-6xl">
+                <div class="mb-8 px-2 animate-fade-in">
+                    <UBreadcrumb :items="breadcrumbLinks" separator="i-lucide-chevron-right" :ui="{
+                        wrapper: 'flex flex-wrap items-center gap-1.5',
+                        li: 'flex items-center gap-1.5',
+                        base: 'text-sm font-semibold tracking-wide transition-colors',
+                        active: 'text-white dark:text-gray-200 cursor-default drop-shadow-md',
+                        inactive: 'text-gray-400 hover:text-emerald-400 dark:text-gray-500 dark:hover:text-emerald-400',
+                        icon: { base: 'w-4 h-4', active: 'text-emerald-500', inactive: 'text-gray-500' },
+                        separator: { base: 'w-4 h-4 text-gray-500' }
+                    }" />
+                </div>
+
                 <div
                     class="bg-white/90 dark:bg-[#1a1b26] text-gray-900 dark:text-white rounded-t-xl overflow-hidden shadow-2xl flex flex-col md:flex-row p-8 md:p-16 gap-12 items-center md:items-start border border-gray-200 dark:border-gray-800 transition-colors duration-300">
 
@@ -99,19 +208,46 @@ const tabs = [
                         <template #info>
                             <div
                                 class="bg-white/90 dark:bg-[#1a1b26] w-full h-[600px] mt-2 rounded-lg flex items-center justify-center">
-                                <span class="text-gray-500 font-bold tracking-widest">CONTENT PLACEHOLDER</span>
+                                <TournamentsInfo :content-url="contentUrl" />
+                            </div>
+                        </template>
+
+                        <template #prereq>
+                            <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
+
+                                <TournamentsLeaderboardInvitational :tournament-id="route.params.id" />
+                            </div>
+                        </template>
+
+                        <template #teams>
+                            <div class="px-4 md:px-6 mt-8 space-y-12 animate-fade-in pb-12">
+                                <TournamentsTeamStandard :tournament-id="route.params.id" />
                             </div>
                         </template>
 
                         <template #result>
                             <div class="bg-white/90 dark:bg-[#1a1b26] px-4 md:px-6 mt-2 space-y-12 animate-fade-in">
-                                <TournamentsLeaderboardStandard :tournament-id="route.params.id" />
-                                <TournamentsMatchHistoryStandard :tournament-id="route.params.id" />
+
+                                <template v-if="isModernInvitational">
+                                    <TournamentsLeaderboardPhased v-if="isModernInvitational"
+                                        :tournament-id="route.params.id" />
+                                </template>
+
+                                <template v-else-if="isRelay">
+                                    <TournamentsLeaderboardRelay :tournament-id="route.params.id" />
+                                </template>
+
+                                <template v-else>
+                                    <TournamentsLeaderboardStandard :tournament-id="route.params.id" />
+                                    <TournamentsMatchHistoryStandard :tournament-id="route.params.id" />
+                                </template>
                             </div>
                         </template>
+
                         <template #stats>
                             <TournamentsPlayerStatsStandard :tournament-id="route.params.id" />
                         </template>
+
                         <template #vods>
                             <TournamentsVodsStandard :tournament-id="route.params.id" />
                         </template>
