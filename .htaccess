@@ -1,8 +1,5 @@
-
-Redirect 301 /Facebook https://www.facebook.com/TeamForestWork
-Redirect 301 /facebook https://www.facebook.com/TeamForestWork
-Redirect 301 /Youtube https://www.youtube.com/channel/UCpxH-OxcJujRLpnDUgoYlsg
-Redirect 301 /youtube https://www.youtube.com/channel/UCpxH-OxcJujRLpnDUgoYlsg
+Redirect 301 /Youtube https://www.youtube.com/@forestwork
+Redirect 301 /youtube https://www.youtube.com/@forestwork
 Redirect 301 /Twitter https://twitter.com/teamforestwork
 Redirect 301 /twitter https://twitter.com/teamforestwork
 
@@ -10,7 +7,7 @@ RewriteEngine on
 RewriteRule ^Discord https://discord.gg/qKrub9b [R=301,L]
 RewriteRule ^discord https://discord.gg/qKrub9b [R=301,L]
 
-ErrorDocument 404 /domains/forestwork.net/public_html/404.html
+ErrorDocument 404 404.html
 
 //Block bad bots
 RewriteEngine On 
@@ -100,4 +97,3 @@ deny from all
 
 //Prevent directory listings
 Options All -Indexes
-Redirect 303 /WaitWhat https://discord.gg/hxNHdP9crv
