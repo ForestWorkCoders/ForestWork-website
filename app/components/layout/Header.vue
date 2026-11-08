@@ -1,5 +1,39 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
+const { user, isPending, login, logout, fetchUser } = useAuth()
+
+// 頁面初次掛載時拉取一次身份
+onMounted(() => {
+  fetchUser()
+})
+
+// 下拉選單項（使用 Nuxt UI 標準資料結構）
+const dropdownItems = computed(() => [
+  [
+    {
+      label: user.value?.global_name || user.value?.username || 'Operator',
+      slot: 'account',
+      disabled: true
+    }
+  ],
+  [
+    {
+      label: '林間小鎮 Discord 伺服器',
+      icon: 'i-simple-icons-discord',
+      to: 'https://discord.com/servers/510192195509157909',
+      target: '_blank'
+    }
+  ],
+  [
+    {
+      label: '登出系統',
+      icon: 'i-heroicons-arrow-left-on-rectangle',
+      to: '/api/auth/logout',
+      external: true,
+      target: '_self'
+    }
+  ]
+])
 
 const items = computed<NavigationMenuItem[]>(() => [
   { label: '主頁', icon: 'i-lucide-house', to: '/' },
@@ -38,6 +72,8 @@ const items = computed<NavigationMenuItem[]>(() => [
     to: '/games/ctf',
   }
 ])
+
+
 </script>
 
 <template>
@@ -55,9 +91,36 @@ const items = computed<NavigationMenuItem[]>(() => [
 
     <template #right>
       <UColorModeButton />
-      <UButton to="https://discord.com/servers/510192195509157909" target="_blank" color="primary" variant="solid"
-        class="hidden lg:inline-flex">
-        加入Discord
+
+      <!-- 1. 載入中骨架屏佔位，防止頁面跳動 -->
+      <div v-if="isPending" class="w-8 h-8 rounded-full bg-slate-800 animate-pulse hidden lg:block" />
+
+      <!-- 2. 已登入：渲染 Discord 頭像與下拉操作選單 -->
+      <UDropdownMenu v-else-if="user" :items="dropdownItems" :popper="{ placement: 'bottom-end' }">
+        <UButton color="secondary" variant="ghost" class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-800">
+          <UAvatar :src="user.avatar || undefined" :alt="user.username" size="sm"
+            class="border border-emerald-500/50" />
+          <span class="text-xs font-mono text-emerald-400 font-bold hidden xl:inline-block pr-1">
+            {{ user.username }}
+          </span>
+          <UIcon name="i-heroicons-chevron-down-20-solid" class="w-4 h-4 text-slate-400" />
+        </UButton>
+
+        <!-- 自訂帳號標題插槽 -->
+        <template #account="{ item }">
+          <div class="text-left font-mono">
+            <p class="text-xs text-slate-400">目前登入身份</p>
+            <p class="truncate font-bold text-xs text-emerald-400">
+              {{ item.label }}
+            </p>
+          </div>
+        </template>
+      </UDropdownMenu>
+
+      <!-- 3. 未登入：醒目的 Discord 登入按鈕 -->
+      <UButton v-else color="primary" variant="solid" icon="i-simple-icons-discord"
+        class="hidden lg:inline-flex font-mono text-xs font-bold" @click="login">
+        Discord 登入
       </UButton>
     </template>
 

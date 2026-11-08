@@ -2,68 +2,75 @@
 import { createHash } from 'node:crypto'
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '../../../types/database.types'
+import { unsealSessionData, SESSION_COOKIE_NAME } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody(event)
-    const submittedFlag = String(body?.flag || '').trim().replace(/^["']|["']$/g, '')
-    const accountId = Number(body?.accountId || 10001)
+  // 1. ★ 核心好品味：从无状态签名的 Cookie 提取真实登录会话
+  const cookieValue = getCookie(event, SESSION_COOKIE_NAME)
+  const session = unsealSessionData(cookieValue)
 
-    if (!submittedFlag) {
-        throw createError({ statusCode: 400, statusMessage: 'Missing flag parameter.' })
-    }
+  if (!session) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Authentication required. Please login with Discord first.'
+    })
+  }
 
-    const supabase = await serverSupabaseClient<Database>(event)
+  // 获取真实 Discord 64 位整数 Snowflake ID
+  const accountId = session.id as unknown as number
 
-    // 1. 同时准备：原样字面量哈希 & 规范化全小写哈希
-    // 准备原始哈希与小写哈希
-    const rawHash = createHash('sha256').update(submittedFlag).digest('hex')
-    const lowerHash = createHash('sha256').update(submittedFlag.toLowerCase()).digest('hex')
+  const body = await readBody(event)
+  const rawFlag = String(body.flag || '').trim()
 
-    // ★ 核心改进：把 error 抓出来，绝不容许静默吞错！
-    const { data: challenge, error: queryError } = await supabase
-        .schema('ctf')
-        .from('challenges')
-        .select('id, title, is_active')
-        .or(`flag_hash.eq.${rawHash},and(is_case_insensitive.eq.true,flag_hash.eq.${lowerHash})`)
-        .eq('is_active', true)
-        .maybeSingle()
+  if (!rawFlag) {
+    return { success: false, message: 'Missing flag payload.' }
+  }
 
-    // 如果数据库本身报错了，立刻在终端咆哮并返回 500，停止掩耳盗铃！
-    if (queryError) {
-        console.error('❌ [CTF Submit DB Error]:', queryError)
-        throw createError({
-            statusCode: 500,
-            statusMessage: `Database validation error: ${queryError.message}`
-        })
-    }
+  // 2. 将输入的 Flag 进行 SHA-256 哈希计算
+  const flagHash = createHash('sha256').update(rawFlag).digest('hex')
 
-    if (!challenge) {
-        return { success: false, message: `REJECTED. Invalid token sequence: "${submittedFlag}".` }
-    }
+  const supabase = await serverSupabaseClient<Database>(event)
 
-    // 3. 记录解题流水（后续逻辑保持不变）
-    const { error: insertError } = await supabase
-        .schema('ctf')
-        .from('solves')
-        .insert({ challenge_id: challenge.id, account_id: accountId })
+  // 3. 校验题目哈希
+  const { data: challenge, error: challengeError } = await supabase
+    .schema('ctf')
+    .from('challenges')
+    .select('id, title, is_active')
+    .eq('flag_hash', flagHash)
+    .single()
 
-    if (insertError) {
-        if (insertError.code === '23505') {
-            return { success: false, message: `DUPLICATE. You have already solved [${challenge.id}].` }
-        }
-        throw createError({ statusCode: 500, statusMessage: insertError.message })
-    }
+  if (challengeError || !challenge || !challenge.is_active) {
+    return { success: false, message: 'Invalid token sequence. Access rejected.' }
+  }
 
-    // 4. 查询当前动态分
-    const { data: ptData } = await supabase
-        .schema('ctf')
-        .from('challenge_points')
-        .select('current_points')
-        .eq('id', challenge.id)
-        .single()
+  // 4. 检查是否重复提交过
+  const { data: existingSolve } = await supabase
+    .schema('ctf')
+    .from('solves')
+    .select('id')
+    .eq('account_id', accountId)
+    .eq('challenge_id', challenge.id)
+    .maybeSingle()
 
-    return {
-        success: true,
-        message: `ACCEPTED! [${challenge.id}] solved. +${ptData?.current_points || 100} PTS awarded.`
-    }
+  if (existingSolve) {
+    return { success: false, message: `Challenge [${challenge.id}] was already solved by this operator.` }
+  }
+
+  // 5. 写入真实的解题记录（由经过验签的 accountId 背书）
+  const { error: insertError } = await supabase
+    .schema('ctf')
+    .from('solves')
+    .insert({
+      account_id: accountId,
+      challenge_id: challenge.id
+    })
+
+  if (insertError) {
+    throw createError({ statusCode: 500, statusMessage: insertError.message })
+  }
+
+  return {
+    success: true,
+    message: `ACCEPTED! [${challenge.id}] solved. Points awarded to ${session.global_name || session.username}.`
+  }
 })

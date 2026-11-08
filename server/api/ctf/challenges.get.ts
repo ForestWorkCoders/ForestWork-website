@@ -24,19 +24,18 @@ export default defineEventHandler(async (event) => {
     return challenges.filter(c => !c.prerequisite_id)
   }
 
-  // ★ 核心好品味：剥离所有非数字字符，还原底层整数本质 (如 'operator_10001' -> 10001)
-  const numericOperator = parseInt(rawOperator.replace(/\D/g, ''), 10)
-  if (Number.isNaN(numericOperator)) {
-    // 无法解析出合法整数，视为非法/未注册操作员
+  // 4. 提取纯数字字符串（如 '311484597248720907'）
+  const cleanOperator = rawOperator.replace(/\D/g, '')
+  if (!cleanOperator) {
     return challenges.filter(c => !c.prerequisite_id)
   }
 
-  // 4. ★ 纯正强类型查询：直接使用 number 匹配，类型 100% 契合且走索引快速查找
+  // ★ 同样以无损字符串查询 BIGINT，消灭浮点数截断
   const { data: userSolves, error: solvesError } = await supabase
     .schema('ctf')
     .from('solves')
     .select('challenge_id')
-    .eq('account_id', numericOperator)
+    .eq('account_id', cleanOperator as unknown as number)
 
   if (solvesError) {
     throw createError({ statusCode: 500, statusMessage: solvesError.message })
