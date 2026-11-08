@@ -106,7 +106,7 @@ export default defineEventHandler(async (event) => {
 
   // 4. ★★★ 核心修復：呼叫 5 參數 RPC，並嚴格捕捉報錯，絕不靜默吞錯 ★★★
   for (const [userId, data] of userDeltaMap.entries()) {
-    const { error: rpcErr } = await supabase.rpc('increment_curse_count', {
+    const { error: rpcErr } = await supabase.schema('trpg').rpc('increment_curse_count', {
       p_user_id: userId,
       p_username: data.username,
       p_year: currentYear,

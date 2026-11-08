@@ -436,7 +436,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
       return { type: 4, data: { content: '⚠️ 請指定要切換的角色名稱！', flags: 64 } }
     }
 
-    const { error } = await supabase.rpc('activate_character', {
+    const { error } = await supabase.schema('trpg').rpc('activate_character', {
       p_discord_id: callerId,
       p_character_name: name
     })

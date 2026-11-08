@@ -1,6 +1,6 @@
 // server/api/ctf/submit.post.ts
 import { createHash } from 'node:crypto'
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '../../../types/database.types'
 import { unsealSessionData, SESSION_COOKIE_NAME } from '../../utils/session'
 
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
   // 2. 将输入的 Flag 进行 SHA-256 哈希计算
   const flagHash = createHash('sha256').update(rawFlag).digest('hex')
 
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = serverSupabaseServiceRole<Database>(event)
 
   // 3. 校验题目哈希
   const { data: challenge, error: challengeError } = await supabase
