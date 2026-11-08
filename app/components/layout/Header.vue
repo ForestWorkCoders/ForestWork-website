@@ -13,18 +13,18 @@ const items = computed<NavigationMenuItem[]>(() => [
     ]
   },
   {
-    label: '日麻系列',
-    icon: 'i-lucide-gamepad-2',
+    label: '雀魂麻將',
+    icon: 'i-lucide-playing-card',
     defaultOpen: true, // 預設展開
     children: [
+      { label: '戰報一覽', to: '/games/mahjongsoul/' },
       { label: '賽事規章', to: '/games/mahjongsoul/rules' },
-      { label: '積分賽', to: '/games/mahjongsoul/' },
       { label: '如何加入比賽場', to: '/games/mahjongsoul/how-to' },
     ]
   },
   {
-    label: '同樂系列',
-    icon: 'i-lucide-users',
+    label: '繪畫系列',
+    icon: 'i-lucide-palette',
     defaultOpen: true, // 預設展開
     children: [
       { label: '林間靈魂繪師', to: 'https://eaglepb2.github.io/gartic_phone/', target: '_blank' },
@@ -34,8 +34,7 @@ const items = computed<NavigationMenuItem[]>(() => [
   {
     label: '謎語人的呻吟',
     icon: 'i-lucide-message-circle',
-    to: '/',
-    target: '_blank'
+    to: '#',
   }
 ])
 </script>
@@ -55,8 +54,8 @@ const items = computed<NavigationMenuItem[]>(() => [
 
     <template #right>
       <UColorModeButton />
-      <UButton to="https://discord.com/servers/510192195509157909" target="_blank" color="primary"
-        variant="solid" class="hidden lg:inline-flex">
+      <UButton to="https://discord.com/servers/510192195509157909" target="_blank" color="primary" variant="solid"
+        class="hidden lg:inline-flex">
         加入Discord
       </UButton>
     </template>
