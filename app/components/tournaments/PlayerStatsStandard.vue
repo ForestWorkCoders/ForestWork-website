@@ -1,18 +1,24 @@
 <script setup>
 import { ref, computed, h, resolveComponent } from 'vue'
+import { use } from 'echarts/core'
+import { RadarChart } from 'echarts/charts'
+import { TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import VChart from 'vue-echarts'
+
+use([RadarChart, TooltipComponent, CanvasRenderer])
 
 const props = defineProps({
-  tournamentId: {
-    type: String,
-    required: true
-  }
+  tournamentId: { type: String, required: true }
 })
 
 const { data: matchData, pending, error } = await useFetch(
   `/api/mahjong/tournaments/${props.tournamentId}/stats`
 )
 
-const playstyleData = ref([])
+const { data: playstyleData, pending: playstylePending } = await useFetch(
+  `/api/mahjong/tournaments/${props.tournamentId}/playstyle`
+)
 
 const top3Players = computed(() => {
   if (!matchData.value) return []
@@ -31,6 +37,82 @@ const top3Players = computed(() => {
     .slice(0, 3)
 })
 
+// ====== 雷达图数据引擎 ======
+// ----------------------------------------------------
+// 魔法引擎：将麻将的真实数据，转化为 0-100 的雷达图分数
+// ----------------------------------------------------
+const radarConfigs = computed(() => {
+  if (!top3Players.value || !playstyleData.value) return []
+
+  return top3Players.value.map(matchPlayer => {
+
+    const tacticalData = playstyleData.value.find(
+      p => p.player_id === matchPlayer.player_id
+    )
+
+    // 如果因为极端原因没找到这个人，返回防爆数据
+    if (!tacticalData) return null
+
+    // 1. 提取真实数据 (注意：现在是从 tacticalData 里取值，而不是 matchPlayer)
+    const rawData = {
+      win: Number(tacticalData.win_rate) || 0,
+      power: Number(tacticalData.avg_win_score) || 0,
+      call: Number(tacticalData.call_rate) || 0,
+      def: Number(tacticalData.deal_in_rate) || 0,
+      riichi: Number(tacticalData.riichi_rate) || 0,
+      tsumo: Number(tacticalData.tsumo_rate) || 0
+    }
+
+    // 2. 防御轴单独做数学反转 (满分20，0放铳=20，20放铳=0)
+    const reversedDef = Math.max(20 - rawData.def, 0)
+
+    // 3. 返回 ECharts 专属的声明式 Option
+    return {
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+        textStyle: { color: 'rgba(255, 255, 255, 0.8)', fontWeight: 'bold' },
+        borderWidth: 0,
+        // 自定义 Tooltip 显示真实的业务数据
+        formatter: () => `
+          和牌: ${rawData.win}%<br/>
+          打点: ${rawData.power}<br/>
+          副露: ${rawData.call}%<br/>
+          放铳: ${rawData.def}% <br/>
+          立直: ${rawData.riichi}%<br/>
+          自摸: ${rawData.tsumo}%
+        `
+      },
+      radar: {
+        // ECharts 天生支持给每个维度设定独立的满分线！
+        indicator: [
+          { name: '和牌', max: 50 },     // 50% 为满格
+          { name: '打点', max: 10000 },   // 10000 分满格
+          { name: '副露', max: 80 },     // 80% 为满格
+          { name: '放铳', max: 20 },     // 反转后的放铳值（20为满格）
+          { name: '立直', max: 80 },     // 80% 为满格
+          { name: '自摸', max: 80 }      // 80% 为满格
+        ],
+        radius: '65%', // 控制雷达图的大小留出文字空间
+        splitNumber: 5,
+        axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 11, fontWeight: 'bold' },
+        splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.15)' } },
+        splitArea: { show: false }, // 隐藏背景色块交替
+        axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
+      },
+      series: [{
+        type: 'radar',
+        data: [{
+          value: [rawData.win, rawData.power, rawData.call, reversedDef, rawData.riichi, rawData.tsumo],
+          itemStyle: { color: 'rgb(16, 185, 129)' }, // Emerald 500
+          areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
+          lineStyle: { width: 2 }
+        }]
+      }]
+    }
+  })
+})
+
 const items = [{
   value: 'match_stats',
   slot: 'match',
@@ -43,7 +125,11 @@ const items = [{
   icon: 'i-lucide-chart-pie'
 }]
 
-
+// 默认让 nickname 列死死钉在左侧
+const columnPinning = ref({
+  left: ['nickname'],
+  right: []
+})
 
 function buildSortableColumns(rawColumns) {
   return rawColumns.map(col => ({
@@ -93,6 +179,7 @@ const matchColumns = buildSortableColumns([
   { accessorKey: 'avg_rank_west', header: '西風平均順位' },
   { accessorKey: 'top_rate_pct', header: '一位率' },
   { accessorKey: 'top2_rate_pct', header: '连对率' },
+  { accessorKey: 'busting_rate', header: '被飛率' },
   { accessorKey: 'avg_score', header: '平均馬點' },
   { accessorKey: 'highest_point', header: '最高馬點' },
   { accessorKey: 'lowest_point', header: '最低馬點' }
@@ -100,19 +187,34 @@ const matchColumns = buildSortableColumns([
 
 const playstyleColumns = buildSortableColumns([
   { accessorKey: 'nickname', header: '选手' },
-  { accessorKey: 'win_rate', header: '和牌率', class: 'text-right' },
-  { accessorKey: 'deal_in_rate', header: '放銃率', class: 'text-right' },
-  { accessorKey: 'tsumo_rate', header: '自摸率', class: 'text-right' },
-  { accessorKey: 'dama_rate', header: '默聽率', class: 'text-right' },
-  { accessorKey: 'exhaustive_draw_rate', header: '流局率', class: 'text-right' },
-  { accessorKey: 'draw_tenpai_rate', header: '流局聽牌率', class: 'text-right' },
-  { accessorKey: 'call_rate', header: '副露率', class: 'text-right' },
-  { accessorKey: 'riichi_rate', header: '立直率', class: 'text-right' },
-  { accessorKey: 'avg_turns', header: '平均和牌巡數', class: 'text-right' },
-  { accessorKey: 'avg_win_score', header: '平均打點', class: 'text-right' },
-  { accessorKey: 'avg_deal_in_score', header: '平均銃點', class: 'text-right' },
-  { accessorKey: 'busting_rate', header: '被飛率', class: 'text-right' }
+  { accessorKey: 'win_rate', header: '和牌率' },
+  { accessorKey: 'deal_in_rate', header: '放铳率' },
+  { accessorKey: 'tsumo_rate', header: '自摸率' },
+  { accessorKey: 'dama_rate', header: '默听率' },
+  { accessorKey: 'exhaustive_draw_rate', header: '流局率' },
+  { accessorKey: 'draw_tenpai_rate', header: '流局听牌率' },
+  { accessorKey: 'call_rate', header: '副露率' },
+  { accessorKey: 'riichi_rate', header: '立直率' },
+  { accessorKey: 'avg_turns', header: '平均和牌巡数' },
+  { accessorKey: 'avg_win_score', header: '平均打点' },
+  { accessorKey: 'avg_deal_in_score', header: '平均铳点' },
+  { accessorKey: 'babei_rate_pct', header: '拔北率' },
+  { accessorKey: 'avg_baopai', header: '平均宝牌' },
+  { accessorKey: 'li_baopai_rate_pct', header: '里宝率' }
 ])
+
+const percentStyles = [
+  { key: 'win_rate', color: 'text-emerald-500 dark:text-emerald-400' },
+  { key: 'deal_in_rate', color: 'text-red-500 dark:text-red-400' },
+  { key: 'tsumo_rate', color: 'text-blue-500 dark:text-blue-400' },
+  { key: 'dama_rate', color: 'text-purple-500 dark:text-purple-400' },
+  { key: 'exhaustive_draw_rate', color: 'text-gray-500 dark:text-gray-400' },
+  { key: 'draw_tenpai_rate', color: 'text-amber-500 dark:text-amber-400' },
+  { key: 'call_rate', color: 'text-orange-500 dark:text-orange-400' },
+  { key: 'riichi_rate', color: 'text-rose-500 dark:text-rose-400' },
+  { key: 'babei_rate_pct', color: 'text-teal-500 dark:text-teal-400' },
+  { key: 'li_baopai_rate_pct', color: 'text-pink-500 dark:text-pink-400' }
+]
 </script>
 
 <template>
@@ -151,16 +253,15 @@ const playstyleColumns = buildSortableColumns([
 
           <div
             class="p-6 flex-1 flex flex-col items-center justify-center min-h-[280px] bg-gray-50/50 dark:bg-transparent">
-            <div
-              class="relative w-full aspect-square max-w-[220px] rounded-full border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
-              <UIcon name="i-lucide-chart-pie" class="w-8 h-8 text-gray-300 dark:text-gray-600 mb-2" />
-              <span class="absolute mt-12 text-xs text-gray-400 font-mono tracking-widest">RADAR CHART AREA</span>
-              <span class="absolute -top-4 text-[10px] font-bold text-gray-500">和牌率</span>
-              <span class="absolute -right-6 top-1/4 text-[10px] font-bold text-gray-500">自摸</span>
-              <span class="absolute -right-6 bottom-1/4 text-[10px] font-bold text-gray-500">副露</span>
-              <span class="absolute -bottom-4 text-[10px] font-bold text-gray-500">速度</span>
-              <span class="absolute -left-6 bottom-1/4 text-[10px] font-bold text-gray-500">立直</span>
-              <span class="absolute -left-6 top-1/4 text-[10px] font-bold text-gray-500">防禦</span>
+            <div class="relative w-full aspect-square max-w-[220px]">
+              <ClientOnly>
+                <VChart v-if="radarConfigs[index]" :option="radarConfigs[index]" class="w-full h-full" autoresize />
+                <template #fallback>
+                  <div class="w-full h-full flex items-center justify-center">
+                    <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+                  </div>
+                </template>
+              </ClientOnly>
             </div>
           </div>
 
@@ -180,11 +281,18 @@ const playstyleColumns = buildSortableColumns([
         <UTabs :items="items" default-value="match_stats" class="w-full">
 
           <template #match>
-            <UTable :columns="matchColumns" :data="matchData" :ui="{
+            <UTable v-model:column-pinning="columnPinning" :columns="matchColumns" :data="matchData" :ui="{
               wrapper: 'overflow-x-auto w-full',
-              base: 'min-w-[1600px]',
-              th: { color: 'text-gray-500 dark:text-gray-400', font: 'font-bold tracking-wider', base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]' },
-              td: { color: 'text-gray-900 dark:text-gray-200', base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50' }
+              base: 'min-w-[1600px] border-collapse',
+              th: {
+                color: 'text-gray-500 dark:text-gray-400',
+                font: 'font-bold tracking-wider',
+                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]'
+              },
+              td: {
+                color: 'text-gray-900 dark:text-gray-200',
+                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50'
+              }
             }">
               <template #nickname-cell="{ row }">
                 <div class="flex items-center gap-3">
@@ -200,12 +308,20 @@ const playstyleColumns = buildSortableColumns([
           </template>
 
           <template #playstyle>
-            <UTable :columns="playstyleColumns" :data="playstyleData" :ui="{
+            <UTable v-model:column-pinning="columnPinning" :columns="playstyleColumns" :data="playstyleData" :ui="{
               wrapper: 'overflow-x-auto w-full',
-              base: 'min-w-[1600px]',
-              th: { color: 'text-gray-500 dark:text-gray-400', font: 'font-bold tracking-wider', base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]' },
-              td: { color: 'text-gray-900 dark:text-gray-200', base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50' }
+              base: 'min-w-[1800px]', /* 随着列数增加，稍微放宽基础宽度 */
+              th: {
+                color: 'text-gray-500 dark:text-gray-400',
+                font: 'font-bold tracking-wider',
+                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]'
+              },
+              td: {
+                color: 'text-gray-900 dark:text-gray-200',
+                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50'
+              }
             }">
+
               <template #nickname-cell="{ row }">
                 <div class="flex items-center gap-3">
                   <UAvatar :src="row.original.avatar" :alt="row.original.nickname" size="sm" />
@@ -213,9 +329,30 @@ const playstyleColumns = buildSortableColumns([
                 </div>
               </template>
 
-              <template #deal_in_rate-cell="{ row }">
-                <span class="text-red-400 font-mono">{{ row.original.deal_in_rate }}%</span>
+              <template v-for="col in percentStyles" #[`${col.key}-cell`]="{ row }" :key="col.key">
+                <span :class="['font-mono', col.color]">
+                  {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '-' }}
+                </span>
               </template>
+
+              <template #avg_win_score-cell="{ row }">
+                <span class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                  {{ row.original.avg_win_score != null ? `+${row.original.avg_win_score}` : '-' }}
+                </span>
+              </template>
+
+              <template #avg_deal_in_score-cell="{ row }">
+                <span class="font-mono font-semibold text-red-600 dark:text-red-400">
+                  {{ row.original.avg_deal_in_score != null ? `-${row.original.avg_deal_in_score}` : '-' }}
+                </span>
+              </template>
+
+              <template #avg_baopai-cell="{ row }">
+                <span class="font-mono font-bold text-amber-500">
+                  {{ row.original.avg_baopai ?? '-' }}
+                </span>
+              </template>
+
             </UTable>
           </template>
 

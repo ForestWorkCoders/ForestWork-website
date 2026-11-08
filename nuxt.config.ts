@@ -14,6 +14,19 @@ export default defineNuxtConfig({
     redirect: false
   },
 
+  vite: {
+    optimizeDeps: {
+      include: [
+        'echarts/charts',
+        'echarts/components',
+        'echarts/core',
+        'echarts/renderers',
+        'markdown-it',
+        'vue-echarts',
+      ]
+    }
+  },
+
   css: ['~/assets/css/main.css'],
 
   routeRules: {
