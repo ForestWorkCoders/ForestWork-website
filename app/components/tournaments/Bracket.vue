@@ -91,22 +91,23 @@ const graphData = computed(() => {
       }
     }
 
+    // TODO: Try to fix the red line as I don't like the appearance.
     // 繪製敗者掉落線 (紅色虛線 - 這是雙敗賽制的靈魂)
-    if (node.match.nextLoserMatchId) {
-      const dropTarget = nodeMap.get(node.match.nextLoserMatchId)
-      if (dropTarget) {
-        // 敗者線從卡片底部正中央出發
-        edges.push({
-          id: `drop-${node.id}`,
-          x1: node.x + CARD_W / 2,
-          y1: node.y + CARD_H,
-          x2: dropTarget.x + CARD_W / 2,
-          y2: dropTarget.y,
-          isDrop: true,
-          color: '#ef4444' // 紅色警告線
-        })
-      }
-    }
+    // if (node.match.nextLoserMatchId) {
+    //   const dropTarget = nodeMap.get(node.match.nextLoserMatchId)
+    //   if (dropTarget) {
+    //     // 敗者線從卡片底部正中央出發
+    //     edges.push({
+    //       id: `drop-${node.id}`,
+    //       x1: node.x + CARD_W / 2,
+    //       y1: node.y + CARD_H,
+    //       x2: dropTarget.x + CARD_W / 2,
+    //       y2: dropTarget.y,
+    //       isDrop: true,
+    //       color: '#ef4444' // 紅色警告線
+    //     })
+    //   }
+    // }
   })
 
   // 4. 計算畫布總尺寸 (確保右側和底部也有同樣的留白，防止手機端滾動截斷)

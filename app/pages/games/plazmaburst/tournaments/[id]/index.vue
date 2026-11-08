@@ -161,7 +161,7 @@ const tabs = computed(() => {
                         <!-- 玩家數據 -->
                         <template #stats>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsPlayerStatsStandard :tournament-id="route.params.id" />
+                                <TournamentsPlayerStatPB2 :tournament-id="route.params.id" />
                             </div>
                         </template>
 
