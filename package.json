@@ -9,10 +9,11 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst,trpg > app/types/database.types.ts",
-    "gartic-sync": "node --env-file=.env scripts/sync-gartic-manifest.js",
-    "test-redirects": "node --env-file=.env scripts/verify-redirects.mjs",
-    "discord-register-commands": "node --env-file=.env scripts/discord-register-commands.mjs"
+    "update:database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst,trpg,ctf > app/types/database.types.ts",
+    "url:redirects": "node --env-file=.env scripts/verify-redirects.mjs",
+    "discord:register-commands": "node --env-file=.env scripts/discord-register-commands.mjs",
+    "gartic:sync": "node --env-file=.env scripts/sync-gartic-manifest.js",
+    "ctf:hash": "node scripts/hash-flag.mjs"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.117",
