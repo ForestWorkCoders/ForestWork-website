@@ -31,13 +31,14 @@ const items = computed<NavigationMenuItem[]>(() => [
     icon: 'i-lucide-users',
     defaultOpen: true, // 預設展開
     children: [
-      { label: '林間靈魂繪師', to: 'https://eaglepb2.github.io/gartic_phone/', target: '_blank' }
+      { label: '林間靈魂繪師', to: 'https://eaglepb2.github.io/gartic_phone/', target: '_blank' },
+      { label: '林間交換繪', to: 'https://kp06125.github.io/card/', target: '_blank' },
     ]
   },
   {
     label: '謎語人的呻吟',
     icon: 'i-lucide-message-circle',
-    to: 'http://104.199.236.163/',
+    to: '/',
     target: '_blank'
   }
 ])
