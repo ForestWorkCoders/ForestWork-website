@@ -1,0 +1,38 @@
+{
+  "id": "2022-10-phase_1",
+  "title": "Round 1: 生活中常見的小吃",
+  "mode": "你畫我猜",
+  "topic": "生活中常見的小吃",
+  "author": "小敏",
+  "baseUrl": "https://efsheupssjxlmrfgmxwp.supabase.co/storage/v1/object/public/Gartic_Phone/2022/10/phase_1",
+  "chains": [
+    {
+      "id": "01",
+      "frames": []
+    },
+    {
+      "id": "02",
+      "frames": []
+    },
+    {
+      "id": "03",
+      "frames": []
+    },
+    {
+      "id": "04",
+      "frames": []
+    },
+    {
+      "id": "05",
+      "frames": []
+    },
+    {
+      "id": "06",
+      "frames": []
+    },
+    {
+      "id": "07",
+      "frames": []
+    }
+  ]
+}

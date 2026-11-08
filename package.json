@@ -1,33 +1,40 @@
 {
   "name": "ForestWorkWebsite",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "update-database": "npx -y supabase gen types typescript --project-id \"efsheupssjxlmrfgmxwp\" --schema public --schema mahjong --schema plazmaburst > app/types/database.types.ts"
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst > app/types/database.types.ts",
+    "gartic-sync": "node --env-file=.env scripts/sync-gartic-manifest.js",
+    "test-redirects": "node scripts/verify-redirects.mjs"
   },
   "dependencies": {
-    "@nuxt/image": "^2.0.0",
-    "@nuxt/ui": "^4.6.1",
-    "@nuxtjs/supabase": "^2.0.5",
+    "@iconify-json/lucide": "^1.2.117",
+    "@iconify-json/simple-icons": "^1.2.90",
+    "@nuxt/ui": "^4.10.0",
+    "@nuxtjs/supabase": "^2.0.9",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "chart.js": "^4.5.1",
-    "nuxt": "^4.4.2",
-    "vue": "^3.5.32",
-    "vue-chartjs": "^5.3.3",
-    "vue-router": "^5.0.4"
+    "discord-component-embed": "^0.2.1",
+    "echarts": "^6.1.0",
+    "markdown-it": "^14.3.0",
+    "nuxt": "^4.5.2",
+    "reveal.js": "^6.0.2",
+    "tailwindcss": "^4.3.2",
+    "vue-echarts": "^8.0.1"
   },
   "devDependencies": {
-    "@nuxt/image": "^2.0.0",
-    "@nuxt/ui": "^4.6.1",
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "nuxt": "^4.4.2",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4"
-  }
+    "@nuxt/eslint": "^1.16.0",
+    "@supabase/supabase-js": "^2.116.0",
+    "@types/node": "^26.5.1",
+    "eslint": "^10.7.0",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.7"
+  },
+  "packageManager": "pnpm@11.13.1"
 }

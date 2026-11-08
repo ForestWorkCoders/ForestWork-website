@@ -20,7 +20,7 @@
       <p class="text-gray-500">探索林間小鎮的多元賽事與社群活動</p>
     </div>
 
-    <div class="max-w-2xl mx-auto mb-16 px-4 flex flex-col gap-2"">
+    <div class="max-w-2xl mx-auto mb-16 px-4 flex flex-col gap-2">
       <UInput v-model="searchQuery" icon="i-lucide-search" size="xl" placeholder="Search..." color="neutral"
         variant="outline" class="shadow-sm transition-all focus-within:ring-2 focus-within:ring-green-500/50" :ui="{
           base: 'py-4 rounded-full'
@@ -28,7 +28,7 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <CircuitCard 
+        <BaseCircuitCard 
           v-for="item in filteredCircuits" 
           :key="item.id" 
           :item="item" 
@@ -59,7 +59,7 @@ const circuits = [
   { 
     id: 2, 
     title: 'Mahjong Soul', 
-    icon: 'i-lucide-id-card-lanyard', 
+    icon: 'i-lucide-playing-cards', 
     description: '雀魂林間小鎮常規積分賽',
     to: '/games/mahjongsoul/'
   },
@@ -69,6 +69,20 @@ const circuits = [
     icon: 'i-lucide-pickaxe', 
     description: '超極限生存競賽',
     to: 'https://eaglepb2.gitbook.io/uhc_report/'
+  },
+  { 
+    id: 4, 
+    title: 'Minecraft SMP', 
+    icon: 'i-lucide-shield', 
+    description: '多人生存競賽',
+    to: '/games/minecraftsmp'
+  },
+  { 
+    id: 5, 
+    title: 'Gartic Phone', 
+    icon: 'i-lucide-palette', 
+    description: '靈魂繪師',
+    to: '/games/garticphone'
   },
 ]
 

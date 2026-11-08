@@ -1,0 +1,59 @@
+{
+  "id": "2022-06-phase_4",
+  "title": "Round 4: 吊飾",
+  "mode": "依樣畫葫蘆",
+  "topic": "吊飾",
+  "author": "zhjo",
+  "baseUrl": "https://efsheupssjxlmrfgmxwp.supabase.co/storage/v1/object/public/Gartic_Phone/2022/06/phase_4",
+  "chains": [
+    {
+      "id": "01",
+      "frames": [
+        "frame_00.png",
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png"
+      ]
+    },
+    {
+      "id": "02",
+      "frames": [
+        "frame_00.png",
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png"
+      ]
+    },
+    {
+      "id": "03",
+      "frames": [
+        "frame_00.png",
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png"
+      ]
+    },
+    {
+      "id": "04",
+      "frames": [
+        "frame_00.png",
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png"
+      ]
+    },
+    {
+      "id": "05",
+      "frames": [
+        "frame_00.png",
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png"
+      ]
+    }
+  ]
+}

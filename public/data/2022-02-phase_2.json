@@ -1,0 +1,70 @@
+{
+  "id": "2022-02-phase_2",
+  "title": "Round 2",
+  "mode": "趣味對局",
+  "topic": "無",
+  "author": "靈魂繪師們",
+  "baseUrl": "https://efsheupssjxlmrfgmxwp.supabase.co/storage/v1/object/public/Gartic_Phone/2022/02/phase_2",
+  "chains": [
+    {
+      "id": "01",
+      "frames": [
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png",
+        "frame_05.png"
+      ]
+    },
+    {
+      "id": "02",
+      "frames": [
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png",
+        "frame_05.png",
+        "frame_06.png",
+        "frame_07.png",
+        "frame_08.png"
+      ]
+    },
+    {
+      "id": "03",
+      "frames": [
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png",
+        "frame_05.png",
+        "frame_06.png",
+        "frame_07.png",
+        "frame_08.png"
+      ]
+    },
+    {
+      "id": "04",
+      "frames": [
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png",
+        "frame_05.png",
+        "frame_06.png",
+        "frame_07.png"
+      ]
+    },
+    {
+      "id": "05",
+      "frames": [
+        "frame_01.png",
+        "frame_02.png",
+        "frame_03.png",
+        "frame_04.png",
+        "frame_05.png",
+        "frame_06.png",
+        "frame_07.png"
+      ]
+    }
+  ]
+}

@@ -36,6 +36,16 @@ const tabs = computed(() => {
         { label: '直播記錄 · VODs', slot: 'vods' }
     ]
 })
+
+useSeoMeta({
+  title: () => tourney.value?.title 
+    ? `${tourney.value.title} · Plazma League` 
+    : 'Match Details · Plazma League',
+  ogTitle: () => tourney.value?.title ?? 'Plazma League Tournament',
+  description: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
+  ogDescription: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
+  ogImage: () => tourney.value?.imageUrl ?? 'https://efsheupssjxlmrfgmxwp.supabase.co/storage/v1/object/public/Mahjong/tournament_logo/forestwork.png'
+})
 </script>
 
 <template>
@@ -44,7 +54,7 @@ const tabs = computed(() => {
     </div>
 
     <div v-else-if="pending" class="min-h-screen flex items-center justify-center text-white">
-        <UIcon name="i-lucide-refresh" class="animate-spin w-8 h-8" />
+        <UIcon name="i-lucide-refresh-cw" class="animate-spin w-8 h-8" />
     </div>
 
     <div v-else
@@ -140,35 +150,35 @@ const tabs = computed(() => {
                         <!-- 賽事資訊 -->
                         <template #info>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsInfo :content-url="contentUrl" />
+                                <BaseTournamentInfo :content-url="contentUrl" />
                             </div>
                         </template>
 
                         <!-- 參賽隊伍 -->
                         <template #teams>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsPB2Teams :tournament-id="route.params.id" />
+                                <Pb2Teams :tournament-id="route.params.id" />
                             </div>
                         </template>
 
                         <!-- 賽事結果 -->
                         <template #result>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsMultiStageToggle :tournament-id="route.params.id" />
+                                <Pb2StageToggle :tournament-id="route.params.id" />
                             </div>
                         </template>
 
                         <!-- 玩家數據 -->
                         <template #stats>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsPlayerStatPB2 :tournament-id="route.params.id" />
+                                <Pb2PlayerStats :tournament-id="route.params.id" />
                             </div>
                         </template>
 
                         <!-- 直播記錄 -->
                         <template #vods>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsVodsStandard :tournament-id="route.params.id" />
+                                <Pb2Vods :tournament-id="route.params.id" />
                             </div>
                         </template>
                     </UTabs>

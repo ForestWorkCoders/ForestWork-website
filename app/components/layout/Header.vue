@@ -1,0 +1,88 @@
+<script setup lang="ts">
+import type { NavigationMenuItem } from '@nuxt/ui'
+
+const items = computed<NavigationMenuItem[]>(() => [
+  { label: '主頁', icon: 'i-lucide-house', to: '/' },
+  {
+    label: '麥塊系列',
+    icon: 'i-lucide-box',
+    defaultOpen: true, // 預設展開
+    children: [
+      { label: '超极限生存竞赛', to: 'https://eaglepb2.gitbook.io/uhc_report/', target: '_blank' },
+      { label: '多人生存 · SMP', to: '/games/minecraftsmp' }
+    ]
+  },
+  {
+    label: '雀魂麻將',
+    icon: 'i-lucide-playing-cards',
+    defaultOpen: true, // 預設展開
+    children: [
+      { label: '戰報一覽', to: '/games/mahjongsoul/' },
+      { label: '賽事規章', to: '/games/mahjongsoul/rules' },
+      { label: '如何加入比賽場', to: '/games/mahjongsoul/how-to' },
+    ]
+  },
+  {
+    label: '繪畫系列',
+    icon: 'i-lucide-palette',
+    defaultOpen: true, // 預設展開
+    children: [
+      { label: '林間靈魂繪師', to: '/games/garticphone' },
+      { label: '林間交換繪', to: 'https://kp06125.github.io/card/', target: '_blank' },
+    ]
+  },
+  {
+    label: '謎語人的呻吟',
+    icon: 'i-lucide-message-circle',
+    to: '#',
+  }
+])
+</script>
+
+<template>
+  <UHeader>
+    <template #title>
+      <NuxtLink to="/" class="flex-shrink-0 flex items-center gap-2">
+        <UColorModeImage light="/images/logo-light.png" dark="/images/logo-dark.png" width="32" height="32"
+          alt="ForestWork" class="h-8 w-auto" />
+        <!-- <img src="~assets/images/favicon.png" alt="ForestWork" class="h-8 w-auto"> -->
+        <span class="font-bold hidden sm:block">ForestWork</span>
+      </NuxtLink>
+    </template>
+
+    <UNavigationMenu :items="items" class="w-full justify-center" content-orientation="vertical" />
+
+    <template #right>
+      <UColorModeButton />
+      <UButton to="https://discord.com/servers/510192195509157909" target="_blank" color="primary" variant="solid"
+        class="hidden lg:inline-flex">
+        加入Discord
+      </UButton>
+    </template>
+
+    <template #toggle="{ open, toggle, ui }">
+      <UButton size="sm" variant="ghost" color="neutral" square :class="ui.toggle({ toggleSide: 'right' })"
+        @click="toggle">
+        <ClientOnly>
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="6" x2="20" y2="6" class="outline-none" />
+            <line x1="4" y1="12" x2="20" y2="12" class="outline-none" />
+            <line x1="4" y1="18" x2="20" y2="18" class="outline-none" />
+          </svg>
+        </ClientOnly>
+      </UButton>
+    </template>
+
+    <template #body>
+      <UNavigationMenu :items="items" orientation="vertical" class="px-2 mt-4" />
+
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 px-4">
+        <UButton to="https://discord.gg/lin-jian-xiao-zhen-510192195509157909" target="_blank" color="primary"
+          variant="solid" block>
+          加入Discord
+        </UButton>
+      </div>
+    </template>
+  </UHeader>
+</template>
