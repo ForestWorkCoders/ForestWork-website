@@ -18,7 +18,10 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
 
   <div v-else-if="data" class="space-y-8 animate-fade-in">
     <section>
-      <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Group Standings</h3>
+      <div class="flex items-center gap-3 pl-2 mb-8">
+        <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Group Standings</h2>
+      </div>
       <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -43,7 +46,7 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
                 <UAvatar :src="team.logo || '/default-team-logo.png'" :alt="team.name" size="sm"
                   class="bg-white ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm flex-shrink-0"
                   :ui="{ rounded: 'rounded-md' }" />
-                <span class="mr-2">  </span>{{ team.name }}
+                <span class="mr-2"> </span>{{ team.name }}
               </td>
               <td class="p-3">{{ team.pld }}</td>
               <td class="p-3">{{ team.w }}</td>
@@ -58,18 +61,23 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
     </section>
 
     <section>
-      <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Matches</h3>
+      <div class="flex items-center gap-3 pl-2 mb-8">
+        <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Matches</h2>
+      </div>
       <div class="space-y-6">
         <div v-for="round in data.rounds" :key="round.roundName">
           <h4 class="text-sm font-semibold text-gray-500 mb-2 uppercase tracking-wider">{{ round.roundName }}</h4>
           <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <li v-for="match in round.matches" :key="match.id">
               <NuxtLink :to="`/games/plazmaburst/tournaments/${tournamentId}/matches/${match.id}`"
-                class="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-500 transition-colors">
-                <span class="truncate font-medium" :style="{ color: match.colorA }">{{ match.teamA }}</span>
+                class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-500 transition-colors">
+                
+                <span class="truncate font-medium text-left" :style="{ color: match.colorA }">
+                  {{ match.teamA }}
+                </span>
 
-                <div
-                  class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded font-mono font-bold text-sm mx-2 whitespace-nowrap">
+                <div class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded font-mono font-bold text-sm whitespace-nowrap justify-self-center">
                   <template v-if="match.status.includes('Walkover')">
                     <span class="text-amber-500">W/O</span>
                   </template>
@@ -81,7 +89,10 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
                   </template>
                 </div>
 
-                <span class="truncate font-medium text-right" :style="{ color: match.colorB }">{{ match.teamB }}</span>
+                <span class="truncate font-medium text-right" :style="{ color: match.colorB }">
+                  {{ match.teamB }}
+                </span>
+                
               </NuxtLink>
             </li>
           </ul>
