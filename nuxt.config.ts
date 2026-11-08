@@ -11,7 +11,17 @@ export default defineNuxtConfig({
   },
 
   supabase: {
-    redirect: false
+    // 强制关闭所有对外部机器人的全局鉴权检查与重定向
+    redirect: false,
+    // 或者如果你开启了重定向保护，必须显式排除该路径：
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      exclude: [
+        '/api/discord/**',   // ★ 核心：彻底禁止 Supabase 插手 Discord 端点！
+        '/api/discord'
+      ]
+    }
   },
 
   vite: {
