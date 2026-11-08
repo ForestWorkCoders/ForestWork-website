@@ -9,6 +9,7 @@ import { handleArrange } from './arrange'
 import { handleDemoPager } from './demo-pager'
 import { handleRollAdv } from './roll_adv'
 import { handleMahjongPair } from './mahjong_pair'
+import { handleBookOfAnswers } from './book-of-answers'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -21,5 +22,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   arrange: handleArrange,
   pages: handleDemoPager,
   roll_adv: handleRollAdv,
-  mahjong_pair: handleMahjongPair
+  mahjong_pair: handleMahjongPair,
+  解答之书: handleBookOfAnswers
 }

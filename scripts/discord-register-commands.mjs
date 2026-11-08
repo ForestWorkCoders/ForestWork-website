@@ -10,7 +10,8 @@ if (!APP_ID || !BOT_TOKEN) {
 // 通用基础指令
 const commonCommands = [
     { name: 'ping', description: '檢查網站與交互機器人運行狀態' },
-    { name: 'site', description: '取得林間小鎮官方網站與重要入口連結' }
+    { name: 'site', description: '取得林間小鎮官方網站與重要入口連結' },
+    { name: 'pages', description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例'},
 ]
 
 // 跑团专有指令
@@ -118,8 +119,16 @@ const diceCommands = [
         ]
     },
     {
-        name: 'pages',
-        description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例'
+        name: '解答之书',
+        description: '翻開《解答之書》，獲取命運對你心中疑惑的隨機啟示',
+        options: [
+            {
+                name: 'question',
+                description: '你心中默想的問題 (可選)',
+                type: 3, // STRING
+                required: false
+            }
+        ]
     }
 ]
 
