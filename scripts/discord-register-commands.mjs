@@ -558,6 +558,20 @@ const forestCommands = [
         name: '🥐 送 1 個 Quaso',
         type: 2
     },
+    {
+        name: 'dump_ids',
+        description: '【管理員】導出身分組成員標籤名單為 TXT 附件',
+        options: [
+            {
+                name: 'role',
+                description: '要導出名單的目標身分組',
+                type: 8, // ★ 8 代表 ROLE 類型
+                required: true
+            }
+        ],
+        // 好品味：在 Discord 控制面將預設權限鎖死給管理員（雙重防禦）
+        default_member_permissions: '8' // 8 代表 Administrator
+    }
 ]
 
 // 按 Guild 配置指令清单 (数据驱动，物理隔离)
