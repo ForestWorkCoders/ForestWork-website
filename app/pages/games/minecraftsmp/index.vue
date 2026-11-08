@@ -35,9 +35,9 @@ interface SeasonLink {
 }
 
 const navLinks: SeasonLink[] = [
-    { title: '第一季', url: 'https://forestworkcoders.github.io/ForestWorkSMPS1', icon: 'i-lucide-dice-1', external: true },
-    { title: '第二季', url: 'https://forestworkcoders.github.io/ForestWorkSMPS2', icon: 'i-lucide-dice-2', external: true },
-    { title: '第三季', url: 'https://forestworkcoders.github.io/ForestWorkSMPS3', icon: 'i-lucide-dice-3', external: true },
+    { title: '第一季', url: 'https://forestwork-smp-s1.pages.dev', icon: 'i-lucide-dice-1', external: true },
+    { title: '第二季', url: 'https://forestwork-smp-s2.pages.dev', icon: 'i-lucide-dice-2', external: true },
+    { title: '第三季', url: 'https://forestwork-smp-s3.pages.dev', icon: 'i-lucide-dice-3', external: true },
 ]
 </script>
 
