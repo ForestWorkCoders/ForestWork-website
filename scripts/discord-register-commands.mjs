@@ -432,6 +432,24 @@ const cocCommands = [
                 ]
             }
         ]
+    },
+    {
+      name: 'sc',
+      description: 'CoC 7版理智檢定 (自動判定、擲骰損失並扣除角色卡 SAN)',
+      options: [
+        {
+          name: 'exp',
+          description: '理智損失表達式 (格式：成功損失/失敗損失，例如：0/1d6, 1/1d4, 1/3)',
+          type: 3, // STRING
+          required: true
+        },
+        {
+          name: 'current',
+          description: '手動指定當前理智值 (選填，預設自動讀取出戰角色卡)',
+          type: 4, // INTEGER
+          required: false
+        }
+      ]
     }
 ]
 

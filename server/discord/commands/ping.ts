@@ -19,7 +19,7 @@ export async function handlePing(interaction: any, event: H3Event) {
   if (latency > 1500) {
     statusEmoji = '🟡'
     remark = '冷啟動延遲 (Cold Start)'
-  } else if (latency > 3000) {
+  } else if (latency > 2500) {
     statusEmoji = '🔴'
     remark = '接近 3 秒超時臨界'
   }

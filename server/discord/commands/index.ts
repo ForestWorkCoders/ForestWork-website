@@ -16,6 +16,7 @@ import { handleInsanity } from './insanity'
 import { handleCocGrowth } from './coc-growth'
 import { handleCocMake } from './coc-make'
 import { handleCardCommand } from './card'
+import { handleSc } from './sc'
 
 export type CommandHandler = (interaction: any, event: H3Event) => Promise<any> | any
 
@@ -33,7 +34,8 @@ export const commandRegistry: Record<string, CommandHandler> = {
   生日密碼: handleBirthday,
   insanity: handleInsanity,
   cc: handleCc,
+  sc: handleSc,
   en: handleCocGrowth,
   coc_make: handleCocMake,
-  card: handleCardCommand
+  card: handleCardCommand,
 }
