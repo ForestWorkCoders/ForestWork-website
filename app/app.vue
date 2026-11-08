@@ -3,7 +3,7 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <SpeedInsights v-if="!isDev" />
+    <!-- <SpeedInsights v-if="!isDev" /> -->
   </div>
 </template>
 
