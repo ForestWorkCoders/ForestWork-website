@@ -361,7 +361,34 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_tournament_match_stats: {
+        Args: { t_id: string }
+        Returns: {
+          avatar: string
+          avg_rank: number
+          avg_rank_east: number
+          avg_rank_north: number
+          avg_rank_south: number
+          avg_rank_west: number
+          avg_score: number
+          avoid_last_rate_pct: number
+          east_count: number
+          highest_point: number
+          lowest_point: number
+          nickname: string
+          north_count: number
+          play_count: number
+          player_id: number
+          rank_1_count: number
+          rank_2_count: number
+          rank_3_count: number
+          rank_4_count: number
+          south_count: number
+          top_rate_pct: number
+          top2_rate_pct: number
+          west_count: number
+        }[]
+      }
     }
     Enums: {
       relay_role:
@@ -477,7 +504,7 @@ export type Database = {
           map_id: string
           match_id: string
           red_team_score: number
-          round_history: number[]
+          round_history: number[] | null
           status: Database["plazmaburst"]["Enums"]["match_status"]
         }
         Insert: {
@@ -487,7 +514,7 @@ export type Database = {
           map_id: string
           match_id: string
           red_team_score: number
-          round_history: number[]
+          round_history?: number[] | null
           status?: Database["plazmaburst"]["Enums"]["match_status"]
         }
         Update: {
@@ -497,7 +524,7 @@ export type Database = {
           map_id?: string
           match_id?: string
           red_team_score?: number
-          round_history?: number[]
+          round_history?: number[] | null
           status?: Database["plazmaburst"]["Enums"]["match_status"]
         }
         Relationships: [
@@ -767,7 +794,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_tournament_player_stats: {
+        Args: { t_id: string }
+        Returns: {
+          avatar: string
+          details: Json
+          nickname: string
+          player_id: string
+          scores: Json
+        }[]
+      }
     }
     Enums: {
       map_category: "arena" | "rails" | "snipers" | "rockets" | "rays" | "snd"
