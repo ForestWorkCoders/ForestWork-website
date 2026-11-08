@@ -20,6 +20,7 @@ const items = computed<NavigationMenuItem[]>(() => [
       { label: '戰報一覽', to: '/games/mahjongsoul/' },
       { label: '賽事規章', to: '/games/mahjongsoul/rules' },
       { label: '如何加入比賽場', to: '/games/mahjongsoul/how-to' },
+      { label: '玩家數據', to: '/games/mahjongsoul/players/sanma', badge: { label: 'Beta', color: 'warning' } },
     ]
   },
   {
