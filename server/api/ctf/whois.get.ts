@@ -2,120 +2,130 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '../../../types/database.types'
 
-/**
- * 斯巴达式身份解析器：将任意外部标识符统一归一化为内部 account_id
- */
-async function resolveTargetAccountId(
-  supabase: any,
-  rawInput: string
-): Promise<number | null> {
-  const trimmed = rawInput.trim()
-  if (!trimmed) return null
-
-  // 1. 快速路径：如果是纯数字或 operator_123 格式，直接纯内存正则提取，零 DB 开销
-  const numericMatch = trimmed.match(/^(?:operator_)?(\d+)$/i)
-  if (numericMatch && numericMatch[1]) {
-    const id = Number(numericMatch[1])
-    return !isNaN(id) && id > 0 ? id : null
-  }
-
-  // 2. 文本路径：作为 Discord 用户名去公共用户表检索
-  // 利用 ilike 确保用户名输入大小写不敏感
-  const { data: userProfile, error } = await supabase
-    .schema('public')
-    .from('participant_data')
-    .select('id, discord_username')
-    .ilike('discord_username', trimmed)
-    .maybeSingle()
-
-  if (error || !userProfile) {
-    return null
-  }
-
-  // 返回对应的内部账户 ID (对应 participant_data.id)
-  return userProfile.id
-}
-
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
-  const rawOperator = String(query.operator || '').trim()
+  const rawTarget = String(query.operator || '').trim()
 
-  if (!rawOperator) {
-    return { found: false, identifier: '' }
+  if (!rawTarget) {
+    return { found: false }
   }
 
   const supabase = await serverSupabaseClient<Database>(event)
 
-  // ★ 核心好品味：单向归一化，消灭所有后续分支
-  const accountId = await resolveTargetAccountId(supabase, rawOperator)
-
-  if (!accountId) {
-    return { found: false, identifier: rawOperator }
-  }
-
-  // ----------------------------------------------------
-  // 以下查询流水线完全保持不变，纯粹基于确定性的 accountId 执行
-  // ----------------------------------------------------
-
-  // 1. 从积分榜获取排名
-  const { data: leaders, error: leaderError } = await supabase
+  // 1. 多態檢索：既支援 Snowflake ID 比對，也支援暱稱比對
+  let rankQuery = supabase
     .schema('ctf')
     .from('leaderboard')
-    .select('account_id, total_score, solves_count')
-    .order('total_score', { ascending: false })
-    .order('last_solve_time', { ascending: true })
+    .select('*')
 
-  if (leaderError) {
-    throw createError({ statusCode: 500, statusMessage: leaderError.message })
+  if (/^\d+$/.test(rawTarget)) {
+    // ★ 核心好品味：純數字時比對 account_id (純文字匹配，絕不用 Number 截斷精度！)
+    rankQuery = rankQuery.eq('account_id', rawTarget as any)
+  } else {
+    // 非純數字時，比對顯示名稱
+    rankQuery = rankQuery.eq('username', rawTarget)
   }
 
-  const rankIndex = (leaders || []).findIndex(l => l.account_id === accountId)
-  if (rankIndex === -1) {
-    return { found: false, identifier: rawOperator }
+  const { data: rankEntry, error: rankError } = await rankQuery.maybeSingle()
+
+  if (rankError) {
+    console.error('[-] whois rank query error:', rankError.message)
+    throw createError({ statusCode: 500, statusMessage: rankError.message })
   }
 
-  const targetLeader = leaders[rankIndex]!
+  // 確定真實要查題目的 account_id
+  let targetAccountId = rankEntry ? rankEntry.account_id : (/^\d+$/.test(rawTarget) ? rawTarget : null)
 
-  // 2. 查询解题流水
-  const { data: solves, error: solveError } = await supabase
+  // 若榜單沒排上（例如 0 分），但傳入的是非數字暱稱，向檔案庫反查 account_id
+  if (!targetAccountId && !/^\d+$/.test(rawTarget)) {
+    const { data: profile } = await supabase
+      .from('participant_data')
+      .select('discord_id')
+      .or(`discord_username.eq.${rawTarget},username.eq.${rawTarget}`)
+      .maybeSingle()
+    if (profile) {
+      targetAccountId = profile.discord_id
+    }
+  }
+
+  if (!targetAccountId) {
+    return { found: false }
+  }
+
+  // 2. 查詢已解題目列表（透過純文字傳遞 BIGINT，零精度損失）
+  const { data: solvesData, error: solvesError } = await supabase
     .schema('ctf')
     .from('solves')
     .select('challenge_id, solved_at')
-    .eq('account_id', accountId)
-    .order('solved_at', { ascending: true })
+    .eq('account_id', targetAccountId as any)
+    .order('solved_at', { ascending: false })
 
-  if (solveError) {
-    throw createError({ statusCode: 500, statusMessage: solveError.message })
+  if (solvesError) {
+    console.error('[-] whois solves query error:', solvesError.message)
+    throw createError({ statusCode: 500, statusMessage: solvesError.message })
   }
 
-  // 3. 关联题目分值
-  const challengeIds = (solves || []).map(s => s.challenge_id)
-  const { data: pointsData } = await supabase
-    .schema('ctf')
-    .from('challenge_points')
-    .select('id, title, category, current_points')
-    .in('id', challengeIds)
+  // 如果榜單與解題庫兩頭皆空，判定查無此人
+  if (!rankEntry && (!solvesData || solvesData.length === 0)) {
+    return { found: false }
+  }
 
-  const pointsMap = new Map((pointsData || []).map(p => [p.id, p]))
+  let challengeMap = new Map<string, { title: string; category: string; points: number }>()
 
-  const detailedSolves = (solves || []).map(s => {
-    const meta = pointsMap.get(s.challenge_id)
+  if (solvesData && solvesData.length > 0) {
+    const challengeIds = Array.from(new Set(solvesData.map(s => s.challenge_id)))
+    
+    const { data: challengesData, error: challengesError } = await supabase
+      .schema('ctf')
+      .from('challenges')
+      .select('id, title, category, initial_points')
+      .in('id', challengeIds)
+
+    if (challengesError) {
+      console.error('[-] whois challenges lookup error:', challengesError.message)
+      throw createError({ statusCode: 500, statusMessage: challengesError.message })
+    }
+
+    if (challengesData) {
+      challengesData.forEach(c => {
+        challengeMap.set(c.id, {
+          title: c.title || c.id,
+          category: c.category || 'MISC',
+          points: c.initial_points || 0
+        })
+      })
+    }
+  }
+
+
+  // 4. 裝配最終檔案
+  const solves = (solvesData || []).map(s => {
+    const meta = challengeMap.get(s.challenge_id)
     return {
-      challengeId: s.challenge_id,
       title: meta?.title || s.challenge_id,
-      category: meta?.category || 'unknown',
-      points: meta?.current_points || 100,
+      category: meta?.category || 'MISC',
+      points: meta?.points || 0,
       solvedAt: s.solved_at
     }
   })
 
+  const computedScore = solves.reduce((sum, item) => sum + item.points, 0)
+
+  const rawRank: any = rankEntry
+
+  // 優先以純淨 Handle 作為主標識，若無則降級為 operator_後四位
+  const operatorHandle = rawRank?.username || rawRank?.user || `operator_${String(targetAccountId).slice(-4)}`
+  
+  // 社交暱稱僅作為備註展示
+  const displayNickname = rawRank?.nickname || operatorHandle
+
   return {
     found: true,
-    identifier: rawOperator,
-    accountId,
-    rank: rankIndex + 1,
-    totalScore: targetLeader.total_score || 0,
-    solvesCount: targetLeader.solves_count || 0,
-    solves: detailedSolves
+    // 前端「玩家昵稱」印這個：格式化為 handle (nickname) 或直接展示
+    accountId: displayNickname !== operatorHandle ? `${operatorHandle} (${displayNickname})` : operatorHandle,
+    rank: rawRank?.rank ?? '-',
+    totalScore: rawRank?.score ?? rawRank?.total_points ?? computedScore,
+    solvesCount: rawRank?.solved ?? rawRank?.solves_count ?? solves.length,
+    solves
   }
 })

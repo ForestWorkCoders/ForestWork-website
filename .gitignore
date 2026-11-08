@@ -25,3 +25,6 @@ logs
 
 # test files
 app_refactor/
+
+# CTF flag password
+ctf_flag_password.csv

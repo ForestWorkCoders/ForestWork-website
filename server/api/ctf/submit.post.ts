@@ -16,6 +16,45 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const guildId = process.env.DISCORD_GUILD_ID
+  const botToken = process.env.DISCORD_BOT_TOKEN
+
+  if(!guildId) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Server Owner forgot to add guild id, bruh...'
+    })
+  }
+
+  if (botToken) {
+    try {
+      const memberRes = await fetch(
+        `https://discord.com/api/v10/guilds/${guildId}/members/${session.id}`,
+        {
+          headers: {
+            Authorization: `Bot ${botToken}`,
+            'User-Agent': 'ForestWork-CTF-Mainframe/1.0'
+          }
+        }
+      )
+
+      // 404 代表該 Discord 帳號根本沒有加入伺服器
+      if (memberRes.status === 404) {
+        return {
+          success: false,
+          message: '[-] ACCESS DENIED: Operator is not enlisted in ForestWork headquarters.\n[SYSTEM] Join our Discord first: https://discord.com/servers/510192195509157909'
+        }
+      }
+
+      if (!memberRes.ok) {
+        console.warn(`[CTF-AUTH] Discord API responded with HTTP ${memberRes.status} for user ${session.id}`)
+      }
+    } catch (err: any) {
+      console.error('[-] Failed to query Discord Guild API:', err.message)
+      // 網路超時或 Discord 故障時可選擇放行或報錯，保證高可用
+    }
+  }
+
   // 获取真实 Discord 64 位整数 Snowflake ID
   const accountId = session.id as unknown as number
 

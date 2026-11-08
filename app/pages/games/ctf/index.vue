@@ -12,14 +12,6 @@ interface VFSNode {
     children?: Record<string, VFSNode>
 }
 
-// 核心数据结构：当前 Discord 登录选手档案
-interface UserProfile {
-    id: string
-    username: string
-    global_name: string | null
-    avatar: string | null
-}
-
 // ★ 核心好品味：操作员 ID 动态派生，彻底消灭 operator_10001 桩代码！
 const currentOperatorId = computed(() => currentUser.value?.id || '')
 const knownChallengeIds = ref<Set<string>>(new Set())
@@ -30,6 +22,58 @@ const promptUser = computed(() => {
 })
 
 const promptPrefix = computed(() => `${promptUser.value}@forestwork:${currentPathStr.value}$`)
+
+// ★ 核心好品味：計算終端視覺列寬（ASCII=1, CJK/全形=2）
+function getVisualWidth(str: string): number {
+    const safeStr = String(str || '')
+    let width = 0
+    for (let i = 0; i < safeStr.length; i++) {
+        const code = safeStr.charCodeAt(i)
+        // 涵蓋全形標點、日文假名、CJK 統一表意漢字等雙倍寬度區間
+        if (
+            (code >= 0x1100 && code <= 0x115F) ||
+            (code >= 0x2E80 && code <= 0xA4CF) ||
+            (code >= 0xAC00 && code <= 0xD7A3) ||
+            (code >= 0xF900 && code <= 0xFAFF) ||
+            (code >= 0xFE10 && code <= 0xFE19) ||
+            (code >= 0xFE30 && code <= 0xFE6F) ||
+            (code >= 0xFF00 && code <= 0xFF60) ||
+            (code >= 0xFFE0 && code <= 0xFFE6)
+        ) {
+            width += 2
+        } else {
+            width += 1
+        }
+    }
+    return width
+}
+
+// 根據視覺寬度補齊空格（取代原生長度 padEnd，防止撐破終端排版）
+function padEndVisual(str: string | undefined | null, targetWidth: number): string {
+    const safeStr = String(str || '')
+    const vWidth = getVisualWidth(safeStr)
+    if (vWidth >= targetWidth) {
+        return safeStr
+    }
+    return safeStr + ' '.repeat(targetWidth - vWidth)
+}
+
+// ★ 核心好品味：斯巴達式定長 19 位時間戳 (YYYY-MM-DD HH:mm:ss)，消滅一切 locale 抖動！
+function formatTimestamp(isoStr?: string | null): string {
+    if (!isoStr) return '--'
+    const d = new Date(isoStr)
+    if (isNaN(d.getTime())) return '--'
+
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const year = d.getFullYear()
+    const month = pad(d.getMonth() + 1)
+    const day = pad(d.getDate())
+    const hours = pad(d.getHours())
+    const mins = pad(d.getMinutes())
+    const secs = pad(d.getSeconds())
+
+    return `${year}-${month}-${day} ${hours}:${mins}:${secs}`
+}
 
 // ==========================================
 // 1. 历史命令栈状态（Command History Buffer）
@@ -401,22 +445,19 @@ async function hydrateChallenges(): Promise<string[]> {
 // ==========================================
 interface ScoreboardEntry {
     rank: number
-    user: string
-    solved: number
-    score: number
-    lastSolve: string
+    username: string    // 新標準 SSOT 欄位
+    user?: string       // 舊代碼相容別名
+    solved: number      // 已解題數
+    solves_count?: number // 資料庫別名相容
+    score: number       // 當前動態衰減總分
+    total_points?: number // 資料庫別名相容
+    lastSolve: string   // 19 位定長時間戳 (YYYY-MM-DD HH:mm:ss)
+    last_solve?: string // 資料庫別名相容
 }
-
-const mockScoreboard: ScoreboardEntry[] = [
-    { rank: 1, user: 'Klm1200', solved: 4, score: 1450, lastSolve: '12m ago' },
-    { rank: 2, user: 'Devil_Smile', solved: 3, score: 1100, lastSolve: '34m ago' },
-    { rank: 3, user: 'guest_942', solved: 2, score: 600, lastSolve: '1h ago' },
-    { rank: 4, user: 'you (guest)', solved: 0, score: 0, lastSolve: '--' }
-]
 
 // 好品味：纯字符填充排版，数值右对齐，文本左对齐，绝不依赖脆弱的 \t
 function formatScoreboard(entries: ScoreboardEntry[]): string {
-    if (entries.length === 0) {
+    if (!Array.isArray(entries) || entries.length === 0) {
         return '(no standings recorded for active cycle)'
     }
 
@@ -425,7 +466,7 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
     const W_USER = 16
     const W_SOLVED = 8
     const W_SCORE = 9
-    const W_TIME = 10
+    const W_TIME = 19
 
     const header =
         'RANK'.padStart(W_RANK) + '  ' +
@@ -443,10 +484,11 @@ function formatScoreboard(entries: ScoreboardEntry[]): string {
 
     const rows = entries.map(item => {
         const rankStr = `#${item.rank}`.padStart(W_RANK)
-        const userStr = item.user.padEnd(W_USER)
-        const solvedStr = String(item.solved).padStart(W_SOLVED)
-        const scoreStr = `${item.score} pts`.padStart(W_SCORE)
-        const timeStr = item.lastSolve.padEnd(W_TIME)
+        const rawUsername = item.username || item.user || 'anonymous'
+        const userStr = padEndVisual(rawUsername, W_USER)
+        const solvedStr = String(item.solved ?? item.solves_count ?? 0).padStart(W_SOLVED)
+        const scoreStr = `${item.score ?? item.total_points ?? 0} pts`.padStart(W_SCORE)
+        const timeStr = formatTimestamp(item.lastSolve || item.last_solve).padEnd(W_TIME)
         return `${rankStr}  ${userStr}  ${solvedStr}  ${scoreStr}  ${timeStr}`
     })
 
@@ -506,17 +548,35 @@ const commands: Record<string, (args: string[]) => void> = {
   clear              清除終端屏幕
   whoami             顯示當前權限標記
   whois [player]     查詢玩家解題檔案明細 (缺省為本人)
-  login              Discord登入`, 'system')
+  login              Discord登入
+  logout             登出當前操作員會話`, 'system')
     },
 
     clear: () => {
         history.value = []
     },
 
+    // ★ 核心好品味：已登入使用者前置攔截，杜絕無意義跳轉！
     login: () => {
+        if (currentUser.value) {
+            appendHistory(`[!] You are already logged in as "${promptUser.value}".`, 'system')
+            appendHistory(`[SYSTEM] Type "logout" or use the header menu to sign out first.`, 'system')
+            return
+        }
+
         appendHistory('[SYSTEM] Redirecting to Discord authorization uplink...', 'system')
-        // ★ 核心好品味：呼叫全站統一的登入管線，精準傳遞當前 /games/ctf 路徑！
         triggerDiscordLogin()
+    },
+
+    // ★ 核心好品味：在終端機內補齊登出閉環指令！
+    logout: () => {
+        if (!currentUser.value) {
+            appendHistory('[-] No active operator session detected.', 'error')
+            return
+        }
+        appendHistory('[SYSTEM] Terminating active operator session...', 'system')
+        // 呼叫全域登出跳轉，登出後回彈當前 CTF 頁面
+        window.location.href = `/api/auth/logout?redirect=${encodeURIComponent(window.location.pathname)}`
     },
 
     whoami: () => {
@@ -561,12 +621,12 @@ const commands: Record<string, (args: string[]) => void> = {
             }
 
             res.solves.forEach((s: any) => {
-                const timeStr = new Date(s.solvedAt).toLocaleTimeString()
-                const cat = `[${s.category}]`.padEnd(9, ' ')
-                const title = s.title.length > 16 ? s.title.slice(0, 15) + '…' : s.title.padEnd(16, ' ')
-                const pts = `(+${s.points} pts)`.padStart(11, ' ')
-
-                appendHistory(`  ${cat} ${title} ${pts}  @ ${timeStr}`, 'output')
+                const catStr = `[${s.category}]`.padEnd(8)
+                const titleStr = padEndVisual(s.title, 20)
+                const ptsStr = `(+${s.points} pts)`.padStart(11)
+                // ★ 核心修復：使用統一的定長時間戳！
+                const timeStr = formatTimestamp(s.solvedAt)
+                appendHistory(`  ${catStr}  ${titleStr}  ${ptsStr}  @ ${timeStr}`, 'output')
             })
         } catch (err: any) {
             appendHistory(`whois: failed to inspect operator: ${err.message || 'Network error'}`, 'error')
@@ -927,6 +987,90 @@ onMounted(async () => {
 function dismissMobileWarning() {
     showMobileWarning.value = false
 }
+
+// ==========================================
+// 1. 常规 SEO / 社交平台基石兜底 (Twitter Card & Open Graph)
+// ==========================================
+useSeoMeta({
+  title: 'FORESTWORK // CTF 終端控制台 · 極客解密挑戰賽',
+  ogTitle: 'FORESTWORK // VIRTUAL_CTF_CONSOLE',
+  description: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
+  ogDescription: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
+  ogImage: 'https://i.imgur.com/cu2YAkn.png', // 可替换为专用的 CTF 终端预览横幅
+  ogUrl: 'https://forestwork.vercel.app/games/ctf',
+  twitterCard: 'summary_large_image',
+  // 终端专属翡翠绿 (#10B981)
+  themeColor: '#10B981'
+})
+
+// ==========================================
+// 2. Discord Component Embed 专属结构体
+// ==========================================
+const ctfDiscordEmbedPayload = {
+  component: {
+    type: 17, // 主容器 Container[cite: 1]
+    accent_color: 1096065, // #10B981 翡翠绿 (HEX 转十进制整数)
+    spoiler: false,
+    components: [
+      {
+        type: 9, // Section 块[cite: 1]
+        components: [
+          {
+            type: 10, // Text 终端字符说明[cite: 1]
+            content: [
+              '# FORESTWORK // CTF MAINFRAME',
+              '`STATUS: ONLINE` · `ENV: POSIX_VFS_SANDBOX`',
+              '',
+              '**【全系統挑戰已上線】**',
+              '• 支援指令: `ls`, `cat`, `open`, `download`, `submit`, `whois`',
+              '• 涵蓋領域: 隱寫術 (Stego) / 逆向 (Reverse) / 密碼學 / Web',
+              '• 賽制特性: 即時分數衰減機制 · Discord 帳號認證綁定',
+              '',
+              '> *「敲下你的第一行指令，奪取屬於你的 Flag。」*'
+            ].join('\n')
+          }
+        ],
+        accessory: {
+          type: 11, // Thumbnail 挂件[cite: 1]
+          media: {
+            url: 'https://i.imgur.com/mfcQRXw.png' // 终端或林间专属 Logo 图标
+          }
+        }
+      },
+      {
+        type: 14, // 视觉分割线[cite: 1]
+        spacing: 1,
+        divider: true
+      },
+      {
+        type: 1, // Action Row 操作按钮容器[cite: 1]
+        components: [
+          {
+            type: 2,
+            style: 5, // Link Button[cite: 1]
+            label: '接入終端 (Launch Shell)',
+            emoji: { name: '💻' },
+            url: 'https://forestwork.vercel.app/games/ctf'
+          },
+        ]
+      }
+    ]
+  }
+}
+
+// ==========================================
+// 3. 声明式注入并彻底覆写根节点
+// ==========================================
+useHead({
+  script: [
+    {
+      key: 'discord:component-embed', // 核心好品味：与 app.vue 相同 key 实施强力覆盖[cite: 1]
+      id: 'discord:component-embed',
+      type: 'application/json',
+      innerHTML: () => JSON.stringify(ctfDiscordEmbedPayload).replace(/</g, '\\u003c') // 安全防爆转义[cite: 1]
+    }
+  ]
+})
 </script>
 
 <template>
