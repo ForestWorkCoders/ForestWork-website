@@ -1,7 +1,7 @@
 // server/discord/commands/cc.ts
 import type { H3Event } from 'h3'
 import { getInteractionOption } from '../utils'
-import { rollCoC } from '../../utils/cocDice'
+import { rollCoC } from '../utils/cocDice'
 
 
 export async function handleCc(interaction: any, event: H3Event) {

@@ -241,21 +241,19 @@ const cocCommands = [
     },
     {
         name: 'en',
-        description: '執行 CoC 7版技能幕間成長檢定 (成功則 1D10 增長)',
+        description: 'CoC 7版技能成長檢定 (支援自動同步出戰角色卡)',
         options: [
             {
                 name: 'skill',
-                description: '要進行成長檢定的技能名稱 (例如：偵察、聆聽)',
+                description: '指定要檢定的技能名稱 (自動讀取並更新出戰角色卡)',
                 type: 3, // STRING
-                required: true
+                required: false
             },
             {
-                name: 'value',
-                description: '當前技能數值 (1 ~ 99)',
+                name: 'target',
+                description: '手動指定技能基礎數值 (不連動角色卡)',
                 type: 4, // INTEGER
-                required: true,
-                min_value: 1,
-                max_value: 99
+                required: false
             }
         ]
     },
@@ -268,6 +266,170 @@ const cocCommands = [
                 description: '是否暗骰車卡 (僅自己可見)',
                 type: 5, // BOOLEAN
                 required: false
+            }
+        ]
+    },
+    {
+        name: 'card',
+        description: 'CoC 7版調查員角色卡管理系統',
+        options: [
+            {
+                name: 'create',
+                description: '填寫表單建立新調查員角色卡',
+                type: 1 // SUB_COMMAND
+            },
+            {
+                name: 'view',
+                description: '檢視調查員角色卡全息檔案',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'name',
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'user',
+                        description: '調閱伺服器其他玩家的角色卡 (可選)',
+                        type: 6, // USER
+                        required: false
+                    }
+                ]
+            },
+            {
+                name: 'list',
+                description: '列出自己擁有的所有調查員角色卡',
+                type: 1 // SUB_COMMAND
+            },
+            {
+                name: 'switch',
+                description: '切換當前出戰中的活躍角色卡',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'name',
+                        description: '要啟用的角色姓名',
+                        type: 3, // STRING
+                        required: true
+                    }
+                ]
+            },
+            {
+                name: 'delete',
+                description: '徹底清除指定的調查員角色卡',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'name',
+                        description: '要刪除的角色姓名',
+                        type: 3, // STRING
+                        required: true
+                    }
+                ]
+            },
+            {
+                name: 'avatar',
+                description: '設定當前出戰或指定調查員的立繪頭像',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'image',
+                        description: '直接拖曳上傳圖片 (自動轉存至永久雲端儲存)',
+                        type: 11, // ATTACHMENT
+                        required: false
+                    },
+                    {
+                        name: 'url',
+                        description: '或直接填寫公開圖片直鏈 (例如 Imgur)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'name',
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                ]
+            },
+            {
+                name: 'edit',
+                description: '修改當前出戰或指定調查員的狀態、屬性或技能',
+                type: 1, // ★ 子指令本身是 type: 1 (SUB_COMMAND)
+                options: [
+                    {
+                        name: 'hp', // [0]
+                        description: '調整體力值 (支援相對增減如 -3, +2 或絕對數值如 12)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'san', // [1]
+                        description: '調整理智值 (支援相對增減如 -5, +1 或絕對數值如 45)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'mp', // [2]
+                        description: '調整魔力值 (支援相對增減如 -2, +4 或絕對數值如 10)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'insanity',
+                        description: '設定精神異常症狀 (填寫 none 或 正常 可解除瘋狂)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'skill', // [3] ★★★ 就是這裡！必須是 3 (STRING)，絕不能是 1！★★★
+                        description: '指定要修改的技能名稱 (例如：偵察、手槍)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'attr', // [4]
+                        description: '指定要修改的八圍屬性 (例如：STR、敏捷)',
+                        type: 3, // STRING
+                        required: false
+                    },
+                    {
+                        name: 'value', // [5]
+                        description: '賦予 skill 或 attr 的新數值 (整數)',
+                        type: 4, // INTEGER
+                        required: false
+                    },
+                    {
+                        name: 'name', // [6]
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
+                    }
+                ]
+            },
+            {
+                name: 'bio',
+                description: '檢視或編輯調查員的生平背景故事 (支援 Markdown 排版)',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'action',
+                        description: '操作類型 (view: 檢視故事 ｜ edit: 開啟編輯視窗)',
+                        type: 3, // STRING
+                        required: true,
+                        choices: [
+                            { name: '檢視背景故事 (View)', value: 'view' },
+                            { name: '編寫/修改故事 (Edit)', value: 'edit' }
+                        ]
+                    },
+                    {
+                        name: 'name',
+                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
+                        type: 3, // STRING
+                        required: false
+                    }
+                ]
             }
         ]
     }

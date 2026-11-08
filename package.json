@@ -9,7 +9,7 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst > app/types/database.types.ts",
+    "update-database": "npx supabase gen types typescript --project-id efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst,trpg > app/types/database.types.ts",
     "gartic-sync": "node --env-file=.env scripts/sync-gartic-manifest.js",
     "test-redirects": "node --env-file=.env scripts/verify-redirects.mjs",
     "discord-register-commands": "node --env-file=.env scripts/discord-register-commands.mjs"
@@ -20,6 +20,7 @@
     "@nuxt/ui": "^4.10.0",
     "@nuxtjs/supabase": "^2.0.9",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.8.0",
     "@vercel/speed-insights": "^2.0.0",
     "discord-component-embed": "^0.2.1",
     "echarts": "^6.1.0",
