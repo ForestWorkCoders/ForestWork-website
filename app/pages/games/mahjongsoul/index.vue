@@ -11,7 +11,7 @@ const mahjongSidebarData = {
         '《雀魂麻將》（MahjongSoul）是Catfood Studio（貓糧工作室）開發的麻將遊戲。該作於2018年6月8日正式發布，於2020年7月15日在steam上線國際中文服。'
     ],
     socialLinks: [
-        { icon: 'i-heroicons-globe-alt', url: 'https://mahjongsoul.yo-star.com/' }, // 官網
+        { icon: 'i-lucide-globe', url: 'https://mahjongsoul.yo-star.com/' }, // 官網
         { icon: 'i-simple-icons-x', url: 'https://twitter.com/MahjongSoul_EN' },   // Twitter (X)
         { icon: 'i-simple-icons-discord', url: 'https://discord.gg/mahjongsoul' },  // Discord
         { icon: 'i-lucide-scale', url: '/games/mahjongsoul/rules' }, // Rules

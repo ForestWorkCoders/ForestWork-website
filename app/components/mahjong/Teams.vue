@@ -32,11 +32,11 @@ const roleColor = {
 <template>
   <section class="animate-fade-in">
     <div v-if="pending" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
+      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 animate-spin text-gray-400" />
     </div>
 
     <div v-else-if="!teams || teams.length === 0" class="text-center py-16 bg-gray-50 dark:bg-[#1e293b] rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-      <UIcon name="i-heroicons-user-group" class="w-12 h-12 mx-auto text-gray-400 mb-3" />
+      <UIcon name="i-lucide-user-group" class="w-12 h-12 mx-auto text-gray-400 mb-3" />
       <h3 class="text-lg font-bold text-gray-900 dark:text-white">參賽隊伍尚未公佈</h3>
       <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Teams are yet to be announced.</p>
     </div>

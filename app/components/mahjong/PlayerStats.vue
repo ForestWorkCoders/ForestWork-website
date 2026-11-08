@@ -226,7 +226,7 @@ const playPercentStyles = [
                 <VChart v-if="radarConfigs[index]" :option="radarConfigs[index]" class="w-full h-full" autoresize />
                 <template #fallback>
                   <div class="w-full h-full flex items-center justify-center">
-                    <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+                    <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
                   </div>
                 </template>
               </ClientOnly>

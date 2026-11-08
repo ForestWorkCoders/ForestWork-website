@@ -11,7 +11,7 @@ const plazmaBurstSidebarData = {
         '《超時空戰士2》是一款由Eric Gurt所製作的橫向2D射擊游戲。從2012年開始開發到現在。期間社區辦了大大小小的比賽。'
     ],
     socialLinks: [
-        { icon: 'i-heroicons-globe-alt', url: 'https://www.plazmaburst2.com/' }, // 官網
+        { icon: 'i-lucide-globe', url: 'https://www.plazmaburst2.com/' }, // 官網
         { icon: 'i-simple-icons-x', url: 'https://x.com/Eric_Gurt' },   // Twitter (X)
         { icon: 'i-simple-icons-discord', url: 'https://discord.gg/plazmaburst' },  // Discord
         { icon: 'i-simple-icons-discord', url: 'https://discord.gg/2cHPEGGRfu' },  // Discord
