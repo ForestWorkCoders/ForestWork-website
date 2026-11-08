@@ -1,6 +1,14 @@
 // scripts/discord-register-commands.mjs
 const APP_ID = process.env.DISCORD_APPLICATION_ID
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
+// scripts/discord-register-commands.mjs 中 tarot 選項：
+import { TAROT_SPREADS } from '../server/discord/assets/tarot-deck.ts'
+
+// 動態組裝 16 個下拉選單項
+const spreadChoices = Object.values(TAROT_SPREADS).map(s => ({
+  name: s.name,
+  value: s.id
+}))
 
 if (!APP_ID || !BOT_TOKEN) {
     console.error('[-] 缺少 APP_ID 或 BOT_TOKEN')
@@ -11,7 +19,7 @@ if (!APP_ID || !BOT_TOKEN) {
 const commonCommands = [
     { name: 'ping', description: '檢查網站與交互機器人運行狀態' },
     { name: 'site', description: '取得林間小鎮官方網站與重要入口連結' },
-    { name: 'pages', description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例'},
+    { name: 'pages', description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例' },
 ]
 
 // 跑团专有指令
@@ -125,6 +133,25 @@ const diceCommands = [
             {
                 name: 'question',
                 description: '你心中默想的問題 (可選)',
+                type: 3, // STRING
+                required: false
+            }
+        ]
+    },
+    {
+        name: '每日塔羅',
+        description: '抽取命運塔羅牌陣 (支援 1 至 10 張牌，預設為 3 張牌陣)',
+        options: [
+            {
+                name: 'spread',
+                description: '選擇占卜牌陣 (可選，預設為經典時序三牌陣)',
+                type: 3, // INTEGER
+                required: false,
+                choices: spreadChoices
+            },
+            {
+                name: 'question',
+                description: '你心中默想或想要占卜的問題 (可選)',
                 type: 3, // STRING
                 required: false
             }
