@@ -11,7 +11,7 @@ const props = defineProps({
 //     "F": { leaderboard: [...], matches: [...] }
 //   }
 // }
-const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tournaments/${props.tournamentId}/matches`)
+const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tournaments/${props.tournamentId}/dashboard`)
 </script>
 
 <template>
@@ -40,7 +40,7 @@ const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tou
           </h2>
         </div>
 
-        <TournamentsBaseLeaderboardTable
+        <BaseLeaderboardTable
           :entity-type="dashboardData.config.entity_type" 
           :columns="dashboardData.config.columns"
           :data="dashboardData.data[phase.id]?.leaderboard || []"
@@ -53,7 +53,7 @@ const { data: dashboardData, pending, error } = await useFetch(`/api/mahjong/tou
             <span class="text-sm font-medium tracking-wide">備註保留區塊</span>
         </div>
 
-        <TournamentsBaseMatchGrid 
+        <BaseMatchGrid 
           :matches="dashboardData.data[phase.id]?.matches || []"
         />
 

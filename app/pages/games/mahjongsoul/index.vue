@@ -90,7 +90,7 @@ const paginatedPastTournaments = computed(() => {
                                 </div>
                                 <div class="mt-4 space-y-4">
                                     <div v-if="allTournaments?.ongoing?.length" class="space-y-3">
-                                        <TournamentsCard v-for="tourney in allTournaments.ongoing" :key="tourney.id"
+                                        <BaseTournamentCard v-for="tourney in allTournaments.ongoing" :key="tourney.id"
                                             :tourney="tourney" game-slug="mahjongsoul"/>
                                     </div>
 
@@ -116,7 +116,7 @@ const paginatedPastTournaments = computed(() => {
 
                                     <div v-if="allTournaments?.past?.length">
                                         <div class="space-y-3">
-                                            <TournamentsCard v-for="tourney in paginatedPastTournaments"
+                                            <BaseTournamentCard v-for="tourney in paginatedPastTournaments"
                                                 :key="tourney.id" :tourney="tourney" game-slug="mahjongsoul"/>
                                         </div>
 
@@ -156,7 +156,7 @@ const paginatedPastTournaments = computed(() => {
                                 </div>
                                 <div class="mt-4">
                                     <div v-if="allTournaments?.upcoming?.length" class="space-y-3">
-                                        <TournamentsCard v-for="tourney in allTournaments.upcoming" :key="tourney.id"
+                                        <BaseTournamentCard v-for="tourney in allTournaments.upcoming" :key="tourney.id"
                                             :tourney="tourney" game-slug="mahjongsoul"/>
                                     </div>
 
@@ -173,7 +173,7 @@ const paginatedPastTournaments = computed(() => {
                     </div>
 
                     <div class="lg:col-span-4 space-y-6">
-                        <GameSidebar :gameName="mahjongSidebarData.name"
+                        <LayoutSidebar :gameName="mahjongSidebarData.name"
                             :coverImageLight="mahjongSidebarData.image_light"
                             :coverImageDark="mahjongSidebarData.image_dark" :description="mahjongSidebarData.desc"
                             :links="mahjongSidebarData.socialLinks" />

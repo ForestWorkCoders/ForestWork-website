@@ -1,7 +1,42 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 
-export default defineEventHandler(async (event) => {
+export interface Pb2TournamentListItem {
+  id: string
+  title: string
+  icon: string
+  tier: string
+  region: string | null
+  start_date: string
+  end_date: string
+}
+
+export interface Pb2TournamentGroupedList {
+  upcoming: Pb2TournamentListItem[]
+  ongoing: Pb2TournamentListItem[]
+  past: Pb2TournamentListItem[]
+}
+
+// 纯函数提取至模块顶层，避免每次请求或循环重复创建函数闭包
+function formatDate(dateString: string | null): string {
+  if (!dateString) return 'TBD'
+  const d = new Date(dateString)
+  if (isNaN(d.getTime())) return 'TBD'
+  return new Intl.DateTimeFormat('en-CA').format(d)
+}
+
+function normalizeTier(tier: string | null): string {
+  if (!tier) return 'Tier ?'
+  return tier.startsWith('Tier') ? tier : `Tier ${tier}`
+}
+
+function parseValidDate(dateString: string | null): Date | null {
+  if (!dateString) return null
+  const d = new Date(dateString)
+  return isNaN(d.getTime()) ? null : d
+}
+
+export default defineEventHandler(async (event): Promise<Pb2TournamentGroupedList> => {
   const supabase = await serverSupabaseClient<Database>(event)
 
   // 抓取所有賽事 (依照建立時間由新到舊排序)
@@ -15,51 +50,45 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: error.message })
   }
 
-  // 準備三個空陣列來裝分類好的資料
-  const result = {
-    upcoming: [] as any[],
-    ongoing: [] as any[],
-    past: [] as any[]
+  const result: Pb2TournamentGroupedList = {
+    upcoming: [],
+    ongoing: [],
+    past: []
   }
 
-  const now = new Date()
+  const nowMs = Date.now()
 
-  tournaments.forEach((t) => {
-    // 日期格式化工具
-    const formatDate = (dateString: string | null) => {
-      if (!dateString) return 'TBD'
-      return new Intl.DateTimeFormat('en-CA').format(new Date(dateString))
-    }
-
-    const formattedTourney = {
+  tournaments?.forEach((t) => {
+    const formattedTourney: Pb2TournamentListItem = {
       id: t.id,
       title: t.title,
       icon: t.icon,
-      tier: t.tier?.startsWith('Tier') ? t.tier : `Tier ${t.tier}`,
+      tier: normalizeTier(t.tier),
       region: t.region,
       start_date: formatDate(t.created_at),
       end_date: formatDate(t.updates_at)
     }
 
-    // ★ 核心時間邏輯判斷 ★
-    if (!t.created_at || !t.updates_at) {
-      // 如果缺漏時間，為保安全，預設丟進歷史賽事
+    const startTime = parseValidDate(t.created_at)
+    const endTime = parseValidDate(t.updates_at)
+
+    // 缺少必要时间戳，归入历史归档
+    if (!startTime || !endTime) {
       result.past.push(formattedTourney)
       return
     }
 
-    const startTime = new Date(t.created_at)
-    const endTime = new Date(t.updates_at)
+    const startMs = startTime.getTime()
+    const endMs = endTime.getTime()
 
-    if (now < startTime) {
+    if (nowMs < startMs) {
       result.upcoming.push(formattedTourney)
-    } else if (now >= startTime && now <= endTime) {
+    } else if (nowMs >= startMs && nowMs <= endMs) {
       result.ongoing.push(formattedTourney)
     } else {
       result.past.push(formattedTourney)
     }
   })
 
-  // 回傳分類好的物件
   return result
 })

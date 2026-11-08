@@ -140,35 +140,35 @@ const tabs = computed(() => {
                         <!-- 賽事資訊 -->
                         <template #info>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsInfo :content-url="contentUrl" />
+                                <BaseTournamentInfo :content-url="contentUrl" />
                             </div>
                         </template>
 
                         <!-- 參賽隊伍 -->
                         <template #teams>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsPB2Teams :tournament-id="route.params.id" />
+                                <Pb2Teams :tournament-id="route.params.id" />
                             </div>
                         </template>
 
                         <!-- 賽事結果 -->
                         <template #result>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsMultiStageToggle :tournament-id="route.params.id" />
+                                <Pb2StageToggle :tournament-id="route.params.id" />
                             </div>
                         </template>
 
                         <!-- 玩家數據 -->
                         <template #stats>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsPlayerStatPB2 :tournament-id="route.params.id" />
+                                <Pb2PlayerStats :tournament-id="route.params.id" />
                             </div>
                         </template>
 
                         <!-- 直播記錄 -->
                         <template #vods>
                             <div class="px-6 py-8 animate-fade-in">
-                                <TournamentsVodsStandard :tournament-id="route.params.id" />
+                                <Pb2Vods :tournament-id="route.params.id" />
                             </div>
                         </template>
                     </UTabs>

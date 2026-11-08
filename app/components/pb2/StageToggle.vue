@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 // 如果你是自动导入 components，这里不需要手动 import。
 // 但为了语义清晰，我们假设有这两个子组件：
-import GroupStage from './GroupStage.vue'
+import GroupStage from '../pb2/GroupStage.vue'
 import Playoffs from './Playoffs.vue' // 你之后再去做这个
 
 const props = defineProps({

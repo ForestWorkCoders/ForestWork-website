@@ -84,7 +84,7 @@ const getRankColor = (rank) => {
           <div class="text-left font-black text-lg italic" :class="getRankColor(row.original.rank)">
             #{{ row.original.rank }}
           </div>
-          <RankTrend :diff="row.original.rank_diff" />
+          <BaseRankTrend :diff="row.original.rank_diff" />
         </template>
 
         <template #player-cell="{ row }">
