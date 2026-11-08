@@ -2,9 +2,10 @@ import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
 import { buildPagerResponse } from '../../discord/commands/demo-pager'
 import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
-import { renderQuasoLeaderboardPayload } from '../../discord/commands/leaderboard'
+import { renderCurseLeaderboardPayload } from '../../discord/commands/leaderboard'
 import { handleLinerBattleCommand, handleLinerBattleButton, handleLinerBattleModal } from '../../discord/commands/linerbattle'
 import { handleGiveQuasoContextMenu } from '../../discord/commands/quaso'
+import { renderQuasoLeaderboardPayload } from '../../discord/commands/leaderboard'
 
 export default defineEventHandler(async (event) => {
   const signature = getHeader(event, 'x-signature-ed25519')
@@ -95,6 +96,7 @@ export default defineEventHandler(async (event) => {
 
   if (message.type === 3) {
     const customId = message.data?.custom_id || ''
+    const clickerId = String(message.member?.user?.id || message.user?.id || '')
     setHeader(event, 'content-type', 'application/json')
 
     if (customId.startsWith('lb_accept:') || customId.startsWith('lb_input:') || customId.startsWith('lb_cancel:')) {
@@ -109,6 +111,32 @@ export default defineEventHandler(async (event) => {
       return {
         type: 7,
         data: buildPagerResponse(targetPage)
+      }
+    }
+
+    if (customId.startsWith('curse_switch_mode:') || customId.startsWith('curse_switch_year:')) {
+      const selectedValue = message.data?.values?.[0] || ''
+      let targetYear: number
+      let targetMode: 'count' | 'ratio'
+
+      if (customId.startsWith('curse_switch_mode:')) {
+        // 操作者變更了「模式」➔ 從 custom_id 提取既有的年份
+        targetYear = parseInt(customId.replace('curse_switch_mode:', ''), 10) || new Date().getFullYear()
+        targetMode = (selectedValue === 'ratio' ? 'ratio' : 'count')
+      } else {
+        // 操作者變更了「年份」➔ 從 custom_id 提取既有的模式
+        const preservedMode = customId.replace('curse_switch_year:', '')
+        targetMode = (preservedMode === 'ratio' ? 'ratio' : 'count')
+        targetYear = parseInt(selectedValue, 10) || new Date().getFullYear()
+      }
+
+      // 執行核心渲染純函數
+      const payload = await renderCurseLeaderboardPayload(targetYear, targetMode, clickerId)
+
+      // 原地刷新卡片 (type: 7 UPDATE_MESSAGE)
+      return {
+        type: 7,
+        data: payload
       }
     }
 

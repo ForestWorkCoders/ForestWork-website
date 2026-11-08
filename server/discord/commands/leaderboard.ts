@@ -7,6 +7,177 @@ function getSupabase() {
 }
 
 /**
+ * 構造單一複合下拉選單 ActionRow (好品味：狀態自包含，當前選中項自動高亮 default: true)
+ */
+export function buildCurseLeaderboardComponents(currentYear: number, currentMode: 'count' | 'ratio') {
+  // 可擴充的歷史年份清單 (乾淨線性，可輕鬆排到 2020 年)
+  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020]
+
+  return [
+    // ---------------------------------------------------------
+    // Row 0: 模式切換下拉選單 (custom_id 攜帶當前年份)
+    // ---------------------------------------------------------
+    {
+      type: 1, // ACTION_ROW
+      components: [
+        {
+          type: 3, // STRING_SELECT
+          custom_id: `curse_switch_mode:${currentYear}`,
+          placeholder: '📊 選擇統計維度 (次數榜 / 濃度百分比)...',
+          options: [
+            {
+              label: '口吐芬芳次數榜',
+              value: 'count',
+              description: '按累計粗口總次數由高到低排名',
+              emoji: { name: '🔢' },
+              default: currentMode === 'count'
+            },
+            {
+              label: '芬芳濃度百分比榜',
+              value: 'ratio',
+              description: '按粗口佔發言總量之百分比排名 (低門檻防噪)',
+              emoji: { name: '📈' },
+              default: currentMode === 'ratio'
+            }
+          ]
+        }
+      ]
+    },
+    // ---------------------------------------------------------
+    // Row 1: 年份切換下拉選單 (custom_id 攜帶當前模式)
+    // ---------------------------------------------------------
+    {
+      type: 1, // ACTION_ROW
+      components: [
+        {
+          type: 3, // STRING_SELECT
+          custom_id: `curse_switch_year:${currentMode}`,
+          placeholder: '📅 選擇統計年度...',
+          options: availableYears.map(year => ({
+            label: `${year} 年度數據`,
+            value: String(year),
+            description: year === 2026 ? '當前活躍統計年度 (進行中)' : `${year} 歷史歸檔數據`,
+            emoji: { name: year === 2026 ? '⚡' : '🏛️' },
+            default: year === currentYear
+          }))
+        }
+      ]
+    }
+  ]
+}
+
+/**
+ * 核心渲染純函數：傳入 (年份, 模式, 觀察者ID)，產出 (Embed + Components)
+ */
+export async function renderCurseLeaderboardPayload(
+  queryYear: number,
+  mode: 'count' | 'ratio',
+  viewerId: string
+) {
+  const supabase = getSupabase()
+  const isRatio = mode === 'ratio'
+
+  // 1. 精準拉取前 10 名
+  let topQuery = supabase
+    .schema('trpg')
+    .from('curse_stats')
+    .select('user_id, username, count, total_messages')
+    .eq('year', queryYear)
+
+  let top10: any[] = []
+
+  if (isRatio) {
+    const { data: ratioData } = await topQuery
+      .gte('total_messages', 5)
+      .order('count', { ascending: false })
+      .limit(50)
+
+    if (ratioData) {
+      top10 = [...ratioData]
+        .sort((a, b) => {
+          const rA = a.total_messages > 0 ? a.count / a.total_messages : 0
+          const rB = b.total_messages > 0 ? b.count / b.total_messages : 0
+          return rB - rA
+        })
+        .slice(0, 10)
+    }
+  } else {
+    const { data: countData } = await topQuery
+      .order('count', { ascending: false })
+      .limit(10)
+    top10 = countData || []
+  }
+
+  // 構造前 10 名文本
+  let rankContent = ''
+  if (top10.length === 0) {
+    rankContent = `📊 **${queryYear} 年度口吐芬芳排行榜** 尚無統計數據！`
+  } else {
+    rankContent = top10.map((item, idx) => {
+      const name = item.username || `用戶_${String(item.user_id).slice(-4)}`
+      if (isRatio) {
+        const pct = item.total_messages > 0 ? ((item.count / item.total_messages) * 100).toFixed(2) : '0.00'
+        return `#${idx + 1} **${name}**\n口吐芬芳百分比: \`${pct}%\` (${item.count}/${item.total_messages})`
+      } else {
+        return `#${idx + 1} **${name}**\n口吐芬芳次數: \`${item.count}\` 次`
+      }
+    }).join('\n\n')
+  }
+
+  // 2. 獨立查詢當前操作者的個人戰績
+  let personalRankBlock = ''
+  const { data: myData } = await supabase
+    .schema('trpg')
+    .from('curse_stats')
+    .select('user_id, username, count, total_messages')
+    .eq('year', queryYear)
+    .eq('user_id', viewerId)
+    .maybeSingle()
+
+  if (myData && myData.count > 0) {
+    let myRank = 1
+    if (!isRatio) {
+      const { count: higherCount } = await supabase
+        .schema('trpg')
+        .from('curse_stats')
+        .select('*', { count: 'exact', head: true })
+        .eq('year', queryYear)
+        .gt('count', myData.count)
+
+      myRank = (higherCount || 0) + 1
+      personalRankBlock = `\n\n--- **你的排名** ---\n第 **${myRank}** 名\n次數: \`${myData.count}\`  總訊息: \`${myData.total_messages}\``
+    } else {
+      const myRate = myData.total_messages > 0 ? myData.count / myData.total_messages : 0
+      const myPct = (myRate * 100).toFixed(2)
+
+      const { data: allRatio } = await supabase
+        .schema('trpg')
+        .from('curse_stats')
+        .select('count, total_messages')
+        .eq('year', queryYear)
+        .gte('total_messages', 5)
+
+      if (allRatio) {
+        const higher = allRatio.filter(r => (r.count / r.total_messages) > myRate).length
+        myRank = higher + 1
+      }
+      personalRankBlock = `\n\n--- **你的排名** ---\n第 **${myRank}** 名\n百分比: \`${myPct}%\`  次數: \`${myData.count}/${myData.total_messages}\``
+    }
+  } else {
+    personalRankBlock = `\n\n--- **你的排名** ---\n未入榜 (閣下在 ${queryYear} 年尚未在監控頻道發表帶有口吐芬芳的訊息)`
+  } const title = isRatio ? `📊 口吐芬芳 百分比排行榜 (${queryYear})`
+    : `📊 口吐芬芳 次數排行榜 (${queryYear})`
+  return {
+    embeds: [{
+      title, description: rankContent + personalRankBlock, color: isRatio ? 0x3498DB : 0x2ECC71, footer: {
+        text: `更新時間: ${new Date().toISOString().replace('T', ' ').slice(0, 19)} · 每年 1 月 1 日重置`
+      }
+    }],
+    components: buildCurseLeaderboardComponents(queryYear, mode)
+  }
+}
+
+/**
  * 構造 Quaso 排行榜專用下拉選單
  */
 export function buildQuasoLeaderboardComponents(currentMode: 'received' | 'sent') {
@@ -115,7 +286,7 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
       color: isReceived ? 0xE67E22 : 0xF1C40F,
       footer: {
         text: '林間小鎮 社交激勵系統 · 對成員右鍵點選「Apps ➔ 🥐 送 1 個 Quaso」即可投遞',
-        icon_url: 'https://i.imgur.com/cu2YAkn.png'
+        // icon_url: 'https://i.imgur.com/cu2YAkn.png'
       },
       timestamp: new Date().toISOString()
     }],
@@ -123,138 +294,26 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
   }
 }
 
+// -------------------------------------------------------------
+// 3. 斜槓指令入口 (/leaderboard)
+// -------------------------------------------------------------
 export async function handleLeaderboardCommand(interaction: any, event: H3Event) {
-  // ★ 嚴格獲取呼叫者字串 ID
   const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
   const subCommand = interaction.data?.options?.[0]?.name
   const subOptions = interaction.data?.options?.[0]?.options || []
 
   if (subCommand === 'curse') {
     const inputYear = subOptions.find((o: any) => o.name === 'year')?.value
-    const mode = subOptions.find((o: any) => o.name === 'mode')?.value || 'count'
-    const queryYear = inputYear || new Date().getFullYear()
-    const supabase = getSupabase()
-    const isRatio = mode === 'ratio'
+    const inputMode = subOptions.find((o: any) => o.name === 'mode')?.value
 
-    // -----------------------------------------------------------
-    // 1. 精準拉取前 10 名 (資料庫層面只拿 10 條，零記憶體浪費)
-    // -----------------------------------------------------------
-    let topQuery = supabase
-      .schema('trpg')
-      .from('curse_stats')
-      .select('user_id, username, count, total_messages')
-      .eq('year', queryYear)
+    const queryYear = inputYear ? Number(inputYear) : new Date().getFullYear()
+    const mode = inputMode === 'ratio' ? 'ratio' : 'count'
 
-    let top10: any[] = []
-
-    if (isRatio) {
-      // 比率模式：設定至少發言 5 條的底線門檻
-      const { data: ratioData } = await topQuery
-        .gte('total_messages', 5)
-        .order('count', { ascending: false })
-        .limit(50)
-
-      if (ratioData) {
-        top10 = [...ratioData]
-          .sort((a, b) => {
-            const rA = a.total_messages > 0 ? a.count / a.total_messages : 0
-            const rB = b.total_messages > 0 ? b.count / b.total_messages : 0
-            return rB - rA
-          })
-          .slice(0, 10)
-      }
-    } else {
-      const { data: countData } = await topQuery
-        .order('count', { ascending: false })
-        .limit(10)
-      top10 = countData || []
-    }
-
-    if (top10.length === 0) {
-      return {
-        type: 4,
-        data: { content: `📊 **${queryYear} 年度口吐芬芳排行榜** 尚無統計數據！` }
-      }
-    }
-
-    // 格式化前 10 名輸出
-    const rankLines = top10.map((item, idx) => {
-      const name = item.username || `用戶_${String(item.user_id).slice(-4)}`
-      if (isRatio) {
-        const pct = item.total_messages > 0 ? ((item.count / item.total_messages) * 100).toFixed(2) : '0.00'
-        return `#${idx + 1} **${name}**\n口吐芬芳百分比: \`${pct}%\` (${item.count}/${item.total_messages})`
-      } else {
-        return `#${idx + 1} **${name}**\n口吐芬芳次數: \`${item.count}\` 次`
-      }
-    })
-
-    // -----------------------------------------------------------
-    // 2. ★ 核心好品味：獨立精準查詢發起者個人數據 (消滅記憶體截斷與精度遺失)
-    // -----------------------------------------------------------
-    let personalRankBlock = ''
-    
-    const { data: myData } = await supabase
-      .schema('trpg')
-      .from('curse_stats')
-      .select('user_id, username, count, total_messages')
-      .eq('year', queryYear)
-      .eq('user_id', callerId) // 純字串匹配，無懈可擊！
-      .maybeSingle()
-
-    if (myData && myData.count > 0) {
-      let myRank = 1
-
-      if (!isRatio) {
-        // 次數模式：算有多少人 count 比我更高
-        const { count: higherCount } = await supabase
-          .schema('trpg')
-          .from('curse_stats')
-          .select('*', { count: 'exact', head: true })
-          .eq('year', queryYear)
-          .gt('count', myData.count)
-
-        myRank = (higherCount || 0) + 1
-        personalRankBlock = `\n\n--- **你的排名** ---\n第 **${myRank}** 名\n次數: \`${myData.count}\`  總訊息: \`${myData.total_messages}\``
-      } else {
-        // 百分比模式：算我的排位
-        const myRate = myData.total_messages > 0 ? myData.count / myData.total_messages : 0
-        const myPct = (myRate * 100).toFixed(2)
-
-        // 檢查在所有合規者中有多少人比率比我高
-        const { data: allRatio } = await supabase
-          .schema('trpg')
-          .from('curse_stats')
-          .select('count, total_messages')
-          .eq('year', queryYear)
-          .gte('total_messages', 5)
-
-        if (allRatio) {
-          const higher = allRatio.filter(r => (r.count / r.total_messages) > myRate).length
-          myRank = higher + 1
-        }
-
-        personalRankBlock = `\n\n--- **你的排名** ---\n第 **${myRank}** 名\n百分比: \`${myPct}%\`  次數: \`${myData.count}/${myData.total_messages}\``
-      }
-    } else {
-      personalRankBlock = `\n\n--- **你的排名** ---\n未入榜 (你今年尚未在監控頻道發表帶有口吐芬芳的訊息)`
-    }
-
-    const title = isRatio
-      ? `📊 口吐芬芳 百分比排行榜 (${queryYear})`
-      : `📊 口吐芬芳 次數排行榜 (${queryYear})`
+    const payload = await renderCurseLeaderboardPayload(queryYear, mode, callerId)
 
     return {
-      type: 4,
-      data: {
-        embeds: [{
-          title,
-          description: rankLines.join('\n\n') + personalRankBlock,
-          color: isRatio ? 0x3498DB : 0x2ECC71,
-          footer: {
-            text: `更新時間: ${new Date().toISOString().replace('T', ' ').slice(0, 19)} · 每年 1 月 1 日重置`
-          }
-        }]
-      }
+      type: 4, // 初始回應用戶：發送帶組件的新訊息
+      data: payload
     }
   }
   if (subCommand === 'quaso') {
