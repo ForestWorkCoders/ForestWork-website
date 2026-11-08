@@ -9,7 +9,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     defaultOpen: true, // 預設展開
     children: [
       { label: '超极限生存竞赛', to: 'https://eaglepb2.gitbook.io/uhc_report/', target: '_blank' },
-      { label: '多人生存 · SMP', to: 'https://forestwork-smp.vercel.app/', target: '_blank' }
+      { label: '多人生存 · SMP', to: '/games/minecraftsmp' }
     ]
   },
   {
@@ -17,9 +17,9 @@ const items = computed<NavigationMenuItem[]>(() => [
     icon: 'i-lucide-gamepad-2',
     defaultOpen: true, // 預設展開
     children: [
-      { label: '賽事規章', to: '/games/mahjongsoul/rules', target: '_blank' },
-      { label: '積分賽', to: '/games/mahjongsoul/', target: '_blank' },
-      { label: '如何加入比賽場', to: '/games/mahjongsoul/how-to', target: '_blank' },
+      { label: '賽事規章', to: '/games/mahjongsoul/rules' },
+      { label: '積分賽', to: '/games/mahjongsoul/' },
+      { label: '如何加入比賽場', to: '/games/mahjongsoul/how-to' },
     ]
   },
   {
