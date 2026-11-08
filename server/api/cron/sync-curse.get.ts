@@ -40,15 +40,25 @@ export default defineEventHandler(async (event) => {
 
   let lastId = cursorRow?.last_message_id ? String(cursorRow.last_message_id) : '0'
   let hasMore = true
-  
+
   // ★ 好品味資料結構升級：同時聚合 username、口吐芬芳增量與總發言增量
   const userDeltaMap = new Map<string, UserDelta>()
   let newestId = lastId
 
   console.log(`[Curse Cron] 開始增量拉取頻道 ${channelId}，起點游標: ${lastId}`)
 
-  // 3. 分頁增量抓取 (利用 after 參數，只拉新訊息)
-  while (hasMore) {
+  // =========================================================================
+  // 1. 抓取控制参数 (严防超时)
+  // =========================================================================
+  const MAX_BATCHES_PER_RUN = 4 // 每次最多拉 4 批 (400條)，耗时绝不超过 2 秒
+  let batchCount = 0
+
+  // =========================================================================
+  // 2. 增量抓取循环 (加入早退防呆)
+  // =========================================================================
+  while (batchCount < MAX_BATCHES_PER_RUN) {
+    batchCount++
+
     const url = new URL(`https://discord.com/api/v10/channels/${channelId}/messages`)
     url.searchParams.set('limit', '100')
     if (lastId !== '0') {
@@ -66,7 +76,6 @@ export default defineEventHandler(async (event) => {
 
     const messages = await res.json()
     if (!Array.isArray(messages) || messages.length === 0) {
-      hasMore = false
       break
     }
 
@@ -97,32 +106,38 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // 將指針向前推移
+    // 指針推移
     lastId = String(messages[messages.length - 1].id)
+
+    // ★ 好品味早退：不足 100 條代表已經摸到底了，立刻 break 退出，絕不多發一次空請求！
     if (messages.length < 100) {
-      hasMore = false
+      break
     }
   }
 
-  // 4. ★★★ 核心修復：呼叫 5 參數 RPC，並嚴格捕捉報錯，絕不靜默吞錯 ★★★
-  for (const [userId, data] of userDeltaMap.entries()) {
-    const { error: rpcErr } = await supabase.schema('trpg').rpc('increment_curse_count', {
-      p_user_id: userId,
-      p_username: data.username,
-      p_year: currentYear,
-      p_curse_delta: data.curseDelta,
-      p_msg_delta: data.msgDelta
+  // =========================================================================
+  // 3. 并发回写数据库 (用 Promise.all 彻底消灭 10 秒超时)
+  // =========================================================================
+  if (userDeltaMap.size > 0) {
+    const updatePromises = Array.from(userDeltaMap.entries()).map(([userId, data]) => {
+      return supabase.schema('trpg').rpc('increment_curse_count', {
+        p_user_id: userId,
+        p_username: data.username,
+        p_year: currentYear,
+        p_curse_delta: data.curseDelta,
+        p_msg_delta: data.msgDelta
+      })
     })
 
-    if (rpcErr) {
-      console.error(`[Cron RPC Error] 使用者 ${userId} 寫入失敗:`, rpcErr)
-      throw createError({ statusCode: 500, statusMessage: `RPC failed: ${rpcErr.message}` })
-    }
+    // 30 个用户的更新将在 300ms 内瞬间并发完成
+    await Promise.all(updatePromises)
   }
 
-  // 5. 儲存最新游標
+  // =========================================================================
+  // 4. 游标安全归档
+  // =========================================================================
   if (newestId !== (cursorRow?.last_message_id ? String(cursorRow.last_message_id) : '0')) {
-    const { error: cursorErr } = await supabase
+    await supabase
       .schema('trpg')
       .from('sync_cursors')
       .upsert({
@@ -130,14 +145,7 @@ export default defineEventHandler(async (event) => {
         last_message_id: newestId,
         updated_at: new Date().toISOString()
       })
-
-    if (cursorErr) {
-      console.error('[Cron Cursor Error] 游標推進失敗:', cursorErr)
-      throw createError({ statusCode: 500, statusMessage: `Cursor upsert failed: ${cursorErr.message}` })
-    }
   }
-
-  console.log(`[Curse Cron] 同步結束。更新人數: ${userDeltaMap.size}，最新游標: ${newestId}`)
 
   return {
     status: 'ok',

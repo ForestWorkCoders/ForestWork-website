@@ -53,19 +53,13 @@ export async function handleGiveQuasoContextMenu(interaction: any, event: H3Even
   return {
     type: 4,
     data: {
-      embeds: [{
-        title: '🥐 Quaso 能量投遞成功！',
-        description: [
-          `<@${callerId}> 投遞了 **1** 枚香脆的 🥐 給 <@${targetId}>！`,
-          '',
-          `*「Quaso 代表著林間小鎮最純粹的敬意與羈絆。」*`,
-          '',
-          `📊 <@${callerId}> 今日剩餘可用額度：\`${result.remaining}/3\` 枚`
-        ].join('\n'),
-        color: 0xE67E22, // 烘焙金黃色
-        footer: { text: '每日午夜 00:00 自動刷新額度 · 輸入 /leaderboard quaso 查看榜單' },
-        timestamp: new Date().toISOString()
-      }]
+      content: `🥐 <@${callerId}> 投遞了 **1** 枚 Quaso 給 <@${targetId}>！*(今日剩餘: \`${result.remaining}/3\`)*`,
+      
+      // ★★★ 核心好品味：禁用所有 Mention 通知！★★★
+      // 名字依然會渲染為藍色可點擊標籤，但絕對不會彈推播、不會響鈴、不會產生小紅點！
+      allowed_mentions: {
+        parse: [] // 清空所有自動提及解析
+      }
     }
   }
 }
