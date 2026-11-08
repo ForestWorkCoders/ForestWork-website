@@ -2,8 +2,9 @@ import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
 import { buildPagerResponse } from '../../discord/commands/demo-pager'
 import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
+import { renderQuasoLeaderboardPayload } from '../../discord/commands/leaderboard'
 import { handleLinerBattleCommand, handleLinerBattleButton, handleLinerBattleModal } from '../../discord/commands/linerbattle'
-
+import { handleGiveQuasoContextMenu } from '../../discord/commands/quaso'
 
 export default defineEventHandler(async (event) => {
   const signature = getHeader(event, 'x-signature-ed25519')
@@ -45,20 +46,29 @@ export default defineEventHandler(async (event) => {
 
   // 2. 核心：处理 Slash Commands (type: 2 = APPLICATION_COMMAND)
   if (message.type === 2) {
+    const commandType = message.data?.type || 1
     const commandName = message.data.name
     setHeader(event, 'content-type', 'application/json')
 
     try {
-      if (commandName === 'card') {
-        const responsePayload = await handleCardCommand(message, event)
-        console.log(`[Discord Card Response Delivered]: Type -> ${responsePayload?.type}`)
-        return responsePayload
+      if (commandType === 1) {
+        if (commandName === 'card') {
+          const responsePayload = await handleCardCommand(message, event)
+          console.log(`[Discord Card Response Delivered]: Type -> ${responsePayload?.type}`)
+          return responsePayload
+        }
+
+        if (commandName === 'lb') {
+          const responsePayload = await handleLinerBattleCommand(message, event)
+          console.log(`[Discord Card Response Delivered]: Type -> ${responsePayload?.type}`)
+          return responsePayload
+        }
       }
 
-      if (commandName === 'lb') {
-        const responsePayload = await handleLinerBattleCommand(message, event)
-        console.log(`[Discord Card Response Delivered]: Type -> ${responsePayload?.type}`)
-        return responsePayload
+      if (commandType === 2) {
+        if (commandName === '🥐 送 1 個 Quaso') {
+          return await handleGiveQuasoContextMenu(message, event)
+        }
       }
 
       const handler = commandRegistry[commandName]
@@ -100,6 +110,13 @@ export default defineEventHandler(async (event) => {
         type: 7,
         data: buildPagerResponse(targetPage)
       }
+    }
+
+    if (customId === 'leaderboard_quaso_switch') {
+      const selectedMode = (message.data?.values?.[0] || 'received') as 'received' | 'sent'
+      const clickerId = String(message.member?.user?.id || message.user?.id || '')
+      const payload = await renderQuasoLeaderboardPayload(selectedMode, clickerId)
+      return { type: 7, data: payload }
     }
 
     return {

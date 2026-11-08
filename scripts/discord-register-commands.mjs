@@ -510,6 +510,23 @@ const forestCommands = [
                         required: false
                     }
                 ]
+            },
+            {
+                name: 'quaso',
+                description: '查看 Quaso (牛角包) 社交人氣與奉獻排行榜',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'mode',
+                        description: '排行榜模式 (預設為團寵人氣榜)',
+                        type: 3, // STRING
+                        required: false,
+                        choices: [
+                            { name: '🥐 團寵人氣榜 (收到最多)', value: 'received' },
+                            { name: '✨ 大善人奉獻榜 (送出最多)', value: 'sent' }
+                        ]
+                    }
+                ]
             }
         ]
     },
@@ -536,6 +553,10 @@ const forestCommands = [
           type: 1 // SUB_COMMAND
         }
       ]
+    },
+    {
+      name: '🥐 送 1 個 Quaso',
+      type: 2
     }
 ]
 

@@ -6,6 +6,123 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
+/**
+ * 構造 Quaso 排行榜專用下拉選單
+ */
+export function buildQuasoLeaderboardComponents(currentMode: 'received' | 'sent') {
+  return [
+    {
+      type: 1, // ACTION_ROW
+      components: [
+        {
+          type: 3, // STRING_SELECT
+          custom_id: 'leaderboard_quaso_switch',
+          placeholder: '⚡ 點擊切換 Quaso 排行榜模式...',
+          options: [
+            {
+              label: '🥐 團寵人氣榜 (收到最多)',
+              value: 'received',
+              description: '查看全伺服器累計獲得最多 Quaso 的人氣王',
+              emoji: { name: '🥐' },
+              default: currentMode === 'received'
+            },
+            {
+              label: '✨ 大善人奉獻榜 (送出最多)',
+              value: 'sent',
+              description: '查看最慷慨分享 Quaso 的大善人',
+              emoji: { name: '✨' },
+              default: currentMode === 'sent'
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+/**
+ * 渲染 Quaso 排行榜 Payload (純函數)
+ */
+export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', viewerId: string) {
+  const supabase = getSupabase()
+  const isReceived = mode === 'received'
+
+  // 1. 呼叫 Postgres 聚合 RPC 拿前 10 名
+  const { data: topList, error } = await supabase.rpc('get_quaso_leaderboard', {
+    p_mode: mode,
+    p_limit: 10
+  })
+
+  let rankContent = ''
+  if (error || !topList || topList.length === 0) {
+    rankContent = `🥐 **Quaso ${isReceived ? '團寵人氣榜' : '大善人奉獻榜'}** 尚無統計數據！快使用右鍵選單投遞第一個 Quaso 吧！`
+  } else {
+    rankContent = topList.map((item: any, idx: number) => {
+      const medals = ['🥇', '🥈', '🥉']
+      const prefix = medals[idx] || `\`#${idx + 1}\``
+      const name = item.username || `用戶_${String(item.user_id).slice(-4)}`
+      const actionText = isReceived ? '累計收穫' : '慷慨送出'
+      return `${prefix} **${name}** ➔ ${actionText} \`${item.total}\` 個 🥐`
+    }).join('\n')
+  }
+
+  // 2. 獨立查詢發起者個人戰績與今日剩餘 Quaso 額度
+  let personalBlock = ''
+  
+  // 查個人總量
+  let personalTotal = 0
+  if (isReceived) {
+    const { data } = await supabase
+      .schema('trpg')
+      .from('quaso_transactions')
+      .select('amount')
+      .eq('receiver_id', viewerId)
+    personalTotal = data?.reduce((acc, cur) => acc + cur.amount, 0) || 0
+  } else {
+    const { data } = await supabase
+      .schema('trpg')
+      .from('quaso_transactions')
+      .select('amount')
+      .eq('giver_id', viewerId)
+    personalTotal = data?.reduce((acc, cur) => acc + cur.amount, 0) || 0
+  }
+
+  // 查今日剩餘額度
+  const todayStr = new Date().toISOString().split('T')[0]
+  const { data: todayRecords } = await supabase
+    .schema('trpg')
+    .from('quaso_transactions')
+    .select('amount')
+    .eq('giver_id', viewerId)
+    .eq('give_date', todayStr)
+  
+  const todayUsed = todayRecords?.reduce((acc, cur) => acc + cur.amount, 0) || 0
+  const remainingToday = Math.max(0, 3 - todayUsed)
+
+  personalBlock = [
+    '',
+    '--- **你的 Quaso 檔案** ---',
+    `個人累計: ${isReceived ? '獲得' : '送出'} \`${personalTotal}\` 個 🥐`,
+    `今日可用額度: \`${remainingToday}/3\` 枚 (午夜 00:00 刷新)`
+  ].join('\n')
+
+  const title = isReceived ? '🥐 Quaso 團寵人氣排行榜 (收到最多)' : '✨ Quaso 大善人奉獻排行榜 (送出最多)'
+
+  return {
+    embeds: [{
+      title,
+      description: rankContent + '\n' + personalBlock,
+      color: isReceived ? 0xE67E22 : 0xF1C40F,
+      footer: {
+        text: '林間小鎮 社交激勵系統 · 對成員右鍵點選「Apps ➔ 🥐 送 1 個 Quaso」即可投遞',
+        icon_url: 'https://i.imgur.com/cu2YAkn.png'
+      },
+      timestamp: new Date().toISOString()
+    }],
+    components: buildQuasoLeaderboardComponents(mode)
+  }
+}
+
 export async function handleLeaderboardCommand(interaction: any, event: H3Event) {
   // ★ 嚴格獲取呼叫者字串 ID
   const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
@@ -139,6 +256,11 @@ export async function handleLeaderboardCommand(interaction: any, event: H3Event)
         }]
       }
     }
+  }
+  if (subCommand === 'quaso') {
+    const mode = subOptions.find((o: any) => o.name === 'mode')?.value || 'received'
+    const payload = await renderQuasoLeaderboardPayload(mode, callerId)
+    return { type: 4, data: payload }
   }
 
   return {
