@@ -149,7 +149,7 @@ const tabs = computed(() => {
                         <!-- 賽事結果 (引入我們寫好的總控台) -->
                         <template #result>
                             <div class="px-6 py-8 animate-fade-in">
-                                <Pb2ResultsDashboard :tournament-id="route.params.id" />
+                                <TournamentsMultiStageToggle :tournament-id="route.params.id" />
                             </div>
                         </template>
 

@@ -40,16 +40,15 @@ export default defineEventHandler(async (event) => {
     // 2. 數據清洗與變換 (Data Transformation)
     const formattedTeams = teams.map(team => {
 
-        // 防守型編程：不僅防 null，還要過濾出 Active 的現役成員！
-        // 這樣被 Traded 或 Released 的選手就不會變成幽靈人口出現在名單上
-        const activeMembers = team.team_members?.filter(tm => tm.status === 'active') || []
-
         // 壓平選手列表
-        const players = activeMembers.map(tm => ({
+        const rawMembers = team.team_members || []
+
+        const players = rawMembers.map(tm => ({
             id: tm.players?.id || null,
             name: tm.players?.nickname || 'Unknown',
             role: tm.role || 'Substitute',
-            avatar: tm.players?.profile_url || null // 修正為 profile_url
+            status: tm.status || 'Active', // 必須把 status 傳過來！
+            avatar: tm.players?.profile_url || null
         }))
 
         // 強制排序：隊長 > 隊員 > 替補

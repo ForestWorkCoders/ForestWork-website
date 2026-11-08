@@ -57,7 +57,6 @@ const activeComponent = computed(() => {
 </template>
 
 <style scoped>
-/* 一点点斯巴达式的过渡动画，不要太花哨 */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.15s ease;

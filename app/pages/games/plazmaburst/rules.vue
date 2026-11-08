@@ -1,5 +1,5 @@
 <script setup>
-const pdfUrl = '/docs/PlazmaBurstRule2025.pdf'
+const pdfUrl = '/docs/PlazmaBurstRule2024.pdf'
 
 const breadcrumbLinks = [
     { label: '首頁 · Home', icon: 'i-lucide-home', to: '/' },
