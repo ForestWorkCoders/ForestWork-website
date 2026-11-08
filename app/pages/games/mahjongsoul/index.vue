@@ -43,6 +43,14 @@ const paginatedPastTournaments = computed(() => {
     const end = start + itemsPerPage
     return allTournaments.value.past.slice(start, end)
 })
+
+useSeoMeta({
+  title: '雀魂麻将 | MahjongSoul | Forestwork',
+  ogTitle: () => '雀魂麻将 | MahjongSoul | Forestwork',
+  description: () => `查看雀魂麻将的即時戰況、積分排行榜與對局紀錄。`,
+  ogDescription: () => `查看雀魂麻将的即時戰況、積分排行榜與對局紀錄。`,
+  ogImage: () => 'https://forestwork.vercel.app/images/mahjongSoul/logo-white.png'
+})
 </script>
 
 <template>

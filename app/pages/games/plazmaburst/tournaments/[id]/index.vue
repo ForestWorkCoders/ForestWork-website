@@ -36,6 +36,16 @@ const tabs = computed(() => {
         { label: '直播記錄 · VODs', slot: 'vods' }
     ]
 })
+
+useSeoMeta({
+  title: () => tourney.value?.title 
+    ? `${tourney.value.title} · Plazma League` 
+    : 'Match Details · Plazma League',
+  ogTitle: () => tourney.value?.title ?? 'Plazma League Tournament',
+  description: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
+  ogDescription: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
+  ogImage: () => tourney.value?.imageUrl ?? 'https://efsheupssjxlmrfgmxwp.supabase.co/storage/v1/object/public/Mahjong/tournament_logo/forestwork.png'
+})
 </script>
 
 <template>

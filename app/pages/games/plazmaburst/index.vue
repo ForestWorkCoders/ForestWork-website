@@ -44,6 +44,14 @@ const paginatedPastTournaments = computed(() => {
     const end = start + itemsPerPage
     return allTournaments.value.past.slice(start, end)
 })
+
+useSeoMeta({
+  title: '超時空戰士2 | Plazma Burst 2 | Forestwork',
+  ogTitle: () => '超時空戰士2 | Plazma Burst 2 | Forestwork',
+  description: () => `查看超時空戰士2的即時戰況、積分排行榜與對局紀錄。`,
+  ogDescription: () => `查看超時空戰士2的即時戰況、積分排行榜與對局紀錄。`,
+  ogImage: () => 'https://forestwork.vercel.app/images/plazmaBurst/logo-white.png'
+})
 </script>
 
 <template>

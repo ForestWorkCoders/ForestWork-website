@@ -65,6 +65,17 @@ const tabs = computed(() => {
 
     return baseTabs
 })
+
+
+useSeoMeta({
+  title: () => tourney.value?.title 
+    ? `${tourney.value.title} · ForestWork Mahjong` 
+    : '賽事詳情 · ForestWork Mahjong',
+  ogTitle: () => tourney.value?.title ?? 'ForestWork Mahjong Tournament',
+  description: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
+  ogDescription: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況、積分排行榜與對局紀錄。`,
+  ogImage: () => tourney.value?.imageUrl ?? 'https://forestwork.vercel.app/default-og.png'
+})
 </script>
 
 <template>
