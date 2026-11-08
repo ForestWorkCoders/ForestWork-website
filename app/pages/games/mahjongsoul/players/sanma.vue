@@ -187,7 +187,9 @@ const basic = computed(() => statsData.value?.basicStats || {
     drawTenpaiRate: 0,
     avgWinScore: 0,
     avgDealInScore: 0,
-    avgWinTurn: 0
+    avgWinTurn: 0,
+    mrRating: '未定級（N/A）',
+    mrLabel: '當前賽季'
 })
 
 // 預設檢視模式：'win' (最大和牌) 或 'dealIn' (最近大銃)
@@ -487,7 +489,7 @@ const achievements = ref([
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <UButton v-if="myMahjongStatus?.linked && !isViewingSelf" size="xs" color="neutral" variant="soft"
-                        icon="i-heroicons-user" class="font-mono" @click="switchToMyself">
+                        icon="i-lucide-user" class="font-mono" @click="switchToMyself">
                         回我的主頁
                     </UButton>
 
@@ -627,8 +629,8 @@ const achievements = ref([
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-gray-800/40 p-3 rounded-lg border border-gray-100 dark:border-gray-800/80">
-                    <div class="text-xs text-gray-400">天梯等級</div>
-                    <div class="text-lg font-bold text-primary-500 mt-1">MR Rating</div>
+                    <div class="text-xs text-gray-400">天梯等級 ({{ basic.mrLabel }})</div>
+                    <div class="text-lg font-bold text-primary-500 mt-1">{{ basic.mrRating }}</div>
                 </div>
             </div>
         </div>
@@ -649,7 +651,7 @@ const achievements = ref([
                     <ClientOnly>
                         <VChart v-if="pieOption" :option="pieOption" class="w-full h-full" autoresize />
                         <template #fallback>
-                            <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
+                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
                         </template>
                     </ClientOnly>
                 </div>
@@ -669,7 +671,7 @@ const achievements = ref([
                     <ClientOnly>
                         <VChart v-if="radarOption" :option="radarOption" class="w-full h-full" autoresize />
                         <template #fallback>
-                            <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
+                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
                         </template>
                     </ClientOnly>
                 </div>
@@ -738,7 +740,7 @@ const achievements = ref([
                 <ClientOnly>
                     <VChart v-if="lineOption" :option="lineOption" class="w-full h-full" autoresize />
                     <template #fallback>
-                        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
+                        <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
                     </template>
                 </ClientOnly>
             </div>
@@ -763,7 +765,7 @@ const achievements = ref([
                     class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 hover:border-primary-500/50 hover:bg-primary-500/5 transition-all group cursor-pointer"
                     @click="inspectOpponent(opp.accountId)">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <UIcon name="i-heroicons-bars-3-bottom-left"
+                        <UIcon name="i-lucide-menu"
                             class="w-4 h-4 text-primary-500 shrink-0 group-hover:scale-110 transition-transform" />
                         <span
                             class="text-sm font-bold text-success-600 dark:text-success-400 truncate group-hover:underline">
@@ -831,7 +833,7 @@ const achievements = ref([
 
                         <UButton v-if="currentMajorHand.paipuId"
                             :to="`https://game.maj-soul.com/1/?paipu=${currentMajorHand.paipuId}`" target="_blank"
-                            size="xs" color="secondary" variant="soft" icon="i-heroicons-arrow-top-right-on-square"
+                            size="xs" color="secondary" variant="soft" icon="i-lucide-external-link"
                             class="font-mono text-gray-700 dark:text-gray-300 hover:text-primary-500">
                             觀看牌譜
                         </UButton>

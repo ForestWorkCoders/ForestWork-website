@@ -27,7 +27,7 @@ const dropdownItems = computed(() => [
   [
     {
       label: '登出系統',
-      icon: 'i-heroicons-arrow-left-on-rectangle',
+      icon: 'i-lucide-log-out',
       to: '/api/auth/logout',
       external: true,
       target: '_self'
@@ -103,7 +103,7 @@ const items = computed<NavigationMenuItem[]>(() => [
           <span class="text-xs font-mono text-emerald-400 font-bold hidden xl:inline-block pr-1">
             {{ user.username }}
           </span>
-          <UIcon name="i-heroicons-chevron-down-20-solid" class="w-4 h-4 text-slate-400" />
+          <UIcon name="i-lucide-chevron-down" class="w-4 h-4 text-slate-400" />
         </UButton>
 
         <!-- 自訂帳號標題插槽 -->
