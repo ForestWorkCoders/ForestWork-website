@@ -27,7 +27,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     icon: 'i-lucide-palette',
     defaultOpen: true, // 預設展開
     children: [
-      { label: '林間靈魂繪師', to: 'https://eaglepb2.github.io/gartic_phone/', target: '_blank' },
+      { label: '林間靈魂繪師', to: '/games/garticphone' },
       { label: '林間交換繪', to: 'https://kp06125.github.io/card/', target: '_blank' },
     ]
   },
