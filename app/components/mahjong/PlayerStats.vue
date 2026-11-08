@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed, h, resolveComponent } from 'vue'
+import { ref, computed } from 'vue'
+import { createSortableColumns } from '~/utils/table'
 import { use } from 'echarts/core'
 import { RadarChart } from 'echarts/charts'
 import { TooltipComponent } from 'echarts/components'
@@ -125,48 +126,8 @@ const items = [{
   icon: 'i-lucide-chart-pie'
 }]
 
-// 默认让 nickname 列死死钉在左侧
-const columnPinning = ref({
-  left: ['nickname'],
-  right: []
-})
 
-function buildSortableColumns(rawColumns) {
-  return rawColumns.map(col => ({
-    accessorKey: col.accessorKey,
-    header: ({ column }) => {
-      // 我们只保留 UIcon，抛弃 UButton
-      const UIcon = resolveComponent('UIcon')
-      const isSorted = column.getIsSorted()
-
-      // 直接渲染原生的 <button> 标签
-      return h('button', {
-        // 使用原生 flex 布局，加上 group 类名方便做悬停特效
-        class: 'flex items-center gap-1.5 focus:outline-none group w-full whitespace-nowrap flex-nowrap',
-        onClick: () => column.toggleSorting(isSorted === 'asc')
-      }, [
-        // 节点 1：确保绝对会渲染出来的表头文字
-        h('span', {
-          class: 'font-bold tracking-wider text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors whitespace-nowrap'
-        }, col.header),
-
-        // 节点 2：动态排序图标
-        h(UIcon, {
-          name: isSorted
-            ? (isSorted === 'asc' ? 'i-lucide-arrow-up-narrow-wide' : 'i-lucide-arrow-down-narrow-wide')
-            : 'i-lucide-arrow-up-down',
-          // 如果没排序，图标稍微变淡；排序了就高亮
-          class: [
-            'shrink-0 w-4 h-4',
-            isSorted ? 'text-emerald-500' : 'text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity'
-          ].join(' ')
-        })
-      ])
-    }
-  }))
-}
-
-const matchColumns = buildSortableColumns([
+const matchColumns = createSortableColumns([
   // 注意這裡：你的 SQL 返回的是 nickname，所以 accessorKey 必須是對應的字段名！
   { accessorKey: 'nickname', header: '选手' },
   { accessorKey: 'play_count', header: '场数' },
@@ -185,7 +146,14 @@ const matchColumns = buildSortableColumns([
   { accessorKey: 'lowest_point', header: '最低馬點' }
 ])
 
-const playstyleColumns = buildSortableColumns([
+const matchPercentStyles = [
+  { key: 'top_rate_pct', color: 'text-amber-500 dark:text-amber-400 font-semibold' },
+  { key: 'top2_rate_pct', color: 'text-blue-500 dark:text-blue-400 font-semibold' },
+  { key: 'avoid_last_rate_pct', color: 'text-emerald-500 dark:text-emerald-400 font-semibold' },
+  { key: 'busting_rate', color: 'text-red-500 dark:text-red-400 font-semibold' }
+]
+
+const playstyleColumns = createSortableColumns([
   { accessorKey: 'nickname', header: '选手' },
   { accessorKey: 'win_rate', header: '和牌率' },
   { accessorKey: 'deal_in_rate', header: '放铳率' },
@@ -203,7 +171,7 @@ const playstyleColumns = buildSortableColumns([
   { accessorKey: 'li_baopai_rate_pct', header: '里宝率' }
 ])
 
-const percentStyles = [
+const playPercentStyles = [
   { key: 'win_rate', color: 'text-emerald-500 dark:text-emerald-400' },
   { key: 'deal_in_rate', color: 'text-red-500 dark:text-red-400' },
   { key: 'tsumo_rate', color: 'text-blue-500 dark:text-blue-400' },
@@ -280,48 +248,52 @@ const percentStyles = [
         class="bg-white dark:bg-[#1e293b] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full overflow-hidden detailed-stats-section">
         <UTabs :items="items" default-value="match_stats" class="w-full">
 
+          <!-- 1. 宏观战绩 Tab -->
           <template #match>
-            <UTable v-model:column-pinning="columnPinning" :columns="matchColumns" :data="matchData" :ui="{
-              wrapper: 'overflow-x-auto w-full',
-              base: 'min-w-[1600px] border-collapse',
-              th: {
-                color: 'text-gray-500 dark:text-gray-400',
-                font: 'font-bold tracking-wider',
-                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]'
-              },
-              td: {
-                color: 'text-gray-900 dark:text-gray-200',
-                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50'
-              }
-            }">
+            <BaseEsportsTable :columns="matchColumns" :data="matchData" :loading="pending" :pinned-left="['nickname']"
+              min-width-class="min-w-[1600px]">
+              <!-- 选手列保持头像 + 名字 -->
               <template #nickname-cell="{ row }">
                 <div class="flex items-center gap-3">
                   <UAvatar :src="row.original.avatar" :alt="row.original.nickname" size="sm" />
-                  <span class="font-bold text-sm">{{ row.original.nickname }}</span>
+                  <span class="font-bold text-sm text-gray-900 dark:text-gray-100">{{ row.original.nickname }}</span>
                 </div>
               </template>
 
-              <template #avoid_last_rate_pct-cell="{ row }">
-                <span class="text-emerald-500 font-mono">{{ row.original.avoid_last_rate_pct }}%</span>
+              <!-- 平均顺位加粗高亮 -->
+              <template #avg_rank-cell="{ row }">
+                <span class="font-mono font-black text-amber-500 dark:text-amber-400 text-sm">
+                  {{ row.original.avg_rank != null ? row.original.avg_rank.toFixed(2) : '-' }}
+                </span>
               </template>
-            </UTable>
+
+              <!-- 核心优化：动态驱动所有百分比字段（一位率、连对率、避四率、被飞率），带防空与 % -->
+              <template v-for="col in matchPercentStyles" #[`${col.key}-cell`]="{ row }" :key="col.key">
+                <span :class="['font-mono text-sm', col.color]">
+                  {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '-' }}
+                </span>
+              </template>
+
+              <!-- 最高马点（正分高光绿） -->
+              <template #highest_point-cell="{ row }">
+                <span class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                  {{ row.original.highest_point != null ? `+${row.original.highest_point}` : '-' }}
+                </span>
+              </template>
+
+              <!-- 最低马点（负分警示红） -->
+              <template #lowest_point-cell="{ row }">
+                <span class="font-mono font-semibold text-red-600 dark:text-red-400">
+                  {{ row.original.lowest_point ?? '-' }}
+                </span>
+              </template>
+            </BaseEsportsTable>
           </template>
 
+          <!-- 2. 打法风格 Tab -->
           <template #playstyle>
-            <UTable v-model:column-pinning="columnPinning" :columns="playstyleColumns" :data="playstyleData" :ui="{
-              wrapper: 'overflow-x-auto w-full',
-              base: 'min-w-[1800px]', /* 随着列数增加，稍微放宽基础宽度 */
-              th: {
-                color: 'text-gray-500 dark:text-gray-400',
-                font: 'font-bold tracking-wider',
-                base: 'whitespace-nowrap px-4 py-4 bg-gray-50 dark:bg-[#18212f]'
-              },
-              td: {
-                color: 'text-gray-900 dark:text-gray-200',
-                base: 'px-4 py-3 border-b border-gray-50 dark:border-gray-800/50'
-              }
-            }">
-
+            <BaseEsportsTable :columns="playstyleColumns" :data="playstyleData" :loading="playstylePending"
+              :pinned-left="['nickname']" min-width-class="min-w-[1800px]">
               <template #nickname-cell="{ row }">
                 <div class="flex items-center gap-3">
                   <UAvatar :src="row.original.avatar" :alt="row.original.nickname" size="sm" />
@@ -329,7 +301,7 @@ const percentStyles = [
                 </div>
               </template>
 
-              <template v-for="col in percentStyles" #[`${col.key}-cell`]="{ row }" :key="col.key">
+              <template v-for="col in playPercentStyles" #[`${col.key}-cell`]="{ row }" :key="col.key">
                 <span :class="['font-mono', col.color]">
                   {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '-' }}
                 </span>
@@ -352,8 +324,7 @@ const percentStyles = [
                   {{ row.original.avg_baopai ?? '-' }}
                 </span>
               </template>
-
-            </UTable>
+            </BaseEsportsTable>
           </template>
 
         </UTabs>
