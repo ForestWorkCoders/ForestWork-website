@@ -14,7 +14,8 @@
     "discord:register-commands": "node --env-file=.env scripts/discord-register-commands.mjs",
     "gartic:split": "node scripts/garticPhone-split-album.mjs",
     "gartic:sync": "node --env-file=.env scripts/garticPhone-sync-manifest.js",
-    "ctf:hash": "node scripts/hash-flag.mjs"
+    "ctf:hash": "node scripts/hash-flag.mjs",
+    "mahjong:recalculate": "npx tsx --env-file=.env scripts/mahjongSoul-recalculate-mr.ts"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.117",
