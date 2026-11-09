@@ -400,21 +400,18 @@ export type Database = {
           account_id: number
           discord_id: number | null
           id: number
-          mr_points: number
           nickname: string
         }
         Insert: {
           account_id: number
           discord_id?: number | null
           id?: number
-          mr_points?: number
           nickname: string
         }
         Update: {
           account_id?: number
           discord_id?: number | null
           id?: number
-          mr_points?: number
           nickname?: string
         }
         Relationships: []
@@ -450,6 +447,27 @@ export type Database = {
             referencedColumns: ["account_id"]
           },
         ]
+      }
+      recent_pairings: {
+        Row: {
+          channel_id: string
+          created_at: string | null
+          id: number
+          triplets: Json
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          id?: number
+          triplets: Json
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          id?: number
+          triplets?: Json
+        }
+        Relationships: []
       }
       rules: {
         Row: {
@@ -1195,34 +1213,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_quaso_leaderboard: {
-        Args: { p_limit?: number; p_mode: string }
-        Returns: {
-          total: number
-          user_id: string
-          username: string
-        }[]
-      }
-      give_quaso: {
-        Args: {
-          p_amount: number
-          p_giver_id: string
-          p_giver_name: string
-          p_receiver_id: string
-          p_receiver_name: string
-        }
-        Returns: Json
-      }
-      increment_curse_count: {
-        Args: {
-          p_curse_delta: number
-          p_msg_delta: number
-          p_user_id: string
-          p_username: string
-          p_year: number
-        }
-        Returns: undefined
-      }
       update_user_data:
         | {
             Args: {
@@ -1452,6 +1442,26 @@ export type Database = {
           user_id: string
           username: string
         }[]
+      }
+      give_quaso: {
+        Args: {
+          p_amount: number
+          p_giver_id: string
+          p_giver_name: string
+          p_receiver_id: string
+          p_receiver_name: string
+        }
+        Returns: Json
+      }
+      increment_curse_count: {
+        Args: {
+          p_curse_delta: number
+          p_msg_delta: number
+          p_user_id: string
+          p_username: string
+          p_year: number
+        }
+        Returns: undefined
       }
     }
     Enums: {

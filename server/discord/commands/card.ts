@@ -1,17 +1,9 @@
 // server/discord/commands/card.ts
 import type { H3Event } from 'h3'
-import { createClient } from '@supabase/supabase-js'
 import { put } from '@vercel/blob'
-import { getInteractionOption } from '../utils'
 import { COC_SKILL_CATEGORIES, BASE_ATTR_KEYS } from '../assets/coc-skills'
 import { parseCharacterCard } from '../utils/cocParser'
-
-// 1. 获取 Supabase 管理端客户端
-function getSupabase() {
-  const url = process.env.SUPABASE_URL || ''
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || ''
-  return createClient(url, serviceKey)
-}
+import { getSupabase } from '../../utils/supabase'
 
 // 2. 格式化单张角色卡为精美的 Discord Embed (完整防弹版，消灭 ReferenceError)
 function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
