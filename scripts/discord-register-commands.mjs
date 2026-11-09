@@ -66,6 +66,12 @@ const diceCommands = [
                 type: 4, // INTEGER
                 required: false,
                 min_value: 1
+            },
+            {
+                name: 'secret',
+                description: '是否進行暗骰 (僅自己可見)',
+                type: 5, // BOOLEAN
+                required: false
             }
         ]
     },
@@ -114,6 +120,12 @@ const diceCommands = [
                 name: 'desc',
                 description: '檢定備註 (例: 力量檢定、敏捷豁免)',
                 type: 3, // STRING
+                required: false
+            },
+            {
+                name: 'secret',
+                description: '是否進行暗骰 (僅自己可見)',
+                type: 5, // BOOLEAN
                 required: false
             }
         ]
