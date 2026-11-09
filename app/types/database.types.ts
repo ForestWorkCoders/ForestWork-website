@@ -1447,6 +1447,36 @@ export type Database = {
         }
         Relationships: []
       }
+      skill_test_attempts: {
+        Row: {
+          created_at: string
+          discord_id: number
+          id: string
+          metrics: Json
+          module_id: number
+          rating: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          discord_id: number
+          id?: string
+          metrics?: Json
+          module_id: number
+          rating?: string
+          score: number
+        }
+        Update: {
+          created_at?: string
+          discord_id?: number
+          id?: string
+          metrics?: Json
+          module_id?: number
+          rating?: string
+          score?: number
+        }
+        Relationships: []
+      }
       sync_cursors: {
         Row: {
           channel_id: string
@@ -1467,7 +1497,29 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_skill_leaderboard: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          discord_id: string | null
+          global_rank: number | null
+          metrics: Json | null
+          module_id: number | null
+          operator_name: string | null
+          rating: string | null
+          score: number | null
+        }
+        Relationships: []
+      }
+      v_skill_personal_bests: {
+        Row: {
+          best_score: number | null
+          discord_id: string | null
+          last_achieved_at: string | null
+          module_id: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       activate_character: {
