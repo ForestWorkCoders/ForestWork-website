@@ -26,33 +26,48 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (botToken) {
-    try {
-      const memberRes = await fetch(
-        `https://discord.com/api/v10/guilds/${guildId}/members/${session.id}`,
-        {
-          headers: {
-            Authorization: `Bot ${botToken}`,
-            'User-Agent': 'ForestWork-CTF-Mainframe/1.0'
-          }
-        }
-      )
+  if (!botToken) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Server is missing DISCORD_BOT_TOKEN, so membership cannot be checked.'
+    })
+  }
 
-      // 404 代表該 Discord 帳號根本沒有加入伺服器
-      if (memberRes.status === 404) {
-        return {
-          success: false,
-          message: '[-] ACCESS DENIED: Operator is not enlisted in ForestWork headquarters.\n[SYSTEM] Join our Discord first: https://discord.com/servers/510192195509157909'
-        }
-      }
+  // Only a member answer (200) lets the flag through. 404 = not in the server;
+  // any other answer, a timeout or a network error = can't check right now, so nothing is saved.
+  const unverified = {
+    success: false,
+    message: '[-] MEMBERSHIP CHECK UNAVAILABLE: Discord could not confirm your membership right now.\n[SYSTEM] Nothing was submitted. Try again in a minute.'
+  }
 
-      if (!memberRes.ok) {
-        console.warn(`[CTF-AUTH] Discord API responded with HTTP ${memberRes.status} for user ${session.id}`)
+  let memberRes: Response
+  try {
+    memberRes = await fetch(
+      `https://discord.com/api/v10/guilds/${guildId}/members/${session.id}`,
+      {
+        headers: {
+          Authorization: `Bot ${botToken}`,
+          'User-Agent': 'ForestWork-CTF-Mainframe/1.0'
+        },
+        signal: AbortSignal.timeout(5000)
       }
-    } catch (err: any) {
-      console.error('[-] Failed to query Discord Guild API:', err.message)
-      // 網路超時或 Discord 故障時可選擇放行或報錯，保證高可用
+    )
+  } catch (err: any) {
+    console.error('[CTF-AUTH] Discord guild member check failed:', err.message)
+    return unverified
+  }
+
+  // 404 代表該 Discord 帳號根本沒有加入伺服器
+  if (memberRes.status === 404) {
+    return {
+      success: false,
+      message: '[-] ACCESS DENIED: Operator is not enlisted in ForestWork headquarters.\n[SYSTEM] Join our Discord first: https://discord.com/servers/510192195509157909'
     }
+  }
+
+  if (!memberRes.ok) {
+    console.error(`[CTF-AUTH] Discord API responded with HTTP ${memberRes.status} for the member check`)
+    return unverified
   }
 
   // 获取真实 Discord 64 位整数 Snowflake ID
