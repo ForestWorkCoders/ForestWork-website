@@ -3,7 +3,7 @@ import { serverSupabaseServiceRole} from '#supabase/server'
 import { unsealSessionData } from '../../utils/session'
 
 interface SubmitBody {
-  discordId?: string
+  authTicket?: string // signed by /api/activities/auth
   moduleId?: number
   score?: number
   rating?: string
@@ -30,16 +30,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid score: Must be between 0 and 50000.' })
   }
 
-  // 3. 选手身份提取与防护
-  let rawDiscordId = String(body?.discordId || '').trim()
+  // 3. The player is whoever the signed ticket says, never an ID from the body.
+  //    Outside production, a missing or bad ticket falls back to the 10001 sandbox player.
+  const session = unsealSessionData(body?.authTicket)
+  let rawDiscordId = session?.id ? String(session.id) : ''
 
-  // ★★★ 核心修复：移除反斜杠转义！使用标准的 /^\d{17,20}\$/ 匹配 17~20 位真实 Snowflake ★★★
   if (!/^\d{17,20}$/.test(rawDiscordId)) {
-    if (process.env.NODE_ENV !== 'production' || rawDiscordId === '10001') {
-      rawDiscordId = '10001' // 开发环境沙盒测试账号
-    } else {
-      throw createError({ statusCode: 401, statusMessage: 'Unauthorized: Valid Discord Snowflake required.' })
+    if (process.env.NODE_ENV === 'production') {
+      throw createError({ statusCode: 401, statusMessage: 'Unauthorized: valid activity ticket required.' })
     }
+    rawDiscordId = '10001'
   }
 
   // 4. ★ 核心加固：使用 ServiceRole 执行特权写入，彻底免疫任何 RLS 意外拦截！[cite: 27]
