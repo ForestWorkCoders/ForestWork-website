@@ -1,5 +1,5 @@
 // server/api/activities/auth.post.ts
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 import { sealSessionData } from '../../utils/session'
 
 interface AuthBody {
@@ -69,20 +69,25 @@ export default defineEventHandler(async (event) => {
 
   // 4. 核心好品味：顺手无缝沉淀进全站公共名册 public.participant_data
   try {
-    const supabase = await serverSupabaseClient(event)
+    const supabase = await serverSupabaseServiceRole(event)
     await supabase
       .schema('public')
       .from('participant_data')
       .upsert({
-        discord_id: user.id as unknown as number, // 保持字符串纯度防精度截断
+        discord_id: user.id, // 保持字符串纯度防精度截断
         discord_username: rawUsername,
         discord_nickname: rawNickname,
         profile_img: avatarUrl
       }, {
         onConflict: 'discord_id'
       })
+    console.log(`[+] [Activity Auth] 成功同步玩家档案: ${rawUsername} (${user.id})`)
   } catch (err: any) {
-    console.warn('[Activity Auth] Participant名册写入跳过:', err.message)
+    console.error('[-] [Activity Auth] Participant名册写入失败:', {
+      code: err.code,
+      message: err.message,
+      details: err.details
+    })
   }
 
   const authTicket = sealSessionData({

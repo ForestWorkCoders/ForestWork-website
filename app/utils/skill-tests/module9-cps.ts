@@ -1,5 +1,14 @@
 // app/utils/skill-tests/module9-cps.ts
-import type { SkillModuleInstance, SkillGameContext, ModuleResultSummary } from './types'
+import {
+  STAGE_WIDTH,
+  STAGE_CENTER_X,
+  STAGE_CENTER_Y,
+  type SkillModuleInstance,
+  type SkillGameContext,
+  type ModuleResultSummary,
+  type Circle,
+  type Rect
+} from './types'
 
 type CpsStatus = 'IDLE' | 'RUNNING' | 'STAGE_COMPLETE' | 'FINISHED'
 
@@ -15,6 +24,11 @@ interface StageResult {
   clicks: number
   cps: number
   score: number
+}
+
+// 纯函数辅助：标准点在矩形内判定 (消除重复手搓)
+function isInsideRect(x: number, y: number, r: Rect): boolean {
+  return x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h
 }
 
 const STAGES: StageConfig[] = [
@@ -33,9 +47,9 @@ const STAGES: StageConfig[] = [
 ]
 
 export class Module9Cps implements SkillModuleInstance {
-  id = 9
-  title = 'Chrono Tap // 10s 爆發點擊基準'
-  readonly durationMs = 0 // 阶段制，不受 60s 倒计时强行截断
+  readonly id = 9
+  readonly title = 'Chrono Tap // 10s 爆發點擊基準'
+  readonly durationMs = 0 // 阶段制，不受 60s 倒计时截断
   isCompleted = false
 
   private context!: SkillGameContext
@@ -46,29 +60,43 @@ export class Module9Cps implements SkillModuleInstance {
   private readonly stageDurationMs = 10000
   private stageResults: StageResult[] = []
 
-  private readonly circle = { x: 400, y: 300, r: 120 }
-  private readonly nextBtn = { x: 280, y: 390, w: 240, h: 54 }
-  private readonly finishBtn = { x: 280, y: 460, w: 240, h: 50 }
+  // 1. 图元与包围盒正规化 (由视口物理常量推导，消灭魔数)
+  private readonly circle: Circle = {
+    x: STAGE_CENTER_X,
+    y: STAGE_CENTER_Y,
+    r: 120
+  }
+  private readonly nextBtn: Rect = {
+    x: (STAGE_WIDTH - 240) / 2, // 280 (自动居中)
+    y: 390,
+    w: 240,
+    h: 54
+  }
+  private readonly finishBtn: Rect = {
+    x: (STAGE_WIDTH - 240) / 2,
+    y: 460,
+    w: 240,
+    h: 50
+  }
 
-  init(context: SkillGameContext) {
+  init(context: SkillGameContext): void {
     this.context = context
     this.stageResults = []
     this.isCompleted = false
     this.resetStage(0)
   }
 
-  private resetStage(idx: number) {
+  private resetStage(idx: number): void {
     this.stageIndex = idx
     this.status = 'IDLE'
     this.validClicks = 0
     this.startTime = 0
   }
 
-  onPointerDown(mx: number, my: number, now: number, button = 0) {
+  onPointerDown(mx: number, my: number, now: number, button = 0): void {
     // 1. 阶段完成过渡屏：点击 Next Stage 按钮
     if (this.status === 'STAGE_COMPLETE') {
-      const btn = this.nextBtn
-      if (mx >= btn.x && mx <= btn.x + btn.w && my >= btn.y && my <= btn.y + btn.h) {
+      if (isInsideRect(mx, my, this.nextBtn)) {
         this.resetStage(1) // 切换至 Stage 2
       }
       return
@@ -76,8 +104,7 @@ export class Module9Cps implements SkillModuleInstance {
 
     // 2. 最终总结算大屏：点击查看总评按钮
     if (this.status === 'FINISHED') {
-      const btn = this.finishBtn
-      if (mx >= btn.x && mx <= btn.x + btn.w && my >= btn.y && my <= btn.y + btn.h) {
+      if (isInsideRect(mx, my, this.finishBtn)) {
         this.isCompleted = true // 触发宿主结算弹窗
       }
       return
@@ -96,7 +123,6 @@ export class Module9Cps implements SkillModuleInstance {
       this.status = 'RUNNING'
       this.startTime = now
       this.validClicks = 1
-      // ★ 核心好品味：不传 x, y，消除飘字粒子压力，纯粹累加顶栏分数
       this.context.addScore(50)
       return
     }
@@ -110,7 +136,7 @@ export class Module9Cps implements SkillModuleInstance {
     }
   }
 
-  private concludeCurrentStage() {
+  private concludeCurrentStage(): void {
     const cps = Number((this.validClicks / 10).toFixed(2))
     const score = this.validClicks * 50
 
@@ -129,7 +155,7 @@ export class Module9Cps implements SkillModuleInstance {
     }
   }
 
-  update(dt: number, now: number, elapsed: number) {
+  update(dt: number, now: number, elapsed: number): void {
     if (this.status !== 'RUNNING') return
 
     const stageElapsed = now - this.startTime
@@ -138,7 +164,7 @@ export class Module9Cps implements SkillModuleInstance {
     }
   }
 
-  render(ctx: CanvasRenderingContext2D, now: number, elapsed: number = 0) {
+  render(ctx: CanvasRenderingContext2D, now: number, elapsed: number = 0): void {
     // ==========================================
     // 视图 A：Stage 1 过渡结算卡片
     // ==========================================
@@ -149,15 +175,15 @@ export class Module9Cps implements SkillModuleInstance {
       ctx.textAlign = 'center'
       ctx.fillStyle = '#a1a1aa'
       ctx.font = '20px ui-monospace, monospace'
-      ctx.fillText(`${res.stageName} 測定完成`, 400, 170)
+      ctx.fillText(`${res.stageName} 測定完成`, STAGE_CENTER_X, 170)
 
       ctx.fillStyle = '#4ade80'
       ctx.font = 'bold 54px ui-monospace, monospace'
-      ctx.fillText(`${res.cps} CPS`, 400, 250)
+      ctx.fillText(`${res.cps} CPS`, STAGE_CENTER_X, 250)
 
       ctx.fillStyle = '#e4e4e7'
       ctx.font = '18px ui-monospace, monospace'
-      ctx.fillText(`有效點擊: ${res.clicks} 次 | 本段戰術分: ${res.score} PTS`, 400, 310)
+      ctx.fillText(`有效點擊: ${res.clicks} 次 | 本段戰術分: ${res.score} PTS`, STAGE_CENTER_X, 310)
 
       const btn = this.nextBtn
       ctx.fillStyle = '#2563eb'
@@ -179,12 +205,12 @@ export class Module9Cps implements SkillModuleInstance {
       ctx.textAlign = 'center'
       ctx.fillStyle = '#f4f4f5'
       ctx.font = '28px ui-monospace, monospace'
-      ctx.fillText('CHRONO TAP // 爆發點擊基準完成', 400, 90)
+      ctx.fillText('CHRONO TAP // 爆發點擊基準完成', STAGE_CENTER_X, 90)
 
       const totalScore = this.stageResults.reduce((sum, r) => sum + r.score, 0)
       ctx.font = 'bold 26px ui-monospace, monospace'
       ctx.fillStyle = '#4ade80'
-      ctx.fillText(`總獲得積分: ${totalScore} PTS`, 400, 140)
+      ctx.fillText(`總獲得積分: ${totalScore} PTS`, STAGE_CENTER_X, 140)
 
       ctx.textAlign = 'left'
       const startY = 210
@@ -245,7 +271,6 @@ export class Module9Cps implements SkillModuleInstance {
       ctx.font = 'bold 64px ui-monospace, monospace'
       ctx.fillText(String(this.validClicks), c.x, c.y + 22)
 
-      // 绘制当前阶段微型倒计时
       const leftSec = Math.max(0, (this.stageDurationMs - (now - this.startTime)) / 1000).toFixed(1)
       ctx.font = 'bold 16px ui-monospace, monospace'
       ctx.fillStyle = '#facc15'
@@ -262,31 +287,44 @@ export class Module9Cps implements SkillModuleInstance {
     // 顶部战术指引
     ctx.fillStyle = '#facc15'
     ctx.font = '20px ui-monospace, monospace'
-    ctx.fillText(cfg.name, 400, 70)
+    ctx.fillText(cfg.name, STAGE_CENTER_X, 70)
 
     ctx.fillStyle = '#e4e4e7'
     ctx.font = '15px ui-monospace, monospace'
-    ctx.fillText(cfg.instruction, 400, 105)
+    ctx.fillText(cfg.instruction, STAGE_CENTER_X, 105)
   }
 
+  // ★ 核心修复：彻底清空所有状态机变量，拒绝脏内存污染！
+  cleanup(): void {
+    this.stageResults = []
+    this.stageIndex = 0
+    this.validClicks = 0
+    this.startTime = 0
+    this.status = 'IDLE'
+    this.isCompleted = false
+  }
+
+  // ★★★ 核心修复：100% 由对局双阶段真实 CPS 严密派生 ★★★
   getResultSummary(): ModuleResultSummary {
     const s1 = this.stageResults[0]
     const s2 = this.stageResults[1]
     const peakCps = Math.max(s1?.cps ?? 0, s2?.cps ?? 0)
+    const totalClicks = (s1?.clicks ?? 0) + (s2?.clicks ?? 0)
+
+    const rating = peakCps >= 15
+      ? 'FLAWLESS ACE'
+      : peakCps >= 10
+        ? 'BURST CADENCE'
+        : 'STANDARD CADENCE'
 
     return {
-      rating: peakCps >= 14 ? 'FLAWLESS ACE' : 'BURST CADENCE',
+      rating,
       metrics: [
-        { value: `${s1?.cps ?? 0}`, label: 'STAGE 1 CPS', badge: 'SINGLE' },
-        { value: `${s2?.cps ?? 0}`, label: 'STAGE 2 CPS', badge: 'BUTTERFLY' },
-        { value: `${peakCps}`, label: 'PEAK CPS', badge: 'x1.50' },
-        { value: `${(s1?.clicks ?? 0) + (s2?.clicks ?? 0)}`, label: 'TOTAL CLICKS' }
+        { value: `${s1?.cps ?? 0}`, label: 'STAGE 1 CPS', badge: (s1?.cps ?? 0) >= 10 ? 'SINGLE' : undefined },
+        { value: `${s2?.cps ?? 0}`, label: 'STAGE 2 CPS', badge: (s2?.cps ?? 0) >= 14 ? 'BUTTERFLY' : undefined },
+        { value: `${peakCps}`, label: 'PEAK CPS', badge: peakCps >= 15 ? 'x2.00' : 'PEAK' },
+        { value: String(totalClicks), label: 'TOTAL CLICKS' }
       ]
     }
-  }
-
-  cleanup() {
-    this.stageResults = []
-    this.isCompleted = false
   }
 }

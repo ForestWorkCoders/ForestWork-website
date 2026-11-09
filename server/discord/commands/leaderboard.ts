@@ -357,7 +357,7 @@ const SKILL_MODULES: Record<number, SkillModuleMeta> = {
   5: { id: 5, title: '05. REACTION', code: 'MOD_REACT_05', category: 'REFLEX KINETICS', emoji: '⚡', color: 0xA855F7, status: 'ready' },
   6: { id: 6, title: '06. APEX TRACK', code: 'MOD_TRACK_06', category: 'DYNAMIC PURSUIT', emoji: '📈', color: 0xEC4899, status: 'ready' },
   7: { id: 7, title: '07. BUFFER FLUSH', code: 'SYS_LOCK_07', category: 'MEMORY CAPACITY', emoji: '🔒', color: 0x52525B, status: 'locked' },
-  8: { id: 8, title: '08. RAPID STRAFE', code: 'SYS_LOCK_08', category: 'SPATIAL AGILITY', emoji: '🔒', color: 0x52525B, status: 'locked' },
+  8: { id: 8, title: '08. PIANO CADENCE', code: 'MOD_TILES_08', category: 'FOUR-LANE CADENCE', emoji: '🎹', color: 0x52525B, status: 'ready' },
   9: { id: 9, title: '09. CHRONO TAP', code: 'MOD_CPS_09', category: 'TEMPORAL CADENCE', emoji: '🔥', color: 0x06B6D4, status: 'ready' },
   10: { id: 10, title: '10. OVERCLOCK', code: 'SYS_LOCK_10', category: 'LIMITER BREAKTHROUGH', emoji: '🔒', color: 0x52525B, status: 'locked' }
 }

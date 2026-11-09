@@ -1,5 +1,17 @@
 // app/utils/skill-tests/module5-reaction.ts
-import type { SkillModuleInstance, SkillGameContext, ModuleResultSummary } from './types'
+import {
+  STAGE_WIDTH,
+  STAGE_HEIGHT,
+  STAGE_CENTER_X,
+  STAGE_CENTER_Y,
+  type SkillModuleInstance,
+  type SkillGameContext,
+  type ModuleResultSummary,
+  type Point,
+  type Rect
+} from './types'
+import { rand, shuffle } from './math'
+
 type StageStatus = 'WAITING' | 'ACTIVE' | 'PENALTY_FREEZE' | 'STAGE_COMPLETE'
 
 interface Stage3Data {
@@ -17,7 +29,7 @@ interface Stage4Data {
   signalTime: number
   targetIndex: number
   boxSize: number
-  boxes: Array<{ x: number; y: number }>
+  boxes: Point[]
 }
 
 interface Stage5Data {
@@ -28,10 +40,10 @@ interface Stage5Data {
 }
 
 export class Module5Reaction implements SkillModuleInstance {
-  id = 5
-  title = '5-Stage Reaction // 綜合反應時基準'
+  readonly id = 5
+  readonly title = '5-Stage Reaction // 綜合反應時基準'
+  readonly durationMs = 0 // 阶段制，不受 60s 倒计时截断
   isCompleted = false
-  durationMs = 0
 
   private context!: SkillGameContext
   private stepIndex = 0
@@ -42,11 +54,20 @@ export class Module5Reaction implements SkillModuleInstance {
   private lastReactionMs = 0
   private penaltyUntil = 0
 
-  private readonly nextBtn = { x: 280, y: 380, w: 240, h: 54 }
+  // 1. 真实遥测数据 (彻底告别假数据)
+  private falseStarts = 0
+
+  // 2. 交互图元结构收敛为标准 Rect
+  private readonly nextBtn: Rect = {
+    x: 280,
+    y: 380,
+    w: 240,
+    h: 54
+  }
 
   private s1SignalTime = 0
   private s2Data = { lightStartTime: 0, f1TotalLights: 0, signalTime: 0 }
-  private s3Data: Stage3Data = { scopeR: 170, dir: 1, speed: 850, radius: 20, x: 0, y: 300, spawnDelay: 0, isMoving: false }
+  private s3Data: Stage3Data = { scopeR: 170, dir: 1, speed: 850, radius: 20, x: 0, y: STAGE_CENTER_Y, spawnDelay: 0, isMoving: false }
   private s4Data: Stage4Data = { signalTime: 0, targetIndex: 0, boxSize: 54, boxes: [] }
   private s5Data: Stage5Data = { nonGreenColors: ['#f43f5e', '#38bdf8', '#c084fc', '#fb923c', '#facc15'], currentColor: '#f43f5e', nextColorTime: 0, isGreen: false }
 
@@ -58,48 +79,32 @@ export class Module5Reaction implements SkillModuleInstance {
     'Stage 5 (綠燈選擇抑制)'
   ]
 
-  init(context: SkillGameContext) {
+  init(context: SkillGameContext): void {
     this.context = context
     this.stepIndex = 0
-    this.stageOrder = this.shuffle([0, 1, 2, 3, 4])
+    this.stageOrder = shuffle([0, 1, 2, 3, 4])
     this.stageTimes = [0, 0, 0, 0, 0]
     this.status = 'WAITING'
+    this.falseStarts = 0
     this.isCompleted = false
     this.initCurrentStage(performance.now())
-  }
-
-  private rand(min: number, max: number): number {
-    return Math.random() * (max - min) + min
-  }
-
-  private shuffle(arr: number[]): number[] {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      const tempI = arr[i]
-      const tempJ = arr[j]
-      if (tempI !== undefined && tempJ !== undefined) {
-        arr[i] = tempJ
-        arr[j] = tempI
-      }
-    }
-    return arr
   }
 
   private getActiveStageId(): number {
     return this.stageOrder[this.stepIndex] ?? 0
   }
 
-  private initCurrentStage(now: number) {
+  private initCurrentStage(now: number): void {
     this.status = 'WAITING'
     this.triggerTime = 0
     const stageId = this.getActiveStageId()
 
     if (stageId === 0) {
-      this.s1SignalTime = now + this.rand(1500, 4000)
+      this.s1SignalTime = now + rand(1500, 4000)
     } else if (stageId === 1) {
       this.s2Data.lightStartTime = now
       this.s2Data.f1TotalLights = 0
-      this.s2Data.signalTime = now + 4000 + this.rand(1000, 2500)
+      this.s2Data.signalTime = now + 4000 + rand(1000, 2500)
     } else if (stageId === 2) {
       const dir = Math.random() < 0.5 ? 1 : -1
       const scopeR = 170
@@ -109,13 +114,13 @@ export class Module5Reaction implements SkillModuleInstance {
         dir,
         speed: 850,
         radius,
-        x: dir === 1 ? (400 - scopeR - radius) : (400 + scopeR + radius),
-        y: 300,
-        spawnDelay: now + this.rand(1200, 2500),
+        x: dir === 1 ? (STAGE_CENTER_X - scopeR - radius) : (STAGE_CENTER_X + scopeR + radius),
+        y: STAGE_CENTER_Y,
+        spawnDelay: now + rand(1200, 2500),
         isMoving: false
       }
     } else if (stageId === 3) {
-      const boxes: Array<{ x: number; y: number }> = []
+      const boxes: Point[] = []
       const boxSize = 54
       const cellW = 200
       const cellH = 150
@@ -124,15 +129,15 @@ export class Module5Reaction implements SkillModuleInstance {
       for (let r = 0; r < 4; r++) {
         for (let c = 0; c < 4; c++) {
           boxes.push({
-            x: this.rand(c * cellW + pad, (c + 1) * cellW - boxSize - pad),
-            y: this.rand(r * cellH + pad, (r + 1) * cellH - boxSize - pad)
+            x: rand(c * cellW + pad, (c + 1) * cellW - boxSize - pad),
+            y: rand(r * cellH + pad, (r + 1) * cellH - boxSize - pad)
           })
         }
       }
 
       this.s4Data = {
-        signalTime: now + this.rand(1500, 3500),
-        targetIndex: Math.floor(this.rand(0, 16)),
+        signalTime: now + rand(1500, 3500),
+        targetIndex: Math.floor(rand(0, 16)),
         boxSize,
         boxes
       }
@@ -140,21 +145,22 @@ export class Module5Reaction implements SkillModuleInstance {
       const nonGreen = ['#f43f5e', '#38bdf8', '#c084fc', '#fb923c', '#facc15']
       this.s5Data = {
         nonGreenColors: nonGreen,
-        currentColor: nonGreen[Math.floor(this.rand(0, nonGreen.length))] || '#f43f5e',
-        nextColorTime: now + this.rand(1000, 3000),
+        currentColor: nonGreen[Math.floor(rand(0, nonGreen.length))] || '#f43f5e',
+        nextColorTime: now + rand(1000, 3000),
         isGreen: false
       }
     }
   }
 
-  private triggerEarlyMistake(now: number) {
+  private triggerEarlyMistake(now: number): void {
+    // ★ 核心遥测：准确记录抢跑失误
+    this.falseStarts++
     this.status = 'PENALTY_FREEZE'
     this.penaltyUntil = now + 1000
-    // 抢跑严厉扣除战术积分
-    this.context.addScore(-250, 400, 300, '#ef4444')
+    this.context.addScore(-250, STAGE_CENTER_X, STAGE_CENTER_Y, '#ef4444')
   }
 
-  onPointerDown(mx: number, my: number, now: number) {
+  onPointerDown(mx: number, my: number, now: number): void {
     if (this.status === 'PENALTY_FREEZE' || this.isCompleted) return
 
     if (this.status === 'WAITING') {
@@ -168,9 +174,8 @@ export class Module5Reaction implements SkillModuleInstance {
       this.stageTimes[stageId] = reactionMs
       this.lastReactionMs = reactionMs
 
-      // ★ 核心战术积分映射：基础 3000 分，依毫秒衰减
       const stageScore = Math.max(0, Math.round(3000 - reactionMs * 6))
-      this.context.addScore(stageScore, 400, 200, '#a855f7')
+      this.context.addScore(stageScore, STAGE_CENTER_X, 200, '#a855f7')
 
       this.status = 'STAGE_COMPLETE'
       return
@@ -191,7 +196,7 @@ export class Module5Reaction implements SkillModuleInstance {
     }
   }
 
-  update(dt: number, now: number, elapsed: number) {
+  update(dt: number, now: number, elapsed: number): void {
     if (this.status === 'PENALTY_FREEZE') {
       if (now >= this.penaltyUntil) {
         this.initCurrentStage(now)
@@ -222,12 +227,12 @@ export class Module5Reaction implements SkillModuleInstance {
       }
       if (d.isMoving) {
         d.x += d.dir * d.speed * dt
-        const crossed = d.dir === 1 ? d.x >= 400 : d.x <= 400
+        const crossed = d.dir === 1 ? d.x >= STAGE_CENTER_X : d.x <= STAGE_CENTER_X
         if (this.status === 'WAITING' && crossed) {
           this.status = 'ACTIVE'
           this.triggerTime = now
         }
-        const outOfScope = d.dir === 1 ? d.x > 400 + d.scopeR + d.radius : d.x < 400 - d.scopeR - d.radius
+        const outOfScope = d.dir === 1 ? d.x > STAGE_CENTER_X + d.scopeR + d.radius : d.x < STAGE_CENTER_X - d.scopeR - d.radius
         if (outOfScope && this.status === 'ACTIVE') {
           this.triggerEarlyMistake(now)
         }
@@ -246,22 +251,22 @@ export class Module5Reaction implements SkillModuleInstance {
           this.status = 'ACTIVE'
           this.triggerTime = now
         } else {
-          d.currentColor = d.nonGreenColors[Math.floor(this.rand(0, d.nonGreenColors.length))] || '#f43f5e'
-          d.nextColorTime = now + this.rand(1000, 3000)
+          d.currentColor = d.nonGreenColors[Math.floor(rand(0, d.nonGreenColors.length))] || '#f43f5e'
+          d.nextColorTime = now + rand(1000, 3000)
         }
       }
     }
   }
 
-  render(ctx: CanvasRenderingContext2D, now: number) {
+  render(ctx: CanvasRenderingContext2D, now: number): void {
     if (this.status === 'PENALTY_FREEZE') {
       ctx.fillStyle = '#ef4444'
       ctx.font = 'bold 36px ui-monospace, monospace'
       ctx.textAlign = 'center'
-      ctx.fillText('搶跑 / 提前點擊！', 400, 280)
+      ctx.fillText('搶跑 / 提前點擊！', STAGE_CENTER_X, 280)
       ctx.font = '20px ui-monospace, monospace'
       ctx.fillStyle = '#fca5a5'
-      ctx.fillText('階段重置中，請等待信號...', 400, 330)
+      ctx.fillText('階段重置中，請等待信號...', STAGE_CENTER_X, 330)
       return
     }
 
@@ -271,11 +276,11 @@ export class Module5Reaction implements SkillModuleInstance {
 
       ctx.fillStyle = '#a1a1aa'
       ctx.font = '20px ui-monospace, monospace'
-      ctx.fillText(`${this.STAGE_NAMES[stageId] ?? ''} 測定完成`, 400, 180)
+      ctx.fillText(`${this.STAGE_NAMES[stageId] ?? ''} 測定完成`, STAGE_CENTER_X, 180)
 
       ctx.fillStyle = '#a855f7'
       ctx.font = 'bold 56px ui-monospace, monospace'
-      ctx.fillText(`${this.lastReactionMs} ms`, 400, 260)
+      ctx.fillText(`${this.lastReactionMs} ms`, STAGE_CENTER_X, 260)
 
       const btn = this.nextBtn
       ctx.fillStyle = '#2563eb'
@@ -304,23 +309,23 @@ export class Module5Reaction implements SkillModuleInstance {
       const isGreen = this.status === 'ACTIVE'
       ctx.fillStyle = isGreen ? '#22c55e' : '#ef4444'
       ctx.beginPath()
-      ctx.arc(400, 300, 90, 0, Math.PI * 2)
+      ctx.arc(STAGE_CENTER_X, STAGE_CENTER_Y, 90, 0, Math.PI * 2)
       ctx.fill()
 
       ctx.fillStyle = '#f4f4f5'
       ctx.font = '24px ui-monospace, monospace'
       ctx.textAlign = 'center'
-      ctx.fillText(isGreen ? '立即點擊！' : '等待變綠...', 400, 450)
+      ctx.fillText(isGreen ? '立即點擊！' : '等待變綠...', STAGE_CENTER_X, 450)
     } else if (stageId === 1) {
       const lightsActive = this.status === 'ACTIVE'
       ctx.textAlign = 'center'
       ctx.font = '24px ui-monospace, monospace'
       ctx.fillStyle = '#f4f4f5'
-      ctx.fillText(lightsActive ? '熄滅！點擊！' : '等待紅燈全熄滅...', 400, 140)
+      ctx.fillText(lightsActive ? '熄滅！點擊！' : '等待紅燈全熄滅...', STAGE_CENTER_X, 140)
 
       const startX = 200
       const gapX = 100
-      const cy = 300
+      const cy = STAGE_CENTER_Y
       const rowOffsetY = 40
       const lampRadius = 26
 
@@ -340,8 +345,8 @@ export class Module5Reaction implements SkillModuleInstance {
         }
       }
     } else if (stageId === 2) {
-      const cx = 400
-      const cy = 300
+      const cx = STAGE_CENTER_X
+      const cy = STAGE_CENTER_Y
       const scopeR = this.s3Data.scopeR
 
       ctx.save()
@@ -350,7 +355,7 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.clip()
 
       ctx.fillStyle = '#0f172a'
-      ctx.fillRect(0, 0, 800, 600)
+      ctx.fillRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT)
 
       if (this.s3Data.isMoving) {
         ctx.beginPath()
@@ -374,7 +379,7 @@ export class Module5Reaction implements SkillModuleInstance {
 
       ctx.save()
       ctx.beginPath()
-      ctx.rect(0, 0, 800, 600)
+      ctx.rect(0, 0, STAGE_WIDTH, STAGE_HEIGHT)
       ctx.arc(cx, cy, scopeR, 0, Math.PI * 2, true)
       ctx.fillStyle = '#050505'
       ctx.fill()
@@ -406,38 +411,48 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.fillStyle = '#f4f4f5'
       ctx.font = '22px ui-monospace, monospace'
       ctx.textAlign = 'center'
-      ctx.fillText('全視野任意方塊變黃瞬間點擊！', 400, 40)
+      ctx.fillText('全視野任意方塊變黃瞬間點擊！', STAGE_CENTER_X, 40)
     } else if (stageId === 4) {
       ctx.beginPath()
-      ctx.arc(400, 300, 90, 0, Math.PI * 2)
+      ctx.arc(STAGE_CENTER_X, STAGE_CENTER_Y, 90, 0, Math.PI * 2)
       ctx.fillStyle = this.s5Data.currentColor
       ctx.fill()
 
       ctx.fillStyle = '#f4f4f5'
       ctx.font = '22px ui-monospace, monospace'
       ctx.textAlign = 'center'
-      ctx.fillText(this.s5Data.isGreen ? '綠燈已出現！點擊！' : '只有變綠才准點！', 400, 450)
+      ctx.fillText(this.s5Data.isGreen ? '綠燈已出現！點擊！' : '只有變綠才准點！', STAGE_CENTER_X, 450)
     }
   }
 
+  cleanup(): void {
+    this.s4Data.boxes = []
+    this.falseStarts = 0
+    this.isCompleted = false
+  }
+
+  // ★★★ 核心修复：100% 由对局真实反应毫秒数与违规抢跑次数推导产出 ★★★
   getResultSummary(): ModuleResultSummary {
     const validTimes = this.stageTimes.filter(t => t > 0)
-    const avgMs = validTimes.length > 0 ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length) : 0
+    const avgMs = validTimes.length > 0
+      ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length)
+      : 0
     const bestMs = validTimes.length > 0 ? Math.min(...validTimes) : 0
 
+    const rating = (avgMs > 0 && avgMs <= 180 && this.falseStarts === 0)
+      ? 'FLAWLESS ACE'
+      : (avgMs > 0 && avgMs <= 240)
+        ? 'COMBAT READY'
+        : 'REFLEX COMPLIANT'
+
     return {
-      rating: avgMs <= 180 ? 'FLAWLESS ACE' : avgMs <= 240 ? 'COMBAT READY' : 'REFLEX COMPLIANT',
+      rating,
       metrics: [
-        { value: `${avgMs}ms`, label: 'AVG REFLEX', badge: avgMs <= 180 ? 'x2.00' : 'x1.20' },
-        { value: `${bestMs}ms`, label: 'PEAK TTK', badge: 'BEST' },
-        { value: '5/5', label: 'STAGES ACED' },
-        { value: '0', label: 'FALSE STARTS' }
+        { value: avgMs > 0 ? `${avgMs}ms` : '--', label: 'AVG REFLEX', badge: avgMs > 0 && avgMs <= 180 ? 'x2.00' : 'x1.20' },
+        { value: bestMs > 0 ? `${bestMs}ms` : '--', label: 'PEAK TTK', badge: 'BEST' },
+        { value: `${validTimes.length}/5`, label: 'STAGES ACED' },
+        { value: String(this.falseStarts), label: 'FALSE STARTS' }
       ]
     }
-  }
-
-  cleanup() {
-    this.s4Data.boxes = []
-    this.isCompleted = false
   }
 }

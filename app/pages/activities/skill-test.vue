@@ -8,6 +8,7 @@ import { Module3Trail } from '~/utils/skill-tests/module3-trail'
 import { Module4OddPair } from '~/utils/skill-tests/module4-oddpair'
 import { Module5Reaction } from '~/utils/skill-tests/module5-reaction'
 import { Module6Tracking } from '~/utils/skill-tests/module6-tracking'
+import { Module8Tiles } from '~/utils/skill-tests/module8-tiles'
 import { Module9Cps } from '~/utils/skill-tests/module9-cps'
 
 definePageMeta({
@@ -28,7 +29,7 @@ definePageMeta({
 const currentDiscordId = ref<string>('10001')
 const currentOperatorDisplay = ref<string>('CONNECTING...')
 
-  // ★ 1. 提升为组件作用域变量，供全页面交互调用
+// ★ 1. 提升为组件作用域变量，供全页面交互调用
 let discordSdkInstance: DiscordSDK | null = null
 
 // ★ 2. 核心好品味：双模外链穿透器（Discord 客户端走 RPC，普通浏览器走 window.open）
@@ -259,7 +260,7 @@ const TRIAL_SLOTS = ref<TrialSlot[]>([
   { id: 5, index: '05', title: 'REACTION', code: 'MOD_REACT_05', category: 'REFLEX KINETICS', status: 'ready', moduleId: 5, bestScore: '---', accentColor: '#A855F7' },
   { id: 6, index: '06', title: 'APEX TRACK', code: 'MOD_TRACK_06', category: 'DYNAMIC PURSUIT', status: 'ready', moduleId: 6, bestScore: '---', accentColor: '#EC4899' },
   { id: 7, index: '07', title: 'BUFFER FLUSH', code: 'SYS_LOCK_07', category: 'MEMORY CAPACITY', status: 'locked', bestScore: '---', accentColor: '#52525B' },
-  { id: 8, index: '08', title: 'RAPID STRAFE', code: 'SYS_LOCK_08', category: 'SPATIAL AGILITY', status: 'locked', bestScore: '---', accentColor: '#52525B' },
+  { id: 8, index: '08', title: 'PIANO CADENCE', code: 'MOD_TILES_08', category: 'FOUR-LANE CADENCE', status: 'ready', moduleId: 8, bestScore: '---', accentColor: '#52525B' },
   { id: 9, index: '09', title: 'CHRONO TAP', code: 'MOD_CPS_09', category: 'TEMPORAL CADENCE', status: 'ready', moduleId: 9, bestScore: '---', accentColor: '#06B6D4' },
   { id: 10, index: '10', title: 'OVERCLOCK', code: 'SYS_LOCK_10', category: 'LIMITER BREAKTHROUGH', status: 'locked', bestScore: '---', accentColor: '#52525B' }
 ])
@@ -329,6 +330,14 @@ const MODULE_BRIEFINGS: Record<number, ModuleBriefing> = {
       { tag: 'PHASE 03', title: '60HZ ACCUMULATE', icon: '⚙️', headline: '幀級連續算分', description: '每鎖定 1 幀（16.6ms）累加 4 分，對局結束後生成高精度平滑跟槍命中率。' }
     ]
   },
+  8: {
+    overview: '測試操作員在 4 軌高速下潛流中的極限節奏控制與雙手手指獨立按鍵協調。',
+    columns: [
+      { tag: 'PHASE 01', title: 'READ THE LANES', icon: '🎹', headline: '鎖定底端目標', description: '觀察中央 4 軌底部 [D / F / J / K] 皇家藍目標方塊，上方黑色色塊將離散下潛。' },
+      { tag: 'PHASE 02', title: 'KEYSTROKE CADENCE', icon: '⚡', headline: '四鍵精準打擊', description: '嚴格按鍵擊碎底塊。每次命中 +30 分並滾動下推，空擊或按錯嚴厲扣除 60 分！' },
+      { tag: 'PHASE 03', title: '60S ENDURANCE', icon: '⏱️', headline: '60 秒極限擊打', description: '限時 60.0 秒。追求零失誤極限下潛，突破 12,000+ 選手級戰術標尺。' }
+    ]
+  },
   9: {
     overview: '專為選手設計的 10 秒短時神經衝動與左右雙鍵極限 CPS 爆發測試。',
     columns: [
@@ -372,6 +381,7 @@ const modules: Record<number, SkillModuleInstance> = {
   4: new Module4OddPair(),
   5: new Module5Reaction(),
   6: new Module6Tracking(),
+  8: new Module8Tiles(),
   9: new Module9Cps()
 }
 
@@ -420,6 +430,10 @@ function handlePointerLeave() {
 }
 
 function handleKeyDown(e: KeyboardEvent) {
+  if (isFinished.value) {
+    return
+  }
+
   if (e.code === 'Escape') {
     if (isScoreboardOpen.value) {
       closeScoreboard()
@@ -463,6 +477,10 @@ function tick(now: number) {
 
   if ((hasTimeLimit && elapsed >= moduleDuration) || activeModule.isCompleted) {
     isFinished.value = true
+
+    if (activeModule) {
+      activeModule.isCompleted = true
+    }
 
     // ★ 核心好品味：本地即时乐观更新 PB，0 毫秒响应，不等网络回包！
     const currentBestNum = Number(String(currentSlot.value.bestScore).replace(/,/g, '')) || 0
@@ -659,7 +677,8 @@ onUnmounted(() => {
         <header
           class="shrink-0 w-full px-5 py-2.5 flex items-center justify-between border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
           <div class="flex items-center gap-3">
-            <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer" @click.prevent="openExternalUrl('https://forestwork.vercel.app/')"
+            <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer"
+              @click.prevent="openExternalUrl('https://forestwork.vercel.app/')"
               class="group flex items-center gap-2 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
               title="開啟林間小鎮官方網站">
               <span
