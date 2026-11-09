@@ -27,6 +27,8 @@ definePageMeta({
 
 
 const currentDiscordId = ref<string>('10001')
+// Signed ticket from /api/activities/auth; the server reads the player's ID only from this
+const authTicket = ref<string>('')
 const currentOperatorDisplay = ref<string>('CONNECTING...')
 
 // ★ 1. 提升为组件作用域变量，供全页面交互调用
@@ -100,6 +102,7 @@ async function initDiscordSdkAsync() {
 
     const authRes = await $fetch<{
       success: boolean
+      authTicket: string
       user: { id: string; username: string; global_name: string; avatar: string }
     }>('/api/activities/auth', {
       method: 'POST',
@@ -107,6 +110,7 @@ async function initDiscordSdkAsync() {
     })
 
     if (authRes.success && authRes.user) {
+      authTicket.value = authRes.authTicket
       currentDiscordId.value = authRes.user.id
       currentOperatorDisplay.value = authRes.user.global_name || authRes.user.username
       console.log(`[Activity Auth] 選手就位: ${currentOperatorDisplay.value} (${authRes.user.id})`)
@@ -116,6 +120,7 @@ async function initDiscordSdkAsync() {
     const errMsg = err?.data?.statusMessage || err?.message || 'UNKNOWN_ERROR'
     console.error('[Activity Auth Error]:', err)
 
+    authTicket.value = ''
     currentDiscordId.value = '10001'
     currentOperatorDisplay.value = `SANDBOX (${errMsg})`
   }
@@ -498,7 +503,7 @@ function tick(now: number) {
       $fetch('/api/activities/submit', {
         method: 'POST',
         body: {
-          discordId: currentDiscordId.value,
+          authTicket: authTicket.value,
           moduleId: currentSlot.value.moduleId,
           score: score.value,
           rating: activeSummary.value.rating,
