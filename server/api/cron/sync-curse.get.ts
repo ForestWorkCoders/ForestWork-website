@@ -14,7 +14,8 @@ export default defineEventHandler(async (event) => {
   // 1. 安全防護：校驗 Vercel Cron Secret
   const authHeader = getHeader(event, 'authorization')
   const cronSecret = process.env.CRON_SECRET
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  // No secret configured = nobody may run it (Vercel's cron sends the secret once it is set)
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
