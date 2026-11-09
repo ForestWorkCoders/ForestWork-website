@@ -462,6 +462,86 @@ const cocCommands = [
                 required: false
             }
         ]
+    },
+    {
+        name: 'room',
+        description: 'TRPG 跑團房間會話與歸檔管理系統',
+        options: [
+            // 1. 開房 (直接作為 Subcommand，type: 1)
+            {
+                name: 'open',
+                description: '開啟新跑團房間 (自動建立公共主線與私密暗骰子區)',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'title',
+                        description: '模組/房間標題 (例如: 瘋狂山脈 第01團)',
+                        type: 3, // STRING
+                        required: true
+                    },
+                    {
+                        name: 'co_gm',
+                        description: '指定共同主持的副 GM (自動拉入暗骰箱)',
+                        type: 6, // USER
+                        required: false
+                    }
+                ]
+            },
+            // 2. 追加 GM
+            {
+                name: 'add_gm',
+                description: '為當前房間追加協作 GM (必須在主線子區內執行)',
+                type: 1,
+                options: [
+                    {
+                        name: 'user',
+                        description: '要晉升為協作 GM 的成員',
+                        type: 6, // USER
+                        required: true
+                    }
+                ]
+            },
+            // 3. 結案閉團
+            {
+                name: 'close',
+                description: '正式結團並存檔 (自動將子區鎖定為只讀並封存)',
+                type: 1,
+                options: [
+                    {
+                        name: 'summary',
+                        description: '結案簡報/結局總結 (例如: 全員生還，古神封印成功)',
+                        type: 3, // STRING
+                        required: false
+                    }
+                ]
+            },
+            // 4. 歷史檔案館檢索
+            {
+                name: 'archive',
+                description: '檢索歷史跑團檔案 (不填參數預設查詢自己參與的所有團)',
+                type: 1,
+                options: [
+                    {
+                        name: 'gm',
+                        description: '依指定 GM 進行篩選',
+                        type: 6, // USER
+                        required: false
+                    },
+                    {
+                        name: 'player',
+                        description: '依指定參團玩家進行篩選',
+                        type: 6, // USER
+                        required: false
+                    },
+                    {
+                        name: 'page',
+                        description: '分頁頁數 (預設第 1 頁)',
+                        type: 4, // INTEGER
+                        required: false
+                    }
+                ]
+            }
+        ]
     }
 ]
 

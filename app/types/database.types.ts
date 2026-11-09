@@ -1408,6 +1408,45 @@ export type Database = {
         }
         Relationships: []
       }
+      room_sessions: {
+        Row: {
+          created_at: string | null
+          ended_at: string | null
+          gm_ids: string[]
+          gm_thread_id: string
+          id: number
+          main_thread_id: string
+          player_ids: string[]
+          room_name: string
+          status: string
+          summary: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          ended_at?: string | null
+          gm_ids?: string[]
+          gm_thread_id: string
+          id?: number
+          main_thread_id: string
+          player_ids?: string[]
+          room_name: string
+          status?: string
+          summary?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          ended_at?: string | null
+          gm_ids?: string[]
+          gm_thread_id?: string
+          id?: number
+          main_thread_id?: string
+          player_ids?: string[]
+          room_name?: string
+          status?: string
+          summary?: string | null
+        }
+        Relationships: []
+      }
       sync_cursors: {
         Row: {
           channel_id: string
@@ -1461,6 +1500,10 @@ export type Database = {
           p_username: string
           p_year: number
         }
+        Returns: undefined
+      }
+      record_room_player: {
+        Args: { p_main_thread_id: string; p_player_id: string }
         Returns: undefined
       }
     }
