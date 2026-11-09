@@ -1,5 +1,6 @@
 // server/api/giveaway/pull.post.ts
-import { defineEventHandler, createError, readBody } from 'h3'
+import { defineEventHandler, createError, readBody, getCookie } from 'h3'
+import { unsealSessionData, SESSION_COOKIE_NAME } from '../../utils/session'
 
 interface DiscordUser {
   id: string
@@ -12,6 +13,16 @@ interface DiscordUser {
 // 核心：必须是 export default defineEventHandler，不要加括号调用，不要改名字！
 // server/api/giveaway/pull.post.ts
 export default defineEventHandler(async (event) => {
+  // Only the site owner may pull voter lists: the bot token can read any channel the bot is in.
+  const session = unsealSessionData(getCookie(event, SESSION_COOKIE_NAME))
+  if (!session) {
+    throw createError({ statusCode: 401, statusMessage: '請先登入 Discord' })
+  }
+  const ownerId = process.env.DISCORD_OWNER_ID?.trim()
+  if (!ownerId || String(session.id) !== ownerId) {
+    throw createError({ statusCode: 403, statusMessage: '只有站長可以使用幸運轉盤' })
+  }
+
   const body = await readBody(event)
   const pollUrl = String(body?.pollUrl || '').trim()
 

@@ -130,6 +130,10 @@ const handlePull = async () => {
     await nextTick()
     drawWheel(currentAngle)
   } catch (err: any) {
+    if (err?.statusCode === 401) {
+      await navigateTo('/api/auth/discord/login?redirect=/tools/giveaway', { external: true })
+      return
+    }
     alert(err?.data?.statusMessage || err?.message || '拉取名单失败')
   } finally {
     loading.value = false
