@@ -1,6 +1,4 @@
-Need to install the following packages:
-supabase@2.110.0
-Ok to proceed? (y) export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -13,6 +11,167 @@ export type Database = {
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
+  }
+  ctf: {
+    Tables: {
+      challenges: {
+        Row: {
+          category: string
+          created_at: string
+          decay_solves: number
+          files: Json
+          flag_hash: string
+          id: string
+          initial_points: number
+          is_active: boolean
+          is_case_insensitive: boolean
+          min_points: number
+          prerequisite_id: string | null
+          prompt: string
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          decay_solves?: number
+          files?: Json
+          flag_hash: string
+          id: string
+          initial_points?: number
+          is_active?: boolean
+          is_case_insensitive?: boolean
+          min_points?: number
+          prerequisite_id?: string | null
+          prompt: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          decay_solves?: number
+          files?: Json
+          flag_hash?: string
+          id?: string
+          initial_points?: number
+          is_active?: boolean
+          is_case_insensitive?: boolean
+          min_points?: number
+          prerequisite_id?: string | null
+          prompt?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solves: {
+        Row: {
+          account_id: number
+          challenge_id: string
+          id: number
+          solved_at: string
+        }
+        Insert: {
+          account_id: number
+          challenge_id: string
+          id?: number
+          solved_at?: string
+        }
+        Update: {
+          account_id?: number
+          challenge_id?: string
+          id?: number
+          solved_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solves_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solves_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      challenge_points: {
+        Row: {
+          category: string | null
+          current_points: number | null
+          decay_solves: number | null
+          files: Json | null
+          id: string | null
+          initial_points: number | null
+          is_active: boolean | null
+          min_points: number | null
+          prerequisite_id: string | null
+          prompt: string | null
+          solve_count: number | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboard: {
+        Row: {
+          account_id: string | null
+          last_solve: string | null
+          last_solve_at: string | null
+          nickname: string | null
+          rank: number | null
+          score: number | null
+          solved: number | null
+          solves_count: number | null
+          total_points: number | null
+          username: string | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   mahjong: {
     Tables: {
@@ -193,7 +352,15 @@ export type Database = {
           won_type?: string
           won_yaku?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "paipu_rounds_paipu_id_fkey"
+            columns: ["paipu_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["uuid"]
+          },
+        ]
       }
       paipu_yaku_dict: {
         Row: {
@@ -246,6 +413,59 @@ export type Database = {
           discord_id?: number | null
           id?: number
           nickname?: string
+        }
+        Relationships: []
+      }
+      player_yearly_mr: {
+        Row: {
+          account_id: number
+          created_at: string | null
+          matches_played: number
+          mr_points: number
+          year: number
+        }
+        Insert: {
+          account_id: number
+          created_at?: string | null
+          matches_played?: number
+          mr_points?: number
+          year: number
+        }
+        Update: {
+          account_id?: number
+          created_at?: string | null
+          matches_played?: number
+          mr_points?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_yearly_mr_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+        ]
+      }
+      recent_pairings: {
+        Row: {
+          channel_id: string
+          created_at: string | null
+          id: number
+          triplets: Json
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          id?: number
+          triplets: Json
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          id?: number
+          triplets?: Json
         }
         Relationships: []
       }
@@ -426,6 +646,31 @@ export type Database = {
       }
     }
     Functions: {
+      get_player_meetup_frequency: {
+        Args: { p_start_time?: string; p_tournament_id?: string }
+        Returns: {
+          meet_up_count: number
+          player1: number
+          player1_name: string
+          player2: number
+          player2_name: string
+        }[]
+      }
+      get_player_recent_ranks: {
+        Args: { matches_count?: number; p_player_id: number }
+        Returns: number[]
+      }
+      get_seat_frequency: {
+        Args: { p_start_time?: string; p_tournament_id?: string }
+        Returns: {
+          account_id: number
+          east: number
+          mahjong_username: string
+          north: number
+          south: number
+          west: number
+        }[]
+      }
       get_tournament_match_stats: {
         Args: { t_id: string }
         Returns: {
@@ -942,18 +1187,21 @@ export type Database = {
       participant_data: {
         Row: {
           discord_id: number
+          discord_nickname: string | null
           discord_username: string
           id: number
           profile_img: string | null
         }
         Insert: {
           discord_id: number
+          discord_nickname?: string | null
           discord_username: string
           id?: number
           profile_img?: string | null
         }
         Update: {
           discord_id?: number
+          discord_nickname?: string | null
           discord_username?: string
           id?: number
           profile_img?: string | null
@@ -962,230 +1210,352 @@ export type Database = {
       }
     }
     Views: {
-      overall_rankings_2023: {
+      [_ in never]: never
+    }
+    Functions: {
+      update_user_data:
+        | {
+            Args: {
+              p_new_pfp?: string
+              p_new_username: string
+              p_user_id: number
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_new_pfp?: string
+              p_new_username: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  trpg: {
+    Tables: {
+      characters: {
         Row: {
-          account_id: number | null
-          first_place_count: number | null
-          first_place_percentage: number | null
-          nickname: string | null
-          second_place_count: number | null
-          second_place_percentage: number | null
-          third_place_count: number | null
-          third_place_percentage: number | null
+          attributes: Json
+          avatar_url: string | null
+          created_at: string
+          discord_id: number
+          hp: number
+          id: string
+          insanity: string | null
+          is_active: boolean
+          mp: number
+          name: string
+          san: number
+          skills: Json
+          story: string | null
+          updated_at: string
+        }
+        Insert: {
+          attributes?: Json
+          avatar_url?: string | null
+          created_at?: string
+          discord_id: number
+          hp?: number
+          id?: string
+          insanity?: string | null
+          is_active?: boolean
+          mp?: number
+          name: string
+          san?: number
+          skills?: Json
+          story?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attributes?: Json
+          avatar_url?: string | null
+          created_at?: string
+          discord_id?: number
+          hp?: number
+          id?: string
+          insanity?: string | null
+          is_active?: boolean
+          mp?: number
+          name?: string
+          san?: number
+          skills?: Json
+          story?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
-      overall_rankings_2024: {
+      curse_stats: {
         Row: {
-          account_id: number | null
-          first_place_count: number | null
-          first_place_percentage: number | null
-          nickname: string | null
-          second_place_count: number | null
-          second_place_percentage: number | null
-          third_place_count: number | null
-          third_place_percentage: number | null
+          count: number
+          total_messages: number
+          updated_at: string | null
+          user_id: string
+          username: string | null
+          year: number
+        }
+        Insert: {
+          count?: number
+          total_messages?: number
+          updated_at?: string | null
+          user_id: string
+          username?: string | null
+          year: number
+        }
+        Update: {
+          count?: number
+          total_messages?: number
+          updated_at?: string | null
+          user_id?: string
+          username?: string | null
+          year?: number
         }
         Relationships: []
       }
-      overall_rankings_2025: {
+      liner_battles: {
         Row: {
-          account_id: number | null
-          first_place_count: number | null
-          first_place_percentage: number | null
-          nickname: string | null
-          second_place_count: number | null
-          second_place_percentage: number | null
-          third_place_count: number | null
-          third_place_percentage: number | null
+          channel_id: string
+          created_at: string | null
+          id: number
+          message_id: string | null
+          p1_hp: number
+          p1_id: string
+          p1_name: string
+          p1_seq: string | null
+          p2_hp: number
+          p2_id: string | null
+          p2_name: string | null
+          p2_seq: string | null
+          round: number
+          status: string
+          system_seq: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          id?: number
+          message_id?: string | null
+          p1_hp?: number
+          p1_id: string
+          p1_name: string
+          p1_seq?: string | null
+          p2_hp?: number
+          p2_id?: string | null
+          p2_name?: string | null
+          p2_seq?: string | null
+          round?: number
+          status?: string
+          system_seq?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          id?: number
+          message_id?: string | null
+          p1_hp?: number
+          p1_id?: string
+          p1_name?: string
+          p1_seq?: string | null
+          p2_hp?: number
+          p2_id?: string | null
+          p2_name?: string | null
+          p2_seq?: string | null
+          round?: number
+          status?: string
+          system_seq?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      quaso_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          give_date: string
+          giver_id: string
+          giver_name: string
+          id: number
+          receiver_id: string
+          receiver_name: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string | null
+          give_date?: string
+          giver_id: string
+          giver_name: string
+          id?: number
+          receiver_id: string
+          receiver_name: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          give_date?: string
+          giver_id?: string
+          giver_name?: string
+          id?: number
+          receiver_id?: string
+          receiver_name?: string
+        }
+        Relationships: []
+      }
+      room_sessions: {
+        Row: {
+          created_at: string | null
+          ended_at: string | null
+          gm_ids: string[]
+          gm_thread_id: string
+          id: number
+          main_thread_id: string
+          player_ids: string[]
+          room_name: string
+          status: string
+          summary: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          ended_at?: string | null
+          gm_ids?: string[]
+          gm_thread_id: string
+          id?: number
+          main_thread_id: string
+          player_ids?: string[]
+          room_name: string
+          status?: string
+          summary?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          ended_at?: string | null
+          gm_ids?: string[]
+          gm_thread_id?: string
+          id?: number
+          main_thread_id?: string
+          player_ids?: string[]
+          room_name?: string
+          status?: string
+          summary?: string | null
+        }
+        Relationships: []
+      }
+      skill_test_attempts: {
+        Row: {
+          created_at: string
+          discord_id: number
+          id: string
+          metrics: Json
+          module_id: number
+          rating: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          discord_id: number
+          id?: string
+          metrics?: Json
+          module_id: number
+          rating?: string
+          score: number
+        }
+        Update: {
+          created_at?: string
+          discord_id?: number
+          id?: string
+          metrics?: Json
+          module_id?: number
+          rating?: string
+          score?: number
+        }
+        Relationships: []
+      }
+      sync_cursors: {
+        Row: {
+          channel_id: string
+          last_message_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id: string
+          last_message_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string
+          last_message_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      v_skill_leaderboard: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          discord_id: string | null
+          global_rank: number | null
+          metrics: Json | null
+          module_id: number | null
+          operator_name: string | null
+          rating: string | null
+          score: number | null
+        }
+        Relationships: []
+      }
+      v_skill_personal_bests: {
+        Row: {
+          best_score: number | null
+          discord_id: string | null
+          last_achieved_at: string | null
+          module_id: number | null
         }
         Relationships: []
       }
     }
     Functions: {
-      available_months: { Args: { league: string }; Returns: string[] }
-      count_tables: { Args: { league: string }; Returns: number }
-      fetch_game_results: {
-        Args: { game_id: number; league_month: string; league_year: string }
-        Returns: {
-          adjusted_east_point_diff: number
-          adjusted_south_point_diff: number
-          adjusted_west_point_diff: number
-          east_nickname: string
-          east_score: number
-          game_end_time: string
-          south_nickname: string
-          south_score: number
-          uuid: string
-          west_nickname: string
-          west_score: number
-        }[]
+      activate_character: {
+        Args: { p_character_name: string; p_discord_id: number }
+        Returns: undefined
       }
-      fetch_group_season: {
-        Args: { season_param: number }
+      get_quaso_leaderboard: {
+        Args: { p_limit?: number; p_mode: string }
         Returns: {
-          defender_name: string
-          defender_score: number
-          diff_100000_striker: number
-          diff_midfield_defender: number
-          diff_striker_midfield: number
-          finals: boolean
-          match: string
-          midfield_name: string
-          midfield_score: number
-          season: number
-          striker_name: string
-          striker_score: number
-          team_name: string
-        }[]
-      }
-      fetch_league_participants: {
-        Args: { league_month: string; league_year: string }
-        Returns: {
-          discord_id: number
-          discord_username: string
-          game_1: number
-          game_10: number
-          game_11: number
-          game_12: number
-          game_13: number
-          game_14: number
-          game_15: number
-          game_16: number
-          game_2: number
-          game_3: number
-          game_4: number
-          game_5: number
-          game_6: number
-          game_7: number
-          game_8: number
-          game_9: number
-          profile_img: string
-          rank: number
-          rank_label: string
           total: number
+          user_id: string
+          username: string
         }[]
       }
-      fetch_league_participants_new: {
-        Args: { league_month: string; league_year: number }
-        Returns: {
-          discord_username: string
-          game_1: number
-          game_10: number
-          game_11: number
-          game_12: number
-          game_13: number
-          game_14: number
-          game_15: number
-          game_16: number
-          game_2: number
-          game_3: number
-          game_4: number
-          game_5: number
-          game_6: number
-          game_7: number
-          game_8: number
-          game_9: number
-          participation_count: number
-          profile_img: string
-          rank: number
-          rank_label: string
-          total: number
-        }[]
-      }
-      fwmp_rankings: {
-        Args: { league_schema: string }
-        Returns: {
-          april: number
-          august: number
-          discord_username: string
-          february: number
-          january: number
-          july: number
-          june: number
-          march: number
-          may: number
-          november: number
-          october: number
-          profile_img: string
-          rank: number
-          september: number
-          total: number
-        }[]
-      }
-      get_adjusted_point_diff: {
+      give_quaso: {
         Args: {
-          east_score: number
-          south_score: number
-          team: string
-          west_score: number
+          p_amount: number
+          p_giver_id: string
+          p_giver_name: string
+          p_receiver_id: string
+          p_receiver_name: string
         }
-        Returns: number
+        Returns: Json
       }
-      get_available_months: {
-        Args: { year: number }
-        Returns: {
-          month: string
-          month_number: number
-        }[]
+      increment_curse_count: {
+        Args: {
+          p_curse_delta: number
+          p_msg_delta: number
+          p_user_id: string
+          p_username: string
+          p_year: number
+        }
+        Returns: undefined
       }
-      get_discord_ids: { Args: never; Returns: string[] }
-      get_individual_records_new: {
-        Args: never
-        Returns: {
-          month: number
-          year: number
-        }[]
-      }
-      get_participants: {
-        Args: never
-        Returns: {
-          discord_id: number
-          discord_username: string
-          mahjongsoul_id: number
-          mahjongsoul_name: string
-          profile_img: string
-        }[]
-      }
-      get_player_meetup_frequency: {
-        Args: never
-        Returns: {
-          meet_up_count: number
-          player1: number
-          player1_name: string
-          player2: number
-          player2_name: string
-        }[]
-      }
-      get_player_recent_ranks: {
-        Args: { matches_count: number; p_player_id: number }
-        Returns: number[]
-      }
-      get_seat_frequency: {
-        Args: never
-        Returns: {
-          account_id: number
-          east: number
-          mahjong_username: string
-          south: number
-          west: number
-        }[]
-      }
-      get_team_data: {
-        Args: { season_param: string }
-        Returns: {
-          defender: string
-          hex_color: number
-          leader: number
-          midfield: string
-          season: number
-          striker: string
-          substitude: string
-          team_name: string
-        }[]
-      }
-      update_user_data: {
-        Args: { new_pfp: string; new_username: string; user_id: number }
+      record_room_player: {
+        Args: { p_main_thread_id: string; p_player_id: string }
         Returns: undefined
       }
     }
@@ -1206,12 +1576,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1235,11 +1605,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1260,11 +1630,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1285,11 +1655,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1302,11 +1672,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1316,6 +1686,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  ctf: {
+    Enums: {},
+  },
   mahjong: {
     Enums: {
       relay_role: [
@@ -1345,6 +1718,9 @@ export const Constants = {
     },
   },
   public: {
+    Enums: {},
+  },
+  trpg: {
     Enums: {},
   },
 } as const

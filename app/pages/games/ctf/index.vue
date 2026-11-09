@@ -1,0 +1,1175 @@
+<script setup lang="ts">
+import { ref, reactive, computed, nextTick, onMounted } from 'vue'
+const { user: currentUser, login: triggerDiscordLogin } = useAuth()
+
+// 1. 核心数据结构：虚拟文件系统（VFS 树形结构）
+interface VFSNode {
+    type: 'dir' | 'file'
+    content?: string       // 文本题面或内容
+    isBinary?: boolean     // 是否为隐写原图/二进制
+    artifactUrl?: string  // 图片或附件下载/预览直链
+    flag?: string          // 模拟 Flag（仅供前端验证，未来切到后端 Hash）
+    children?: Record<string, VFSNode>
+}
+
+// ★ 核心好品味：操作员 ID 动态派生，彻底消灭 operator_10001 桩代码！
+const currentOperatorId = computed(() => currentUser.value?.id || '')
+const knownChallengeIds = ref<Set<string>>(new Set())
+
+const promptUser = computed(() => {
+    if (!currentUser.value) return 'guest'
+    return currentUser.value.username
+})
+
+const promptPrefix = computed(() => `${promptUser.value}@forestwork:${currentPathStr.value}$`)
+
+// ★ 核心好品味：計算終端視覺列寬（ASCII=1, CJK/全形=2）
+function getVisualWidth(str: string): number {
+    const safeStr = String(str || '')
+    let width = 0
+    for (let i = 0; i < safeStr.length; i++) {
+        const code = safeStr.charCodeAt(i)
+        // 涵蓋全形標點、日文假名、CJK 統一表意漢字等雙倍寬度區間
+        if (
+            (code >= 0x1100 && code <= 0x115F) ||
+            (code >= 0x2E80 && code <= 0xA4CF) ||
+            (code >= 0xAC00 && code <= 0xD7A3) ||
+            (code >= 0xF900 && code <= 0xFAFF) ||
+            (code >= 0xFE10 && code <= 0xFE19) ||
+            (code >= 0xFE30 && code <= 0xFE6F) ||
+            (code >= 0xFF00 && code <= 0xFF60) ||
+            (code >= 0xFFE0 && code <= 0xFFE6)
+        ) {
+            width += 2
+        } else {
+            width += 1
+        }
+    }
+    return width
+}
+
+// 根據視覺寬度補齊空格（取代原生長度 padEnd，防止撐破終端排版）
+function padEndVisual(str: string | undefined | null, targetWidth: number): string {
+    const safeStr = String(str || '')
+    const vWidth = getVisualWidth(safeStr)
+    if (vWidth >= targetWidth) {
+        return safeStr
+    }
+    return safeStr + ' '.repeat(targetWidth - vWidth)
+}
+
+// ★ 核心好品味：斯巴達式定長 19 位時間戳 (YYYY-MM-DD HH:mm:ss)，消滅一切 locale 抖動！
+function formatTimestamp(isoStr?: string | null): string {
+    if (!isoStr) return '--'
+    const d = new Date(isoStr)
+    if (isNaN(d.getTime())) return '--'
+
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const year = d.getFullYear()
+    const month = pad(d.getMonth() + 1)
+    const day = pad(d.getDate())
+    const hours = pad(d.getHours())
+    const mins = pad(d.getMinutes())
+    const secs = pad(d.getSeconds())
+
+    return `${year}-${month}-${day} ${hours}:${mins}:${secs}`
+}
+
+// ==========================================
+// 1. 历史命令栈状态（Command History Buffer）
+// ==========================================
+const commandHistory = ref<string[]>([])
+const historyIdx = ref(-1)
+const inputDraft = ref('')
+
+const isMobileDevice = ref(false)
+const showMobileWarning = ref(false)
+
+function handleHistoryUp() {
+    if (commandHistory.value.length === 0) return
+
+    if (historyIdx.value === -1) {
+        inputDraft.value = inputCmd.value
+        historyIdx.value = commandHistory.value.length - 1
+    } else if (historyIdx.value > 0) {
+        historyIdx.value--
+    }
+
+    // 好品味：提取局部常量并通过卫语句收窄，消灭 undefined 越界隐患
+    const targetCmd = commandHistory.value[historyIdx.value]
+    if (targetCmd !== undefined) {
+        inputCmd.value = targetCmd
+    }
+}
+
+function handleHistoryDown() {
+    if (historyIdx.value === -1) return
+
+    if (historyIdx.value < commandHistory.value.length - 1) {
+        historyIdx.value++
+        const targetCmd = commandHistory.value[historyIdx.value]
+        if (targetCmd !== undefined) {
+            inputCmd.value = targetCmd
+        }
+    } else {
+        // 到底归位
+        historyIdx.value = -1
+        inputCmd.value = inputDraft.value
+    }
+}
+
+async function showScoreboard() {
+    appendHistory('[GLOBAL OPERATOR STANDINGS // DECAY_ACTIVE]', 'system')
+    try {
+        const entries = await $fetch<ScoreboardEntry[]>('/api/ctf/leaderboard')
+        appendHistory(formatScoreboard(entries), 'output')
+    } catch (err: any) {
+        appendHistory(`Failed to fetch standings: ${err.message}`, 'error')
+    }
+}
+
+// ==========================================
+// 2. 工业级 Tab 自动补全引擎 (POSIX 行为对齐)
+// ==========================================
+
+// 辅助纯函数：计算多个字符串的最长公共前缀 (LCP)
+function getLongestCommonPrefix(words: string[]): string {
+    if (words.length === 0) return ''
+    const first = words[0] || ''
+    let prefix = ''
+    for (let i = 0; i < first.length; i++) {
+        const char = first[i]
+        if (words.every(w => w[i] === char)) {
+            prefix += char
+        } else {
+            break
+        }
+    }
+    return prefix
+}
+
+function handleTabComplete(e: KeyboardEvent) {
+    e.preventDefault()
+
+    const rawCmd = inputCmd.value
+    // 如果输入全为空白，直接忽略
+    if (!rawCmd.trim() && !rawCmd.endsWith(' ')) {
+        return
+    }
+
+    const endsWithSpace = rawCmd.endsWith(' ')
+    const tokens = rawCmd.trim().split(/\s+/)
+
+    // ----------------------------------------------------
+    // 场景 A: 补全主命令 (只有一个 token 且未按空格)
+    // ----------------------------------------------------
+    if (tokens.length === 1 && !endsWithSpace) {
+        const prefix = tokens[0] || ''
+        const commandList = Object.keys(commands)
+        const matches = commandList.filter(cmd => cmd.startsWith(prefix))
+
+        if (matches.length === 1) {
+            const match = matches[0]
+            if (match) {
+                inputCmd.value = `${match} `
+            }
+        } else if (matches.length > 1) {
+            const lcp = getLongestCommonPrefix(matches)
+            if (lcp.length > prefix.length) {
+                inputCmd.value = lcp
+            } else {
+                // 打印所有匹配命令候选
+                appendHistory(`${promptPrefix.value} ${rawCmd}`, 'input')
+                appendHistory(matches.sort().join('  '), 'output')
+            }
+        }
+        return
+    }
+
+    // ----------------------------------------------------
+    // 场景 B: 补全路径参数 (后续参数)
+    // ----------------------------------------------------
+    // 获取当前正在输入的最后一个参数片段
+    const currentToken = endsWithSpace ? '' : (tokens[tokens.length - 1] || '')
+
+    // 将路径解构为：父级目录路径 (dirPart) 与 文件名前缀 (filePrefix)
+    const lastSlashIndex = currentToken.lastIndexOf('/')
+    let dirPart = ''
+    let filePrefix = currentToken
+
+    if (lastSlashIndex !== -1) {
+        dirPart = currentToken.slice(0, lastSlashIndex + 1) // 保留末尾的 /
+        filePrefix = currentToken.slice(lastSlashIndex + 1)
+    }
+
+    // 寻址父级节点：如果 dirPart 为空则在当前目录找，否则去对应目录找
+    const parentNode = dirPart ? resolvePath(dirPart) : getCurrentNode()
+
+    if (!parentNode || parentNode.type !== 'dir' || !parentNode.children) {
+        return
+    }
+
+    // 提取子项并应用智能隐藏文件过滤
+    let entries = Object.keys(parentNode.children)
+
+    // 核心好品味：如果用户没显式敲 '.'，不主动提示隐藏文件
+    if (!filePrefix.startsWith('.')) {
+        entries = entries.filter(name => !name.startsWith('.'))
+    }
+
+    const matches = entries.filter(name => name.startsWith(filePrefix))
+
+    // 0 个匹配直接忽略
+    if (matches.length === 0) {
+        return
+    }
+
+    matches.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+
+    // 计算替换基准：当前命令除最后一个 token 外的前缀字符串
+    const baseCmd = endsWithSpace
+        ? rawCmd
+        : rawCmd.slice(0, rawCmd.length - currentToken.length)
+
+    // 单一匹配：直接推送到终点
+    if (matches.length === 1) {
+        const match = matches[0]
+        if (!match) return
+
+        const childNode = parentNode.children[match]
+        const isDir = childNode?.type === 'dir'
+        const completedToken = `${dirPart}${match}${isDir ? '/' : ' '}`
+
+        inputCmd.value = `${baseCmd}${completedToken}`
+    }
+    // 多匹配：计算公共前缀，若无更大前缀则打印候选列表
+    else {
+        const lcp = getLongestCommonPrefix(matches)
+        if (lcp.length > filePrefix.length) {
+            inputCmd.value = `${baseCmd}${dirPart}${lcp}`
+        } else {
+            // 像标准终端一样回显输入并列出候选项
+            appendHistory(`${promptPrefix.value} ${rawCmd}`, 'input')
+            const formatted = matches.map(name => {
+                const isDir = parentNode.children?.[name]?.type === 'dir'
+                return isDir ? `${name}/` : name
+            })
+            appendHistory(formatted.join('  '), 'output')
+        }
+    }
+}
+
+const vfs = reactive<Record<string, VFSNode>>({
+    'challenges': {
+        type: 'dir',
+        children: {}
+    },
+    'readme.txt': {
+        type: 'file',
+        content: 'FORESTWORK CTF ENVIRONMENT\n輸入 "help" 獲取幫助。\n輸入 "ls challenges" 查看各類題目。\n你會發現，所有的flag開頭都是以"PBCTF"開頭的。'
+    },
+    '.flag_sample.txt': {
+        type: 'file',
+        content: 'PBCTF{TKU_4_Acc3pt1ng_Tut0r1aLs_B38694}'
+    }
+})
+
+const rootNode = computed<VFSNode>(() => ({
+    type: 'dir',
+    children: vfs
+}))
+
+/**
+ * 将相对或绝对路径解析为对应的 VFS 节点
+ * @param targetPath 目标路径（如 "prompt.txt", "/challenges", "../", "."）
+ * @returns 目标 VFSNode，若路径不存在则返回 null
+ */
+function resolvePath(targetPath: string): VFSNode | null {
+    const trimmed = targetPath.trim()
+    if (!trimmed || trimmed === '.') {
+        return getCurrentNode()
+    }
+
+    // 判定绝对路径与相对路径的起始基准
+    const isAbsolute = trimmed.startsWith('/')
+    const segments: string[] = isAbsolute ? [] : [...currentPath.value]
+
+    // 按 / 分割并利用栈压入/弹出
+    const rawParts = trimmed.split('/').filter(Boolean)
+    for (const part of rawParts) {
+        if (part === '.') continue
+        if (part === '..') {
+            segments.pop()
+        } else {
+            segments.push(part)
+        }
+    }
+
+    // 从根节点自顶向下顺藤摸瓜
+    let curr: VFSNode = rootNode.value
+
+    for (const seg of segments) {
+        if (curr.type !== 'dir' || !curr.children) {
+            return null
+        }
+        // 严格适配 noUncheckedIndexedAccess
+        const nextNode: VFSNode | undefined = curr.children[seg]
+        if (!nextNode) {
+            return null
+        }
+        curr = nextNode
+    }
+
+    return curr
+}
+
+/**
+ * 获取当前工作目录所在的 VFSNode
+ */
+function getCurrentNode(): VFSNode {
+    let curr: VFSNode = rootNode.value
+
+    for (const seg of currentPath.value) {
+        if (curr.type !== 'dir' || !curr.children) {
+            return rootNode.value
+        }
+        const nextNode: VFSNode | undefined = curr.children[seg]
+        if (!nextNode) {
+            return rootNode.value
+        }
+        curr = nextNode
+    }
+
+    return curr
+}
+
+// ==========================================
+// 动态关卡数据水合引擎 (支持多文本文件与代码注入)
+// ==========================================
+async function hydrateChallenges(): Promise<string[]> {
+    try {
+        const data = await $fetch<any[]>('/api/ctf/challenges', {
+            params: { operator: currentOperatorId.value }
+        })
+        if (!data || !vfs['challenges']) return []
+
+        // ★ 核心好品味：水合前彻底清空旧挂载，消灭任何 HMR 或旧迭代残留的脏目录！
+        vfs['challenges'].children = {}
+        const challengesRoot = vfs['challenges'].children
+        const loadedIds: string[] = []
+
+        data.forEach((c) => {
+            // 防呆校验：禁止空 ID 或只有斜杠的非法题目
+            if (!c.id || typeof c.id !== 'string') return
+
+            const cleanId = c.id.trim().replace(/^\/+|\/+$/g, '') // 剥离首尾多余斜杠
+            loadedIds.push(cleanId)
+
+            const cleanPrompt = (c.prompt || c.description || '').replace(/\\n/g, '\n')
+            const childrenNodes: Record<string, VFSNode> = {
+                'prompt.txt': {
+                    type: 'file',
+                    content: `[${c.title}]\nCATEGORY: ${c.category}\nCURRENT_VALUE: ${c.current_points} pts\nSOLVES: ${c.solve_count}\n\n${cleanPrompt}`
+                }
+            }
+
+            // 通用 mkdir -p 算法向下穿透
+            const segments = cleanId.split('/')
+            let currentCursor = challengesRoot // 每次迭代必须严格从根游标出发！
+
+            for (let i = 0; i < segments.length - 1; i++) {
+                const seg = segments[i]
+                if (!currentCursor[seg] || currentCursor[seg].type !== 'dir') {
+                    currentCursor[seg] = {
+                        type: 'dir',
+                        children: {}
+                    }
+                }
+                currentCursor = currentCursor[seg].children!
+            }
+
+            const leafName = segments[segments.length - 1]
+            if (!currentCursor[leafName] || currentCursor[leafName].type !== 'dir') {
+                currentCursor[leafName] = {
+                    type: 'dir',
+                    children: childrenNodes
+                }
+            } else {
+                currentCursor[leafName].children = {
+                    ...currentCursor[leafName].children,
+                    ...childrenNodes
+                }
+            }
+
+            // 遍历 files，智能分流当前目录与父目录
+            if (c.files && typeof c.files === 'object') {
+                for (const [rawFilename, val] of Object.entries(c.files)) {
+                    const isParentTarget = rawFilename.startsWith('../')
+                    const cleanName = isParentTarget ? rawFilename.slice(3) : rawFilename
+
+                    // 挂载目标容器
+                    const targetContainer = isParentTarget ? currentCursor : currentCursor[leafName].children!
+
+                    if (typeof val === 'string') {
+                        const trimmedVal = val.trim()
+                        const isHttp = /^https?:\/\//i.test(trimmedVal)
+                        const isUrlShortcut = /\.url$/i.test(cleanName)
+
+                        if (isUrlShortcut) {
+                            targetContainer[cleanName] = { type: 'file', content: trimmedVal, artifactUrl: trimmedVal, isBinary: false }
+                        } else if (isHttp) {
+                            targetContainer[cleanName] = { type: 'file', isBinary: true, artifactUrl: trimmedVal }
+                        } else {
+                            targetContainer[cleanName] = { type: 'file', content: val.replace(/\\n/g, '\n') }
+                        }
+                    } else if (typeof val === 'object' && val !== null && (val as any).artifact_url) {
+                        targetContainer[cleanName] = { type: 'file', isBinary: true, artifactUrl: (val as any).artifact_url }
+                    }
+                }
+            }
+        })
+
+        if (knownChallengeIds.value.size === 0) {
+            knownChallengeIds.value = new Set(loadedIds)
+        }
+
+        return loadedIds
+    } catch (err: any) {
+        appendHistory(`[WARN] Failed to sync challenges: ${err.message || 'Offline mode'}`, 'error')
+        return []
+    }
+}
+
+// ==========================================
+// 1. Mock 排行榜数据结构（未来直接用 useFetch 替换为 /api/ctf/leaderboard）
+// ==========================================
+interface ScoreboardEntry {
+    rank: number
+    username: string    // 新標準 SSOT 欄位
+    user?: string       // 舊代碼相容別名
+    solved: number      // 已解題數
+    solves_count?: number // 資料庫別名相容
+    score: number       // 當前動態衰減總分
+    total_points?: number // 資料庫別名相容
+    lastSolve: string   // 19 位定長時間戳 (YYYY-MM-DD HH:mm:ss)
+    last_solve?: string // 資料庫別名相容
+}
+
+// 好品味：纯字符填充排版，数值右对齐，文本左对齐，绝不依赖脆弱的 \t
+function formatScoreboard(entries: ScoreboardEntry[]): string {
+    if (!Array.isArray(entries) || entries.length === 0) {
+        return '(no standings recorded for active cycle)'
+    }
+
+    // 列宽契约定义
+    const W_RANK = 6
+    const W_USER = 16
+    const W_SOLVED = 8
+    const W_SCORE = 9
+    const W_TIME = 19
+
+    const header =
+        'RANK'.padStart(W_RANK) + '  ' +
+        'OPERATOR'.padEnd(W_USER) + '  ' +
+        'SOLVED'.padStart(W_SOLVED) + '  ' +
+        'SCORE'.padStart(W_SCORE) + '  ' +
+        'LATEST'.padEnd(W_TIME)
+
+    const separator =
+        '-'.repeat(W_RANK) + '  ' +
+        '-'.repeat(W_USER) + '  ' +
+        '-'.repeat(W_SOLVED) + '  ' +
+        '-'.repeat(W_SCORE) + '  ' +
+        '-'.repeat(W_TIME)
+
+    const rows = entries.map(item => {
+        const rankStr = `#${item.rank}`.padStart(W_RANK)
+        const rawUsername = item.username || item.user || 'anonymous'
+        const userStr = padEndVisual(rawUsername, W_USER)
+        const solvedStr = String(item.solved ?? item.solves_count ?? 0).padStart(W_SOLVED)
+        const scoreStr = `${item.score ?? item.total_points ?? 0} pts`.padStart(W_SCORE)
+        const timeStr = formatTimestamp(item.lastSolve || item.last_solve).padEnd(W_TIME)
+        return `${rankStr}  ${userStr}  ${solvedStr}  ${scoreStr}  ${timeStr}`
+    })
+
+    return [header, separator, ...rows].join('\n')
+}
+
+// 2. 易失状态（Session State）
+const inputCmd = ref('')
+const terminalRef = ref<HTMLElement | null>(null)
+const inputRef = ref<HTMLInputElement | null>(null)
+
+interface PreviewMedia {
+    url: string
+    name: string
+    type: 'image' | 'video'
+}
+const activeMedia = ref<PreviewMedia | null>(null)
+
+interface HistoryLine {
+    id: number
+    type: 'input' | 'output' | 'error' | 'success' | 'system'
+    text: string
+}
+
+const history = ref<HistoryLine[]>([
+    { id: 1, type: 'system', text: 'FORESTWORK_OS [Version 2026.09.17]' },
+    { id: 2, type: 'system', text: 'Secure Virtual Environment initialized. Type "help" for active directives.\n' }
+])
+
+// 计算当前工作目录字符串
+const currentPath = ref<string[]>([])
+
+const currentPathStr = computed(() => {
+    return currentPath.value.length === 0 ? '/' : '/' + currentPath.value.join('/')
+})
+
+function appendHistory(text: string, type: HistoryLine['type'] = 'output') {
+    history.value.push({ id: Date.now() + Math.random(), text, type })
+    nextTick(() => {
+        if (terminalRef.value) {
+            terminalRef.value.scrollTop = terminalRef.value.scrollHeight
+        }
+    })
+}
+
+// 4. 命令分发字典（Command Dispatcher）
+const commands: Record<string, (args: string[]) => void> = {
+    help: () => {
+        appendHistory(`目前擁有的指令集:
+  ls [-a] [dir]      列出目錄清單 (支援 -a 顯示隱藏項目)
+  cd <dir>           切換工作目錄
+  cat <file>         讀取文本文件
+  open <image>       在視窗中預覽隱寫原圖
+  download <file>    下載未損壞的原始二進制文件
+  submit <flag>      向驗證器提交 Flag，需先登入Discord
+  scoreboard         檢視全場即時積分榜 (別名: top)
+  clear              清除終端屏幕
+  whoami             顯示當前權限標記
+  whois [player]     查詢玩家解題檔案明細 (缺省為本人)
+  login              Discord登入
+  logout             登出當前操作員會話`, 'system')
+    },
+
+    clear: () => {
+        history.value = []
+    },
+
+    // ★ 核心好品味：已登入使用者前置攔截，杜絕無意義跳轉！
+    login: () => {
+        if (currentUser.value) {
+            appendHistory(`[!] You are already logged in as "${promptUser.value}".`, 'system')
+            appendHistory(`[SYSTEM] Type "logout" or use the header menu to sign out first.`, 'system')
+            return
+        }
+
+        appendHistory('[SYSTEM] Redirecting to Discord authorization uplink...', 'system')
+        triggerDiscordLogin()
+    },
+
+    // ★ 核心好品味：在終端機內補齊登出閉環指令！
+    logout: () => {
+        if (!currentUser.value) {
+            appendHistory('[-] No active operator session detected.', 'error')
+            return
+        }
+        appendHistory('[SYSTEM] Terminating active operator session...', 'system')
+        // 呼叫全域登出跳轉，登出後回彈當前 CTF 頁面
+        window.location.href = `/api/auth/logout?redirect=${encodeURIComponent(window.location.pathname)}`
+    },
+
+    whoami: () => {
+        if (currentUser.value) {
+            appendHistory(`OPERATOR: ${currentUser.value.global_name || currentUser.value.username} (ID: ${currentUser.value.id})`, 'output')
+        } else {
+            appendHistory('OPERATOR: Anonymous Guest. Type \'login\' to authenticate.', 'output')
+        }
+    },
+
+    // ==========================================
+    // whois: 查询选手解题档案 (默认回退至当前操作员)
+    // ==========================================
+    whois: async (args) => {
+        // 核心好品味：如果没有传参，无缝降级为查询自己！
+        const target = args[0]?.trim() || currentOperatorId.value
+
+        appendHistory(`[TELEMETRY] 尋轉關於 ${target} 的記錄...`, 'system')
+
+        try {
+            const res = await $fetch<any>('/api/ctf/whois', {
+                params: { operator: target }
+            })
+
+            if (!res || !res.found) {
+                appendHistory(`[-] 玩家 "${target}" 不存在、或尚未解出任何一道題目。`, 'error')
+                return
+            }
+
+            // 格式化输出卡片
+            appendHistory(`[玩家檔案]
+  玩家昵稱 : ${res.accountId}
+  目前名次 : #${res.rank}
+  目前總分 : ${res.totalScore} 分
+  解題題數 : ${res.solvesCount} 題
+
+  已解決的謎題:`, 'output')
+
+            if (res.solves.length === 0) {
+                appendHistory('  (目前沒有任何解題記錄)', 'system')
+                return
+            }
+
+            res.solves.forEach((s: any) => {
+                const catStr = `[${s.category}]`.padEnd(8)
+                const titleStr = padEndVisual(s.title, 20)
+                const ptsStr = `(+${s.points} pts)`.padStart(11)
+                // ★ 核心修復：使用統一的定長時間戳！
+                const timeStr = formatTimestamp(s.solvedAt)
+                appendHistory(`  ${catStr}  ${titleStr}  ${ptsStr}  @ ${timeStr}`, 'output')
+            })
+        } catch (err: any) {
+            appendHistory(`whois: failed to inspect operator: ${err.message || 'Network error'}`, 'error')
+        }
+    },
+
+    ls: (args) => {
+        // 1. 判定是否传入了包含 'a' 的标志位（如 -a, -la, -al）
+        const showAll = args.some(arg => arg.startsWith('-') && arg.includes('a'))
+
+        // 2. 剥离所有的 flag 参数，剩下的才是目标路径（如有）
+        const pathArgs = args.filter(arg => !arg.startsWith('-'))
+        const targetPath = pathArgs[0]
+
+        const targetNode = targetPath ? resolvePath(targetPath) : getCurrentNode()
+
+        if (!targetNode) {
+            appendHistory(`ls: cannot access '${targetPath}': No such file or directory`, 'error')
+            return
+        }
+
+        if (targetNode.type !== 'dir' || !targetNode.children) {
+            // 如果目标是文件，直接输出文件名
+            appendHistory(targetPath || '', 'output')
+            return
+        }
+
+        // 3. 核心好品味：基于数据结构过滤，而不是业务判断
+        let entries = Object.keys(targetNode.children || {})
+
+        if (!showAll) {
+            // 默认过滤掉所有以 . 开头的隐藏项
+            entries = entries.filter(name => !name.startsWith('.'))
+        }
+
+        if (entries.length === 0) {
+            // 如果目录下只有隐藏文件且没有敲 -a，输出空行或直接静默
+            return
+        }
+
+        entries.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+
+        // 格式化输出：目录追加 /，并保持排序
+        const formatted = entries.map(name => {
+            const isDir = targetNode.children?.[name]?.type === 'dir'
+            return isDir ? `${name}/` : name
+        })
+
+        appendHistory(formatted.join('  '), 'output')
+    },
+
+    cd: (args) => {
+        const target = args[0]?.trim()
+
+        // 1. 无参数或 cd ~ 或 cd /，直接回根目录
+        if (!target || target === '~' || target === '/') {
+            currentPath.value = []
+            return
+        }
+
+        // 2. 利用 resolvePath 直接嗅探目标节点
+        const targetNode = resolvePath(target)
+
+        if (!targetNode) {
+            appendHistory(`cd: no such file or directory: ${target}`, 'error')
+            return
+        }
+
+        if (targetNode.type !== 'dir') {
+            appendHistory(`cd: not a directory: ${target}`, 'error')
+            return
+        }
+
+        // 3. 计算新的工作目录栈
+        const isAbsolute = target.startsWith('/')
+        const segments = isAbsolute ? [] : [...currentPath.value]
+        const rawParts = target.split('/').filter(Boolean)
+
+        for (const part of rawParts) {
+            if (part === '.') continue
+            if (part === '..') {
+                segments.pop()
+            } else {
+                segments.push(part)
+            }
+        }
+
+        currentPath.value = segments
+    },
+
+    cat: (args) => {
+        const target = args[0]?.trim()
+        if (!target) {
+            appendHistory('cat: missing file operand', 'error')
+            return
+        }
+
+        // 核心：统一使用 resolvePath，同时支持相对路径与绝对路径
+        const node = resolvePath(target)
+
+        if (!node) {
+            appendHistory(`cat: ${target}: No such file or directory`, 'error')
+            return
+        }
+
+        if (node.type === 'dir') {
+            appendHistory(`cat: ${target}: Is a directory`, 'error')
+            return
+        }
+
+        if (node.isBinary) {
+            appendHistory(`cat: ${target}: Cannot display binary file. Use 'open' or 'download'.`, 'error')
+            return
+        }
+
+        appendHistory(node.content || '', 'output')
+    },
+
+    // ==========================================
+    // open: 通用媒体工件检查器 与 外部靶场穿透
+    // ==========================================
+    open: (args) => {
+        const target = args[0]?.trim()
+        if (!target) {
+            appendHistory('open: missing operand. Usage: open <media_file | url>', 'error')
+            return
+        }
+
+        // 1. 如果输入本身就是纯 URL：直接无视拦截弹射新标签页
+        if (/^https?:\/\//i.test(target)) {
+            openExternalTab(target)
+            appendHistory(`[SYSTEM] Dispatched external uplink: ${target}`, 'system')
+            return
+        }
+
+        const node = resolvePath(target)
+
+        if (!node) {
+            appendHistory(`open: ${target}: No such file or directory`, 'error')
+            return
+        }
+
+        if (node.type === 'dir') {
+            appendHistory(`open: ${target}: Is a directory`, 'error')
+            return
+        }
+
+        // 2. ★ 核心好品味：针对 .url 快捷方式文件，提取其内容/直链并以 DOM 锚点穿透打开！
+        if (target.toLowerCase().endsWith('.url') || (node.artifactUrl && /^https?:\/\//i.test(node.artifactUrl) && !/\.(jpe?g|png|gif|webp|svg|bmp|ico|mp4|webm|ogg|mov|zip|pcap|bin|tar|gz)$/i.test(target))) {
+            const destUrl = node.artifactUrl || node.content?.trim()
+            if (destUrl) {
+                openExternalTab(destUrl)
+                appendHistory(`[SYSTEM] Dispatched external uplink from shortcut: ${destUrl}`, 'system')
+                return
+            }
+        }
+
+        if (!node.artifactUrl) {
+            appendHistory(`open: ${target}: Not an external media artifact.`, 'error')
+            return
+        }
+
+        // 3. 图像与视频媒体嗅探
+        const isImage = /\.(jpe?g|png|gif|webp|svg|bmp|ico)$/i.test(target)
+        const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(target)
+
+        if (!isImage && !isVideo) {
+            appendHistory(`open: ${target}: Unsupported media stream format. Use 'download' instead.`, 'error')
+            return
+        }
+
+        const fileName = target.split('/').pop() || target
+        activeMedia.value = {
+            url: node.artifactUrl,
+            name: fileName,
+            type: isVideo ? 'video' : 'image'
+        }
+
+        appendHistory(`[SYSTEM] Displaying artifact inspector for: ${target} [${isVideo ? 'VIDEO' : 'IMAGE'}]`, 'system')
+    },
+
+    download: (args) => {
+        const target = args[0]?.trim()
+        if (!target) {
+            appendHistory('download: missing file operand', 'error')
+            return
+        }
+
+        const node = resolvePath(target)
+
+        if (!node) {
+            appendHistory(`download: ${target}: No such file or directory`, 'error')
+            return
+        }
+
+        if (node.type === 'dir') {
+            appendHistory(`download: ${target}: Is a directory`, 'error')
+            return
+        }
+
+        if (!node.artifactUrl) {
+            appendHistory(`download: ${target}: File has no external artifact stream.`, 'error')
+            return
+        }
+
+        // 安全外链下载
+        const fileName = target.split('/').pop() || 'artifact.bin'
+        triggerDownload(node.artifactUrl, fileName)
+        appendHistory(`[SYSTEM] Dispatched raw binary download stream: ${fileName}`, 'system')
+    },
+
+    submit: async (args) => {
+
+        if (!currentUser.value) {
+            appendHistory("[-] ACCESS DENIED: Authentication required to register flag.", 'error')
+            appendHistory("[SYSTEM] Type 'login' to authenticate via Discord uplink.", 'system')
+            return
+        }
+
+        const rawFlag = args.join(' ').trim().replace(/^["']|["']$/g, '')
+        if (!rawFlag) {
+            appendHistory('submit: missing flag payload. Usage: submit <FLAG{...}>', 'error')
+            return
+        }
+
+        appendHistory('[VALIDATING] Dispatching cryptographic token sequence...', 'system')
+
+        try {
+
+            const res = await $fetch<{ success: boolean; message: string }>('/api/ctf/submit', {
+                method: 'POST',
+                body: { flag: rawFlag }
+            })
+
+            if (res.success) {
+                appendHistory(`[+] ${res.message}`, 'success')
+
+                // ★ 重新拉取最新关卡列表
+                const currentIds = await hydrateChallenges()
+
+                // ★ 核心好品味：严格比对权威集合中「未曾出现过」的全新关卡！
+                const newlyUnlocked = currentIds.filter(id => !knownChallengeIds.value.has(id))
+
+                newlyUnlocked.forEach(newId => {
+                    appendHistory(`[SYSTEM] ⚠️ CLEARANCE UPGRADED: New sector discovered: /challenges/${newId}`, 'system')
+                    // 动态并入已知集合，杜绝未来任何二次误报
+                    knownChallengeIds.value.add(newId)
+                })
+            } else {
+                appendHistory(`[-] ${res.message}`, 'error')
+            }
+        } catch (err: any) {
+            appendHistory(`[-] API_ERROR: ${err.statusMessage || err.message || 'Submission failed'}`, 'error')
+        }
+    },
+
+    scoreboard: showScoreboard,
+    top: showScoreboard,
+}
+
+// 5. 输入调度器
+function handleExecute() {
+    const line = inputCmd.value.trim()
+    if (!line) return
+
+    if (commandHistory.value[commandHistory.value.length - 1] !== line) {
+        commandHistory.value.push(line)
+    }
+    historyIdx.value = -1
+    inputDraft.value = ''
+
+    appendHistory(`${promptPrefix.value} ${line}`, 'input')
+
+    // 核心修复：安全提取首词，用卫语句斩杀 undefined
+    const tokens = line.split(/\s+/)
+    const rawCmd = tokens[0]
+    if (!rawCmd) return
+
+    const cmd = rawCmd.toLowerCase()
+    const args = tokens.slice(1)
+    inputCmd.value = ''
+
+    const executor = commands[cmd]
+    if (executor) {
+        executor(args)
+    } else {
+        appendHistory(`command not found: ${cmd}. Type "help" for available directives.`, 'error')
+    }
+}
+
+function focusInput() {
+    inputRef.value?.focus()
+}
+
+function handleTerminalClick() {
+    const selection = window.getSelection()
+    if (selection && selection.toString().trim().length > 0) {
+        return // 正在选词，放行用户原生操作
+    }
+    inputRef.value?.focus()
+}
+
+function triggerDownload(url: string, filename?: string) {
+    if (!url) return
+
+    // 如果没有显式指定文件名，从 URL 末尾优雅截取，兜底为 artifact.bin
+    const fallbackName = url.split('/').pop()?.split('?')[0] || 'artifact.bin'
+    const finalName = filename?.trim() || fallbackName
+
+    const link = document.createElement('a')
+    link.href = url
+    link.download = finalName
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+}
+
+function openExternalTab(rawUrl: string) {
+    if (!rawUrl) return
+    let dest = rawUrl.trim()
+
+    // 协议安全补齐：防止相对路径污染
+    if (!/^https?:\/\//i.test(dest)) {
+        dest = `https://${dest}`
+    }
+
+    const link = document.createElement('a')
+    link.href = dest
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+}
+
+onMounted(async () => {
+    focusInput()
+
+    await hydrateChallenges()
+
+    // 纯原生精确匹配：屏幕宽度 < 768px 或具备移动端触控特征
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        isMobileDevice.value = true
+        showMobileWarning.value = true
+
+        // 同时以 Unix MOTD (Message of the Day) 风格，在终端历史流中白纸黑字留下系统提示
+        appendHistory(
+            '[WARN] MOBILE CLIENT DETECTED: Certain steganography, forensics, and binary artifacts require desktop reverse-engineering suites. Not all challenges are solvable on a mobile device alone.',
+            'system'
+        )
+    }
+})
+
+// 允许选手手动点掉横幅，释放更多终端纵向空间
+function dismissMobileWarning() {
+    showMobileWarning.value = false
+}
+
+// ==========================================
+// 1. 常规 SEO / 社交平台基石兜底 (Twitter Card & Open Graph)
+// ==========================================
+useSeoMeta({
+  title: 'FORESTWORK // CTF 終端控制台 · 極客解密挑戰賽',
+  ogTitle: 'FORESTWORK // VIRTUAL_CTF_CONSOLE',
+  description: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
+  ogDescription: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
+  ogImage: 'https://i.imgur.com/cu2YAkn.png', // 可替换为专用的 CTF 终端预览横幅
+  ogUrl: 'https://forestwork.vercel.app/games/ctf',
+  twitterCard: 'summary_large_image',
+  // 终端专属翡翠绿 (#10B981)
+  themeColor: '#10B981'
+})
+
+// ==========================================
+// 2. Discord Component Embed 专属结构体
+// ==========================================
+const ctfDiscordEmbedPayload = {
+  component: {
+    type: 17, // 主容器 Container[cite: 1]
+    accent_color: 1096065, // #10B981 翡翠绿 (HEX 转十进制整数)
+    spoiler: false,
+    components: [
+      {
+        type: 9, // Section 块[cite: 1]
+        components: [
+          {
+            type: 10, // Text 终端字符说明[cite: 1]
+            content: [
+              '# FORESTWORK // CTF MAINFRAME',
+              '`STATUS: ONLINE` · `ENV: POSIX_VFS_SANDBOX`',
+              '',
+              '**【全系統挑戰已上線】**',
+              '• 支援指令: `ls`, `cat`, `open`, `download`, `submit`, `whois`',
+              '• 涵蓋領域: 隱寫術 (Stego) / 逆向 (Reverse) / 密碼學 / Web',
+              '• 賽制特性: 即時分數衰減機制 · Discord 帳號認證綁定',
+              '',
+              '> *「敲下你的第一行指令，奪取屬於你的 Flag。」*'
+            ].join('\n')
+          }
+        ],
+        accessory: {
+          type: 11, // Thumbnail 挂件[cite: 1]
+          media: {
+            url: 'https://i.imgur.com/mfcQRXw.png' // 终端或林间专属 Logo 图标
+          }
+        }
+      },
+      {
+        type: 14, // 视觉分割线[cite: 1]
+        spacing: 1,
+        divider: true
+      },
+      {
+        type: 1, // Action Row 操作按钮容器[cite: 1]
+        components: [
+          {
+            type: 2,
+            style: 5, // Link Button[cite: 1]
+            label: '接入終端 (Launch Shell)',
+            emoji: { name: '💻' },
+            url: 'https://forestwork.vercel.app/games/ctf'
+          },
+        ]
+      }
+    ]
+  }
+}
+
+// ==========================================
+// 3. 声明式注入并彻底覆写根节点
+// ==========================================
+useHead({
+  script: [
+    {
+      key: 'discord:component-embed', // 核心好品味：与 app.vue 相同 key 实施强力覆盖[cite: 1]
+      id: 'discord:component-embed',
+      type: 'application/json',
+      innerHTML: () => JSON.stringify(ctfDiscordEmbedPayload).replace(/</g, '\\u003c') // 安全防爆转义[cite: 1]
+    }
+  ]
+})
+</script>
+
+<template>
+    <!-- 1. 根容器：砍掉 min-h-screen！用 100dvh 精准扣除 Header 与 Footer 高度，彻底封死外层滚动条 -->
+    <div
+        class="w-full max-w-5xl mx-auto px-4 pt-4 pb-2 sm:pt-6 sm:pb-3 h-[58dvh] md:h-[62dvh] lg:h-[calc(100dvh-10.5rem)] max-h-[620px] lg:max-h-none flex flex-col items-center select-text font-mono text-slate-200 overflow-hidden">
+
+        <!-- 顶栏标题指示器（保持原样） -->
+        <header class="w-full shrink-0 mb-2 flex justify-between items-center border-b border-emerald-950/80 pb-2">
+            <div class="flex items-center gap-3">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <h1 class="text-xs sm:text-sm font-bold tracking-widest text-emerald-400">
+                    FORESTWORK // VIRTUAL_CTF_CONSOLE
+                </h1>
+            </div>
+            <NuxtLink to="/" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                [EXIT SESSION]
+            </NuxtLink>
+        </header>
+
+        <!-- 3. 终端主视口（flex-1 自动吃满所有垂直剩余空间，自身 overflow-hidden 杜绝外溢） -->
+        <!-- 终端主视口 -->
+        <main @click="handleTerminalClick"
+            class="w-full flex-1 min-h-0 bg-[#0f141c] border border-slate-800 rounded-lg p-3 sm:p-4 flex flex-col cursor-text shadow-2xl shadow-black/80 selection:bg-emerald-500 selection:text-black overflow-hidden relative">
+            <!-- ★★★ 移动端专属警示条：内嵌于终端框顶部，不撑大外部页面，可手动关闭 ★★★ -->
+            <div v-if="showMobileWarning"
+                class="shrink-0 mb-2.5 px-3 py-2 bg-amber-950/40 border border-amber-500/50 rounded flex items-start justify-between gap-2 text-amber-300 text-xs">
+                <div class="flex items-center gap-2 leading-relaxed">
+                    <span>
+                        檢測到行動裝置 / 平板設備。部分隱寫術（Stego）與二進制逆向題目需要桌面端專業工具鏈，可能無法僅憑觸控裝置獨立完成。
+                    </span>
+                </div>
+                <button @click.stop="dismissMobileWarning"
+                    class="shrink-0 text-amber-400 hover:text-amber-200 font-bold px-1.5 py-0.5 rounded bg-amber-900/40 hover:bg-amber-800/60 transition-colors"
+                    title="關閉提示">
+                    [ACK/OK]
+                </button>
+            </div>
+
+            <!-- 输出历史流（全站唯一滚动区，高度会自动根据是否有上方横幅弹性伸缩） -->
+            <div ref="terminalRef" class="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                <div v-for="item in history" :key="item.id"
+                    class="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
+                    <span v-if="item.type === 'input'" class="text-slate-400 font-bold">{{ item.text }}</span>
+                    <span v-else-if="item.type === 'error'" class="text-rose-400 font-medium">{{ item.text }}</span>
+                    <span v-else-if="item.type === 'success'" class="text-emerald-400 font-bold">{{ item.text }}</span>
+                    <span v-else-if="item.type === 'system'" class="text-sky-400">{{ item.text }}</span>
+                    <span v-else class="text-slate-300">{{ item.text }}</span>
+                </div>
+            </div>
+
+            <!-- 命令行输入条保持在最底端 -->
+            <div class="shrink-0 flex items-center gap-2 mt-2 pt-2 border-t border-slate-800/80">
+                <span class="text-emerald-400 font-bold text-xs sm:text-sm whitespace-nowrap select-none">
+                    {{ promptPrefix }}
+                </span>
+                <input ref="inputRef" v-model="inputCmd" @keydown.enter="handleExecute"
+                    @keydown.tab.prevent="handleTabComplete" @keydown.up.prevent="handleHistoryUp"
+                    @keydown.down.prevent="handleHistoryDown" type="text" autofocus spellcheck="false"
+                    autocomplete="off"
+                    class="flex-1 bg-transparent border-none outline-none text-emerald-300 font-mono text-xs sm:text-sm caret-emerald-400 p-0 focus:ring-0" />
+            </div>
+        </main>
+
+        <!-- ========================================== -->
+        <!-- 统一媒体工件检查器 (Artifact Inspector Modal) -->
+        <!-- ========================================== -->
+        <div v-if="activeMedia"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 select-none"
+            @click.self="activeMedia = null">
+            <div
+                class="relative max-w-4xl w-full bg-black/90 border border-emerald-500/40 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.2)] overflow-hidden flex flex-col">
+                <!-- 弹窗顶栏 (Unix 质感) -->
+                <div
+                    class="flex items-center justify-between px-4 py-2 bg-emerald-950/40 border-b border-emerald-500/30 font-mono text-xs text-emerald-400">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>INSPECTOR // {{ activeMedia.name }}</span>
+                    </div>
+                    <button type="button"
+                        class="text-emerald-500/60 hover:text-emerald-300 transition-colors uppercase font-bold"
+                        @click="activeMedia = null">
+                        [CLOSE ESC]
+                    </button>
+                </div>
+
+                <!-- 媒体核心视口 -->
+                <div class="p-2 flex items-center justify-center bg-black min-h-[200px] max-h-[80vh] overflow-auto">
+                    <!-- 视频形态：带原生控制台、自动播放 -->
+                    <video v-if="activeMedia.type === 'video'" :src="activeMedia.url" controls autoplay playsinline
+                        class="max-w-full max-h-[75vh] rounded object-contain border border-emerald-500/20">
+                        Your browser does not support HTML5 video streaming.
+                    </video>
+
+                    <!-- 图像形态 -->
+                    <img v-else :src="activeMedia.url" :alt="activeMedia.name"
+                        class="max-w-full max-h-[75vh] object-contain rounded" />
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

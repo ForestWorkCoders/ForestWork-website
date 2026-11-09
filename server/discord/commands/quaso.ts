@@ -1,0 +1,61 @@
+// server/discord/commands/quaso.ts
+import type { H3Event } from 'h3'
+import { getSupabase } from '../../utils/supabase'
+
+/**
+ * 處理 Discord 右鍵上下文選單: [🥐 送 1 個 Quaso]
+ */
+export async function handleGiveQuasoContextMenu(interaction: any, event: H3Event) {
+  const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
+  const callerName = interaction.member?.nick || interaction.member?.user?.global_name || interaction.user?.username || '熱心群友'
+  const targetId = String(interaction.data?.target_id || '')
+
+  // 從 resolved 記憶體直接取得目標真實名稱
+  const resolvedMember = interaction.data?.resolved?.members?.[targetId]
+  const resolvedUser = interaction.data?.resolved?.users?.[targetId]
+  const targetName = resolvedMember?.nick || resolvedUser?.global_name || resolvedUser?.username || '神秘群友'
+
+  if (!callerId || !targetId) {
+    return { type: 4, data: { content: '❌ 無法解析贈送者或目標身分。', flags: 64 } }
+  }
+
+  if (resolvedUser?.bot) {
+    return {
+      type: 4,
+      data: {
+        content: `🤖 **機器人拒絕了你的 Quaso！**\n*「代碼只喝機油，不吃高碳水牛角包。把你的愛留給活著的群友吧！」*`,
+        flags: 64 // 僅點擊者本人可見，不污染公屏
+      }
+    }
+  }
+
+  const supabase = getSupabase()
+  const { data: result, error } = await supabase.schema('trpg').rpc('give_quaso', {
+    p_giver_id: callerId,
+    p_giver_name: callerName,
+    p_receiver_id: targetId,
+    p_receiver_name: targetName,
+    p_amount: 1
+  })
+
+  if (error) {
+    return { type: 4, data: { content: `❌ 投遞失敗，資料庫異常：${error.message}`, flags: 64 } }
+  }
+
+  if (!result?.success) {
+    return { type: 4, data: { content: result?.message || '🛑 投遞失敗！', flags: 64 } }
+  }
+
+  return {
+    type: 4,
+    data: {
+      content: `🥐 <@${callerId}> 投遞了 **1** 枚 Quaso 給 <@${targetId}>！*(今日剩餘: \`${result.remaining}/3\`)*`,
+      
+      // ★★★ 核心好品味：禁用所有 Mention 通知！★★★
+      // 名字依然會渲染為藍色可點擊標籤，但絕對不會彈推播、不會響鈴、不會產生小紅點！
+      allowed_mentions: {
+        parse: [] // 清空所有自動提及解析
+      }
+    }
+  }
+}
