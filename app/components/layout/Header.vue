@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-const { user, isPending, login, fetchUser } = useAuth()
+const { user, isPending, login, logout, fetchUser } = useAuth()
 
 // 頁面初次掛載時拉取一次身份
 onMounted(() => {
@@ -28,9 +28,7 @@ const dropdownItems = computed(() => [
     {
       label: '登出系統',
       icon: 'i-lucide-log-out',
-      to: '/api/auth/logout',
-      external: true,
-      target: '_self'
+      onSelect: logout
     }
   ]
 ])
