@@ -79,15 +79,10 @@ const items = computed<NavigationMenuItem[]>(() => [
     <!-- 🟢 1. 消除 <a> 套 <a> 的致命 Bug，并将 PNG 替换为矢量 SVG -->
     <template #title>
       <div class="flex-shrink-0 flex items-center gap-2">
-        <UColorModeImage
-          light="/brand/svg/logo-dark.svg"
-          dark="/brand/svg/logo-light.svg"
-          width="32"
-          height="32"
-          alt="ForestWork Logo"
-          class="h-8 w-auto"
-        />
-        <span class="font-bold hidden sm:block">ForestWork</span>
+        <!-- 1. Emblem 图案标 -->
+        <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg" alt="ForestWork Emblem" class="h-4.75 w-auto" />
+        <!-- 2. Text 文字标（取代原本的 HTML 纯文本，自动响应浅/深色模式） -->
+        <UColorModeImage light="/brand/svg/text-en-dark.svg" dark="/brand/svg/text-en-light.svg" alt="ForestWork" class="h-3.5 w-auto hidden sm:block" />
       </div>
     </template>
 
@@ -103,8 +98,10 @@ const items = computed<NavigationMenuItem[]>(() => [
 
         <!-- 已登入：渲染 Discord 頭像與下拉操作選單 -->
         <UDropdownMenu v-else-if="user" :items="dropdownItems" :popper="{ placement: 'bottom-end' }">
-          <UButton color="secondary" variant="ghost" class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-800">
-            <UAvatar :src="user.avatar || undefined" :alt="user.username" size="sm" class="border border-emerald-500/50" />
+          <UButton color="secondary" variant="ghost"
+            class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-800">
+            <UAvatar :src="user.avatar || undefined" :alt="user.username" size="sm"
+              class="border border-emerald-500/50" />
             <span class="text-xs font-mono text-emerald-400 font-bold hidden xl:inline-block pr-1">
               {{ user.username }}
             </span>
@@ -122,14 +119,8 @@ const items = computed<NavigationMenuItem[]>(() => [
         </UDropdownMenu>
 
         <!-- 未登入：Discord 登入按鈕 -->
-        <UButton
-          v-else
-          color="primary"
-          variant="solid"
-          icon="i-simple-icons-discord"
-          class="hidden lg:inline-flex font-mono text-xs font-bold"
-          @click="login"
-        >
+        <UButton v-else color="primary" variant="solid" icon="i-simple-icons-discord"
+          class="hidden lg:inline-flex font-mono text-xs font-bold" @click="login">
           Discord 登入
         </UButton>
 
@@ -141,24 +132,10 @@ const items = computed<NavigationMenuItem[]>(() => [
 
     <!-- 🟢 3. 彻底拔掉静态 SVG 身上有害的 <ClientOnly> -->
     <template #toggle="{ open, toggle, ui }">
-      <UButton
-        size="sm"
-        variant="ghost"
-        color="neutral"
-        square
-        :class="ui.toggle({ toggleSide: 'right' })"
-        @click="toggle"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="size-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
+      <UButton size="sm" variant="ghost" color="neutral" square :class="ui.toggle({ toggleSide: 'right' })"
+        @click="toggle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="4" y1="6" x2="20" y2="6" />
           <line x1="4" y1="12" x2="20" y2="12" />
           <line x1="4" y1="18" x2="20" y2="18" />
@@ -170,13 +147,8 @@ const items = computed<NavigationMenuItem[]>(() => [
       <UNavigationMenu :items="items" orientation="vertical" class="px-2 mt-4" />
 
       <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 px-4">
-        <UButton
-          to="https://discord.gg/lin-jian-xiao-zhen-510192195509157909"
-          target="_blank"
-          color="primary"
-          variant="solid"
-          block
-        >
+        <UButton to="https://discord.gg/lin-jian-xiao-zhen-510192195509157909" target="_blank" color="primary"
+          variant="solid" block>
           加入Discord
         </UButton>
       </div>
