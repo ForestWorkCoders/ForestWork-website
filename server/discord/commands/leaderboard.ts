@@ -312,14 +312,216 @@ export async function handleLeaderboardCommand(interaction: any, event: H3Event)
       data: payload
     }
   }
+
   if (subCommand === 'quaso') {
     const mode = subOptions.find((o: any) => o.name === 'mode')?.value || 'received'
     const payload = await renderQuasoLeaderboardPayload(mode, callerId)
     return { type: 4, data: payload }
   }
 
+  if (subCommand === 'skill') {
+    const inputModule = subOptions.find((o: any) => o.name === 'module')?.value
+    const targetModuleId = inputModule ? Number(inputModule) : 1
+    const payload = await renderSkillLeaderboardPayload(targetModuleId, callerId)
+    return {
+      type: 4, // 初始回應用戶
+      data: payload
+    }
+  }
+
   return {
     type: 4,
     data: { content: `⚠️ 未知的排行榜類型：\`${subCommand}\``, flags: 64 }
+  }
+}
+
+
+// -------------------------------------------------------------
+// 3. 技能評定 10 槽位元數據契約
+// -------------------------------------------------------------
+interface SkillModuleMeta {
+  id: number
+  title: string
+  code: string
+  category: string
+  emoji: string
+  color: number
+  status: 'ready' | 'locked'
+}
+
+const SKILL_MODULES: Record<number, SkillModuleMeta> = {
+  1: { id: 1, title: '01. PRECISION', code: 'MOD_AIM_01', category: 'TARGET ACQUISITION', emoji: '🎯', color: 0x10B981, status: 'ready' },
+  2: { id: 2, title: '02. DUAL AXIS', code: 'MOD_CTRL_02', category: 'MOTOR COORDINATION', emoji: '🎮', color: 0x38BDF8, status: 'ready' },
+  3: { id: 3, title: '03. TRAIL LINK', code: 'MOD_SCAN_03', category: 'COGNITIVE SEQUENCE', emoji: '🔢', color: 0xFACC15, status: 'ready' },
+  4: { id: 4, title: '04. ODD PAIR', code: 'MOD_PERC_04', category: 'ANOMALY DETECTION', emoji: '🧩', color: 0xF43F5E, status: 'ready' },
+  5: { id: 5, title: '05. REACTION', code: 'MOD_REACT_05', category: 'REFLEX KINETICS', emoji: '⚡', color: 0xA855F7, status: 'ready' },
+  6: { id: 6, title: '06. APEX TRACK', code: 'MOD_TRACK_06', category: 'DYNAMIC PURSUIT', emoji: '📈', color: 0xEC4899, status: 'ready' },
+  7: { id: 7, title: '07. BUFFER FLUSH', code: 'SYS_LOCK_07', category: 'MEMORY CAPACITY', emoji: '🔒', color: 0x52525B, status: 'locked' },
+  8: { id: 8, title: '08. RAPID STRAFE', code: 'SYS_LOCK_08', category: 'SPATIAL AGILITY', emoji: '🔒', color: 0x52525B, status: 'locked' },
+  9: { id: 9, title: '09. CHRONO TAP', code: 'MOD_CPS_09', category: 'TEMPORAL CADENCE', emoji: '🔥', color: 0x06B6D4, status: 'ready' },
+  10: { id: 10, title: '10. OVERCLOCK', code: 'SYS_LOCK_10', category: 'LIMITER BREAKTHROUGH', emoji: '🔒', color: 0x52525B, status: 'locked' }
+}
+
+/**
+ * 構造雙排互動組件：Row 1 下拉選單 + Row 2 Activity 原生啟動按鈕
+ */
+export function buildSkillLeaderboardComponents(currentModuleId: number) {
+  const clientId = process.env.DISCORD_CLIENT_ID || process.env.DISCORD_APPLICATION_ID || '311484597248720907'
+  
+  // 1. 構造 10 槽位下拉選單選項
+  const options = Object.values(SKILL_MODULES).map(m => ({
+    label: `${m.title} // ${m.category}`,
+    value: String(m.id),
+    description: m.status === 'locked' ? '【SYS_LOCK】模組鎖定整備中' : `查看該科目全球前 10 強天梯排行`,
+    emoji: { name: m.emoji },
+    default: m.id === currentModuleId
+  }))
+
+  return [
+    // ActionRow 1: 下拉選單切換科目
+    {
+      type: 1,
+      components: [
+        {
+          type: 3, // STRING_SELECT
+          custom_id: 'leaderboard_skill_switch',
+          placeholder: '⚡ 點擊切換 10 槽位評定科目...',
+          options
+        }
+      ]
+    },
+    // ActionRow 2: Discord Activity 原生直通按鈕 (Link Button)
+    {
+      type: 1,
+      components: [
+        {
+          type: 2, // BUTTON
+          style: 5, // LINK
+          label: '🚀 啟動 Discord 靶場 (Launch Activity)',
+          url: `https://discord.com/activities/${clientId}`
+        },
+        {
+          type: 2,
+          style: 5,
+          label: '🌐 Web 備用入口',
+          url: 'https://forestwork.vercel.app/activities/skill-test'
+        }
+      ]
+    }
+  ]
+}
+
+/**
+ * 核心渲染純函數：拉取該科目全球前 10 榜單與查詢者個人 PB
+ */
+export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: string) {
+  const mod = SKILL_MODULES[moduleId] || SKILL_MODULES[1]!
+  const supabase = getSupabase()
+
+  // 1. 若為鎖定模組，直接給出斯巴達式安全告知
+  if (mod.status === 'locked') {
+    return {
+      embeds: [{
+        title: `${mod.emoji} ${mod.title} // ${mod.category}`,
+        description: `🔒 **【SYS_LOCK // 機密限制】**\n\n該科目核心物理矩陣正在整備調試中，尚未向外場操作員開放。\n請切換至其他就緒模組進行評定。`,
+        color: mod.color,
+        footer: { text: 'ForestWork // Tactical Benchmark Matrix' }
+      }],
+      components: buildSkillLeaderboardComponents(mod.id)
+    }
+  }
+
+  // 2. 查詢該科目全服排名前 10 戰績
+  const { data: topList, error } = await supabase
+    .schema('trpg')
+    .from('v_skill_leaderboard')
+    .select('global_rank, discord_id, operator_name, score, rating, created_at')
+    .eq('module_id', mod.id)
+    .order('global_rank', { ascending: true })
+    .limit(10)
+
+  let rankContent = ''
+  if (error || !topList || topList.length === 0) {
+    rankContent = `// 該科目暫無評定記錄 · 等待首位特工登頂`
+  } else {
+    const medals = ['🥇', '🥈', '🥉']
+    rankContent = topList.map(item => {
+      const prefix = medals[item.global_rank - 1] || `\`#${item.global_rank}\``
+      return `${prefix} **${item.operator_name}** ➔ \`${item.score.toLocaleString()}\` PTS \`[${item.rating}]\``
+    }).join('\n')
+  }
+
+  // 3. 查詢當前呼叫者在該科目的個人歷史最佳戰績 (PB)
+  let personalBlock = ''
+  if (viewerId) {
+    let myRank: number | null = null
+    let myScore: number | null = null
+    let myRating: string = 'COMBAT READY'
+
+    // ① 第一優先：如果在剛剛拉取的前 10 強中，直接內存命中！0 次額外網路請求！
+    const inTopEntry = topList?.find(item => String(item.discord_id) === String(viewerId))
+    if (inTopEntry) {
+      myRank = inTopEntry.global_rank
+      myScore = inTopEntry.score
+      myRating = inTopEntry.rating || 'COMBAT READY'
+    } 
+    // ② 第二優先：若未進入前 10 強，直接向 v_skill_leaderboard 單表反查該選手的全服權威位次
+    else {
+      const { data: myRankEntry, error: rankErr } = await supabase
+        .schema('trpg')
+        .from('v_skill_leaderboard')
+        .select('global_rank, score, rating')
+        .eq('module_id', mod.id)
+        .eq('discord_id', String(viewerId))
+        .maybeSingle()
+
+      if (rankErr) {
+        console.error('[-] 個人戰術檔案反查異常:', rankErr.message)
+      } else if (myRankEntry) {
+        myRank = myRankEntry.global_rank
+        myScore = myRankEntry.score
+        myRating = myRankEntry.rating || 'COMBAT READY'
+      }
+    }
+
+    // 格式化輸出個人檔案
+    if (myScore !== null && myRank !== null) {
+      personalBlock = [
+        '',
+        '--- **你的戰術檔案 // PERSONAL RECORD** ---',
+        `個人最佳: \`${myScore.toLocaleString()} PTS\` · 全服位次: **#${myRank}** \`[${myRating}]\``
+      ].join('\n')
+    } else {
+      personalBlock = [
+        '',
+        '--- **你的戰術檔案 // PERSONAL RECORD** ---',
+        `尚未完成該科目評定 · 點擊下方按鈕啟動 Activity 開始測試！`
+      ].join('\n')
+    }
+  }
+
+  return {
+    embeds: [{
+      title: `${mod.emoji} ${mod.title} // ${mod.category}`,
+      description: rankContent + (personalBlock ? '\n' + personalBlock : ''),
+      color: mod.color,
+      fields: [
+        {
+          name: '科目代號',
+          value: `\`${mod.code}\``,
+          inline: true
+        },
+        {
+          name: '狀態標籤',
+          value: '`DEPLOYABLE`',
+          inline: true
+        }
+      ],
+      footer: {
+        text: 'ForestWork // Skill Sandbox · 點擊下方按鈕直接啟動 Activity'
+      },
+      timestamp: new Date().toISOString()
+    }],
+    components: buildSkillLeaderboardComponents(mod.id)
   }
 }

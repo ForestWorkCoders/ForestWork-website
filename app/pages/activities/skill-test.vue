@@ -28,6 +28,26 @@ definePageMeta({
 const currentDiscordId = ref<string>('10001')
 const currentOperatorDisplay = ref<string>('CONNECTING...')
 
+  // ★ 1. 提升为组件作用域变量，供全页面交互调用
+let discordSdkInstance: DiscordSDK | null = null
+
+// ★ 2. 核心好品味：双模外链穿透器（Discord 客户端走 RPC，普通浏览器走 window.open）
+async function openExternalUrl(url: string) {
+  if (discordSdkInstance) {
+    try {
+      await discordSdkInstance.commands.openExternalLink({ url })
+      return
+    } catch (err) {
+      console.warn('[Activity SDK] openExternalLink 降級:', err)
+    }
+  }
+
+  // 獨立瀏覽器或 SDK 失敗時的防彈兜底
+  if (import.meta.client) {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+}
+
 async function initDiscordSdkAsync() {
   try {
     const rawClientId = (useRuntimeConfig().public as Record<string, unknown>).discordClientId
@@ -59,6 +79,7 @@ async function initDiscordSdkAsync() {
 
     // 此时 window.location.search 中 100% 存在 frame_id，构造函数安全通过！
     const discordSdk = new DiscordSDK(clientId)
+    discordSdkInstance = discordSdk
 
     // 后续握手与静默授权保持不变...
     await Promise.race([
@@ -638,7 +659,7 @@ onUnmounted(() => {
         <header
           class="shrink-0 w-full px-5 py-2.5 flex items-center justify-between border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
           <div class="flex items-center gap-3">
-            <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer"
+            <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer" @click.prevent="openExternalUrl('https://forestwork.vercel.app/')"
               class="group flex items-center gap-2 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
               title="開啟林間小鎮官方網站">
               <span
