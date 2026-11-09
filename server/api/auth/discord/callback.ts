@@ -1,10 +1,19 @@
 // server/api/auth/discord/callback.get.ts
 import { createClient } from '@supabase/supabase-js'
-import { sealSessionData, SESSION_COOKIE_NAME } from '../../../utils/session'
+import { sealSessionData, sanitizeRedirect, SESSION_COOKIE_NAME, OAUTH_STATE_COOKIE } from '../../../utils/session'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const code = String(query.code || '').trim()
+
+  // The state must match the one login.ts saved for this browser, or the code isn't ours to use
+  // (stops login CSRF). On a mismatch or an expired cookie, start the login again.
+  const saved = getCookie(event, OAUTH_STATE_COOKIE) || ''
+  deleteCookie(event, OAUTH_STATE_COOKIE, { path: '/api/auth/discord' })
+  const [savedState, savedReturn] = saved.split('.')
+  if (!savedState || savedState !== String(query.state || '')) {
+    return sendRedirect(event, '/api/auth/discord/login')
+  }
 
   if (!code) {
     throw createError({ statusCode: 400, statusMessage: 'Missing authorization code from Discord callback.' })
@@ -107,6 +116,6 @@ export default defineEventHandler(async (event) => {
     path: '/'
   })
 
-  const returnTo = sanitizeRedirect(query.state)
+  const returnTo = sanitizeRedirect(Buffer.from(savedReturn || '', 'base64url').toString('utf-8'))
   return sendRedirect(event, returnTo)
 })

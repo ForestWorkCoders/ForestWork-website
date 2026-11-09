@@ -68,4 +68,7 @@ export function unsealSessionData(cookieValue?: string): UserSession | null {
   }
 }
 
-export { SESSION_COOKIE_NAME }
+// Short-lived cookie holding the OAuth state value and the return path between login and callback
+const OAUTH_STATE_COOKIE = 'fw_oauth_state'
+
+export { SESSION_COOKIE_NAME, OAUTH_STATE_COOKIE }
