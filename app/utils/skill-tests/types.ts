@@ -15,20 +15,35 @@ export interface SkillGameContext {
   addScore: (delta: number, x?: number, y?: number, color?: string) => void
 }
 
+export interface ResultMetric {
+  value: string | number
+  label: string
+  badge?: string // 金色倍率胶囊或状态 (如 "x2.00", "PEAK", "100%")
+}
+
+export interface ModuleResultSummary {
+  rating: string // 如 "FLAWLESS ACE", "TACTICAL APEX", "COMBAT READY"
+  metrics: ResultMetric[]
+}
+
 export interface SkillModuleInstance {
   id: number
   title: string
-  // 初始化（重置内部状态机）
+  readonly durationMs?: number
+  isCompleted?: boolean
+
   init(ctx: SkillGameContext): void
-  // 每帧状态演进
   update(dt: number, now: number, elapsed: number): void
-  // 每帧绘制（基于 800x600 逻辑坐标）
-  render(ctx: CanvasRenderingContext2D, now: number): void
-  // 鼠标/触控交互（已自动归一化为 800x600 逻辑坐标）
-  onPointerDown?(x: number, y: number, now: number): void
-  // 按键交互 (如 Module 2)
+  // ★ 核心升级：render 允许直接接收 elapsed（从对局开始计算的绝对毫秒数）
+  render(ctx: CanvasRenderingContext2D, now: number, elapsed?: number): void
+
+  getResultSummary?(): ModuleResultSummary
+
+  onPointerDown?(x: number, y: number, now: number, button?: number): void
+  onPointerMove?(x: number, y: number): void
+  onPointerLeave?(): void
+
   onKeyDown?(code: string, e: KeyboardEvent): void
   onKeyUp?(code: string, e: KeyboardEvent): void
-  // 卸载清理
   cleanup?(): void
 }
