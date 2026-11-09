@@ -15,6 +15,19 @@ useSeoMeta({
   themeColor: '#4C7766'
 })
 
+useHead({
+  link: [
+    // 预连接 Google Fonts CDN 提升加载速度
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+    // 仅引入 Open Sans[cite: 5] 与 JetBrains Mono[cite: 5] 的 Latin 字符集（轻量极速）
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Open+Sans:wght@400;600;700;800&display=swap'
+    }
+  ]
+})
+
 // 2. Discord 官方爬虫专属组件树 (静态嵌入式)
 const discordEmbedPayload = {
   component: {
