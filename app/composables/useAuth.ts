@@ -29,12 +29,11 @@ export function useAuth() {
     window.location.href = `/api/auth/discord/login?redirect=${encodeURIComponent(currentPath)}`
   }
 
-  // 登出：携带当前浏览器的 pathname 销毁会话并回弹
-  const logout = () => {
+  // 登出：POST from this page, then reload it so every part of the page sees the logged-out state
+  const logout = async () => {
+    await $fetch('/api/auth/logout', { method: 'POST' })
     user.value = null
-    console.log("logout set!")
-    const currentPath = window.location.pathname + window.location.search
-    window.location.href = `/api/auth/logout?redirect=${encodeURIComponent(currentPath)}`
+    window.location.reload()
   }
 
   return {

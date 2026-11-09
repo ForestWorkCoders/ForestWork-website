@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, nextTick, onMounted } from 'vue'
-const { user: currentUser, login: triggerDiscordLogin } = useAuth()
+const { user: currentUser, login: triggerDiscordLogin, logout: triggerDiscordLogout } = useAuth()
 
 // 1. 核心数据结构：虚拟文件系统（VFS 树形结构）
 interface VFSNode {
@@ -575,8 +575,8 @@ const commands: Record<string, (args: string[]) => void> = {
             return
         }
         appendHistory('[SYSTEM] Terminating active operator session...', 'system')
-        // 呼叫全域登出跳轉，登出後回彈當前 CTF 頁面
-        window.location.href = `/api/auth/logout?redirect=${encodeURIComponent(window.location.pathname)}`
+        // 呼叫全域登出，登出後重新載入當前 CTF 頁面
+        triggerDiscordLogout()
     },
 
     whoami: () => {
