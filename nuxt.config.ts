@@ -40,6 +40,18 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  app: {
+    head: {
+      script: [
+        {
+          // ★ 核心好品味：在 HTML 头部直接执行原生判定，0 毫秒跳跃，消灭一切 CDN 缓存与水合闪烁
+          innerHTML: `if (window.location.pathname === '/' && (window.location.hostname.includes('discordsays.com') || window.location.search.includes('frame_id='))) { window.location.replace('/activities/skill-test' + window.location.search); }`,
+          type: 'text/javascript'
+        }
+      ]
+    }
+  },
+
   routeRules: {
     // 0. 絕對默認
     '/': { prerender: true },
@@ -63,7 +75,15 @@ export default defineNuxtConfig({
 
     // 3. Gartic Phone 旧站重定向（301 永久重定向）
     '/gartic_phone': { redirect: { to: '/games/garticphone', statusCode: 301 } },
-    '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } }
+    '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } },
+
+    // 4. Discord 站内嵌套允许（CSP + XFO）
+    '/activities/**': {
+      headers: {
+        'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com",
+        'X-Frame-Options': 'ALLOWALL'
+      }
+    }
   },
 
   compatibilityDate: '2026-06-30',

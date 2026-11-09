@@ -18,6 +18,7 @@
     "mahjong:recalculate": "npx tsx --env-file=.env scripts/mahjongSoul-recalculate-mr.ts"
   },
   "dependencies": {
+    "@discord/embedded-app-sdk": "^2.5.0",
     "@iconify-json/lucide": "^1.2.117",
     "@iconify-json/simple-icons": "^1.2.90",
     "@nuxt/ui": "^4.10.0",
