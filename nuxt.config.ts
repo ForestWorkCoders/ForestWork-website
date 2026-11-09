@@ -3,8 +3,26 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@nuxtjs/supabase'
+    '@nuxtjs/supabase',
+    '@nuxtjs/sitemap'
   ],
+
+  site: {
+    url: 'https://forestwork.vercel.app'
+  },
+
+  sitemap: {
+    // 自动整合 Nitro 动态 URL 来源
+    sources: [
+      '/api/__sitemap__/urls'
+    ],
+    // 排除纯内部 API 端点，防止泄露给搜索引擎
+    exclude: [
+      '/api/**',
+      '/activities/**',
+      '/tools/giveaway'
+    ]
+  },
 
   devtools: {
     enabled: true
@@ -65,7 +83,11 @@ export default defineNuxtConfig({
     '/gartic_phone': { redirect: { to: '/games/garticphone', statusCode: 301 } },
     '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } },
 
-    // 4. Discord 站内嵌套允许（CSP + XFO）
+    // 4. CTF 旧站重定向（301 永久重定向）
+    '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 302 } },
+    '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 302 } },
+
+    // 5. Discord 站内嵌套允许（CSP + XFO）
     '/activities/**': {
       headers: {
         'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com",
