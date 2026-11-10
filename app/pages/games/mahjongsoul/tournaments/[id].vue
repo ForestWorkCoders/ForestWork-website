@@ -214,20 +214,10 @@ useHead({
                 <div
                     class="bg-white dark:bg-[#1a1c23] w-full border-x border-b border-gray-200 dark:border-gray-800 rounded-b-xl shadow-sm">
                     <div v-if="tabs.length > 1">
+                        <!-- The bar scrolls sideways when the labels don't fit (phones), instead of cutting them to "…" -->
                         <UTabs :items="tabs" class="w-full" :ui="{
-                            wrapper: 'w-full',
-                            list: {
-                                // 核心：移动端允许横向滑动、禁止折行、隐藏滚动条；在大屏恢复自适应宽度
-                                base: 'flex flex-nowrap overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full justify-start sm:justify-center',
-                                background: 'bg-gray-100 dark:bg-[#0f172a]',
-                                padding: 'p-1',
-                                tab: {
-                                    // 核心：whitespace-nowrap 坚决禁止文字打省略号截断，padding 自适应
-                                    base: 'whitespace-nowrap shrink-0 text-xs sm:text-sm px-3 py-2 font-medium',
-                                    active: 'text-gray-950 dark:text-white font-bold',
-                                    inactive: 'text-gray-500 dark:text-gray-400'
-                                }
-                            }
+                            list: 'overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                            trigger: 'shrink-0'
                         }">
                             <!-- 賽事資訊 -->
                             <template #info>
