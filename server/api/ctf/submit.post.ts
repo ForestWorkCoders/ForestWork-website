@@ -58,6 +58,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 404 代表該 Discord 帳號根本沒有加入伺服器
+  // (same link as DISCORD_SERVER_URL in app/utils/links.ts)
   if (memberRes.status === 404) {
     return {
       success: false,

@@ -20,7 +20,7 @@ const dropdownItems = computed(() => [
     {
       label: '林間小鎮 Discord 伺服器',
       icon: 'i-simple-icons-discord',
-      to: 'https://discord.com/servers/510192195509157909',
+      to: DISCORD_SERVER_URL,
       target: '_blank'
     }
   ],
@@ -145,7 +145,7 @@ const items = computed<NavigationMenuItem[]>(() => [
       <UNavigationMenu :items="items" orientation="vertical" class="px-2 mt-4" />
 
       <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 px-4">
-        <UButton to="https://discord.gg/lin-jian-xiao-zhen-510192195509157909" target="_blank" color="primary"
+        <UButton :to="DISCORD_SERVER_URL" target="_blank" color="primary"
           variant="solid" block>
           加入Discord
         </UButton>
