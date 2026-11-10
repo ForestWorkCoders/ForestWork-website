@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
   if (memberRes.status === 404) {
     return {
       success: false,
-      message: '[-] ACCESS DENIED: Operator is not enlisted in ForestWork headquarters.\n[SYSTEM] Join our Discord first: https://discord.com/servers/she-chu-xiao-zhen-510192195509157909'
+      message: '[-] ACCESS DENIED: Operator is not enlisted in ForestWork headquarters.\n[SYSTEM] Join our Discord first: https://discord.com/servers/510192195509157909'
     }
   }
 
