@@ -1,5 +1,6 @@
 // scripts/backfill-curse.mjs
 import { createClient } from '@supabase/supabase-js'
+import { countCurses } from '../server/discord/curse-words.mjs'
 
 // 1. 解析與驗證命令列傳入的年份參數
 const rawYear = process.argv[2]
@@ -24,9 +25,6 @@ if (!DISCORD_BOT_TOKEN || !CHANNEL_ID || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-
-// 粗口正則清單
-const CURSE_REGEX = /(fuck|shit|機掰|雞掰|78|靠邀|靠么|靠北|三小|殺小|3小|尛|你媽的|操|NMSL|CNMB|你媽逼|NMB|媽的|幹|E04|e04|屌|屄|幹你娘|操你媽|你媽死了|林老師勒|王八蛋|米蟲|賤貨|智障|敗類|白癡|北七|婊子|屎|下流|fk|fucking|fucker|nigga|niggas|nigger|老母|林北|林娘|白癡|智障|低能|腦殘|腦缺|腦癱|霍金|北七|87|靠杯|靠腰|靠夭|三洨|啥小|沙小|可悲|臥槽|窩操|王八蛋|wc|sb|傻逼|傻B|狗屎|去死|幹話|屁話|神經病|有病|皮炎|屁眼|p眼|迪克|nmsl|cnmb|nmb|死全家|死媽|死媽的|死你媽|死你全家|全家產|他喵的)/gi
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -133,12 +131,9 @@ async function runBackfill(year) {
       userData.msgDelta += 1
       userData.username = displayName
 
-      const content = msg.content || ''
-      const matches = content.match(CURSE_REGEX)
-      if (matches && matches.length > 0) {
-        totalCurseDetected += matches.length
-        userData.curseDelta += matches.length
-      }
+      const curses = countCurses(msg.content || '')
+      totalCurseDetected += curses
+      userData.curseDelta += curses
     }
 
     lastId = batchNewestId
