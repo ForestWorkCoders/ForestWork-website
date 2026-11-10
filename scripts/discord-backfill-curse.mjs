@@ -57,6 +57,11 @@ async function runBackfill(year) {
   let totalMessagesProcessed = 0
   let totalCurseDetected = 0
   let isCompleted = false
+  let reachedLatest = false // true only when the channel has no newer message at all
+
+  // The whole year is added up here first and written once at the end,
+  // so a run that fails halfway leaves the database untouched.
+  const yearTotals = new Map()
 
   while (!isCompleted) {
     const url = new URL(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`)
@@ -84,25 +89,34 @@ async function runBackfill(year) {
 
     if (!res.ok) {
       console.error(`❌ Discord API 異常 (HTTP ${res.status}):`, await res.text())
-      break
+      console.error('❌ Nothing was written to the database.')
+      process.exit(1)
     }
 
     const messages = await res.json()
     if (!Array.isArray(messages) || messages.length === 0) {
       console.log('🏁 已無更多歷史訊息。')
       isCompleted = true
+      reachedLatest = true
       break
     }
 
-    const userBatchMap = new Map()
     let batchNewestId = lastId
 
     for (const msg of messages) {
-      // 一旦消息時間跨入下一年，立即中斷
+      // Next year's messages end the run after this page. They are skipped, not a reason to stop
+      // reading: a page comes newest first, so this year's messages follow them in the same page.
       if (BigInt(msg.id) >= BigInt(END_SNOWFLAKE)) {
-        console.log(`\n🛑 [Boundary Reached] 檢測到抵達 ${NEXT_YEAR}-01-01 邊界訊息 (${msg.id})，立即安全剎車！`)
+        if (!isCompleted) {
+          console.log(`\n🛑 [Boundary Reached] 檢測到抵達 ${NEXT_YEAR}-01-01 邊界訊息 (${msg.id})，立即安全剎車！`)
+        }
         isCompleted = true
-        break
+        continue
+      }
+
+      // Track the newest ID before skipping bots, or a bot at the end of a page is fetched again
+      if (BigInt(msg.id) > BigInt(batchNewestId)) {
+        batchNewestId = String(msg.id)
       }
 
       totalMessagesProcessed++
@@ -111,11 +125,11 @@ async function runBackfill(year) {
       const uId = String(msg.author.id)
       const displayName = msg.author.global_name || msg.author.username || '神秘成員'
 
-      if (!userBatchMap.has(uId)) {
-        userBatchMap.set(uId, { username: displayName, curseDelta: 0, msgDelta: 0 })
+      if (!yearTotals.has(uId)) {
+        yearTotals.set(uId, { username: displayName, curseDelta: 0, msgDelta: 0 })
       }
 
-      const userData = userBatchMap.get(uId)
+      const userData = yearTotals.get(uId)
       userData.msgDelta += 1
       userData.username = displayName
 
@@ -124,26 +138,6 @@ async function runBackfill(year) {
       if (matches && matches.length > 0) {
         totalCurseDetected += matches.length
         userData.curseDelta += matches.length
-      }
-
-      if (BigInt(msg.id) > BigInt(batchNewestId)) {
-        batchNewestId = String(msg.id)
-      }
-    }
-
-    // 原子累加至 Supabase
-    for (const [userId, data] of userBatchMap.entries()) {
-      const { error: rpcErr } = await supabase.schema('trpg').rpc('increment_curse_count', {
-        p_user_id: userId,
-        p_username: data.username,
-        p_year: year,
-        p_curse_delta: data.curseDelta,
-        p_msg_delta: data.msgDelta
-      })
-
-      if (rpcErr) {
-        console.error(`\n❌ [RPC 寫入失敗] 使用者: ${userId} (${data.username})`, rpcErr)
-        process.exit(1)
       }
     }
 
@@ -155,12 +149,54 @@ async function runBackfill(year) {
       `📊 [${year} 歸檔進度] 日期: ${currentDate} | 累計處理: ${totalMessagesProcessed} 條 | 捕獲粗口: ${totalCurseDetected} 次`
     )
 
+    if (isCompleted) break
+
     if (messages.length < 100) {
       isCompleted = true
+      reachedLatest = true
       break
     }
 
     await sleep(200) // 防禦節流
+  }
+
+  // Replace the year's rows: clear them, then write the fresh totals.
+  // Running the script again for the same year gives the same numbers instead of adding on top.
+  const { error: clearErr } = await supabase.schema('trpg').from('curse_stats').delete().eq('year', year)
+  if (clearErr) {
+    console.error(`\n❌ [清除 ${year} 舊資料失敗]`, clearErr)
+    process.exit(1)
+  }
+
+  for (const [userId, data] of yearTotals.entries()) {
+    const { error: rpcErr } = await supabase.schema('trpg').rpc('increment_curse_count', {
+      p_user_id: userId,
+      p_username: data.username,
+      p_year: year,
+      p_curse_delta: data.curseDelta,
+      p_msg_delta: data.msgDelta
+    })
+
+    if (rpcErr) {
+      console.error(`\n❌ [RPC 寫入失敗] 使用者: ${userId} (${data.username})`, rpcErr)
+      console.error(`❌ ${year} is only partly written. Run the script again.`)
+      process.exit(1)
+    }
+  }
+
+  // Caught up with the live channel: tell the daily cron where to continue,
+  // so it doesn't count these messages a second time.
+  if (reachedLatest) {
+    const { error: cursorErr } = await supabase.schema('trpg').from('sync_cursors').upsert({
+      channel_id: CHANNEL_ID,
+      last_message_id: lastId,
+      updated_at: new Date().toISOString()
+    })
+    if (cursorErr) {
+      console.error('\n❌ [游標寫入失敗]', cursorErr)
+      process.exit(1)
+    }
+    console.log(`📌 Cron cursor saved at ${lastId} (${snowflakeToDate(lastId)})`)
   }
 
   console.log(`\n================ ${year} 歸檔總結 ================`)
