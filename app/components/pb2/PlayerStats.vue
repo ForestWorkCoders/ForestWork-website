@@ -287,17 +287,7 @@ const top3Charts = computed(() => {
           class="bg-white dark:bg-[#1e293b] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full overflow-hidden detailed-stats-section">
 
           <!-- 模式切換 Tabs：不要在外層加 p-4 border-b，直接讓 Tabs 作為卡片頂部通欄 -->
-          <UTabs :items="tabs" v-model="currentCategory" class="w-full" :ui="{
-            wrapper: 'w-full',
-            list: {
-              background: 'bg-gray-100 dark:bg-[#0f172a]',
-              // 翡翠绿药丸高亮
-              indicator: 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm',
-              tab: {
-                base: 'font-semibold transition-colors py-2'
-              }
-            }
-          }">
+          <UTabs :items="tabs" v-model="currentCategory" class="w-full">
             <!-- 核心修复：Nuxt UI 会自动依据 tabs 里的 icon 渲染且仅渲染一个图标！ -->
             <!-- 我们在插槽里只需要控制文字：移动端 hidden，大于 640px (sm:) 时 inline 展开 -->
             <template #default="{ item }">
