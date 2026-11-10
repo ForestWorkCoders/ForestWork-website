@@ -104,6 +104,11 @@ const parsedHtml = computed(() => {
   opacity: 0.85;
 }
 
+/* Tailwind's reset removes list markers; bring them back */
+.markdown-body :deep(ul) { @apply list-disc; }
+.markdown-body :deep(ol) { @apply list-decimal; }
+.markdown-body :deep(li ul) { @apply list-[circle]; }
+
 .markdown-body :deep(a) {
   @apply hover:underline;
   /* 祖母绿 500 是完美的中间色，在黑底和白底上都能清晰阅读 */
