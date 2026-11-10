@@ -3,6 +3,13 @@ import { toComponentEmbedJson } from 'discord-component-embed';
 import { SpeedInsights } from '@vercel/speed-insights/vue';
 import { Analytics } from '@vercel/analytics/vue';
 
+// The public address of the page being shown: the production host plus the path, without the query string
+// or a trailing slash (so /games/x and /games/x/ are one address).
+// Used for og:url and the canonical link, so a shared link describes its own page,
+// and copies on other hosts (staging, old aliases) point search engines at production.
+const route = useRoute()
+const pageUrl = computed(() => `https://forestwork.vercel.app${route.path.replace(/(.)\/+$/, '$1')}`)
+
 // 1. 常规 SEO / 社交平台兜底 (当平台不支持 component-embed 时降级显示)
 useSeoMeta({
   title: '林間小鎮 · ForestWork',
@@ -10,13 +17,14 @@ useSeoMeta({
   description: '林間小鎮賽事網頁',
   ogDescription: '林間小鎮賽事網頁',
   ogImage: 'https://i.imgur.com/cu2YAkn.png',
-  ogUrl: 'https://forestwork.vercel.app',
+  ogUrl: () => pageUrl.value,
   twitterCard: 'summary_large_image',
   themeColor: '#4C7766'
 })
 
 useHead({
   link: [
+    { rel: 'canonical', href: pageUrl },
     // 预连接 Google Fonts CDN 提升加载速度
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
