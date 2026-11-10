@@ -21,12 +21,15 @@ const { data: playstyleData, pending: playstylePending } = await useFetch(
   `/api/mahjong/tournaments/${props.tournamentId}/playstyle`
 )
 
+// A player needs this many games to get on the podium
+const PODIUM_MIN_GAMES = 8
+
 const top3Players = computed(() => {
   if (!matchData.value) return []
 
   return matchData.value
-    // 1. 过滤：只允许打满 8 局及以上的硬核玩家入场
-    .filter(player => player.play_count >= 8)
+    // 1. 过滤：只允许打满 PODIUM_MIN_GAMES 局及以上的硬核玩家入场
+    .filter(player => player.play_count >= PODIUM_MIN_GAMES)
     // 2. 排序：主要按平均顺位升序 (越低越牛)；如果顺位相同，按打的场数降序 (场数越多含金量越高)
     .sort((a, b) => {
       if (a.avg_rank === b.avg_rank) {
@@ -195,7 +198,13 @@ const playPercentStyles = [
         </h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Early in a cup nobody has enough games yet; say so instead of showing an empty section -->
+      <p v-if="!top3Players.length"
+        class="text-sm text-gray-500 dark:text-gray-400 py-6 text-center border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+        尚無選手打滿 {{ PODIUM_MIN_GAMES }} 場 · No player has {{ PODIUM_MIN_GAMES }} games yet
+      </p>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div v-for="(player, index) in top3Players" :key="player.nickname || index"
           class="bg-white dark:bg-[#18212f] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col relative group">
 
