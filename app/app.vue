@@ -90,7 +90,7 @@ const discordEmbedPayload = {
             style: 5,
             label: '加入 Discord',
             emoji: { name: '📌' },
-            url: 'https://discord.gg/lin-jian-xiao-zhen-510192195509157909'
+            url: DISCORD_SERVER_URL
           }
         ]
       }

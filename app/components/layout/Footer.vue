@@ -35,7 +35,7 @@
         icon="i-simple-icons-discord"
         color="neutral"
         variant="ghost"
-        to="https://discord.gg/XhAHbCq3VB"
+        :to="DISCORD_SERVER_URL"
         target="_blank"
         aria-label="Discord"
       />
