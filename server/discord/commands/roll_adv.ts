@@ -1,7 +1,7 @@
 // server/discord/commands/roll.ts 完整重構版：
-import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
 import { getInteractionOption } from '../utils'
+import { evaluateDiceExpression } from '../dice'
 import { getSupabase } from '~~/server/utils/supabase'
 
 /**
@@ -19,84 +19,6 @@ async function postDiscordMessage(channelId: string, content: string) {
     },
     body: JSON.stringify({ content })
   }).catch((err) => console.error('[Discord Sync Error]:', err))
-}
-
-/**
- * 带有 Keep (kh/kl) / Drop (dh/dl) 修饰符的标准 Dice 词法解析器
- */
-function evaluateDiceExpression(expression: string): { total: number; breakdown: string } {
-  const clean = expression.replace(/\s+/g, '').toLowerCase()
-
-  const termRegex = /([+-]?)(?:(?:(\d*)d(\d+)(?:(kh|kl|dh|dl|k|d)(\d*))?)|(\d+))/g
-  let match: RegExpExecArray | null
-
-  let total = 0
-  const breakdownParts: string[] = []
-
-  while ((match = termRegex.exec(clean)) !== null) {
-    const [fullMatch, signStr, diceCountStr, diceFacesStr, modType, modCountStr, constantStr] = match
-    if (!fullMatch) continue
-
-    const sign = signStr === '-' ? -1 : 1
-    const prefix = sign === -1 ? ' - ' : breakdownParts.length > 0 ? ' + ' : ''
-
-    if (constantStr !== undefined) {
-      const val = parseInt(constantStr, 10)
-      total += sign * val
-      breakdownParts.push(`${prefix}${val}`)
-    } else if (diceFacesStr !== undefined) {
-      const count = Math.min(50, Math.max(1, diceCountStr ? parseInt(diceCountStr, 10) : 1))
-      const faces = Math.min(1000, Math.max(1, parseInt(diceFacesStr, 10)))
-
-      const rawRolls: number[] = []
-      for (let i = 0; i < count; i++) {
-        rawRolls.push(crypto.randomInt(1, faces + 1))
-      }
-
-      const indexed = rawRolls.map((val, idx) => ({ idx, val }))
-      let keptIndices = new Set<number>(indexed.map(item => item.idx))
-
-      if (modType) {
-        const modNum = modCountStr ? parseInt(modCountStr, 10) : 1
-        const safeNum = Math.min(count, Math.max(1, modNum))
-
-        if (modType === 'k' || modType === 'kh') {
-          indexed.sort((a, b) => b.val - a.val)
-          keptIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
-        } else if (modType === 'kl') {
-          indexed.sort((a, b) => a.val - b.val)
-          keptIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
-        } else if (modType === 'dl' || modType === 'd') {
-          indexed.sort((a, b) => a.val - b.val)
-          const dropIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
-          keptIndices = new Set(rawRolls.map((_, i) => i).filter(i => !dropIndices.has(i)))
-        } else if (modType === 'dh') {
-          indexed.sort((a, b) => b.val - a.val)
-          const dropIndices = new Set(indexed.slice(0, safeNum).map(item => item.idx))
-          keptIndices = new Set(rawRolls.map((_, i) => i).filter(i => !dropIndices.has(i)))
-        }
-      }
-
-      let diceSum = 0
-      const formattedRolls = rawRolls.map((val, i) => {
-        if (keptIndices.has(i)) {
-          diceSum += val
-          return `**${val}**`
-        }
-        return `~~${val}~~`
-      })
-
-      total += sign * diceSum
-
-      const modLabel = modType ? `${modType}${modCountStr || ''}` : ''
-      breakdownParts.push(`${prefix}\`${count}d${faces}${modLabel}\` [${formattedRolls.join(', ')}]`)
-    }
-  }
-
-  return {
-    total,
-    breakdown: breakdownParts.join('') || '0'
-  }
 }
 
 export async function handleRollAdv(interaction: any, event: H3Event) {
