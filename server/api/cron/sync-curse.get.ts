@@ -113,35 +113,36 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // 4. 并发回写数据库
-  await Promise.all(
-    Array.from(deltas.values()).map((d) =>
-      supabase.schema('trpg').rpc('increment_curse_count', {
-        p_user_id: d.userId,
-        p_username: d.username,
-        p_year: d.year,
-        p_curse_delta: d.curseDelta,
-        p_msg_delta: d.msgDelta
-      })
-    )
-  )
-
-  // 5. 游标安全归档
+  // 4. Save the counts and the new cursor together, in one database transaction.
+  //    `applied` is false when the cursor moved since this run started (another run or a
+  //    backfill got there first): then nothing is written, so nothing is counted twice.
+  let applied = true
   if (cursor !== startId) {
-    await supabase
-      .schema('trpg')
-      .from('sync_cursors')
-      .upsert({
-        channel_id: channelId,
-        last_message_id: cursor,
-        updated_at: new Date().toISOString()
-      })
+    const { data, error } = await supabase.schema('trpg').rpc('apply_curse_sync', {
+      p_channel_id: channelId,
+      p_expected_cursor: startId,
+      p_new_cursor: cursor,
+      p_deltas: Array.from(deltas.values()).map((d) => ({
+        user_id: d.userId,
+        username: d.username,
+        year: d.year,
+        curses: d.curseDelta,
+        messages: d.msgDelta
+      }))
+    })
+
+    // Nothing was saved and the cursor did not move: the next run reads the same messages again
+    if (error) {
+      console.error('[Curse Cron] apply_curse_sync failed:', error.message)
+      throw createError({ statusCode: 500, statusMessage: 'Curse sync could not be saved' })
+    }
+    applied = data === true
   }
 
   return {
-    status: 'ok',
-    syncedUsers: deltas.size,
-    newCursor: cursor,
-    caughtUp
+    status: applied ? 'ok' : 'skipped',
+    syncedUsers: applied ? deltas.size : 0,
+    newCursor: applied ? cursor : startId,
+    caughtUp: applied && caughtUp
   }
 })
