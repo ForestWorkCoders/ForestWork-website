@@ -2,42 +2,26 @@
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
 import { getInteractionOption } from '../utils'
+import { evaluateDiceExpression, isDiceExpression } from '../dice'
 import { getSupabase } from '../../utils/supabase'
 
 const d100 = () => crypto.randomInt(1, 101)
-
-/**
- * 簡易擲骰表達式解析器 (支援純數字如 "1" 或骰子如 "1d6", "2d10")
- */
-function rollDiceExpression(exp: string): { total: number, detail: string } {
-  const clean = exp.trim().toLowerCase()
-  const match = clean.match(/^(\d+)?d(\d+)$/)
-  
-  if (match) {
-    const count = parseInt(match[1] || '1', 10)
-    const sides = parseInt(match[2]!, 10)
-    const rolls = Array.from({ length: count }, () => crypto.randomInt(1, sides + 1))
-    const sum = rolls.reduce((a, b) => a + b, 0)
-    return { total: sum, detail: count > 1 ? `(${rolls.join('+')})=${sum}` : `${sum}` }
-  }
-
-  const staticVal = parseInt(clean, 10) || 0
-  return { total: staticVal, detail: `${staticVal}` }
-}
 
 export async function handleSc(interaction: any, event: H3Event) {
   const callerId = interaction.member?.user?.id || interaction.user?.id
   const expParam = getInteractionOption<string>(interaction, 'exp')?.trim()
   const manualSan = getInteractionOption<number>(interaction, 'current')
 
-  if (!expParam || !expParam.includes('/')) {
+  // Exactly two readable sides (pass/fail). Anything else is refused: an unreadable loss must not count as 0.
+  const sides = (expParam || '').split('/').map(s => s.trim())
+  if (sides.length !== 2 || !sides.every(isDiceExpression)) {
     return {
       type: 4,
-      data: { content: '⚠️ 請提供標準的理智損失表達式！格式如：`0/1d6` 或 `1/1d4`。', flags: 64 }
+      data: { content: '⚠️ 請提供標準的理智損失表達式！格式如：`0/1d6`、`1/1d4` 或 `1/1d10+1`。', flags: 64 }
     }
   }
 
-  const [passExp, failExp] = expParam.split('/').map(s => s.trim())
+  const [passExp, failExp] = sides
   const supabase = getSupabase()
   let currentSan: number
   let activeChar: any = null
@@ -81,7 +65,8 @@ export async function handleSc(interaction: any, event: H3Event) {
 
   // 3. 結算損失數值
   const selectedExp = isPass ? passExp! : failExp!
-  const { total: loss, detail: lossDetail } = rollDiceExpression(selectedExp)
+  const { total: rolled, breakdown: lossDetail } = evaluateDiceExpression(selectedExp)
+  const loss = Math.max(0, rolled) // a SAN check never heals (e.g. 1d4-2 rolling 1)
   const newSan = Math.max(0, currentSan - loss)
 
   // 4. 原子寫回資料庫（若綁定了角色卡）
@@ -111,7 +96,7 @@ export async function handleSc(interaction: any, event: H3Event) {
       },
       {
         name: `💥 理智損失結算 (執行: ${selectedExp})`,
-        value: `損失點數：**\`${loss}\`** 點 ${lossDetail !== String(loss) ? `\`${lossDetail}\`` : ''}\n理智變更：\`${currentSan}\` ➔ **\`${newSan}\`**${dbSynced ? ' ⭐ *(角色卡已自動同步)*' : ''}`,
+        value: `損失點數：**\`${loss}\`** 點 ${lossDetail !== String(loss) ? `← ${lossDetail}` : ''}\n理智變更：\`${currentSan}\` ➔ **\`${newSan}\`**${dbSynced ? ' ⭐ *(角色卡已自動同步)*' : ''}`,
         inline: false
       }
     ],
