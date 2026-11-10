@@ -1,6 +1,7 @@
 // server/discord/commands/roll.ts 完整重構版：
 import type { H3Event } from 'h3'
 import { getInteractionOption } from '../utils'
+import { recordRoomPlayer } from '../room-player'
 import { evaluateDiceExpression } from '../dice'
 import { getSupabase } from '~~/server/utils/supabase'
 
@@ -34,7 +35,7 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
   // ========================================================================
   // ★ 核心好品味：若在公開子區內，並發「登記玩家」與「取得 GM 暗骰子區 ID」
   // ========================================================================
-  if (channelType === 12) {
+  if (channelType === 11 || channelType === 12) {
     const supabase = getSupabase()
     const [roomRes] = await Promise.all([
       // 查詢當前子區是否屬於某個活躍跑團房間
@@ -46,10 +47,7 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
         .eq('status', 'ACTIVE')
         .maybeSingle(),
       // 記錄參團玩家身分
-      supabase.rpc('record_room_player', {
-        p_main_thread_id: currentChannelId,
-        p_player_id: callerId
-      })
+      recordRoomPlayer(interaction)
     ])
 
     if (roomRes.data?.gm_thread_id) {
