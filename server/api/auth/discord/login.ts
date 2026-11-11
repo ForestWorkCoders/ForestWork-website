@@ -10,19 +10,8 @@ export default defineEventHandler((event) => {
     throw createError({ statusCode: 500, statusMessage: 'OAuth configuration missing.' })
   }
 
-  const query = getQuery(event)
-  const referer = getHeader(event, 'referer')
-
-  // ★ 核心好品味：優先取 query.redirect，缺省則從 Referer 提取 pathname，最後才兜底 /
-  let targetPath = query.redirect
-  if (!targetPath && referer) {
-    try {
-      targetPath = new URL(referer).pathname
-    } catch {
-      targetPath = '/'
-    }
-  }
-  const returnTo = sanitizeRedirect(query.redirect)
+  // Where to go after login: ?redirect= (every login link passes it), else /
+  const returnTo = sanitizeRedirect(getQuery(event).redirect)
 
   const authUrl = new URL('https://discord.com/oauth2/authorize')
   authUrl.searchParams.set('client_id', clientId)
