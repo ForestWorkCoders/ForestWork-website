@@ -461,13 +461,6 @@ const dealInTargetOption = computed(() => {
         }]
     }
 })
-
-// 成就佔位
-const achievements = ref([
-    { title: '役滿盃 冠軍', event: '2023 March Mahjong Event', date: '2023-03-28', icon: '🏆' },
-    { title: '年度大師賽 季軍', event: '2024 December Finals', date: '2024-12-15', icon: '🥉' },
-    { title: '活動周單日四連勝', event: '2025 Event Week', date: '2025-06-12', icon: '🔥' }
-])
 </script>
 
 <template>
@@ -857,29 +850,6 @@ const achievements = ref([
             <!-- 空態防禦 -->
             <div v-else class="text-center py-8 text-sm text-gray-400 font-mono">
                 當前選定區間內暫無{{ majorHandMode === 'win' ? '和牌' : '放銃' }}記錄
-            </div>
-        </div>
-
-        <!-- 8. 榮譽與成就 -->
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">榮譽與成就 · Achievements</h2>
-                    <p class="text-xs text-gray-500">歷史大賽桂冠與特殊賽事頭名記錄</p>
-                </div>
-                <UBadge color="neutral" variant="solid" size="xs">手動維護</UBadge>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <div v-for="(achieve, idx) in achievements" :key="idx"
-                    class="flex items-start gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
-                    <div class="text-2xl">{{ achieve.icon || '🏆' }}</div>
-                    <div>
-                        <div class="font-bold text-sm text-gray-900 dark:text-white">{{ achieve.title }}</div>
-                        <div class="text-xs text-emerald-500 font-mono mt-0.5">{{ achieve.event }}</div>
-                        <div class="text-[11px] text-gray-400 mt-1">{{ achieve.date }}</div>
-                    </div>
-                </div>
             </div>
         </div>
 
