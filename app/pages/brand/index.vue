@@ -213,11 +213,11 @@ const colors: ColorToken[] = [
                             <div
                                 class="h-32 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
                                 <div class="flex items-center justify-center gap-2.5 max-w-full">
-                                    <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                    <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                         alt="Emblem" class="h-7 sm:h-8 w-auto shrink-0" />
                                     <!-- 🟢 防御性约束：max-w-[65%] + object-contain 彻底消灭移动端破框 -->
-                                    <UColorModeImage light="/brand/svg/text-en-dark.svg"
-                                        dark="/brand/svg/text-en-light.svg" alt="Forest Work"
+                                    <UColorModeImage light="/brand/svg/text-en-black.svg"
+                                        dark="/brand/svg/text-en-white.svg" alt="Forest Work"
                                         class="h-4 sm:h-5 w-auto max-w-[65%] object-contain" />
                                 </div>
                             </div>
@@ -234,11 +234,11 @@ const colors: ColorToken[] = [
                             <div
                                 class="h-32 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
                                 <div class="flex items-center justify-center gap-2.5 max-w-full">
-                                    <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                    <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                         alt="Emblem" class="h-7 sm:h-8 w-auto shrink-0" />
                                     <!-- 中文横向字标 -->
-                                    <UColorModeImage light="/brand/svg/text-zh-dark.svg"
-                                        dark="/brand/svg/text-zh-light.svg" alt="林間小鎮"
+                                    <UColorModeImage light="/brand/svg/text-zh-black.svg"
+                                        dark="/brand/svg/text-zh-white.svg" alt="林間小鎮"
                                         class="h-5 sm:h-6 w-auto max-w-[65%] object-contain" />
                                 </div>
                             </div>
@@ -255,14 +255,14 @@ const colors: ColorToken[] = [
                             <div
                                 class="h-44 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
                                 <div class="flex flex-col items-center justify-center space-y-2.5 max-w-full">
-                                    <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                    <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                         alt="ForestWork Emblem" class="h-14 sm:h-16 w-auto shrink-0" />
                                     <div class="flex flex-col items-center justify-center space-y-1 max-w-full">
-                                        <UColorModeImage light="/brand/svg/text-zh-dark.svg"
-                                            dark="/brand/svg/text-zh-light.svg" alt="林間小鎮"
+                                        <UColorModeImage light="/brand/svg/text-zh-black.svg"
+                                            dark="/brand/svg/text-zh-white.svg" alt="林間小鎮"
                                             class="h-4 sm:h-5 w-auto max-w-full object-contain" />
-                                        <UColorModeImage light="/brand/svg/text-en-dark.svg"
-                                            dark="/brand/svg/text-en-light.svg" alt="Forest Work"
+                                        <UColorModeImage light="/brand/svg/text-en-black.svg"
+                                            dark="/brand/svg/text-en-white.svg" alt="Forest Work"
                                             class="h-1 sm:h-2 w-auto max-w-full object-contain" />
                                     </div>
                                 </div>
@@ -280,7 +280,7 @@ const colors: ColorToken[] = [
                             <!-- Logo 预览框：纯 Emblem 图案 -->
                             <div
                                 class="h-28 bg-white dark:bg-[#090A0F] rounded-lg border border-gray-200/60 dark:border-zinc-800/80 flex items-center justify-center p-4 shadow-sm">
-                                <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg"
+                                <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                     alt="ForestWork Symbol Only" class="h-10 w-auto" />
                             </div>
 
@@ -302,7 +302,7 @@ const colors: ColorToken[] = [
                         <div class="space-y-2">
                             <div
                                 class="bg-[#231F20] h-48 rounded-2xl flex items-center justify-center p-8 border border-zinc-800 shadow-inner">
-                                <img src="/brand/svg/logo-light.svg" alt="ForestWork 白色標誌"
+                                <img src="/brand/svg/logo-white.svg" alt="ForestWork 白色標誌"
                                     class="h-24 w-auto object-contain" />
                             </div>
                             <div class="text-xs font-mono text-center text-gray-500">炭黑背景 (Charcoal Black) — 白色標誌</div>
@@ -312,7 +312,7 @@ const colors: ColorToken[] = [
                         <div class="space-y-2">
                             <div
                                 class="bg-[#4C7766] h-48 rounded-2xl flex items-center justify-center p-8 shadow-inner">
-                                <img src="/brand/svg/logo-light.svg" alt="ForestWork 白色標誌"
+                                <img src="/brand/svg/logo-white.svg" alt="ForestWork 白色標誌"
                                     class="h-24 w-auto object-contain" />
                             </div>
                             <div class="text-xs font-mono text-center text-gray-500">森林墨綠背景 (Forest Emerald) — 白色標誌
@@ -323,7 +323,7 @@ const colors: ColorToken[] = [
                         <div class="space-y-2">
                             <div
                                 class="bg-white border border-gray-200 h-48 rounded-2xl flex items-center justify-center p-8 shadow-inner">
-                                <img src="/brand/svg/logo-dark.svg" alt="ForestWork 黑色標誌"
+                                <img src="/brand/svg/logo-black.svg" alt="ForestWork 黑色標誌"
                                     class="h-24 w-auto object-contain" />
                             </div>
                             <div class="text-xs font-mono text-center text-gray-500">純白 / 淺灰背景 — 黑色標誌</div>
