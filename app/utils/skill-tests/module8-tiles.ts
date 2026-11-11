@@ -53,7 +53,7 @@ export class Module8Tiles implements SkillModuleInstance {
   private currentStreak = 0
   private maxStreak = 0
 
-  private isStarted = false
+  isStarted = false
   private errorLane: number | null = null
   private errorUntil = 0
 

@@ -468,6 +468,8 @@ function handleKeyUp(e: KeyboardEvent) {
 function tick(now: number) {
   const dt = Math.min((now - lastTime) / 1000, 0.1)
   lastTime = now
+  // A module waiting for its first input (e.g. PIANO CADENCE) doesn't use up its time
+  if (activeModule.isStarted === false) startTime = now
   const elapsed = now - startTime
 
   const moduleDuration = activeModule.durationMs ?? 60000
@@ -1112,7 +1114,7 @@ onUnmounted(() => {
         </div>
 
         <div class="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-500">
-          <span>STATUS: STANDBY // MOCK_DATA</span>
+          <span>STATUS: {{ liveLeaderboard.length ? 'LIVE // SUPABASE' : 'STANDBY // NO_DATA' }}</span>
           <span class="text-emerald-500/80">SUPABASE_SYNC: READY</span>
         </div>
       </div>
