@@ -4,6 +4,7 @@ import { put } from '@vercel/blob'
 import { COC_SKILL_CATEGORIES, BASE_ATTR_KEYS } from '../assets/coc-skills'
 import { parseCharacterCard } from '../utils/cocParser'
 import { getSupabase } from '../../utils/supabase'
+import { FORESTWORK_ICON_URL } from '../utils'
 
 // 2. 格式化单张角色卡为精美的 Discord Embed (完整防弹版，消灭 ReferenceError)
 function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
@@ -118,7 +119,7 @@ function buildCharacterBioEmbed(char: any) {
     ],
     footer: {
       text: '林間小鎮 TRPG · 調查員傳記紀錄室',
-      icon_url: 'https://i.imgur.com/cu2YAkn.png'
+      icon_url: FORESTWORK_ICON_URL
     },
     timestamp: new Date().toISOString()
   }

@@ -73,7 +73,7 @@ useSeoMeta({
 <template>
 
     <div
-        class="flex-1 flex flex-col bg-gray-50 dark:bg-[#1a1b26] bg-[url('https://static.wikia.nocookie.net/plazmabursttwo/images/9/93/Plazma_Burst_2_background.JPG')] bg-cover bg-fixed bg-center transition-colors duration-300">
+        class="flex-1 flex flex-col bg-gray-50 dark:bg-[#1a1b26] bg-[url('/images/plazmaBurst/bg.webp')] bg-cover bg-fixed bg-center transition-colors duration-300">
         <!-- 内层蒙版：同样 flex-1 flex flex-col 铺满，负责毛玻璃与透光度 -->
         <div
             class="flex-1 flex flex-col bg-white/70 dark:bg-black/60 backdrop-blur-md py-8 transition-colors duration-300">

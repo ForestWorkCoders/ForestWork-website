@@ -14,7 +14,7 @@ useSeoMeta({
     ogTitle: '林間SMP · ForestWork',
     description: '林間小鎮多元化SMP多人生存伺服器 ⎯ 只供受邀請成員與實況主遊玩、交流。',
     ogDescription: '林間小鎮多元化SMP多人生存伺服器 ⎯ 只供受邀請成員與實況主遊玩、交流。',
-    ogImage: 'https://i.imgur.com/cu2YAkn.png'
+    ogImage: SHARE_IMAGE_URL
 })
 
 // 2. 原生剪贴板逻辑

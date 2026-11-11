@@ -1,7 +1,7 @@
 // server/discord/commands/sc.ts
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
-import { getInteractionOption } from '../utils'
+import { FORESTWORK_ICON_URL, getInteractionOption } from '../utils'
 import { recordRoomPlayer } from '../room-player'
 import { evaluateDiceExpression, isDiceExpression } from '../dice'
 import { getSupabase } from '../../utils/supabase'
@@ -103,7 +103,7 @@ export async function handleSc(interaction: any, event: H3Event) {
     ],
     footer: {
       text: '林間小鎮 TRPG · 理智吞噬引擎',
-      icon_url: 'https://i.imgur.com/cu2YAkn.png'
+      icon_url: FORESTWORK_ICON_URL
     },
     timestamp: new Date().toISOString()
   }
