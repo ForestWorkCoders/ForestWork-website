@@ -16,7 +16,7 @@ useSeoMeta({
   ogTitle: '林間小鎮 · ForestWork',
   description: '林間小鎮賽事網頁',
   ogDescription: '林間小鎮賽事網頁',
-  ogImage: 'https://i.imgur.com/cu2YAkn.png',
+  ogImage: SHARE_IMAGE_URL,
   ogUrl: () => pageUrl.value,
   twitterCard: 'summary_large_image',
   themeColor: '#4C7766'
@@ -54,7 +54,7 @@ const discordEmbedPayload = {
         items: [
           {
             media: {
-              url: 'https://i.imgur.com/cu2YAkn.png'
+              url: SHARE_IMAGE_URL
             },
             description: 'ForestWork Banner',
             spoiler: false

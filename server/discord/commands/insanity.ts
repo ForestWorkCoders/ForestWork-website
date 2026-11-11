@@ -1,7 +1,7 @@
 // server/discord/commands/insanity.ts
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
-import { getInteractionOption } from '../utils'
+import { FORESTWORK_ICON_URL, getInteractionOption } from '../utils'
 import rawInsanityData from '../assets/insanity.json'
 
 type InsanityMode = 'full' | 'phobia' | 'mania'
@@ -86,7 +86,7 @@ export async function handleInsanity(interaction: any, event: H3Event) {
           fields,
           footer: {
             text: '林間小鎮 TRPG · 守秘人理智結算系統',
-            icon_url: 'https://i.imgur.com/cu2YAkn.png'
+            icon_url: FORESTWORK_ICON_URL
           },
           timestamp: new Date().toISOString()
         }

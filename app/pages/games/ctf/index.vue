@@ -996,7 +996,7 @@ useSeoMeta({
   ogTitle: 'FORESTWORK // VIRTUAL_CTF_CONSOLE',
   description: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
   ogDescription: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
-  ogImage: 'https://i.imgur.com/cu2YAkn.png', // 可替换为专用的 CTF 终端预览横幅
+  ogImage: SHARE_IMAGE_URL, // 可替换为专用的 CTF 终端预览横幅
   twitterCard: 'summary_large_image',
   // 终端专属翡翠绿 (#10B981)
   themeColor: '#10B981'
@@ -1032,7 +1032,7 @@ const ctfDiscordEmbedPayload = {
         accessory: {
           type: 11, // Thumbnail 挂件[cite: 1]
           media: {
-            url: 'https://i.imgur.com/mfcQRXw.png' // 终端或林间专属 Logo 图标
+            url: 'https://forestwork.vercel.app/images/share/forestwork-team.png' // 终端或林间专属 Logo 图标
           }
         }
       },

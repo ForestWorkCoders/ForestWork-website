@@ -58,7 +58,7 @@ useSeoMeta({
     </div>
 
     <div v-else
-        class="min-h-screen bg-gray-50 dark:bg-[#0f111a] bg-[url('https://static.wikia.nocookie.net/plazmabursttwo/images/9/93/Plazma_Burst_2_background.JPG')] bg-cover bg-fixed bg-center">
+        class="min-h-screen bg-gray-50 dark:bg-[#0f111a] bg-[url('/images/plazmaBurst/bg.webp')] bg-cover bg-fixed bg-center">
         <div class="min-h-screen bg-black/50 backdrop-blur-sm pt-20 pb-12">
 
             <UContainer class="max-w-6xl">

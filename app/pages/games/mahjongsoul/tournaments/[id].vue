@@ -83,14 +83,14 @@ useSeoMeta({
     ogTitle: () => tourney.value?.title ?? 'ForestWork Mahjong Tournament',
     description: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況與對局紀錄。`,
     ogDescription: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況與對局紀錄。`,
-    ogImage: () => tourney.value?.imageUrl ?? 'https://i.imgur.com/cu2YAkn.png'
+    ogImage: () => tourney.value?.imageUrl ?? SHARE_IMAGE_URL
 })
 
 // 2. 动态组件树计算
 const embedPayload = computed(() => {
     const title = tourney.value?.title || '林間小鎮賽事'
     const targetUrl = `https://forestwork.vercel.app/games/mahjongsoul/tournaments/${route.params.id}`
-    const image = tourney.value?.imageUrl || 'https://i.imgur.com/cu2YAkn.png'
+    const image = tourney.value?.imageUrl || SHARE_IMAGE_URL
     const formatText = computed(() => {
         if (tourney.value?.format === 'event') return '趣味活動周'
         if (tourney.value?.format === 'relay') return '隊伍接力賽'
@@ -139,7 +139,7 @@ useHead({
     </div>
 
     <div v-else
-        class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] bg-[url('https://webusstatic.yo-star.com/mj-us-tournament-h5/prod/assets/bg.e1efdef8.png')] bg-cover bg-fixed bg-center">
+        class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] bg-[url('/images/mahjongSoul/bg.png')] bg-cover bg-fixed bg-center">
 
         <div class="min-h-screen bg-black/50 backdrop-blur-sm pt-20 pb-12">
 

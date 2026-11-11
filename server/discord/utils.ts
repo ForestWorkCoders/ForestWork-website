@@ -1,4 +1,8 @@
 // server/discord/utils.ts
+
+// ForestWork share image, used as the author/footer icon on bot embeds. Served from public/images/share.
+export const FORESTWORK_ICON_URL = 'https://forestwork.vercel.app/images/share/forestwork-share.png'
+
 export function getInteractionOption<T = any>(interaction: any, name: string): T | undefined {
   const options = interaction.data?.options
   if (!Array.isArray(options)) return undefined

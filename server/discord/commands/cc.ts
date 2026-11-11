@@ -1,6 +1,6 @@
 // server/discord/commands/cc.ts
 import type { H3Event } from 'h3'
-import { getInteractionOption } from '../utils'
+import { FORESTWORK_ICON_URL, getInteractionOption } from '../utils'
 import { recordRoomPlayer } from '../room-player'
 import { rollCoC } from '../utils/cocDice'
 
@@ -48,7 +48,7 @@ export async function handleCc(interaction: any, event: H3Event) {
     color,
     footer: {
       text: isSecret ? '林間小鎮 TRPG · 秘密檢定 (僅自己可見)' : '林間小鎮 TRPG · CoC 7th 檢定系統',
-      icon_url: 'https://i.imgur.com/cu2YAkn.png'
+      icon_url: FORESTWORK_ICON_URL
     },
     timestamp: new Date().toISOString()
   }
