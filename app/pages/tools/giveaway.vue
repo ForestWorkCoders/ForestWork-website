@@ -117,7 +117,10 @@ const selectedAnswerId = ref(1)
 const handlePull = async () => {
   if (!pollUrl.value || isSpinning.value) return
   loading.value = true
-  // ... 清空状态
+  // A new list starts a new giveaway
+  currentWinner.value = null
+  currentWinnerIndex.value = null
+  winnersHistory.value = []
   try {
     const res = await $fetch<{ candidates: Candidate[] }>('/api/giveaway/pull', {
       method: 'POST',
