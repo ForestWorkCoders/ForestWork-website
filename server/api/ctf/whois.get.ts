@@ -1,6 +1,6 @@
 // server/api/ctf/whois.get.ts
 import { serverSupabaseClient } from '#supabase/server'
-import type { Database } from '../../../types/database.types'
+import type { Database } from '~/types/database.types'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
