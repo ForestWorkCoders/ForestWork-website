@@ -78,9 +78,9 @@ const items = computed<NavigationMenuItem[]>(() => [
     <template #title>
       <div class="flex-shrink-0 flex items-center gap-2">
         <!-- 1. Emblem 图案标 -->
-        <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg" alt="ForestWork Emblem" class="h-4.75 w-auto" />
+        <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg" alt="ForestWork Emblem" class="h-4.75 w-auto" />
         <!-- 2. Text 文字标（取代原本的 HTML 纯文本，自动响应浅/深色模式） -->
-        <UColorModeImage light="/brand/svg/text-en-dark.svg" dark="/brand/svg/text-en-light.svg" alt="ForestWork" class="h-3.5 w-auto hidden sm:block" />
+        <UColorModeImage light="/brand/svg/text-en-black.svg" dark="/brand/svg/text-en-white.svg" alt="ForestWork" class="h-3.5 w-auto hidden sm:block" />
       </div>
     </template>
 

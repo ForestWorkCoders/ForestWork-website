@@ -87,6 +87,14 @@ export default defineNuxtConfig({
     '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 301 } },
     '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 301 } },
 
+    // 4.1. Brand SVGs renamed by artwork colour (light → white, dark → black)
+    '/brand/svg/logo-light.svg': { redirect: { to: '/brand/svg/logo-white.svg', statusCode: 301 } },
+    '/brand/svg/logo-dark.svg': { redirect: { to: '/brand/svg/logo-black.svg', statusCode: 301 } },
+    '/brand/svg/text-en-light.svg': { redirect: { to: '/brand/svg/text-en-white.svg', statusCode: 301 } },
+    '/brand/svg/text-en-dark.svg': { redirect: { to: '/brand/svg/text-en-black.svg', statusCode: 301 } },
+    '/brand/svg/text-zh-light.svg': { redirect: { to: '/brand/svg/text-zh-white.svg', statusCode: 301 } },
+    '/brand/svg/text-zh-dark.svg': { redirect: { to: '/brand/svg/text-zh-black.svg', statusCode: 301 } },
+
     // 5. Let Discord embed the activities. CSP frame-ancestors is the whole rule;
     //    X-Frame-Options has no "allow these hosts" value, so it is not sent here.
     '/activities/**': {
