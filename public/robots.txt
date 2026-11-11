@@ -8,3 +8,8 @@ Disallow: /you_wot_seriously_do_that/
 Disallow: /i_have_no_idea/
 # Block specific file types if needed
 Disallow: /*.json$
+# ...except the Gartic Phone data the replay pages load in the browser
+# (the longer rule wins, so this beats the line above for /data only)
+Allow: /data/*.json$
+
+Sitemap: https://forestwork.vercel.app/sitemap.xml
