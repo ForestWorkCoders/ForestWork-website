@@ -28,3 +28,5 @@ app_refactor/
 
 # CTF flag password
 ctf_flag_password.csv
+# Supabase CLI cache (linked project, CLI version)
+supabase/.temp/
