@@ -49,18 +49,19 @@ export function sanitizeRedirect(target?: unknown): string {
 /**
  * 验证签名并还原 Session 数据（如被篡改立即返回 null）
  */
-export function unsealSessionData(cookieValue?: string): UserSession | null {
-  if (!cookieValue || !cookieValue.includes('.')) return null
+export function unsealSessionData(cookieValue?: unknown): UserSession | null {
+  // The activity ticket comes from a JSON body, so it may not be a string at all
+  if (typeof cookieValue !== 'string') return null
   const [payload, signature] = cookieValue.split('.')
   if (!payload || !signature) return null
 
-  const expectedSignature = crypto
-    .createHmac('sha256', getSecretKey())
-    .update(payload)
-    .digest('base64url')
+  const given = Buffer.from(signature)
+  const expected = Buffer.from(
+    crypto.createHmac('sha256', getSecretKey()).update(payload).digest('base64url'),
+  )
 
-  // 时序安全比较，彻底杜绝计时攻击
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+  // timingSafeEqual throws on a length mismatch; the length is public, so check it first
+  if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) {
     return null
   }
 
