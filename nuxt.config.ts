@@ -87,11 +87,11 @@ export default defineNuxtConfig({
     '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 302 } },
     '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 302 } },
 
-    // 5. Discord 站内嵌套允许（CSP + XFO）
+    // 5. Let Discord embed the activities. CSP frame-ancestors is the whole rule;
+    //    X-Frame-Options has no "allow these hosts" value, so it is not sent here.
     '/activities/**': {
       headers: {
-        'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com",
-        'X-Frame-Options': 'ALLOWALL'
+        'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com"
       }
     }
   },
