@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import sessionIndex from '~~/public/data/index.json'
 
 definePageMeta({
     layout: false
@@ -7,6 +8,22 @@ definePageMeta({
 
 const route = useRoute()
 const sessionId = route.params.id as string
+
+// Page title from the session index, so the server HTML (and share previews) name the round.
+// The session data itself loads only in the browser.
+const indexEntry = sessionIndex.find(s => s.id === sessionId)
+const pageTitle = indexEntry
+    ? `${indexEntry.year}/${indexEntry.month} ${indexEntry.title} · 林間靈魂繪師 · ForestWork`
+    : '林間靈魂繪師 · ForestWork'
+const pageDescription = indexEntry
+    ? `${indexEntry.mode} · ${indexEntry.chainsCount} 條故事鏈`
+    : '選擇一個歷史對局，見證人類想像力的崩壞。'
+useSeoMeta({
+    title: pageTitle,
+    ogTitle: pageTitle,
+    description: pageDescription,
+    ogDescription: pageDescription
+})
 
 useHead({
     link: [
