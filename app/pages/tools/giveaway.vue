@@ -68,7 +68,7 @@ const drawWheel = (angle: number) => {
         ctx.fillStyle = '#9ca3af'
         ctx.font = '14px sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillText('奖池已空', center, center + 5)
+        ctx.fillText('獎池已空', center, center + 5)
         return
     }
 
@@ -137,7 +137,7 @@ const handlePull = async () => {
       await navigateTo('/api/auth/discord/login?redirect=/tools/giveaway', { external: true })
       return
     }
-    alert(err?.data?.statusMessage || err?.message || '拉取名单失败')
+    alert(err?.data?.statusMessage || err?.message || '拉取名單失敗')
   } finally {
     loading.value = false
   }
@@ -209,10 +209,10 @@ const commitAndRemoveWinner = () => {
     <div class="max-w-4xl mx-auto px-4 py-8 space-y-8">
         <div class="text-center space-y-2">
             <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                林间幸运转盘 · Multi-Draw Giveaway
+                林間幸運轉盤 · Multi-Draw Giveaway
             </h1>
             <p class="text-sm text-gray-500">
-                第一步拉取名单固定池子，第二步可连环抽选并随时移出中奖者
+                第一步拉取名單固定獎池，第二步可連續抽獎並隨時移出中獎者
             </p>
         </div>
 
@@ -222,7 +222,7 @@ const commitAndRemoveWinner = () => {
         <UInput
           v-model="pollUrl"
           class="flex-1"
-          placeholder="https://discord.com/channels/.../.../... (支持在末尾加 #2 指定选项)"
+          placeholder="https://discord.com/channels/.../.../..."
           icon="i-heroicons-link"
           :disabled="isSpinning || loading"
         />
@@ -231,16 +231,16 @@ const commitAndRemoveWinner = () => {
         <USelect
           v-model="selectedAnswerId"
           :items="[
-            { label: '选项 1 (默认)', value: 1 },
-            { label: '选项 2', value: 2 },
-            { label: '选项 3', value: 3 },
-            { label: '选项 4', value: 4 },
-            { label: '选项 5', value: 5 },
-            { label: '选项 6', value: 6 },
-            { label: '选项 7', value: 7 },
-            { label: '选项 8', value: 8 },
-            { label: '选项 9', value: 9 },
-            { label: '选项 10', value: 10 }
+            { label: '選項 1（預設）', value: 1 },
+            { label: '選項 2', value: 2 },
+            { label: '選項 3', value: 3 },
+            { label: '選項 4', value: 4 },
+            { label: '選項 5', value: 5 },
+            { label: '選項 6', value: 6 },
+            { label: '選項 7', value: 7 },
+            { label: '選項 8', value: 8 },
+            { label: '選項 9', value: 9 },
+            { label: '選項 10', value: 10 }
           ]"
           class="w-36"
           :disabled="isSpinning || loading"
@@ -253,7 +253,7 @@ const commitAndRemoveWinner = () => {
           icon="i-heroicons-arrow-down-tray"
           @click="handlePull"
         >
-          第一步：拉取名单
+          第一步：拉取名單
         </UButton>
       </div>
     </UCard>
@@ -278,7 +278,7 @@ const commitAndRemoveWinner = () => {
                     <UButton size="lg" color="primary"
                         :disabled="pool.length === 0 || isSpinning || currentWinner !== null" :loading="isSpinning"
                         icon="i-heroicons-sparkles" @click="handleDraw">
-                        {{ pool.length === 0 ? '奖池已无候选人' : `开始抽奖 (剩余 ${pool.length} 人)` }}
+                        {{ pool.length === 0 ? '獎池已無候選人' : `開始抽獎（剩餘 ${pool.length} 人）` }}
                     </UButton>
                 </div>
 
@@ -286,7 +286,7 @@ const commitAndRemoveWinner = () => {
                 <UCard v-if="currentWinner" class="w-full border-2 border-emerald-500 bg-emerald-950/20 text-center">
                     <div class="space-y-4 py-2">
                         <div class="text-xs font-bold uppercase tracking-widest text-emerald-400">
-                            🎯 本轮中奖玩家
+                            🎯 本輪中獎玩家
                         </div>
                         <div class="flex items-center justify-center gap-3">
                             <UAvatar v-if="currentWinner.avatarUrl" :src="currentWinner.avatarUrl"
@@ -298,7 +298,7 @@ const commitAndRemoveWinner = () => {
                         <div class="pt-2">
                             <UButton color="primary" variant="solid" icon="i-heroicons-user-minus"
                                 @click="commitAndRemoveWinner">
-                                移入中奖名单并准备下一轮
+                                移入獲獎名單並準備下一輪
                             </UButton>
                         </div>
                     </div>
@@ -327,7 +327,7 @@ const commitAndRemoveWinner = () => {
                 </template>
 
                 <div v-if="winnersHistory.length === 0" class="text-xs text-gray-500 text-center py-6">
-                    暂无中奖记录，点击左侧按钮开抽
+                    暫無中獎記錄，點擊左側按鈕開抽
                 </div>
 
                 <ul v-else class="divide-y divide-gray-800 space-y-2">

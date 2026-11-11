@@ -27,24 +27,23 @@ export default defineEventHandler(async (event) => {
   const pollUrl = String(body?.pollUrl || '').trim()
 
   if (!pollUrl) {
-    throw createError({ statusCode: 400, statusMessage: '缺少 Discord 消息链接' })
+    throw createError({ statusCode: 400, statusMessage: '缺少 Discord 訊息連結' })
   }
 
-  // 1. 好品味正则：同时提取 channelId、messageId 与末尾可选的 #选项编号 (例如 .../14786264606#2)
-  const match = pollUrl.match(/channels\/\d+\/(\d+)\/(\d+)(?:[#?](?:answer=|opt=)?(\d+))?/)
+  // 1. Take channelId and messageId from the message link (anything after them is ignored)
+  const match = pollUrl.match(/channels\/\d+\/(\d+)\/(\d+)/)
   if (!match) {
-    throw createError({ statusCode: 400, statusMessage: '非法的 Discord 消息链接格式' })
+    throw createError({ statusCode: 400, statusMessage: 'Discord 訊息連結格式不正確' })
   }
 
-  // 干净解构出三个物理坐标
-  const [, channelId, messageId, urlAnswerId] = match
+  const [, channelId, messageId] = match
 
-  // 2. 核心优雅管道：显式入参 > URL Hash 锚点 > 默认第 1 项
-  const answerId = Number(body?.answerId) || Number(urlAnswerId) || 1
+  // 2. The answer comes from the page's dropdown only (default: answer 1)
+  const answerId = Number(body?.answerId) || 1
 
   const botToken = process.env.DISCORD_BOT_TOKEN
   if (!botToken) {
-    throw createError({ statusCode: 500, statusMessage: '服务端未配置 DISCORD_BOT_TOKEN' })
+    throw createError({ statusCode: 500, statusMessage: '伺服器未設定 DISCORD_BOT_TOKEN' })
   }
 
   // ========================================================================
@@ -64,7 +63,7 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!res.ok) {
-      throw createError({ statusCode: res.status, statusMessage: `Discord API 报错: HTTP ${res.status}` })
+      throw createError({ statusCode: res.status, statusMessage: `Discord API 錯誤：HTTP ${res.status}` })
     }
 
     const data = await res.json()
@@ -90,7 +89,7 @@ export default defineEventHandler(async (event) => {
 
   const candidates = Array.from(votersMap.values())
   if (candidates.length === 0) {
-    throw createError({ statusCode: 400, statusMessage: `该投票选项 (#${answerId}) 没有任何玩家参与` })
+    throw createError({ statusCode: 400, statusMessage: `這個投票選項（#${answerId}）沒有任何玩家參與` })
   }
 
   return { candidates }
