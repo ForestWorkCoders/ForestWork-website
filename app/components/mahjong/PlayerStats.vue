@@ -80,9 +80,9 @@ const radarConfigs = computed(() => {
         // 自定义 Tooltip 显示真实的业务数据
         formatter: () => `
           和牌: ${rawData.win}%<br/>
-          打点: ${rawData.power}<br/>
+          打點: ${rawData.power}<br/>
           副露: ${rawData.call}%<br/>
-          放铳: ${rawData.def}% <br/>
+          放銃: ${rawData.def}% <br/>
           立直: ${rawData.riichi}%<br/>
           自摸: ${rawData.tsumo}%
         `
@@ -91,9 +91,9 @@ const radarConfigs = computed(() => {
         // ECharts 天生支持给每个维度设定独立的满分线！
         indicator: [
           { name: '和牌', max: 50 },     // 50% 为满格
-          { name: '打点', max: 10000 },   // 10000 分满格
+          { name: '打點', max: 10000 },   // 10000 分满格
           { name: '副露', max: 80 },     // 80% 为满格
-          { name: '放铳', max: 20 },     // 反转后的放铳值（20为满格）
+          { name: '放銃', max: 20 },     // 反转后的放铳值（20为满格）
           { name: '立直', max: 80 },     // 80% 为满格
           { name: '自摸', max: 80 }      // 80% 为满格
         ],
@@ -120,21 +120,21 @@ const radarConfigs = computed(() => {
 const items = [{
   value: 'match_stats',
   slot: 'match',
-  label: '宏观战绩 (Match Stats)',
+  label: '宏觀戰績 (Match Stats)',
   icon: 'i-lucide-trophy'
 }, {
   value: 'playstyle_stats',
   slot: 'playstyle',
-  label: '打法风格 (Playstyle Stats)',
+  label: '打法風格 (Playstyle Stats)',
   icon: 'i-lucide-chart-pie'
 }]
 
 
 const matchColumns = createSortableColumns([
   // 注意這裡：你的 SQL 返回的是 nickname，所以 accessorKey 必須是對應的字段名！
-  { accessorKey: 'nickname', header: '选手' },
-  { accessorKey: 'play_count', header: '场数' },
-  { accessorKey: 'avg_rank', header: '平均顺位', class: 'font-bold' },
+  { accessorKey: 'nickname', header: '選手' },
+  { accessorKey: 'play_count', header: '場數' },
+  { accessorKey: 'avg_rank', header: '平均順位', class: 'font-bold' },
   { accessorKey: 'east_count', header: '東風次數' },
   { accessorKey: 'avg_rank_east', header: '東風平均順位' },
   { accessorKey: 'south_count', header: '南風次數' },
@@ -142,7 +142,7 @@ const matchColumns = createSortableColumns([
   { accessorKey: 'west_count', header: '西風次數' },
   { accessorKey: 'avg_rank_west', header: '西風平均順位' },
   { accessorKey: 'top_rate_pct', header: '一位率' },
-  { accessorKey: 'top2_rate_pct', header: '连对率' },
+  { accessorKey: 'top2_rate_pct', header: '連對率' },
   { accessorKey: 'busting_rate', header: '被飛率' },
   { accessorKey: 'avg_score', header: '平均馬點' },
   { accessorKey: 'highest_point', header: '最高馬點' },
@@ -157,21 +157,21 @@ const matchPercentStyles = [
 ]
 
 const playstyleColumns = createSortableColumns([
-  { accessorKey: 'nickname', header: '选手' },
+  { accessorKey: 'nickname', header: '選手' },
   { accessorKey: 'win_rate', header: '和牌率' },
-  { accessorKey: 'deal_in_rate', header: '放铳率' },
+  { accessorKey: 'deal_in_rate', header: '放銃率' },
   { accessorKey: 'tsumo_rate', header: '自摸率' },
-  { accessorKey: 'dama_rate', header: '默听率' },
+  { accessorKey: 'dama_rate', header: '默聽率' },
   { accessorKey: 'exhaustive_draw_rate', header: '流局率' },
-  { accessorKey: 'draw_tenpai_rate', header: '流局听牌率' },
+  { accessorKey: 'draw_tenpai_rate', header: '流局聽牌率' },
   { accessorKey: 'call_rate', header: '副露率' },
   { accessorKey: 'riichi_rate', header: '立直率' },
-  { accessorKey: 'avg_turns', header: '平均和牌巡数' },
-  { accessorKey: 'avg_win_score', header: '平均打点' },
-  { accessorKey: 'avg_deal_in_score', header: '平均铳点' },
+  { accessorKey: 'avg_turns', header: '平均和牌巡數' },
+  { accessorKey: 'avg_win_score', header: '平均打點' },
+  { accessorKey: 'avg_deal_in_score', header: '平均銃點' },
   { accessorKey: 'babei_rate_pct', header: '拔北率' },
-  { accessorKey: 'avg_baopai', header: '平均宝牌' },
-  { accessorKey: 'li_baopai_rate_pct', header: '里宝率' }
+  { accessorKey: 'avg_baopai', header: '平均寶牌' },
+  { accessorKey: 'li_baopai_rate_pct', header: '裏寶率' }
 ])
 
 const playPercentStyles = [
@@ -224,7 +224,7 @@ const playPercentStyles = [
 
             <div class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400">
               <UIcon name="i-lucide-swords" class="w-4 h-4 opacity-70" />
-              <span>{{ player.play_count }} 场对局</span>
+              <span>{{ player.play_count }} 場對局</span>
             </div>
           </div>
 
@@ -249,7 +249,7 @@ const playPercentStyles = [
     <section>
       <div class="mb-6 border-b border-gray-200 dark:border-gray-800 pb-4 flex justify-between items-end">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-          综合数据 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Overall Statistics</span>
+          綜合數據 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Overall Statistics</span>
         </h2>
       </div>
 
