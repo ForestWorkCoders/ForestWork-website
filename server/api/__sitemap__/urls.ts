@@ -1,6 +1,6 @@
 // server/api/__sitemap__/urls.ts
-import fs from 'node:fs'
-import path from 'node:path'
+// Bundled at build time: server functions on Vercel have no public/ folder on disk
+import sessionIndex from '~~/public/data/index.json'
 import { serverSupabaseClient } from '#supabase/server'
 
 // 辅助函数：确保时间戳符合 ISO8601 且消灭 null / undefined
@@ -14,27 +14,10 @@ export default defineEventHandler(async (event) => {
     const urls: Array<{ loc: string; lastmod?: string }> = []
 
     // ==========================================
-    // 1. 本地磁盘静态流：Gartic Phone 对局 (SSOT)
+    // 1. Gartic Phone replays, one per session in public/data/index.json
     // ==========================================
-    const indexPath = path.join(process.cwd(), 'public/data/index.json')
-
-    if (fs.existsSync(indexPath)) {
-        try {
-            const indexRaw = fs.readFileSync(indexPath, 'utf-8')
-            const sessions = JSON.parse(indexRaw)
-
-            if (Array.isArray(sessions)) {
-                for (const session of sessions) {
-                    if (session.id) {
-                        urls.push({
-                            loc: `/games/gartic-phone/${session.id}`
-                        })
-                    }
-                }
-            }
-        } catch (err) {
-            console.error('[Sitemap] 读取 public/data/index.json 失败:', err)
-        }
+    for (const session of sessionIndex) {
+        urls.push({ loc: `/games/garticphone/${session.id}` })
     }
 
     // ==========================================
