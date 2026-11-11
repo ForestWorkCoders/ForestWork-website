@@ -1,4 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+// Vercel sets VERCEL_ENV at build time: 'production', 'preview' (staging and branches) or unset locally
+const isVercelPreview = !!process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production'
+
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
@@ -101,7 +105,10 @@ export default defineNuxtConfig({
       headers: {
         'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com"
       }
-    }
+    },
+
+    // 6. Keep staging and branch previews out of search results; production builds skip this
+    ...(isVercelPreview && { '/**': { headers: { 'X-Robots-Tag': 'noindex' } } })
   },
 
   compatibilityDate: '2026-06-30',
