@@ -11,8 +11,10 @@ export default defineEventHandler(async (event) => {
   const saved = getCookie(event, OAUTH_STATE_COOKIE) || ''
   deleteCookie(event, OAUTH_STATE_COOKIE, { path: '/api/auth/discord' })
   const [savedState, savedReturn] = saved.split('.')
+  const returnTo = sanitizeRedirect(Buffer.from(savedReturn || '', 'base64url').toString('utf-8'))
   if (!savedState || savedState !== String(query.state || '')) {
-    return sendRedirect(event, '/api/auth/discord/login')
+    // Start again, keeping the page the user came from
+    return sendRedirect(event, `/api/auth/discord/login?redirect=${encodeURIComponent(returnTo)}`)
   }
 
   if (!code) {
@@ -116,6 +118,5 @@ export default defineEventHandler(async (event) => {
     path: '/'
   })
 
-  const returnTo = sanitizeRedirect(Buffer.from(savedReturn || '', 'base64url').toString('utf-8'))
   return sendRedirect(event, returnTo)
 })
