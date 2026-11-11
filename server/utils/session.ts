@@ -30,16 +30,20 @@ export function sealSessionData(user: UserSession): string {
   return `${payload}.${signature}`
 }
 
+// Only paths on this site are allowed after login. Let the URL parser decide, the way a browser
+// would: "//evil.com", "/\evil.com", "/<tab>/evil.com" and absolute URLs all resolve to another origin.
+const LOCAL_ORIGIN = 'http://local.invalid'
+
 export function sanitizeRedirect(target?: unknown): string {
-  if (typeof target !== 'string' || !target) {
+  if (typeof target !== 'string') return '/'
+  try {
+    const url = new URL(target.trim(), LOCAL_ORIGIN)
+    const path = url.pathname + url.search + url.hash
+    // Check the result as well: "/..//evil.com" normalises to "//evil.com"
+    return url.origin === LOCAL_ORIGIN && new URL(path, LOCAL_ORIGIN).origin === LOCAL_ORIGIN ? path : '/'
+  } catch {
     return '/'
   }
-  const trimmed = target.trim()
-  // 必须以单个 / 开头，且严禁以 // 开头（防止 //evil.com 协议相对外链）
-  if (trimmed.startsWith('/') && !trimmed.startsWith('//')) {
-    return trimmed
-  }
-  return '/'
 }
 
 /**
