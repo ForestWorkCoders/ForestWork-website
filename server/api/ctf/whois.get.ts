@@ -44,7 +44,8 @@ export default defineEventHandler(async (event) => {
       .or(`discord_username.eq.${rawTarget},username.eq.${rawTarget}`)
       .maybeSingle()
     if (profile) {
-      targetAccountId = profile.discord_id
+      // leaderboard.account_id is text; W47 fixes this fallback (bad column, bigint read as number)
+      targetAccountId = String(profile.discord_id)
     }
   }
 
