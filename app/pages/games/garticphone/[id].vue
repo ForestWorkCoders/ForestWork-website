@@ -256,6 +256,15 @@ onBeforeUnmount(() => {
             </button>
         </div>
 
+        <!-- Unknown session id (typo, old link): say so instead of an empty page -->
+        <div v-if="error" class="flex items-center justify-center min-h-screen px-4">
+            <div
+                class="w-[90%] max-w-xl bg-amber-300 border-4 border-black shadow-[6px_6px_0px_0px_#000] p-6 sm:p-8 rounded-xl text-center">
+                <h2 class="text-2xl sm:text-3xl font-black text-black">找不到這場對局</h2>
+                <p class="mt-2 font-bold text-black">Session not found</p>
+            </div>
+        </div>
+
         <!-- 主展示区 -->
         <div v-if="sessionData" class="reveal">
             <div class="slides">
