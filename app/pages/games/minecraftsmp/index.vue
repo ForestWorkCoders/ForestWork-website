@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+
+// Background: the video loop, or a still image for visitors who ask their device for reduced motion.
+// Decided in the browser, so a reduced-motion visitor never starts the video download.
+const background = ref<'video' | 'still' | null>(null)
+onMounted(() => {
+    background.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'still' : 'video'
+})
 
 // 1. SEO 元数据
 useSeoMeta({
@@ -57,9 +64,12 @@ const navLinks: SeasonLink[] = [
 <template>
     <div class="relative flex-1 flex flex-col items-center justify-center p-6 text-center overflow-hidden">
         <!-- 1. 视频背景 -->
-        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover pointer-events-none">
+        <video v-if="background === 'video'" autoplay loop muted playsinline
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none">
             <source src="/images/minecraftsmp/hero-bg.mp4" type="video/mp4">
         </video>
+        <img v-else-if="background === 'still'" src="/images/minecraftsmp/hero-still.webp" alt="" aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none">
 
         <!-- 2. 暗化蒙版 (保证对比度) -->
         <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/80 backdrop-blur-[2px] pointer-events-none"
