@@ -1182,37 +1182,174 @@ export type Database = {
             referencedRelation: "participant_data"
             referencedColumns: ["discord_id"]
           },
+          {
+            foreignKeyName: "mahjong_data_discord_id_fkey"
+            columns: ["discord_id"]
+            isOneToOne: true
+            referencedRelation: "v_member_boost_summary"
+            referencedColumns: ["discord_id"]
+          },
+        ]
+      }
+      member_key_redemptions: {
+        Row: {
+          created_at: string
+          discord_id: number
+          game_name: string
+          id: number
+          revealed_at: string | null
+          sent_at: string
+          steam_key: string
+        }
+        Insert: {
+          created_at?: string
+          discord_id: number
+          game_name: string
+          id?: never
+          revealed_at?: string | null
+          sent_at?: string
+          steam_key: string
+        }
+        Update: {
+          created_at?: string
+          discord_id?: number
+          game_name?: string
+          id?: never
+          revealed_at?: string | null
+          sent_at?: string
+          steam_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_key_redemptions_discord_id_fkey"
+            columns: ["discord_id"]
+            isOneToOne: false
+            referencedRelation: "participant_data"
+            referencedColumns: ["discord_id"]
+          },
+          {
+            foreignKeyName: "member_key_redemptions_discord_id_fkey"
+            columns: ["discord_id"]
+            isOneToOne: false
+            referencedRelation: "v_member_boost_summary"
+            referencedColumns: ["discord_id"]
+          },
+        ]
+      }
+      member_profiles: {
+        Row: {
+          created_at: string
+          discord_id: number
+          historical_boost_months: number
+          is_currently_boosting: boolean
+          level: number
+          metadata: Json
+          premium_since: string | null
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          discord_id: number
+          historical_boost_months?: number
+          is_currently_boosting?: boolean
+          level?: number
+          metadata?: Json
+          premium_since?: string | null
+          updated_at?: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          discord_id?: number
+          historical_boost_months?: number
+          is_currently_boosting?: boolean
+          level?: number
+          metadata?: Json
+          premium_since?: string | null
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_profiles_discord_id_fkey"
+            columns: ["discord_id"]
+            isOneToOne: true
+            referencedRelation: "participant_data"
+            referencedColumns: ["discord_id"]
+          },
+          {
+            foreignKeyName: "member_profiles_discord_id_fkey"
+            columns: ["discord_id"]
+            isOneToOne: true
+            referencedRelation: "v_member_boost_summary"
+            referencedColumns: ["discord_id"]
+          },
         ]
       }
       participant_data: {
         Row: {
+          created_at: string
           discord_id: number
           discord_nickname: string | null
           discord_username: string
           id: number
+          joined_at: string
           profile_img: string | null
         }
         Insert: {
+          created_at?: string
           discord_id: number
           discord_nickname?: string | null
           discord_username: string
           id?: number
+          joined_at?: string
           profile_img?: string | null
         }
         Update: {
+          created_at?: string
           discord_id?: number
           discord_nickname?: string | null
           discord_username?: string
           id?: number
+          joined_at?: string
           profile_img?: string | null
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      v_member_boost_summary: {
+        Row: {
+          current_streak_months: number | null
+          discord_id: number | null
+          historical_boost_months: number | null
+          is_currently_boosting: boolean | null
+          level: number | null
+          metadata: Json | null
+          premium_since: string | null
+          total_boost_months: number | null
+          updated_at: string | null
+          username: string | null
+          xp: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_level_from_xp: { Args: { p_xp: number }; Returns: number }
+      increment_user_xp: {
+        Args: { p_discord_id: string; p_xp_delta: number }
+        Returns: undefined
+      }
+      sync_member_boost_status: {
+        Args: {
+          p_discord_id: number
+          p_premium_since: string
+          p_username: string
+        }
+        Returns: undefined
+      }
       update_user_data:
         | {
             Args: {
@@ -1525,6 +1662,15 @@ export type Database = {
       activate_character: {
         Args: { p_character_name: string; p_discord_id: number }
         Returns: undefined
+      }
+      apply_curse_sync: {
+        Args: {
+          p_channel_id: string
+          p_deltas: Json
+          p_expected_cursor: string
+          p_new_cursor: string
+        }
+        Returns: boolean
       }
       get_quaso_leaderboard: {
         Args: { p_limit?: number; p_mode: string }
