@@ -1,7 +1,7 @@
 // server/api/ctf/submit.post.ts
 import { createHash } from 'node:crypto'
 import { serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '../../../types/database.types'
+import type { Database } from '~/types/database.types'
 import { unsealSessionData, SESSION_COOKIE_NAME } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
