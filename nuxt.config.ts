@@ -84,8 +84,8 @@ export default defineNuxtConfig({
     '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } },
 
     // 4. CTF 旧站重定向（301 永久重定向）
-    '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 302 } },
-    '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 302 } },
+    '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 301 } },
+    '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 301 } },
 
     // 5. Let Discord embed the activities. CSP frame-ancestors is the whole rule;
     //    X-Frame-Options has no "allow these hosts" value, so it is not sent here.
