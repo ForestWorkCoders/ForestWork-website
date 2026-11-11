@@ -80,7 +80,10 @@ const items = computed<NavigationMenuItem[]>(() => [
         <!-- 1. Emblem 图案标 -->
         <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg" alt="ForestWork Emblem" class="h-4.75 w-auto" />
         <!-- 2. Text 文字标（取代原本的 HTML 纯文本，自动响应浅/深色模式） -->
-        <UColorModeImage light="/brand/svg/text-en-black.svg" dark="/brand/svg/text-en-white.svg" alt="ForestWork" class="h-3.5 w-auto hidden sm:block" />
+        <!--    Show/hide sits on a wrapper: classes on UColorModeImage reach both of its images, so sm:block would un-hide the dark-mode one -->
+        <span class="hidden sm:flex">
+          <UColorModeImage light="/brand/svg/text-en-black.svg" dark="/brand/svg/text-en-white.svg" alt="ForestWork" class="h-3.5 w-auto" />
+        </span>
       </div>
     </template>
 
