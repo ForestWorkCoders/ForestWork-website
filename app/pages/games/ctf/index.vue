@@ -996,7 +996,7 @@ useSeoMeta({
   ogTitle: 'FORESTWORK // VIRTUAL_CTF_CONSOLE',
   description: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
   ogDescription: '純前端 WebShell 虛擬終端靶場。支援動態 VFS 檔案系統、隱寫術分析、二進制逆向與動態衰減計分。立即接入 Mainframe 展開滲透！',
-  ogImage: SHARE_IMAGE_URL, // 可替换为专用的 CTF 终端预览横幅
+  ogImage: 'https://forestwork.vercel.app/images/share/ctf.png', // 1200×630 shot of this terminal after `help`
   twitterCard: 'summary_large_image',
   // 终端专属翡翠绿 (#10B981)
   themeColor: '#10B981'
