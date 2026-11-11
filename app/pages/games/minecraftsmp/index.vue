@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 // 1. SEO 元数据
 useSeoMeta({
@@ -11,20 +11,33 @@ useSeoMeta({
 })
 
 // 2. 原生剪贴板逻辑
-const serverIp = 'told you to coming soon :('
-const copied = ref(false)
+// The server address. Empty until the server opens: the button then shows "Coming Soon"
+// and only answers with the joke, without touching the visitor's clipboard.
+// Fill it in and the same button shows the address and copies it.
+const serverIp = ''
+const flash = ref<string | null>(null)
 
-async function copy() {
+function show(text: string) {
+    flash.value = text
+    setTimeout(() => {
+        flash.value = null
+    }, 2000)
+}
+
+async function onClick() {
+    if (!serverIp) return show('told you to coming soon :(')
     try {
         await navigator.clipboard.writeText(serverIp)
-        copied.value = true
-        setTimeout(() => {
-            copied.value = false
-        }, 2000)
+        show('已複製到剪貼簿！')
     } catch (err) {
         console.error('复制失败:', err)
     }
 }
+
+const buttonIcon = computed(() => {
+    if (!serverIp) return 'i-lucide-hourglass'
+    return flash.value ? 'i-lucide-check' : 'i-lucide-clipboard'
+})
 
 // 3. 季数导航链接
 interface SeasonLink {
@@ -59,9 +72,9 @@ const navLinks: SeasonLink[] = [
             </h1>
 
             <!-- IP 复制交互按钮 -->
-            <UButton color="primary" size="xl" variant="solid" :icon="copied ? 'i-lucide-check' : 'i-lucide-clipboard'"
-                class="font-medium tracking-wide shadow-2xl hover:scale-105 transition-transform" @click="copy()">
-                {{ copied ? '已複製到剪貼簿！' : 'Coming Soon' }}
+            <UButton color="primary" size="xl" variant="solid" :icon="buttonIcon"
+                class="font-medium tracking-wide shadow-2xl hover:scale-105 transition-transform" @click="onClick()">
+                {{ flash ?? (serverIp || 'Coming Soon') }}
             </UButton>
 
             <p class="text-gray-200 text-sm sm:text-base font-medium drop-shadow">
