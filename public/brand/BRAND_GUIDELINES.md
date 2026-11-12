@@ -8,11 +8,13 @@ The same rules as the brand centre at https://forestwork.vercel.app/brand.
 |---|---|---|
 | Forest Emerald 森林墨綠 (primary) | `#4C7766` | Primary buttons, links, focus rings |
 | Amber Gold 琥珀金 (secondary) | `#D97706` | Highlights: champions, live, eyebrow labels |
-| Crisp White 雪白 | `#FFFFFF` | Light page background |
+| Crisp White 雪白 | `#FFFFFF` | Light-mode cards, background behind the black logo, print white |
+| Mist White 霧白 | `#F7F9FC` | Light page background (softer than pure white) |
 | Cool Grey 冷灰 | `#C9D1D9` | Borders, disabled controls, body text in dark mode |
 | Charcoal Black 炭黑 | `#231F20` | Background behind the white logo; print black. Not a page colour |
 | Ink Black 墨黑 | `#0D1117` | Dark page background |
 
+- Light mode: page `#F7F9FC`, cards `#FFFFFF`, borders `slate-200`.
 - Dark mode: page `#0D1117`, cards `#161B22`, borders `#30363D`.
 - Neutral greys use a cool scale (Tailwind `slate`) to match Ink Black.
 - Status colours (win / loss, error, rank changes) may use red, blue and purple. They are not brand colours.
@@ -52,7 +54,7 @@ Files are named by the colour of the artwork, not the background.
 | Vertical lockup 直向組合 | 75px (emblem `h-14`, ZH `h-5`, EN `h-3.5`) |
 | Emblem alone 純圖案 | 24px |
 
-- Black artwork on light backgrounds (`#FFFFFF`, `#F9FAFB`); white artwork on dark ones (`#0D1117`, `#161B22`, `#231F20`, Forest Emerald, dark photos).
+- Black artwork on light backgrounds (`#FFFFFF`, `#F7F9FC`); white artwork on dark ones (`#0D1117`, `#161B22`, `#231F20`, Forest Emerald, dark photos).
 - Keep clear space of **0.25×** the emblem height on every side.
 - Don't stretch, recolour, rotate, outline or add shadows; don't change the viewBox; don't place the logo on busy, low-contrast images.
 

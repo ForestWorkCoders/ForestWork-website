@@ -57,8 +57,17 @@ const colors: ColorToken[] = [
         hex: '#FFFFFF',
         rgb: '255, 255, 255',
         cmyk: '0/0/0/0',
-        description: '淺色模式的頁面底色。',
+        description: '淺色模式的卡片底色、白色背景標誌與印刷用白。',
         bgClass: 'bg-white border-b border-slate-200 dark:border-[#30363D]'
+    },
+    {
+        name: '霧白 (Mist White)',
+        role: '中性色',
+        hex: '#F7F9FC',
+        rgb: '247, 249, 252',
+        cmyk: '2/1/0/1',
+        description: '淺色模式的頁面底色，比純白柔和，減少長時間閱讀的刺眼感。',
+        bgClass: 'bg-[#F7F9FC] border-b border-slate-200 dark:border-[#30363D]'
     },
     {
         name: '冷灰 (Cool Grey)',
@@ -103,7 +112,7 @@ const spacingRules = [
 </script>
 
 <template>
-    <div class="min-h-screen bg-white dark:bg-[#0D1117] text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div class="min-h-screen bg-[#F7F9FC] dark:bg-[#0D1117] text-slate-900 dark:text-slate-100 transition-colors duration-300">
         <UContainer class="py-12 md:py-16 space-y-20 max-w-6xl">
 
             <!-- Page header -->
@@ -139,7 +148,7 @@ const spacingRules = [
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div v-for="color in colors.filter(c => c.role !== '中性色')" :key="color.hex"
                         @click="copyToClipboard(color.hex)"
-                        class="group cursor-pointer bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] rounded-2xl overflow-hidden hover:border-[#4C7766] transition-all duration-200 shadow-sm">
+                        class="group cursor-pointer bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] rounded-2xl overflow-hidden hover:border-[#4C7766] transition-all duration-200 shadow-sm">
                         <div :class="[color.bgClass, 'h-40 w-full relative p-4 flex items-end justify-end']">
                             <span
                                 class="text-xs font-mono px-2 py-1 rounded bg-black/40 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
@@ -163,10 +172,10 @@ const spacingRules = [
 
                 <div>
                     <h3 class="text-xl font-bold text-slate-900 dark:text-white">中性色 (Neutrals)</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-5">
                         <div v-for="color in colors.filter(c => c.role === '中性色')" :key="color.hex"
                             @click="copyToClipboard(color.hex)"
-                            class="group cursor-pointer bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] rounded-2xl overflow-hidden hover:border-[#4C7766] transition-all duration-200 shadow-sm">
+                            class="group cursor-pointer bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] rounded-2xl overflow-hidden hover:border-[#4C7766] transition-all duration-200 shadow-sm">
                             <div :class="[color.bgClass, 'h-28 w-full relative p-3 flex items-end justify-end']">
                                 <span
                                     class="text-xs font-mono px-2 py-0.5 rounded bg-black/40 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
@@ -186,7 +195,7 @@ const spacingRules = [
                         </div>
                     </div>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-4 max-w-3xl">
-                        灰階使用冷色調 (Tailwind slate)，與墨黑一致。勝負、錯誤與名次變化等狀態色可用紅、藍、紫，但不屬於品牌色。各遊戲頁面可保留自己的強調色，其餘規範（字型、字級、標誌、用語與深色底色）照常適用。
+                        淺色模式：頁面用霧白，卡片用雪白；深色模式：頁面用墨黑，卡片 #161B22。灰階使用冷色調 (Tailwind slate)，與墨黑一致。勝負、錯誤與名次變化等狀態色可用紅、藍、紫，但不屬於品牌色。各遊戲頁面可保留自己的強調色，其餘規範（字型、字級、標誌、用語與深色底色）照常適用。
                     </p>
                 </div>
             </section>
@@ -212,9 +221,9 @@ const spacingRules = [
 
                         <!-- Horizontal lockup EN -->
                         <div
-                            class="bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
+                            class="bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
                             <div
-                                class="h-32 bg-white dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
+                                class="h-32 bg-[#F7F9FC] dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
                                 <div class="flex items-center justify-center gap-2.5 max-w-full">
                                     <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                         alt="Emblem" class="h-11.25 w-auto shrink-0" />
@@ -232,9 +241,9 @@ const spacingRules = [
 
                         <!-- Horizontal lockup ZH -->
                         <div
-                            class="bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
+                            class="bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
                             <div
-                                class="h-32 bg-white dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
+                                class="h-32 bg-[#F7F9FC] dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
                                 <div class="flex items-center justify-center gap-2.5 max-w-full">
                                     <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                         alt="Emblem" class="h-11.25 w-auto shrink-0" />
@@ -252,9 +261,9 @@ const spacingRules = [
 
                         <!-- Vertical lockup: emblem h-14, ZH h-5, EN h-3.5 -->
                         <div
-                            class="bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
+                            class="bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
                             <div
-                                class="h-32 bg-white dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
+                                class="h-32 bg-[#F7F9FC] dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
                                 <div class="flex flex-col items-center justify-center gap-1.5 max-w-full">
                                     <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                         alt="ForestWork Emblem" class="h-14 w-auto shrink-0" />
@@ -275,9 +284,9 @@ const spacingRules = [
 
                         <!-- Emblem only -->
                         <div
-                            class="bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
+                            class="bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
                             <div
-                                class="h-32 bg-white dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm">
+                                class="h-32 bg-[#F7F9FC] dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm">
                                 <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                     alt="ForestWork Symbol Only" class="h-10 w-auto" />
                             </div>
@@ -374,7 +383,7 @@ const spacingRules = [
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div
-                        class="bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-6 rounded-2xl">
+                        class="bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-6 rounded-2xl">
                         <h4 class="text-base font-bold text-slate-900 dark:text-white">字級規範</h4>
                         <ul class="space-y-2 mt-4">
                             <li v-for="r in sizeRules" :key="r.size" class="text-sm text-slate-600 dark:text-slate-300">
@@ -383,7 +392,7 @@ const spacingRules = [
                         </ul>
                     </div>
                     <div
-                        class="bg-slate-50 dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-6 rounded-2xl">
+                        class="bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-6 rounded-2xl">
                         <h4 class="text-base font-bold text-slate-900 dark:text-white">間距規範</h4>
                         <ul class="space-y-2 mt-4">
                             <li v-for="r in spacingRules" :key="r.rule" class="text-sm text-slate-600 dark:text-slate-300">
