@@ -35,7 +35,7 @@ scripts/        one-off and maintenance scripts (see below)
 
 ## Running it locally
 
-Needs Node.js and pnpm (the version is pinned in `package.json` under `packageManager`).
+Needs Node.js 24 (`engines` in `package.json`; the scripts load `.ts` files directly) and pnpm (the version is pinned in `package.json` under `packageManager`).
 
 ```bash
 pnpm install
