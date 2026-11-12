@@ -236,7 +236,7 @@ const top3Charts = computed(() => {
             class="bg-white dark:bg-[#18212f] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col relative group">
             <!-- 浮雕大名次水印 -->
             <div
-              class="absolute -right-4 -top-8 text-[120px] font-black text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
+              class="absolute -right-4 -top-8 text-[120px] font-extrabold text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
               #{{ index + 1 }}
             </div>
 
@@ -245,7 +245,7 @@ const top3Charts = computed(() => {
               <UAvatar :src="chart.avatar" :alt="chart.name" size="xl"
                 class="ring-4 ring-gray-50 dark:ring-[#1e293b] shadow-lg mb-3 shrink-0 bg-gray-100 dark:bg-gray-800" />
               <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ chart.name }}</h3>
-              <div class="mt-2 flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-black text-2xl">
+              <div class="mt-2 flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-extrabold text-2xl">
                 <span>{{ chart.overallScore }}</span>
                 <span class="text-xs text-gray-400 font-medium tracking-widest ml-1">SCORE</span>
               </div>
@@ -304,7 +304,7 @@ const top3Charts = computed(() => {
             <!-- 排名插槽：保证在 60px 宽度内绝对居中不溢出 -->
             <template #rank-cell="{ row }">
               <div class="flex items-center justify-center w-full">
-                <span class="font-black text-xs sm:text-base italic px-1.5 py-0.5 rounded transition-colors" :class="row.original.rank === 1
+                <span class="font-extrabold text-xs sm:text-base italic px-1.5 py-0.5 rounded transition-colors" :class="row.original.rank === 1
                   ? 'text-yellow-400 bg-yellow-400/10'
                   : row.original.rank === 2
                     ? 'text-slate-300 bg-slate-300/10'

@@ -221,29 +221,29 @@ const abnormalMatchMessage = computed(() => {
           <!-- 紅隊 (左側) -->
           <div class="flex items-center gap-4 flex-1">
             <!-- 分數：動態讀取，並注入隊伍主題色 -->
-            <div class="text-4xl md:text-5xl font-black w-12 text-center"
+            <div class="text-4xl md:text-5xl font-extrabold w-12 text-center"
               :style="{ color: match.redTeam.colour || '#ef4444' }">
               {{ displayData.scoreRed ?? '-' }}
             </div>
             <UAvatar :src="match.redTeam.logo" size="lg" class="hidden md:block bg-white shadow-sm"
               :ui="{ rounded: 'rounded-md' }" />
-            <div class="font-black text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate">
+            <div class="font-extrabold text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate">
               {{ match.redTeam.name }}
             </div>
           </div>
 
           <!-- VS 標籤 -->
-          <div class="px-4 text-gray-400 font-black text-sm uppercase tracking-widest opacity-50">VS</div>
+          <div class="px-4 text-gray-400 font-extrabold text-sm uppercase tracking-widest opacity-50">VS</div>
 
           <!-- 藍隊 (右側) -->
           <div class="flex items-center gap-4 flex-1 justify-end">
             <div
-              class="font-black text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate text-right">
+              class="font-extrabold text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate text-right">
               {{ match.blueTeam.name }}
             </div>
             <UAvatar :src="match.blueTeam.logo" size="lg" class="hidden md:block bg-white shadow-sm"
               :ui="{ rounded: 'rounded-md' }" />
-            <div class="text-4xl md:text-5xl font-black w-12 text-center"
+            <div class="text-4xl md:text-5xl font-extrabold w-12 text-center"
               :style="{ color: match.blueTeam.colour || '#3b82f6' }">
               {{ displayData.scoreBlue ?? '-' }}
             </div>
@@ -313,7 +313,7 @@ const abnormalMatchMessage = computed(() => {
             class="bg-white dark:bg-gray-900 p-4 border border-gray-200 dark:border-gray-800 rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-gray-400 transition-colors"
             @click="activeTab = game.gameNumber">
             <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">Map {{ game.gameNumber }}</span>
-            <span class="text-sm font-black truncate max-w-full">{{ game.map.name }}</span>
+            <span class="text-sm font-extrabold truncate max-w-full">{{ game.map.name }}</span>
             <div class="flex items-center gap-3 mt-1 font-mono text-lg font-bold">
               <span :style="{ color: match.redTeam.colour }">{{ game.score.red ?? '-' }}</span>
               <span class="text-gray-400 text-sm">:</span>
@@ -336,7 +336,7 @@ const abnormalMatchMessage = computed(() => {
           <div class="space-y-3">
             <div class="flex items-center gap-2 mb-4">
               <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: match.redTeam.colour || '#ef4444' }"></div>
-              <h4 class="font-black text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
+              <h4 class="font-extrabold text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
                 match.redTeam.name }}</h4>
             </div>
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
@@ -379,7 +379,7 @@ const abnormalMatchMessage = computed(() => {
           <div class="space-y-3">
             <div class="flex items-center gap-2 mb-4">
               <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: match.blueTeam.colour || '#3b82f6' }"></div>
-              <h4 class="font-black text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
+              <h4 class="font-extrabold text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
                 match.blueTeam.name }}</h4>
             </div>
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">

@@ -158,7 +158,7 @@ const drawOrthogonalLine = (x1, y1, x2, y2, isDrop) => {
       <div 
         v-for="header in graphData.headers" 
         :key="header.id"
-        class="absolute text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center select-none pointer-events-none"
+        class="absolute text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center select-none pointer-events-none"
         :style="{ left: header.x + 'px', top: header.y + 'px', width: CARD_W + 'px' }"
       >
         {{ header.text }}
@@ -183,14 +183,14 @@ const drawOrthogonalLine = (x1, y1, x2, y2, isDrop) => {
             ></div>
             <span 
               class="text-xs truncate w-28 transition-all" 
-              :class="node.match.winner === 'A' ? 'font-black text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
+              :class="node.match.winner === 'A' ? 'font-extrabold text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
             >
               {{ node.match.teamA || 'TBD' }}
             </span>
           </div>
           <span 
             class="font-mono text-xs transition-all" 
-            :class="node.match.winner === 'A' ? 'font-black text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
+            :class="node.match.winner === 'A' ? 'font-extrabold text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
           >
             {{ node.match.scoreA ?? '-' }}
           </span>
@@ -208,14 +208,14 @@ const drawOrthogonalLine = (x1, y1, x2, y2, isDrop) => {
             ></div>
             <span 
               class="text-xs truncate w-28 transition-all" 
-              :class="node.match.winner === 'B' ? 'font-black text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
+              :class="node.match.winner === 'B' ? 'font-extrabold text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
             >
               {{ node.match.teamB || 'TBD' }}
             </span>
           </div>
           <span 
             class="font-mono text-xs transition-all" 
-            :class="node.match.winner === 'B' ? 'font-black text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
+            :class="node.match.winner === 'B' ? 'font-extrabold text-gray-900 dark:text-white' : (!node.match.winner ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500')"
           >
             {{ node.match.scoreB ?? '-' }}
           </span>

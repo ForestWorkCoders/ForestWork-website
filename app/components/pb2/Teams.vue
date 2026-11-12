@@ -80,7 +80,7 @@ const roleColor = {
                         :style="{ backgroundColor: team.colour || 'transparent' }"></div>
             <UAvatar :src="team.logo || '/default-team-logo.png'" size="lg" class="bg-white" :ui="{ rounded: 'rounded-lg' }" />
             <div class="flex flex-col">
-              <h3 class="text-lg md:text-xl font-black text-gray-900 dark:text-white flex items-baseline gap-2">
+              <h3 class="text-lg md:text-xl font-extrabold text-gray-900 dark:text-white flex items-baseline gap-2">
                 <span v-if="team.short_sign" class="text-sm font-bold opacity-70" :style="{ color: team.colour }">[{{ team.short_sign }}]</span>
                 {{ team.name }}
               </h3>
@@ -116,13 +116,13 @@ const roleColor = {
             >
               <span 
                 v-if="player.status !== 'active'" 
-                class="w-16 text-center text-[10px] font-black tracking-widest uppercase py-1.5 rounded shadow-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                class="w-16 text-center text-[10px] font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
               >
                 {{ player.status }}
               </span>
               <span 
                 v-else
-                class="w-16 text-center text-[10px] font-black tracking-widest uppercase py-1.5 rounded shadow-sm"
+                class="w-16 text-center text-[10px] font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm"
                 :class="roleColor[player.role] || roleColor.substitute"
               >
                 {{ roleDisplay[player.role] || player.role }}

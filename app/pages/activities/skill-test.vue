@@ -691,7 +691,7 @@ onUnmounted(() => {
               <span
                 class="text-xs font-mono font-bold text-emerald-400 group-hover:-translate-x-0.5 transition-transform">←</span>
               <span
-                class="text-xs font-black tracking-widest uppercase text-zinc-200 group-hover:text-white font-mono whitespace-nowrap">
+                class="text-xs font-extrabold tracking-widest uppercase text-zinc-200 group-hover:text-white font-mono whitespace-nowrap">
                 FORESTWORK.OS
               </span>
               <span class="text-[10px] text-zinc-500 group-hover:text-emerald-400 font-mono">↗</span>
@@ -700,7 +700,7 @@ onUnmounted(() => {
 
           <div class="text-center px-2">
             <h1
-              class="text-xs sm:text-base md:text-lg font-black tracking-[0.2em] text-white uppercase font-mono whitespace-nowrap">
+              class="text-xs sm:text-base md:text-lg font-extrabold tracking-[0.2em] text-white uppercase font-mono whitespace-nowrap">
               CHOOSE YOUR TRIAL
             </h1>
             <p
@@ -731,7 +731,7 @@ onUnmounted(() => {
                 class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-zinc-600 group-hover:border-emerald-400 transition-colors" />
 
               <div class="shrink-0 flex justify-between items-start font-mono z-10 leading-tight">
-                <span class="text-[10px] sm:text-[11px] font-black transition-colors"
+                <span class="text-[10px] sm:text-[11px] font-extrabold transition-colors"
                   :style="{ color: slot.status === 'ready' ? slot.accentColor : '#71717a' }">
                   // {{ slot.index }}
                 </span>
@@ -749,7 +749,7 @@ onUnmounted(() => {
 
               <div class="flex-1 min-h-0 flex flex-col items-center justify-center py-0.5 overflow-hidden relative">
                 <div
-                  class="text-xl sm:text-2xl font-black font-mono transition-transform duration-200 group-hover:scale-110 select-none"
+                  class="text-xl sm:text-2xl font-extrabold font-mono transition-transform duration-200 group-hover:scale-110 select-none"
                   :style="{ color: slot.status === 'ready' ? slot.accentColor : '#3f3f46' }">
                   {{ slot.status === 'ready' ? '⚡' : '🔒' }}
                 </div>
@@ -769,7 +769,7 @@ onUnmounted(() => {
                 <div>
                   <div class="text-[7px] sm:text-[8px] tracking-widest text-zinc-500 uppercase">PB</div>
                   <div
-                    class="text-[11px] sm:text-xs font-black tracking-tight text-zinc-200 group-hover:text-white transition-colors">
+                    class="text-[11px] sm:text-xs font-extrabold tracking-tight text-zinc-200 group-hover:text-white transition-colors">
                     {{ slot.bestScore }}
                   </div>
                 </div>
@@ -815,7 +815,7 @@ onUnmounted(() => {
         </div>
 
         <div class="text-center">
-          <h1 class="text-sm sm:text-lg font-black tracking-[0.2em] text-white uppercase">
+          <h1 class="text-sm sm:text-lg font-extrabold tracking-[0.2em] text-white uppercase">
             {{ currentSlot.title }}
           </h1>
           <p class="text-[9px] tracking-widest text-emerald-400 uppercase hidden sm:block">
@@ -836,7 +836,7 @@ onUnmounted(() => {
             class="relative flex flex-col justify-between bg-[#0e1117] border border-zinc-800 rounded-sm overflow-hidden shadow-2xl group hover:border-zinc-700 transition-colors">
             <!-- 工业战术卡头 (实色横条，致敬原图顶部米黄色块) -->
             <div
-              class="shrink-0 bg-[#d4af37] text-black px-3.5 py-2 flex items-center justify-between font-black tracking-widest text-xs uppercase">
+              class="shrink-0 bg-[#d4af37] text-black px-3.5 py-2 flex items-center justify-between font-extrabold tracking-widest text-xs uppercase">
               <span>{{ step.title }}</span>
               <span class="text-[10px] opacity-75 font-mono">{{ step.tag }}</span>
             </div>
@@ -880,7 +880,7 @@ onUnmounted(() => {
 
         <!-- 主要动作：正式部署 / 开打 (PLAY) -->
         <button @click="launchSlot(currentSlot)"
-          class="px-8 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transform hover:-translate-y-0.5">
+          class="px-8 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transform hover:-translate-y-0.5">
           DEPLOY // 開始實戰 ➔
         </button>
       </footer>
@@ -926,17 +926,17 @@ onUnmounted(() => {
             class="absolute inset-0 z-30 bg-[#090a0f]/95 backdrop-blur-md flex flex-col items-center justify-between p-6 sm:p-8 font-mono select-none animate-fade-in">
             <!-- 1. 顶部：战术评级与超大 COMBAT SCORE (致敬原图 FLAWLESS ACE + 11,678) -->
             <div class="text-center space-y-1">
-              <h2 class="text-xl sm:text-2xl font-black tracking-[0.25em] text-[#d4af37] uppercase">
+              <h2 class="text-xl sm:text-2xl font-extrabold tracking-[0.25em] text-[#d4af37] uppercase">
                 {{ activeSummary.rating }}
               </h2>
-              <div class="text-5xl sm:text-7xl font-black tracking-tight text-[#d4af37] drop-shadow-md">
+              <div class="text-5xl sm:text-7xl font-extrabold tracking-tight text-[#d4af37] drop-shadow-md">
                 {{ score.toLocaleString() }}
               </div>
               <div class="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
                 COMBAT SCORE
               </div>
               <div class="flex items-center justify-center gap-2 pt-1 font-mono">
-                <span class="px-2 py-0.5 text-[10px] font-black bg-[#d4af37] text-black rounded-sm shadow-sm uppercase">
+                <span class="px-2 py-0.5 text-[10px] font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm uppercase">
                   {{ playerRankBadge }}
                 </span>
                 <span class="text-xs font-bold tracking-widest text-[#ef4444]">
@@ -950,11 +950,11 @@ onUnmounted(() => {
               class="w-full max-w-2xl bg-[#0e1117] border border-zinc-800 rounded-sm overflow-hidden shadow-2xl my-auto">
               <!-- Tab 切换头 (致敬原图顶栏色块) -->
               <div
-                class="grid grid-cols-2 text-center text-xs font-black tracking-widest uppercase cursor-pointer border-b border-zinc-800">
+                class="grid grid-cols-2 text-center text-xs font-extrabold tracking-widest uppercase cursor-pointer border-b border-zinc-800">
                 <button @click="settlementTab = 'summary'" :class="[
                   'py-3 transition-colors',
                   settlementTab === 'summary'
-                    ? 'bg-[#d4af37] text-black shadow-inner font-black'
+                    ? 'bg-[#d4af37] text-black shadow-inner font-extrabold'
                     : 'bg-[#12141a] text-zinc-400 hover:text-white'
                 ]">
                   MATCH SUMMARY
@@ -962,7 +962,7 @@ onUnmounted(() => {
                 <button @click="settlementTab = 'ranking'" :class="[
                   'py-3 transition-colors',
                   settlementTab === 'ranking'
-                    ? 'bg-[#d4af37] text-black shadow-inner font-black'
+                    ? 'bg-[#d4af37] text-black shadow-inner font-extrabold'
                     : 'bg-[#12141a] text-zinc-400 hover:text-white'
                 ]">
                   GLOBAL RANKING
@@ -974,7 +974,7 @@ onUnmounted(() => {
                 <div v-for="(metric, idx) in activeSummary.metrics" :key="idx"
                   class="flex flex-col items-center justify-between space-y-1.5">
                   <!-- 指标主数值 -->
-                  <div class="text-xl sm:text-2xl font-black tracking-tight text-white font-mono">
+                  <div class="text-xl sm:text-2xl font-extrabold tracking-tight text-white font-mono">
                     {{ metric.value }}
                   </div>
                   <!-- 指标标签 -->
@@ -984,7 +984,7 @@ onUnmounted(() => {
                   <!-- 金色倍率胶囊 (x2.00 等) -->
                   <div class="h-5 flex items-center justify-center">
                     <span v-if="metric.badge"
-                      class="px-2 py-0.5 text-[10px] font-black bg-[#d4af37] text-black rounded-sm shadow-sm">
+                      class="px-2 py-0.5 text-[10px] font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm">
                       {{ metric.badge }}
                     </span>
                   </div>
@@ -1008,12 +1008,12 @@ onUnmounted(() => {
                     ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold'
                     : 'text-zinc-300'
                 ]">
-                  <span class="col-span-2 font-black italic text-zinc-500">#{{ entry.global_rank }}</span>
+                  <span class="col-span-2 font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
                   <span class="col-span-5 truncate flex items-center gap-1.5">
                     <img :src="entry.avatar_url" class="w-3.5 h-3.5 rounded-full" alt="" />
                     <span>{{ entry.operator_name }}</span>
                   </span>
-                  <span class="col-span-3 text-right font-black text-zinc-100">{{ entry.score.toLocaleString() }}</span>
+                  <span class="col-span-3 text-right font-extrabold text-zinc-100">{{ entry.score.toLocaleString() }}</span>
                   <span class="col-span-2 text-right text-[10px] text-zinc-500">
                     {{ new Date(entry.created_at).toLocaleDateString() }}
                   </span>
@@ -1037,7 +1037,7 @@ onUnmounted(() => {
 
               <!-- 再次挑战主按钮 (加宽金色实心矩形) -->
               <button @click="launchSlot(currentSlot)"
-                class="flex-1 h-11 bg-[#d4af37] hover:bg-[#e6c14a] text-black font-black text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] transform hover:-translate-y-0.5 flex items-center justify-center">
+                class="flex-1 h-11 bg-[#d4af37] hover:bg-[#e6c14a] text-black font-extrabold text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] transform hover:-translate-y-0.5 flex items-center justify-center">
                 PLAY AGAIN
               </button>
 
@@ -1095,12 +1095,12 @@ onUnmounted(() => {
               ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold'
               : 'hover:bg-zinc-900/60 text-zinc-300'
           ]">
-            <span class="col-span-2 font-black italic text-zinc-500">#{{ entry.global_rank }}</span>
+            <span class="col-span-2 font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
             <span class="col-span-5 truncate flex items-center gap-1.5">
               <img :src="entry.avatar_url" class="w-3.5 h-3.5 rounded-full" alt="" />
               <span>{{ entry.operator_name }}</span>
             </span>
-            <span class="col-span-3 text-right font-black font-mono text-zinc-100">{{ entry.score.toLocaleString()
+            <span class="col-span-3 text-right font-extrabold font-mono text-zinc-100">{{ entry.score.toLocaleString()
             }}</span>
             <span class="col-span-2 text-right text-[10px] text-zinc-500">
               {{ new Date(entry.created_at).toLocaleDateString() }}

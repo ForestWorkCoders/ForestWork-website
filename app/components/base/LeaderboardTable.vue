@@ -9,7 +9,7 @@
           DNF
         </div>
         <div v-else
-          class="inline-block text-center font-black text-base sm:text-lg italic px-2 py-0.5 rounded transition-colors"
+          class="inline-block text-center font-extrabold text-base sm:text-lg italic px-2 py-0.5 rounded transition-colors"
           :class="getRankColor(row.original.rank)">
           #{{ row.original.rank }}
         </div>
@@ -29,7 +29,7 @@
 
     <template #total-cell="{ row }">
       <div class="text-center font-bold text-sm sm:text-base font-mono"
-        :class="isDnfRow(row) ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-emerald-500 dark:text-emerald-400 font-black'">
+        :class="isDnfRow(row) ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-emerald-500 dark:text-emerald-400 font-extrabold'">
         {{ row.original.total }}
       </div>
     </template>

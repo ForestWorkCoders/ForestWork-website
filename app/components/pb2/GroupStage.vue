@@ -20,7 +20,7 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
     <section>
       <div class="flex items-center gap-3 pl-2 mb-8">
         <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Group Standings</h2>
+        <h2 class="text-2xl font-extrabold tracking-widest uppercase text-gray-900 dark:text-white">Group Standings</h2>
       </div>
       <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
         <table class="w-full text-left border-collapse">
@@ -63,7 +63,7 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
     <section>
       <div class="flex items-center gap-3 pl-2 mb-8">
         <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Matches</h2>
+        <h2 class="text-2xl font-extrabold tracking-widest uppercase text-gray-900 dark:text-white">Matches</h2>
       </div>
       <div class="space-y-6">
         <div v-for="round in data.rounds" :key="round.roundName">

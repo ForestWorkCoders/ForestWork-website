@@ -42,7 +42,7 @@ useHead({
             <UIcon name="i-lucide-file-text" class="w-6 h-6 text-amber-600 dark:text-amber-500" />
             <span class="text-sm font-bold text-amber-600 dark:text-amber-500 tracking-widest uppercase">Rulebook</span>
           </div>
-          <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">
+          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             賽事通用規則
           </h1>
           <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2 tracking-wide">
@@ -80,7 +80,7 @@ useHead({
           <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner">
             <UIcon name="i-lucide-search-alert" class="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <h3 class="text-xl font-black text-gray-900 dark:text-white mb-3 tracking-wide">在手機上閱讀指南</h3>
+          <h3 class="text-xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-wide">在手機上閱讀指南</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
             受限於行動裝置瀏覽器，為提供最佳的流暢滑動與閱讀體驗，請點擊下方按鈕以全螢幕模式開啟文件。
           </p>

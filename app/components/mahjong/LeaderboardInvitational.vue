@@ -57,7 +57,7 @@ const getRankColor = (rank) => (rank <= 9 ? 'text-green-400' : 'text-gray-400')
       :empty-state="{ icon: 'i-lucide-database', label: '尚無玩家獲得積分' }"
     >
       <template #rank-cell="{ row }">
-        <div class="text-left font-black text-lg italic" :class="getRankColor(row.original.rank)">
+        <div class="text-left font-extrabold text-lg italic" :class="getRankColor(row.original.rank)">
           #{{ row.original.rank }}
         </div>
         <BaseRankTrend :diff="row.original.rank_diff" />
@@ -71,7 +71,7 @@ const getRankColor = (rank) => (rank <= 9 ? 'text-green-400' : 'text-gray-400')
       </template>
 
       <template #total-cell="{ row }">
-        <div class="text-left font-black text-lg font-mono text-emerald-400 dark:text-emerald-500">
+        <div class="text-left font-extrabold text-lg font-mono text-emerald-400 dark:text-emerald-500">
           {{ row.original.total }}
         </div>
       </template>

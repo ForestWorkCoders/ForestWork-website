@@ -72,7 +72,7 @@ const roleColor = {
             :key="player.name"
             class="flex items-center gap-4 group" >
             <span 
-              class="w-14 text-center text-xs font-black tracking-widest uppercase py-1.5 rounded-md shadow-sm"
+              class="w-14 text-center text-xs font-extrabold tracking-widest uppercase py-1.5 rounded-md shadow-sm"
               :class="roleColor[player.role] || roleColor.Substitute"
             >
               {{ roleDisplay[player.role] || player.role }}

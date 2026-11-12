@@ -39,7 +39,7 @@ const isEmpty = computed(() => {
       <div v-if="brackets.upperBracket.length > 0" class="space-y-6">
         <div class="flex items-center gap-3 pl-2">
           <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-          <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">
+          <h2 class="text-2xl font-extrabold tracking-widest uppercase text-gray-900 dark:text-white">
             <!-- {{ brackets.lowerBracket.length > 0 ? 'Upper Bracket' : 'Playoffs Bracket' }} -->
             {{  'Playoffs Bracket' }}
           </h2>
@@ -52,7 +52,7 @@ const isEmpty = computed(() => {
         
         <div class="flex items-center gap-3 pl-2">
           <div class="w-1.5 h-6 bg-red-500 rounded-full"></div>
-          <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Lower Bracket</h2>
+          <h2 class="text-2xl font-extrabold tracking-widest uppercase text-gray-900 dark:text-white">Lower Bracket</h2>
         </div>
         <Pb2Bracket :rounds="brackets.lowerBracket" />
       </div> -->
@@ -62,7 +62,7 @@ const isEmpty = computed(() => {
     <div class="mt-16 pt-12 border-t-2 border-gray-100 dark:border-gray-800">
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Playoffs MVP & Stats</h2>
+          <h2 class="text-2xl font-extrabold tracking-widest uppercase text-gray-900 dark:text-white">Playoffs MVP & Stats</h2>
           <p class="text-sm text-gray-500 mt-1">季後賽個人數據排行榜</p>
         </div>
         <UIcon name="i-lucide-bar-chart-3" class="w-8 h-8 text-gray-300 dark:text-gray-700" />
