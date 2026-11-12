@@ -2,7 +2,8 @@
 import type { H3Event } from 'h3'
 import { waitUntil } from '@vercel/functions'
 
-const OWNER_ID = '129569761309753344'
+// Administrator bit in Discord's permission bitfield (matches default_member_permissions '8' at registration)
+const ADMINISTRATOR = 1n << 3n
 
 /**
  * 分頁拉取伺服器全量成員（自動跨越 1000 人限制，杜絕漏人）
@@ -47,21 +48,21 @@ async function fetchAllGuildMembers(guildId: string, botToken: string): Promise<
 }
 
 export async function handleDumpIds(interaction: any, event: H3Event) {
-  const callerId = String(interaction.member?.user?.id || interaction.user?.id || '')
-  
-  // 1. 斯巴達防線：只認本人 Snowflake ID
-  if (callerId !== OWNER_ID) {
-    return {
-      type: 4,
-      data: { content: '❌ **權限不足**：此核心管理指令僅限擁有者本人執行。', flags: 64 }
-    }
-  }
-
   const guildId = interaction.guild_id
   if (!guildId) {
     return {
       type: 4,
       data: { content: '❌ 此指令僅限在伺服器內部執行！', flags: 64 }
+    }
+  }
+
+  // 1. Server admins only. Registration hides it from non-admins, but a server can
+  //    re-grant commands in its Integrations settings, so check the caller's own permissions too.
+  const callerPermissions = BigInt(interaction.member?.permissions ?? 0)
+  if ((callerPermissions & ADMINISTRATOR) === 0n) {
+    return {
+      type: 4,
+      data: { content: '❌ **權限不足**：此指令僅限伺服器管理員執行。', flags: 64 }
     }
   }
 
