@@ -811,7 +811,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <!-- 左側：標題與得失點數 -->
                     <div class="flex items-baseline gap-2">
-                        <span class="text-xl font-black font-mono"
+                        <span class="text-xl font-extrabold font-mono"
                             :class="majorHandMode === 'win' ? 'text-primary-600 dark:text-primary-400' : 'text-rose-500'">
                             {{ currentMajorHand.title }}
                         </span>
@@ -839,7 +839,7 @@ const dealInTargetOption = computed(() => {
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800/60">
                         <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
                         <span class="font-bold" :class="[
-                            yaku.isYakuman ? 'text-amber-500 font-black' : (majorHandMode === 'win' ? 'text-primary-500' : 'text-rose-400')
+                            yaku.isYakuman ? 'text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary-500' : 'text-rose-400')
                         ]">
                             {{ yaku.label || `${yaku.han} 番` }}
                         </span>

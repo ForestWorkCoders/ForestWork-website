@@ -209,7 +209,7 @@ const playPercentStyles = [
           class="bg-white dark:bg-[#18212f] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col relative group">
 
           <div
-            class="absolute -right-4 -top-8 text-[120px] font-black text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
+            class="absolute -right-4 -top-8 text-[120px] font-extrabold text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
             #{{ index + 1 }}
           </div>
 
@@ -217,7 +217,7 @@ const playPercentStyles = [
             <UAvatar :src="player.avatar" :alt="player.nickname" size="xl"
               class="ring-4 ring-gray-50 dark:ring-[#1e293b] shadow-lg mb-3" />
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ player.nickname }}</h3>
-            <div class="mt-2 flex items-center gap-1 text-amber-500 dark:text-amber-400 font-black text-2xl">
+            <div class="mt-2 flex items-center gap-1 text-amber-500 dark:text-amber-400 font-extrabold text-2xl">
               <span>{{ player.avg_rank?.toFixed(2) ?? '-' }}</span>
               <span class="text-xs text-gray-400 font-medium tracking-widest ml-1">AVG RANK</span>
             </div>
@@ -271,7 +271,7 @@ const playPercentStyles = [
 
               <!-- 平均顺位加粗高亮 -->
               <template #avg_rank-cell="{ row }">
-                <span class="font-mono font-black text-amber-500 dark:text-amber-400 text-sm">
+                <span class="font-mono font-extrabold text-amber-500 dark:text-amber-400 text-sm">
                   {{ row.original.avg_rank != null ? row.original.avg_rank.toFixed(2) : '-' }}
                 </span>
               </template>
