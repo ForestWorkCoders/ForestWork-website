@@ -1,4 +1,5 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { Database } from '~/types/database.types'
 
 export default defineEventHandler(async (event) => {
     const tournamentId = getRouterParam(event, 'id')
@@ -7,7 +8,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Tournament ID is required' })
     }
 
-    const supabase = await serverSupabaseClient(event)
+    const supabase = await serverSupabaseClient<Database>(event)
 
     // 1. 執行關聯查詢：加入 status 欄位，並修正 profile_url
     const { data: teams, error } = await supabase
