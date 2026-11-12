@@ -1,4 +1,4 @@
-// scripts/backfill-curse.mjs
+// scripts/discord-backfill-curse.mjs
 import { createClient } from '@supabase/supabase-js'
 import { countCurses } from '../server/discord/curse-words.mjs'
 
@@ -6,7 +6,7 @@ import { countCurses } from '../server/discord/curse-words.mjs'
 const rawYear = process.argv[2]
 if (!rawYear || !/^\d{4}$/.test(rawYear)) {
   console.error('❌ 請提供正確的 4 位數西元年份！')
-  console.error('👉 執行範例: node --env-file=.env scripts/backfill-curse.mjs 2024')
+  console.error('👉 執行範例: node --env-file=.env scripts/discord-backfill-curse.mjs 2024')
   process.exit(1)
 }
 
