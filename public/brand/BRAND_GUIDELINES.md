@@ -38,6 +38,7 @@ The same rules as the brand centre at https://forestwork.vercel.app/brand.
 - The gap below a heading is **at least the heading's font size**, e.g. `text-2xl` (24px) → `mt-6`.
 - Between paragraphs: **1.5×** the line gap (`space-y-3` to `space-y-4` for `text-sm`).
 - Between sections: one rhythm per page (`space-y-16` to `space-y-20`).
+- Line length: cap paragraphs at `max-w-prose` (about 30–45 Chinese or 60–75 Latin characters per line). Don't stretch text to the container width. Text inside cards and tables follows the card.
 
 ## 5. Logo (標誌)
 
