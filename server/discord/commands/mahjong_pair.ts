@@ -98,7 +98,7 @@ export async function handleMahjongPair(interaction: any, event: H3Event) {
 
   // ★★★ 改造點 1：並行拉取「歷史牌譜頻次」、「座位頻次」以及「本頻道過去 4 小時內的前 3 輪分桌」★★★
   const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
-  const [meetupRes, seatRes, recentRoundsRes] = await Promise.all([
+  const [meetupRes, seatRes, recentRoundsRes, participantsRes] = await Promise.all([
     supabase.schema('mahjong').rpc('get_player_meetup_frequency' as any),
     supabase.schema('mahjong').rpc('get_seat_frequency' as any),
     supabase.schema('mahjong')
@@ -107,19 +107,28 @@ export async function handleMahjongPair(interaction: any, event: H3Event) {
       .eq('channel_id', channelId)
       .gte('created_at', fourHoursAgo)
       .order('created_at', { ascending: false })
-      .limit(3)
+      .limit(3),
+    // Names come from the register, not from recent seats: players who haven't played lately still have one
+    supabase.schema('mahjong')
+      .from('participants')
+      .select('account_id, nickname')
+      .in('account_id', accountIds)
   ])
 
   const meetupData = (meetupRes.data || []) as any[]
   const seatData = (seatRes.data || []) as any[]
   const recentRounds = (recentRoundsRes.data || []) as any[]
+  const participants = (participantsRes.data || []) as any[]
 
-  // 構造碰面頻次表 (基礎歷史值)
-  const playerFrequency = new Map<string, number>()
+  // Real meet-ups from match history (shown to people)
+  const meetups = new Map<string, number>()
   meetupData.forEach(r => {
     const pairKey = getPairKey(Number(r.player1), Number(r.player2))
-    playerFrequency.set(pairKey, (playerFrequency.get(pairKey) || 0) + r.meet_up_count)
+    meetups.set(pairKey, (meetups.get(pairKey) || 0) + Number(r.meet_up_count))
   })
+
+  // Scoring frequency = real meet-ups + this session's penalties below
+  const playerFrequency = new Map(meetups)
 
   // ★★★ 改造點 2：核心好品味！疊加本場近期輪次，施加超強 L6 範數虛擬懲罰 (+20 次) ★★★
   recentRounds.forEach(roundRow => {
@@ -140,15 +149,14 @@ export async function handleMahjongPair(interaction: any, event: H3Event) {
 
   // 構造座位頻次與昵稱表
   const seatFrequency = new Map<number, { east: number; south: number; west: number }>()
-  const playerMap = new Map<number, string>()
   seatData.forEach(r => {
     seatFrequency.set(r.account_id, {
       east: r.east || 0,
       south: r.south || 0,
       west: r.west || 0
     })
-    playerMap.set(r.account_id, r.mahjong_username || `ID:${r.account_id}`)
   })
+  const playerMap = new Map<number, string>(participants.map(r => [Number(r.account_id), r.nickname]))
 
   const getPairFreq = (p1: number, p2: number) => {
     return playerFrequency.get(getPairKey(p1, p2)) || 0
@@ -253,17 +261,17 @@ export async function handleMahjongPair(interaction: any, event: H3Event) {
       }
     })
 
-    const names = bestPerm.map(pid => playerMap.get(pid) || `Unknown_${pid}`)
+    const names = bestPerm.map(pid => playerMap.get(pid) || '未登記')
     
     const exportIds = isAccountMode 
       ? bestPerm 
       : bestPerm.map(acc2friend)
 
-    // 真實牌譜碰撞頻次 (扣除本場虛擬疊加的 +20，給人類看真實次數)
+    // Real meet-ups only, without this session's penalties
     const [p1, p2, p3] = bestPerm
-    const rawF1 = getPairFreq(p1, p2) % 20
-    const rawF2 = getPairFreq(p2, p3) % 20
-    const rawF3 = getPairFreq(p1, p3) % 20
+    const rawF1 = meetups.get(getPairKey(p1, p2)) || 0
+    const rawF2 = meetups.get(getPairKey(p2, p3)) || 0
+    const rawF3 = meetups.get(getPairKey(p1, p3)) || 0
 
     // 通道 A: 人類核對用富文本卡片
     matchResults.push(
