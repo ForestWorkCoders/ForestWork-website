@@ -75,7 +75,7 @@ export async function handleTarot(interaction: any, event: H3Event) {
       fields,
       thumbnail: { url: imageUrl },
       footer: isLast ? {
-        text: `林間小鎮 · 命運塔羅 (${spread.name})`,
+        text: `林間小鎮 · 命運塔羅 (${spread.name}) · 牌面插圖：Discord Wumpus Tarot`,
         icon_url: ''
       } : undefined,
       timestamp: isLast ? new Date().toISOString() : undefined
