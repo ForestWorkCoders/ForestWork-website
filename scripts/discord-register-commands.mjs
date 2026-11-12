@@ -24,7 +24,6 @@ const headers = {
 const commonCommands = [
     { name: 'ping', description: '檢查網站與交互機器人運行狀態' },
     { name: 'site', description: '取得林間小鎮官方網站與重要入口連結' },
-    { name: 'pages', description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例' },
 ]
 
 // 跑团专有指令
