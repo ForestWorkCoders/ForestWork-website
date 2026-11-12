@@ -10,7 +10,7 @@ try {
   sharp = sharpModule.default;
 } catch {
   console.error('❌ 缺少核心图像处理库: sharp');
-  console.error('👉 请先在项目根目录运行: pnpm add -D sharp\n');
+  console.error('👉 请先在项目根目录运行: pnpm install\n');
   process.exit(1);
 }
 
