@@ -21,6 +21,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      # Without these, prerendering "/" fails with a bare "[500] Server Error".
+      - name: Check Supabase secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          missing=0
+          for name in SUPABASE_URL SUPABASE_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is missing (Settings → Secrets and variables → Actions → Repository secrets)."
+              missing=1
+            fi
+          done
+          exit $missing
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
       - uses: actions/setup-node@v5
