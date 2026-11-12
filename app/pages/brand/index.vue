@@ -108,7 +108,8 @@ const spacingRules = [
     { rule: '標題下方', value: '間距至少等於標題字級，例如 text-2xl (24px) → mt-6' },
     { rule: '段落之間', value: '行距的 1.5 倍 (text-sm 用 space-y-3 至 space-y-4)' },
     { rule: '區塊之間', value: '同一頁面保持同一節奏 (space-y-16 至 space-y-20)' },
-    { rule: '行寬', value: '段落用 max-w-prose，每行約 30–45 個中文字，不要撐滿容器寬度' }
+    { rule: '行寬', value: '段落用 max-w-prose，每行約 30–45 個中文字，不要撐滿容器寬度' },
+    { rule: '對齊', value: '中文段落左右對齊 (text-justify)，窄卡片除外；多項規則分列為清單，不擠在同一段' }
 ]
 </script>
 
@@ -126,7 +127,7 @@ const spacingRules = [
                     <h1 class="text-4xl font-extrabold tracking-tight mt-1 text-slate-900 dark:text-white">
                         品牌資源中心
                     </h1>
-                    <p class="text-slate-500 dark:text-slate-400 mt-9 max-w-prose text-base">
+                    <p class="text-slate-500 dark:text-slate-400 mt-9 max-w-prose text-base text-justify">
                         林間小鎮 (ForestWork) 官方品牌指南：包含標誌、色彩、字型、間距與用語規範，供社群成員、賽事主辦方及合作夥伴使用。
                     </p>
                 </div>
@@ -164,7 +165,7 @@ const spacingRules = [
                                 HEX <span class="text-slate-900 dark:text-slate-200 font-bold">{{ color.hex }}</span>
                                 &nbsp;·&nbsp; RGB {{ color.rgb }} &nbsp;·&nbsp; CMYK {{ color.cmyk }}
                             </p>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mt-3">
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mt-3 text-justify">
                                 {{ color.description }}
                             </p>
                         </div>
@@ -195,9 +196,13 @@ const spacingRules = [
                             </div>
                         </div>
                     </div>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-4 max-w-prose">
-                        淺色模式：頁面用霧白，卡片用雪白；深色模式：頁面用墨黑，卡片 #161B22。灰階使用冷色調 (Tailwind slate)，與墨黑一致。勝負、錯誤與名次變化等狀態色可用紅、藍、紫，但不屬於品牌色。各遊戲頁面可保留自己的強調色，其餘規範（字型、字級、標誌、用語與深色底色）照常適用。
-                    </p>
+                    <ul class="space-y-3 text-sm text-slate-500 dark:text-slate-400 mt-4 max-w-prose text-justify list-disc pl-5">
+                        <li>淺色模式：頁面用霧白，卡片用雪白。</li>
+                        <li>深色模式：頁面用墨黑，卡片用 #161B22。</li>
+                        <li>灰階使用冷色調 (Tailwind slate)，與墨黑一致。</li>
+                        <li>勝負、錯誤與名次變化等狀態色可用紅、藍、紫，但不屬於品牌色。</li>
+                        <li>各遊戲頁面可保留自己的強調色，其餘規範（字型、字級、標誌、用語與深色底色）照常適用。</li>
+                    </ul>
                 </div>
             </section>
 
@@ -213,7 +218,7 @@ const spacingRules = [
 
                 <div>
                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">留白與最小尺寸規範</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-400 max-w-prose mt-5">
+                    <p class="text-sm text-slate-600 dark:text-slate-400 max-w-prose mt-5 text-justify">
                         標誌四周須保持至少 <code class="font-bold text-[#4C7766]">0.25x</code> 的安全留白，其中 <code
                             class="font-bold text-[#4C7766]">x</code> 為標誌圖案的高度。任何文字或圖像元素均不得侵入此區域。頁首使用時，圖案標最小 28px (h-7)，字標 14–16px (h-3.5–h-4)。
                     </p>
@@ -346,7 +351,7 @@ const spacingRules = [
                     <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#D97706]">TYPEFACE</span>
                     <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">Open Sans 與 JetBrains Mono</h2>
                 </div>
-                <div class="space-y-3 text-sm text-slate-600 dark:text-slate-400 max-w-prose">
+                <div class="space-y-3 text-sm text-slate-600 dark:text-slate-400 max-w-prose text-justify">
                     <p><strong>標題與正文：</strong>Open Sans，中文則使用系統的繁體中文字型 (PingFang TC、Microsoft JhengHei 或 Noto Sans TC)。</p>
                     <p><strong>數據與程式碼：</strong>JetBrains Mono，適用於賽事比分、統計數據、代碼與區塊小標。Open Sans 最粗為 800 (ExtraBold)，請勿使用 900。</p>
                 </div>
@@ -376,7 +381,7 @@ const spacingRules = [
 
                     <div class="pt-4 border-t border-[#30363D]">
                         <div class="text-xs font-mono text-slate-400 font-bold tracking-widest uppercase">正文段落 (BODY COPY)</div>
-                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-prose mt-2">
+                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-prose mt-2 text-justify">
                             正文使用 Open Sans Regular。建議每行保持在 30–45 個中文字（或 60–75 個英文字元）以獲得最佳閱讀體驗。賽事數據與排行榜使用等寬字型，確保數字在不同螢幕寬度下對齊。
                         </p>
                     </div>
@@ -417,7 +422,7 @@ const spacingRules = [
                     <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#D97706]">LANGUAGE</span>
                     <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">用語規範</h2>
                 </div>
-                <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300 max-w-prose list-disc pl-5">
+                <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300 max-w-prose text-justify list-disc pl-5">
                     <li>全站使用<strong>繁體中文（台灣用語）</strong>，包含頁面標題與分享描述。</li>
                     <li>同一項數據在各頁面使用同一個名稱：<strong>默聽率</strong>、<strong>流局聽牌率</strong>、<strong>平均和牌巡數</strong>。</li>
                     <li>中英雙語標籤（例如「玩家數據 · Player Stats」）可以使用。</li>

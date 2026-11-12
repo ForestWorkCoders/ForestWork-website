@@ -39,6 +39,7 @@ The same rules as the brand centre at https://forestwork.vercel.app/brand.
 - Between paragraphs: **1.5×** the line gap (`space-y-3` to `space-y-4` for `text-sm`).
 - Between sections: one rhythm per page (`space-y-16` to `space-y-20`).
 - Line length: cap paragraphs at `max-w-prose` (about 30–45 Chinese or 60–75 Latin characters per line). Don't stretch text to the container width. Text inside cards and tables follows the card.
+- Alignment: Chinese paragraphs are justified (`text-justify`), so inline codes such as `#161B22` don't leave a ragged right edge. Narrow cards (under about 20 characters per line) stay left-aligned, because justifying them spreads the characters too far. Several separate rules go in a list, not one paragraph.
 
 ## 5. Logo (標誌)
 
