@@ -4,7 +4,7 @@ const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
 // scripts/discord-register-commands.mjs 中 tarot 選項：
 import { TAROT_SPREADS } from '../server/discord/assets/tarot-deck.ts'
 
-// 動態組裝 16 個下拉選單項
+// 每個牌陣一個下拉選單項 (由 TAROT_SPREADS 動態產生；Discord 上限 25 項)
 const spreadChoices = Object.values(TAROT_SPREADS).map(s => ({
     name: s.name,
     value: s.id
