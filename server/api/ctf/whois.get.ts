@@ -1,6 +1,6 @@
 // server/api/ctf/whois.get.ts
 import { serverSupabaseClient } from '#supabase/server'
-import type { Database } from '../../../types/database.types'
+import type { Database } from '~/types/database.types'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -33,20 +33,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: rankError.message })
   }
 
-  // 確定真實要查題目的 account_id
-  let targetAccountId = rankEntry ? rankEntry.account_id : (/^\d+$/.test(rawTarget) ? rawTarget : null)
-
-  // 若榜單沒排上（例如 0 分），但傳入的是非數字暱稱，向檔案庫反查 account_id
-  if (!targetAccountId && !/^\d+$/.test(rawTarget)) {
-    const { data: profile } = await supabase
-      .from('participant_data')
-      .select('discord_id')
-      .or(`discord_username.eq.${rawTarget},username.eq.${rawTarget}`)
-      .maybeSingle()
-    if (profile) {
-      targetAccountId = profile.discord_id
-    }
-  }
+  // Who to look up: the leaderboard row's account_id, or a raw numeric ID.
+  // The leaderboard is built from ctf.solves, so a name that isn't on it has no solves to show.
+  const targetAccountId = rankEntry ? rankEntry.account_id : (/^\d+$/.test(rawTarget) ? rawTarget : null)
 
   if (!targetAccountId) {
     return { found: false }

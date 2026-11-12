@@ -71,7 +71,7 @@ useSeoMeta({
 
 <template>
     <div
-        class="flex-1 flex flex-col bg-gray-50 dark:bg-[#1a1b26] bg-[url('https://webusstatic.yo-star.com/mj-us-tournament-h5/prod/assets/bg.e1efdef8.png')] bg-cover bg-fixed bg-center transition-colors duration-300">
+        class="flex-1 flex flex-col bg-gray-50 dark:bg-[#1a1b26] bg-[url('/images/mahjongSoul/bg.png')] bg-cover bg-fixed bg-center transition-colors duration-300">
         <!-- 内层蒙版：同样 flex-1 flex flex-col 铺满，负责毛玻璃与透光度 -->
         <div
             class="flex-1 flex flex-col bg-white/70 dark:bg-black/60 backdrop-blur-md py-8 transition-colors duration-300">

@@ -10,8 +10,8 @@
     
     <!-- 1. Emblem 大徽标 (h-16 ~ h-24 弹性伸缩) -->
     <UColorModeImage
-      light="/brand/svg/logo-light.svg"
-      dark="/brand/svg/logo-light.svg"
+      light="/brand/svg/logo-white.svg"
+      dark="/brand/svg/logo-white.svg"
       alt="ForestWork Emblem"
       class="h-30 sm:h-44 md:h-48 w-auto object-contain"
     />
@@ -20,15 +20,15 @@
     <div class="flex flex-col items-center justify-center gap-1.5 sm:gap-2">
       <!-- 中文 Logotype (林間小鎮) -->
       <UColorModeImage
-        light="/brand/svg/text-zh-light.svg"
-        dark="/brand/svg/text-zh-light.svg"
+        light="/brand/svg/text-zh-white.svg"
+        dark="/brand/svg/text-zh-white.svg"
         alt="林間小鎮"
         class="h-8 sm:h-10 md:h-12 w-auto object-contain"
       />
       <!-- 英文 Logotype (Forest Work) -->
       <UColorModeImage
-        light="/brand/svg/text-en-light.svg"
-        dark="/brand/svg/text-en-light.svg"
+        light="/brand/svg/text-en-white.svg"
+        dark="/brand/svg/text-en-white.svg"
         alt="ForestWork"
         class="h-2 sm:h-3 md:h-4 w-auto object-contain opacity-90"
       />

@@ -1,6 +1,5 @@
 import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
-import { buildPagerResponse } from '../../discord/commands/demo-pager'
 import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
 import { handleLinerBattleCommand, handleLinerBattleButton, handleLinerBattleModal } from '../../discord/commands/linerbattle'
 import { handleGiveQuasoContextMenu } from '../../discord/commands/quaso'
@@ -107,17 +106,6 @@ export default defineEventHandler(async (event) => {
 
     if (customId.startsWith('lb_accept:') || customId.startsWith('lb_input:') || customId.startsWith('lb_cancel:')) {
       return await handleLinerBattleButton(interaction, event)
-    }
-
-    // 匹配 pager 翻页事件: "pager:nav:<pageNumber>"
-    if (customId.startsWith('pager:nav:')) {
-      const targetPage = parseInt(customId.split(':')[2] || '1', 10)
-
-      // 好品味：返回 type: 7 (UPDATE_interaction)，在原地就地更新消息！
-      return {
-        type: 7,
-        data: buildPagerResponse(targetPage)
-      }
     }
 
     if (customId.startsWith('curse_switch_mode:') || customId.startsWith('curse_switch_year:')) {

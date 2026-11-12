@@ -1,64 +1,91 @@
-# Nuxt Starter Template
+# 林間小鎮 · ForestWork
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+The website of the ForestWork community: tournament pages and player stats for Mahjong Soul (雀魂) and Plazma Burst 2, Gartic Phone (林間靈魂繪師) replays, the Minecraft SMP, a CTF, community tools, and the brand centre. The ForestWork Discord bot is served from the same app.
 
-Use this template to get started with [Nuxt UI](https://ui.nuxt.com) quickly.
+Live site: <https://forestwork.vercel.app>
 
-- [Live demo](https://starter-template.nuxt.dev/)
-- [Documentation](https://ui.nuxt.com/docs/getting-started/installation/nuxt)
+## Tech stack
 
-<a href="https://starter-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png">
-    <img alt="Nuxt Starter Template" src="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png" width="830" height="466">
-  </picture>
-</a>
+| Part | What |
+|---|---|
+| Framework | [Nuxt 4](https://nuxt.com) with [Nuxt UI v4](https://ui.nuxt.com) and Tailwind CSS |
+| Charts | ECharts (`vue-echarts`) |
+| Database | Supabase (Postgres). Schemas: `public`, `mahjong`, `plazmaburst`, `trpg`, `ctf` |
+| Hosting | Vercel: serverless functions, Blob storage, a daily cron, Analytics and Speed Insights |
+| Discord bot | HTTP interactions endpoint in `server/api/discord/`, commands in `server/discord/` |
 
-> The starter template for Vue is on https://github.com/nuxt-ui-templates/starter-vue.
+## Folder map
 
-## Quick Start
-
-```bash [Terminal]
-npm create nuxt@latest -- -t ui
+```text
+app/
+  pages/        site pages: games/{mahjongsoul,plazmaburst,garticphone,minecraftsmp,ctf}, activities/, tools/, brand/
+  components/   page parts, grouped by game (mahjong/, pb2/, …) and base/ for shared ones
+  composables/  shared logic
+  utils/        auto-imported helpers and constants (e.g. links.ts)
+  types/        generated Supabase types (pnpm update:database)
+server/
+  api/          API routes: auth, mahjong, plazmaburst, ctf, giveaway, activities, cron, discord
+  discord/      bot commands and helpers
+  routes/       non-/api server routes
+public/
+  brand/        logos and wordmarks (see /brand on the site)
+  data/         Gartic Phone sessions (index.json + one file per round)
+scripts/        one-off and maintenance scripts (see below)
 ```
 
-## Deploy your own
+## Running it locally
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-name=starter&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fstarter&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fstarter-dark.png&demo-url=https%3A%2F%2Fstarter-template.nuxt.dev%2F&demo-title=Nuxt%20Starter%20Template&demo-description=A%20minimal%20template%20to%20get%20started%20with%20Nuxt%20UI.)
-
-## Setup
-
-Make sure to install the dependencies:
+Needs Node.js 24 (`engines` in `package.json`; the scripts load `.ts` files directly) and pnpm (the version is pinned in `package.json` under `packageManager`).
 
 ```bash
 pnpm install
 ```
 
-## Development Server
+Create a `.env` file in the repo root. **Never commit it.** The app and the scripts read these variables:
 
-Start the development server on `http://localhost:3000`:
+| Variable | Used for |
+|---|---|
+| `SUPABASE_URL`, `SUPABASE_KEY` | Supabase client (`@nuxtjs/supabase`) |
+| `SUPABASE_ANON_KEY` | fallback key for `gartic:sync` and `mahjong:recalculate` |
+| `SUPABASE_SERVICE_ROLE_KEY` | server-side writes (keep it out of anything sent to the browser) |
+| `SESSION_SECRET` | signs the login session cookie |
+| `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_REDIRECT_URI` | Discord login |
+| `DISCORD_APPLICATION_ID`, `DISCORD_PUBLIC_KEY`, `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`, `DISCORD_OWNER_ID` | Discord bot |
+| `CURSE_TRACK_CHANNEL_ID` | channel the curse counter syncs from |
+| `CRON_SECRET` | the cron route refuses calls without it |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob uploads |
+| `BASE_URL` | site that `url:redirects` checks (default: the live site) |
+
+Then:
 
 ```bash
 pnpm dev
 ```
 
-## Production
+The site runs on <http://localhost:3000>. Vercel-only parts (`/_vercel/…` analytics scripts, the cron) don't run locally.
 
-Build the application for production:
+## Scripts
 
-```bash
-pnpm build
-```
+| Command | What it does |
+|---|---|
+| `pnpm dev` / `pnpm build` / `pnpm preview` | Nuxt dev server, production build, preview of the build |
+| `pnpm lint` / `pnpm typecheck` | ESLint, `nuxt typecheck` |
+| `pnpm update:database` | regenerates `app/types/database.types.ts` from Supabase |
+| `pnpm discord:register-commands` | registers the bot's slash commands with Discord |
+| `pnpm gartic:split` / `pnpm gartic:sync` | splits a Gartic Phone album into session files / syncs the manifest |
+| `pnpm ctf:hash` | hashes a CTF flag for storage |
+| `pnpm mahjong:recalculate` | recalculates the Mahjong MR values in Supabase |
+| `pnpm url:redirects` | checks that the old URLs still redirect correctly |
 
-Locally preview production build:
+Scripts that take `--env-file=.env` talk to the real services. Run them only when you mean to.
 
-```bash
-pnpm preview
-```
+## Branches and releases
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- `main` is production, and `staging` is the staging deployment.
+- Each change goes on its own branch (`fix/…`, `feat/…`) from `staging`. It reaches `staging` through a pull request, merged with a merge commit.
+- A release is a pull request from `staging` into `main`, followed by a SemVer tag (`vMAJOR.MINOR.PATCH`).
+- Pull requests follow the template: What? / Why? / How? / Testing? / Screenshots (optional) / Anything Else?
 
-## Renovate integration
+## Licence
 
-Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+All rights reserved. See [LICENSE](LICENSE).

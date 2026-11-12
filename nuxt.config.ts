@@ -1,4 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+// Vercel sets VERCEL_ENV at build time: 'production', 'preview' (staging and branches) or unset locally
+const isVercelPreview = !!process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production'
+
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
@@ -84,16 +88,27 @@ export default defineNuxtConfig({
     '/gartic_phone/**': { redirect: { to: '/games/garticphone', statusCode: 301 } },
 
     // 4. CTF 旧站重定向（301 永久重定向）
-    '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 302 } },
-    '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 302 } },
+    '/pages/others/Puzzles': { redirect: { to: '/games/ctf', statusCode: 301 } },
+    '/pages/others/Puzzles/**': { redirect: { to: '/games/ctf', statusCode: 301 } },
 
-    // 5. Discord 站内嵌套允许（CSP + XFO）
+    // 4.1. Brand SVGs renamed by artwork colour (light → white, dark → black)
+    '/brand/svg/logo-light.svg': { redirect: { to: '/brand/svg/logo-white.svg', statusCode: 301 } },
+    '/brand/svg/logo-dark.svg': { redirect: { to: '/brand/svg/logo-black.svg', statusCode: 301 } },
+    '/brand/svg/text-en-light.svg': { redirect: { to: '/brand/svg/text-en-white.svg', statusCode: 301 } },
+    '/brand/svg/text-en-dark.svg': { redirect: { to: '/brand/svg/text-en-black.svg', statusCode: 301 } },
+    '/brand/svg/text-zh-light.svg': { redirect: { to: '/brand/svg/text-zh-white.svg', statusCode: 301 } },
+    '/brand/svg/text-zh-dark.svg': { redirect: { to: '/brand/svg/text-zh-black.svg', statusCode: 301 } },
+
+    // 5. Let Discord embed the activities. CSP frame-ancestors is the whole rule;
+    //    X-Frame-Options has no "allow these hosts" value, so it is not sent here.
     '/activities/**': {
       headers: {
-        'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com",
-        'X-Frame-Options': 'ALLOWALL'
+        'Content-Security-Policy': "frame-ancestors 'self' https://*.discordsays.com https://discord.com"
       }
-    }
+    },
+
+    // 6. Keep staging and branch previews out of search results; production builds skip this
+    ...(isVercelPreview && { '/**': { headers: { 'X-Robots-Tag': 'noindex' } } })
   },
 
   compatibilityDate: '2026-06-30',

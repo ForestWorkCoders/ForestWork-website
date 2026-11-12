@@ -58,7 +58,7 @@ useSeoMeta({
     </div>
 
     <div v-else
-        class="min-h-screen bg-gray-50 dark:bg-[#0f111a] bg-[url('https://static.wikia.nocookie.net/plazmabursttwo/images/9/93/Plazma_Burst_2_background.JPG')] bg-cover bg-fixed bg-center">
+        class="min-h-screen bg-gray-50 dark:bg-[#0f111a] bg-[url('/images/plazmaBurst/bg.webp')] bg-cover bg-fixed bg-center">
         <div class="min-h-screen bg-black/50 backdrop-blur-sm pt-20 pb-12">
 
             <UContainer class="max-w-6xl">
@@ -131,20 +131,10 @@ useSeoMeta({
                 <!-- 導覽與內容區塊 -->
                 <div
                     class="bg-white dark:bg-[#1a1c23] w-full border-x border-b border-gray-200 dark:border-gray-800 rounded-b-xl shadow-sm">
+                    <!-- The bar scrolls sideways when the labels don't fit (phones), instead of cutting them to "…" -->
                     <UTabs :items="tabs" class="w-full" :ui="{
-                        list: {
-                            background: 'bg-gray-50 dark:bg-[#15171e]',
-                            rounded: 'rounded-none',
-                            padding: 'p-0',
-                            marker: { background: 'bg-blue-500/10 dark:bg-blue-500/20', rounded: 'rounded-none' },
-                            tab: {
-                                rounded: 'rounded-none',
-                                active: 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-500',
-                                inactive: 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
-                                padding: 'py-5 px-6',
-                                font: 'font-bold tracking-wider'
-                            }
-                        }
+                        list: 'overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                        trigger: 'shrink-0'
                     }">
 
                         <!-- 賽事資訊 -->

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+
+// Background: the video loop, or a still image for visitors who ask their device for reduced motion.
+// Decided in the browser, so a reduced-motion visitor never starts the video download.
+const background = ref<'video' | 'still' | null>(null)
+onMounted(() => {
+    background.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'still' : 'video'
+})
 
 // 1. SEO 元数据
 useSeoMeta({
@@ -7,24 +14,37 @@ useSeoMeta({
     ogTitle: '林間SMP · ForestWork',
     description: '林間小鎮多元化SMP多人生存伺服器 ⎯ 只供受邀請成員與實況主遊玩、交流。',
     ogDescription: '林間小鎮多元化SMP多人生存伺服器 ⎯ 只供受邀請成員與實況主遊玩、交流。',
-    ogImage: 'https://i.imgur.com/cu2YAkn.png'
+    ogImage: SHARE_IMAGE_URL
 })
 
 // 2. 原生剪贴板逻辑
-const serverIp = 'told you to coming soon :('
-const copied = ref(false)
+// The server address. Empty until the server opens: the button then shows "Coming Soon"
+// and only answers with the joke, without touching the visitor's clipboard.
+// Fill it in and the same button shows the address and copies it.
+const serverIp = ''
+const flash = ref<string | null>(null)
 
-async function copy() {
+function show(text: string) {
+    flash.value = text
+    setTimeout(() => {
+        flash.value = null
+    }, 2000)
+}
+
+async function onClick() {
+    if (!serverIp) return show('told you to coming soon :(')
     try {
         await navigator.clipboard.writeText(serverIp)
-        copied.value = true
-        setTimeout(() => {
-            copied.value = false
-        }, 2000)
+        show('已複製到剪貼簿！')
     } catch (err) {
         console.error('复制失败:', err)
     }
 }
+
+const buttonIcon = computed(() => {
+    if (!serverIp) return 'i-lucide-hourglass'
+    return flash.value ? 'i-lucide-check' : 'i-lucide-clipboard'
+})
 
 // 3. 季数导航链接
 interface SeasonLink {
@@ -44,9 +64,12 @@ const navLinks: SeasonLink[] = [
 <template>
     <div class="relative flex-1 flex flex-col items-center justify-center p-6 text-center overflow-hidden">
         <!-- 1. 视频背景 -->
-        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover pointer-events-none">
+        <video v-if="background === 'video'" autoplay loop muted playsinline
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none">
             <source src="/images/minecraftsmp/hero-bg.mp4" type="video/mp4">
         </video>
+        <img v-else-if="background === 'still'" src="/images/minecraftsmp/hero-still.webp" alt="" aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none">
 
         <!-- 2. 暗化蒙版 (保证对比度) -->
         <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/80 backdrop-blur-[2px] pointer-events-none"
@@ -59,9 +82,9 @@ const navLinks: SeasonLink[] = [
             </h1>
 
             <!-- IP 复制交互按钮 -->
-            <UButton color="primary" size="xl" variant="solid" :icon="copied ? 'i-lucide-check' : 'i-lucide-clipboard'"
-                class="font-medium tracking-wide shadow-2xl hover:scale-105 transition-transform" @click="copy()">
-                {{ copied ? '已複製到剪貼簿！' : 'Coming Soon' }}
+            <UButton color="primary" size="xl" variant="solid" :icon="buttonIcon"
+                class="font-medium tracking-wide shadow-2xl hover:scale-105 transition-transform" @click="onClick()">
+                {{ flash ?? (serverIp || 'Coming Soon') }}
             </UButton>
 
             <p class="text-gray-200 text-sm sm:text-base font-medium drop-shadow">

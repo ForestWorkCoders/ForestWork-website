@@ -1,7 +1,8 @@
 // server/discord/commands/en.ts
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
-import { getInteractionOption } from '../utils'
+import { FORESTWORK_ICON_URL, getInteractionOption } from '../utils'
+import { recordRoomPlayer } from '../room-player'
 import { getSupabase } from '../../utils/supabase'
 
 const d100 = () => crypto.randomInt(1, 101)
@@ -130,7 +131,7 @@ export async function handleCocGrowth(interaction: any, event: H3Event) {
     ],
     footer: {
       text: synced ? '林間小鎮 TRPG · 數值已自動同步寫入出戰角色卡' : '林間小鎮 TRPG · 數值檢定引擎',
-      icon_url: 'https://i.imgur.com/cu2YAkn.png'
+      icon_url: FORESTWORK_ICON_URL
     },
     timestamp: new Date().toISOString()
   }
@@ -143,19 +144,8 @@ export async function handleCocGrowth(interaction: any, event: H3Event) {
     })
   }
 
-  // 如果當前是在某個跑團主線子區內擲骰，將擲骰者自動納入參團名單！
-  const channelType = interaction.channel?.type
-  if (channelType === 11) {
-    const currentChannelId = String(interaction.channel_id)
-    const callerId = String(interaction.member?.user?.id || interaction.user?.id)
-
-    // 異步打點，不阻塞投骰的主線回應
-    const supabase = getSupabase()
-    await supabase.rpc('record_room_player', {
-      p_main_thread_id: currentChannelId,
-      p_player_id: callerId
-    })
-  }
+  // Inside a TRPG room's thread, whoever rolls joins the room's player list
+  await recordRoomPlayer(interaction)
 
   return {
     type: 4,

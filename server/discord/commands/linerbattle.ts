@@ -178,7 +178,7 @@ export function buildLinerBattleEmbed(battle: any) {
     color: isFinished ? 0xE74C3C : (isWaitingInput ? 0x3498DB : 0xF1C40F),
     footer: {
       text: '位差差額承受傷害 · 精準命中獲取等額回血 · 上限 100 HP',
-    //   icon_url: 'https://i.imgur.com/cu2YAkn.png'
+    //   icon_url: FORESTWORK_ICON_URL
     },
     timestamp: new Date().toISOString()
   }

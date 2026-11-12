@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import sessionIndex from '~~/public/data/index.json'
 
 definePageMeta({
     layout: false
@@ -7,6 +8,22 @@ definePageMeta({
 
 const route = useRoute()
 const sessionId = route.params.id as string
+
+// Page title from the session index, so the server HTML (and share previews) name the round.
+// The session data itself loads only in the browser.
+const indexEntry = sessionIndex.find(s => s.id === sessionId)
+const pageTitle = indexEntry
+    ? `${indexEntry.year}/${indexEntry.month} ${indexEntry.title} · 林間靈魂繪師 · ForestWork`
+    : '林間靈魂繪師 · ForestWork'
+const pageDescription = indexEntry
+    ? `${indexEntry.mode} · ${indexEntry.chainsCount} 條故事鏈`
+    : '選擇一個歷史對局，見證人類想像力的崩壞。'
+useSeoMeta({
+    title: pageTitle,
+    ogTitle: pageTitle,
+    description: pageDescription,
+    ogDescription: pageDescription
+})
 
 useHead({
     link: [
@@ -254,6 +271,15 @@ onBeforeUnmount(() => {
                     : 'bg-gray-700/60 text-gray-500 border-gray-600 shadow-none cursor-not-allowed pointer-events-none'">
                 &darr;
             </button>
+        </div>
+
+        <!-- Unknown session id (typo, old link): say so instead of an empty page -->
+        <div v-if="error" class="flex items-center justify-center min-h-screen px-4">
+            <div
+                class="w-[90%] max-w-xl bg-amber-300 border-4 border-black shadow-[6px_6px_0px_0px_#000] p-6 sm:p-8 rounded-xl text-center">
+                <h2 class="text-2xl sm:text-3xl font-black text-black">找不到這場對局</h2>
+                <p class="mt-2 font-bold text-black">Session not found</p>
+            </div>
         </div>
 
         <!-- 主展示区 -->

@@ -20,7 +20,7 @@ const dropdownItems = computed(() => [
     {
       label: '林間小鎮 Discord 伺服器',
       icon: 'i-simple-icons-discord',
-      to: 'https://discord.com/servers/510192195509157909',
+      to: DISCORD_SERVER_URL,
       target: '_blank'
     }
   ],
@@ -52,7 +52,7 @@ const items = computed<NavigationMenuItem[]>(() => [
       { label: '戰報一覽', to: '/games/mahjongsoul/' },
       { label: '賽事規章', to: '/games/mahjongsoul/rules' },
       { label: '如何加入比賽場', to: '/games/mahjongsoul/how-to' },
-      { label: '玩家數據', to: '/games/mahjongsoul/players/sanma', badge: { label: 'Beta', color: 'warning' } }
+      { label: '玩家數據', to: '/games/mahjongsoul/players/sanma' }
     ]
   },
   {
@@ -78,9 +78,12 @@ const items = computed<NavigationMenuItem[]>(() => [
     <template #title>
       <div class="flex-shrink-0 flex items-center gap-2">
         <!-- 1. Emblem 图案标 -->
-        <UColorModeImage light="/brand/svg/logo-dark.svg" dark="/brand/svg/logo-light.svg" alt="ForestWork Emblem" class="h-4.75 w-auto" />
+        <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg" alt="ForestWork Emblem" class="h-4.75 w-auto" />
         <!-- 2. Text 文字标（取代原本的 HTML 纯文本，自动响应浅/深色模式） -->
-        <UColorModeImage light="/brand/svg/text-en-dark.svg" dark="/brand/svg/text-en-light.svg" alt="ForestWork" class="h-3.5 w-auto hidden sm:block" />
+        <!--    Show/hide sits on a wrapper: classes on UColorModeImage reach both of its images, so sm:block would un-hide the dark-mode one -->
+        <span class="hidden sm:flex">
+          <UColorModeImage light="/brand/svg/text-en-black.svg" dark="/brand/svg/text-en-white.svg" alt="ForestWork" class="h-3.5 w-auto" />
+        </span>
       </div>
     </template>
 
@@ -145,7 +148,7 @@ const items = computed<NavigationMenuItem[]>(() => [
       <UNavigationMenu :items="items" orientation="vertical" class="px-2 mt-4" />
 
       <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 px-4">
-        <UButton to="https://discord.gg/lin-jian-xiao-zhen-510192195509157909" target="_blank" color="primary"
+        <UButton :to="DISCORD_SERVER_URL" target="_blank" color="primary"
           variant="solid" block>
           加入Discord
         </UButton>

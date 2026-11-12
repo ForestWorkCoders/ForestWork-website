@@ -16,12 +16,12 @@ export async function handlePing(interaction: any, event: H3Event) {
   let statusEmoji = '🟢'
   let remark = '極速 (Hot)'
 
-  if (latency > 1500) {
-    statusEmoji = '🟡'
-    remark = '冷啟動延遲 (Cold Start)'
-  } else if (latency > 2500) {
+  if (latency > 2500) {
     statusEmoji = '🔴'
     remark = '接近 3 秒超時臨界'
+  } else if (latency > 1500) {
+    statusEmoji = '🟡'
+    remark = '冷啟動延遲 (Cold Start)'
   }
 
   return {

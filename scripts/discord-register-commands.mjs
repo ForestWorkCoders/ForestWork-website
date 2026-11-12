@@ -4,7 +4,7 @@ const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
 // scripts/discord-register-commands.mjs 中 tarot 選項：
 import { TAROT_SPREADS } from '../server/discord/assets/tarot-deck.ts'
 
-// 動態組裝 16 個下拉選單項
+// 每個牌陣一個下拉選單項 (由 TAROT_SPREADS 動態產生；Discord 上限 25 項)
 const spreadChoices = Object.values(TAROT_SPREADS).map(s => ({
     name: s.name,
     value: s.id
@@ -24,7 +24,6 @@ const headers = {
 const commonCommands = [
     { name: 'ping', description: '檢查網站與交互機器人運行狀態' },
     { name: 'site', description: '取得林間小鎮官方網站與重要入口連結' },
-    { name: 'pages', description: '展示帶有分頁按鈕的 Embed 交互卡片展示範例' },
 ]
 
 // 跑团专有指令

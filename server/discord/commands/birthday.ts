@@ -1,6 +1,6 @@
 // server/discord/commands/birthday.ts
 import type { H3Event } from 'h3'
-import { getInteractionOption } from '../utils'
+import { FORESTWORK_ICON_URL, getInteractionOption } from '../utils'
 import birthdayData from '../assets/birthday-book.json'
 
 export async function handleBirthday(interaction: any, event: H3Event) {
@@ -35,7 +35,7 @@ export async function handleBirthday(interaction: any, event: H3Event) {
           color: 0x4C7766, // 林間墨綠
           footer: {
             text: '林間小鎮 · 366天生日靈魂密碼',
-            icon_url: 'https://i.imgur.com/cu2YAkn.png'
+            icon_url: FORESTWORK_ICON_URL
           }
         }
       ]

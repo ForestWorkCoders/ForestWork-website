@@ -1,7 +1,7 @@
 // scripts/generate-tarot-rev.mjs
 import fs from 'node:fs'
 import path from 'node:path'
-import sharp from 'sharp' // 本地安裝一次用作構建工具: pnpm add -D sharp
+import sharp from 'sharp' // devDependency (pnpm install)
 
 const TAROT_DIR = path.resolve('public/tarot')
 

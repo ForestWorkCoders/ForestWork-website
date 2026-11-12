@@ -1,7 +1,7 @@
 // server/api/ctf/submit.post.ts
 import { createHash } from 'node:crypto'
 import { serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '../../../types/database.types'
+import type { Database } from '~/types/database.types'
 import { unsealSessionData, SESSION_COOKIE_NAME } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
@@ -58,6 +58,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 404 代表該 Discord 帳號根本沒有加入伺服器
+  // (same link as DISCORD_SERVER_URL in app/utils/links.ts)
   if (memberRes.status === 404) {
     return {
       success: false,

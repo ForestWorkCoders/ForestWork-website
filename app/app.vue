@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { toComponentEmbedJson } from 'discord-component-embed';
 import { SpeedInsights } from '@vercel/speed-insights/vue';
 import { Analytics } from '@vercel/analytics/vue';
+
+// The public address of the page being shown: the production host plus the path, without the query string
+// or a trailing slash (so /games/x and /games/x/ are one address).
+// Used for og:url and the canonical link, so a shared link describes its own page,
+// and copies on other hosts (staging, old aliases) point search engines at production.
+const route = useRoute()
+const pageUrl = computed(() => `https://forestwork.vercel.app${route.path.replace(/(.)\/+$/, '$1')}`)
 
 // 1. 常规 SEO / 社交平台兜底 (当平台不支持 component-embed 时降级显示)
 useSeoMeta({
@@ -9,18 +15,19 @@ useSeoMeta({
   ogTitle: '林間小鎮 · ForestWork',
   description: '林間小鎮賽事網頁',
   ogDescription: '林間小鎮賽事網頁',
-  ogImage: 'https://i.imgur.com/cu2YAkn.png',
-  ogUrl: 'https://forestwork.vercel.app',
+  ogImage: SHARE_IMAGE_URL,
+  ogUrl: () => pageUrl.value,
   twitterCard: 'summary_large_image',
   themeColor: '#4C7766'
 })
 
 useHead({
   link: [
+    { rel: 'canonical', href: pageUrl },
     // 预连接 Google Fonts CDN 提升加载速度
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-    // 仅引入 Open Sans[cite: 5] 与 JetBrains Mono[cite: 5] 的 Latin 字符集（轻量极速）
+    // 仅引入 Open Sans 与 JetBrains Mono 的 Latin 字符集（轻量极速）
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Open+Sans:wght@400;600;700;800&display=swap'
@@ -46,7 +53,7 @@ const discordEmbedPayload = {
         items: [
           {
             media: {
-              url: 'https://i.imgur.com/cu2YAkn.png'
+              url: SHARE_IMAGE_URL
             },
             description: 'ForestWork Banner',
             spoiler: false
@@ -82,7 +89,7 @@ const discordEmbedPayload = {
             style: 5,
             label: '加入 Discord',
             emoji: { name: '📌' },
-            url: 'https://discord.gg/lin-jian-xiao-zhen-510192195509157909'
+            url: DISCORD_SERVER_URL
           }
         ]
       }

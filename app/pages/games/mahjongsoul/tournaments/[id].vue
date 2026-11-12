@@ -1,6 +1,5 @@
 <script setup>
 import { buildTournamentDiscordEmbed } from '@/utils/mahjongDiscordEmbed'
-import { toComponentEmbedJson } from 'discord-component-embed';
 
 const route = useRoute()
 
@@ -83,14 +82,14 @@ useSeoMeta({
     ogTitle: () => tourney.value?.title ?? 'ForestWork Mahjong Tournament',
     description: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況與對局紀錄。`,
     ogDescription: () => `查看 ${tourney.value?.title ?? '賽事'} 的即時戰況與對局紀錄。`,
-    ogImage: () => tourney.value?.imageUrl ?? 'https://i.imgur.com/cu2YAkn.png'
+    ogImage: () => tourney.value?.imageUrl ?? SHARE_IMAGE_URL
 })
 
 // 2. 动态组件树计算
 const embedPayload = computed(() => {
     const title = tourney.value?.title || '林間小鎮賽事'
     const targetUrl = `https://forestwork.vercel.app/games/mahjongsoul/tournaments/${route.params.id}`
-    const image = tourney.value?.imageUrl || 'https://i.imgur.com/cu2YAkn.png'
+    const image = tourney.value?.imageUrl || SHARE_IMAGE_URL
     const formatText = computed(() => {
         if (tourney.value?.format === 'event') return '趣味活動周'
         if (tourney.value?.format === 'relay') return '隊伍接力賽'
@@ -139,7 +138,7 @@ useHead({
     </div>
 
     <div v-else
-        class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] bg-[url('https://webusstatic.yo-star.com/mj-us-tournament-h5/prod/assets/bg.e1efdef8.png')] bg-cover bg-fixed bg-center">
+        class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] bg-[url('/images/mahjongSoul/bg.png')] bg-cover bg-fixed bg-center">
 
         <div class="min-h-screen bg-black/50 backdrop-blur-sm pt-20 pb-12">
 
@@ -214,20 +213,10 @@ useHead({
                 <div
                     class="bg-white dark:bg-[#1a1c23] w-full border-x border-b border-gray-200 dark:border-gray-800 rounded-b-xl shadow-sm">
                     <div v-if="tabs.length > 1">
+                        <!-- The bar scrolls sideways when the labels don't fit (phones), instead of cutting them to "…" -->
                         <UTabs :items="tabs" class="w-full" :ui="{
-                            wrapper: 'w-full',
-                            list: {
-                                // 核心：移动端允许横向滑动、禁止折行、隐藏滚动条；在大屏恢复自适应宽度
-                                base: 'flex flex-nowrap overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full justify-start sm:justify-center',
-                                background: 'bg-gray-100 dark:bg-[#0f172a]',
-                                padding: 'p-1',
-                                tab: {
-                                    // 核心：whitespace-nowrap 坚决禁止文字打省略号截断，padding 自适应
-                                    base: 'whitespace-nowrap shrink-0 text-xs sm:text-sm px-3 py-2 font-medium',
-                                    active: 'text-gray-950 dark:text-white font-bold',
-                                    inactive: 'text-gray-500 dark:text-gray-400'
-                                }
-                            }
+                            list: 'overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                            trigger: 'shrink-0'
                         }">
                             <!-- 賽事資訊 -->
                             <template #info>

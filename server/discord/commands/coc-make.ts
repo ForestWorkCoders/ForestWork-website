@@ -1,7 +1,7 @@
 // server/discord/commands/coc-make.ts
 import crypto from 'node:crypto'
 import type { H3Event } from 'h3'
-import { getInteractionOption } from '../utils'
+import { FORESTWORK_ICON_URL, getInteractionOption } from '../utils'
 
 const d6 = () => crypto.randomInt(1, 7)
 const rollSum = (n: number, add: number = 0) =>
@@ -68,7 +68,7 @@ export async function handleCocMake(interaction: any, event: H3Event) {
         ],
         footer: {
             text: isSecret ? '林間小鎮 TRPG · 秘密車卡 (僅自己可見)' : '林間小鎮 TRPG · 調查員創角協議',
-            icon_url: 'https://i.imgur.com/cu2YAkn.png'
+            icon_url: FORESTWORK_ICON_URL
         },
         timestamp: new Date().toISOString()
     }
