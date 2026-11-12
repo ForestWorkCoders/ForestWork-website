@@ -2,6 +2,12 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* Brand typefaces (see /brand). Chinese falls back to the system's Traditional Chinese font. */
+@theme {
+  --font-sans: 'Open Sans', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
 /* 2. 斯巴达式原生实现，消除所有 @apply 魔法，直接读取 V4 变量 */
 .custom-scrollbar {
   scrollbar-width: thin;
