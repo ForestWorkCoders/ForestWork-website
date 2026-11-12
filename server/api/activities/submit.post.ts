@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     rawDiscordId = '10001'
   }
 
-  // 4. ★ 核心加固：使用 ServiceRole 执行特权写入，彻底免疫任何 RLS 意外拦截！[cite: 27]
+  // 4. ★ 核心加固：使用 ServiceRole 执行特权写入，彻底免疫任何 RLS 意外拦截！
   const supabase = serverSupabaseServiceRole(event)
 
   const { data, error } = await supabase

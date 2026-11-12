@@ -27,7 +27,7 @@ useHead({
     // 预连接 Google Fonts CDN 提升加载速度
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-    // 仅引入 Open Sans[cite: 5] 与 JetBrains Mono[cite: 5] 的 Latin 字符集（轻量极速）
+    // 仅引入 Open Sans 与 JetBrains Mono 的 Latin 字符集（轻量极速）
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Open+Sans:wght@400;600;700;800&display=swap'
