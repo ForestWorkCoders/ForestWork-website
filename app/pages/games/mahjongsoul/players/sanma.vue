@@ -514,7 +514,7 @@ const dealInTargetOption = computed(() => {
                         </button>
                     </div>
 
-                    <div class="flex items-center gap-2 text-xs font-mono">
+                    <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
                         <span class="text-gray-400">自訂月份:</span>
                         <input v-model="dateRange.start" type="month" :min="careerBounds.start"
                             :max="dateRange.end || careerBounds.end"
