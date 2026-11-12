@@ -1,6 +1,5 @@
 <script setup>
 import { buildTournamentDiscordEmbed } from '@/utils/mahjongDiscordEmbed'
-import { toComponentEmbedJson } from 'discord-component-embed';
 
 const route = useRoute()
 
