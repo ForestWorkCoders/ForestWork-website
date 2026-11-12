@@ -334,7 +334,7 @@ const commitAndRemoveWinner = () => {
                     <li v-for="item in winnersHistory" :key="item.winner.id"
                         class="pt-2 flex items-center justify-between text-sm">
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-mono text-primary-400 font-bold">#{{ item.round }}</span>
+                            <span class="text-xs font-mono text-primary font-bold">#{{ item.round }}</span>
                             <span class="font-medium text-gray-200">{{ item.winner.name }}</span>
                         </div>
                         <span class="text-[10px] font-mono text-gray-500">{{ item.drawnAt }}</span>

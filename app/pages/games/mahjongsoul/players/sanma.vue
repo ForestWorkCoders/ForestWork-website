@@ -508,7 +508,7 @@ const dealInTargetOption = computed(() => {
                     <div class="flex flex-wrap items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-lg">
                         <button v-for="preset in presets" :key="preset.id"
                             class="px-2.5 py-1 text-xs rounded-md font-mono transition-colors"
-                            :class="activePresetId === preset.id ? 'bg-primary-500 text-white font-bold shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                            :class="activePresetId === preset.id ? 'bg-primary text-inverted font-bold shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
                             @click="applyPreset(preset)">
                             {{ preset.label }}
                         </button>
@@ -518,11 +518,11 @@ const dealInTargetOption = computed(() => {
                         <span class="text-gray-400">自訂月份:</span>
                         <input v-model="dateRange.start" type="month" :min="careerBounds.start"
                             :max="dateRange.end || careerBounds.end"
-                            class="bg-transparent border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500" />
+                            class="bg-transparent border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary" />
                         <span class="text-gray-400">至</span>
                         <input v-model="dateRange.end" type="month" :min="dateRange.start || careerBounds.start"
                             :max="careerBounds.end"
-                            class="bg-transparent border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500" />
+                            class="bg-transparent border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary" />
                     </div>
                 </div>
 
@@ -623,7 +623,7 @@ const dealInTargetOption = computed(() => {
                 <div
                     class="bg-gray-50 dark:bg-gray-800/40 p-3 rounded-lg border border-gray-100 dark:border-gray-800/80">
                     <div class="text-xs text-gray-400">天梯等級 ({{ basic.mrLabel }})</div>
-                    <div class="text-lg font-bold text-primary-500 mt-1">{{ basic.mrRating }}</div>
+                    <div class="text-lg font-bold text-primary mt-1">{{ basic.mrRating }}</div>
                 </div>
             </div>
         </div>
@@ -755,11 +755,11 @@ const dealInTargetOption = computed(() => {
             <div v-if="frequentOpponents.length > 0"
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 font-mono">
                 <div v-for="opp in frequentOpponents" :key="opp.accountId"
-                    class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 hover:border-primary-500/50 hover:bg-primary-500/5 transition-all group cursor-pointer"
+                    class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 hover:border-primary/50 hover:bg-primary/5 transition-all group cursor-pointer"
                     @click="inspectOpponent(opp.accountId)">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
                         <UIcon name="i-lucide-menu"
-                            class="w-4 h-4 text-primary-500 shrink-0 group-hover:scale-110 transition-transform" />
+                            class="w-4 h-4 text-primary shrink-0 group-hover:scale-110 transition-transform" />
                         <span
                             class="text-sm font-bold text-success-600 dark:text-success-400 truncate group-hover:underline">
                             {{ opp.nickname }}
@@ -794,7 +794,7 @@ const dealInTargetOption = computed(() => {
                 <div
                     class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-lg self-start sm:self-auto font-mono text-xs">
                     <button class="px-3 py-1 rounded-md transition-colors font-bold"
-                        :class="majorHandMode === 'win' ? 'bg-primary-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                        :class="majorHandMode === 'win' ? 'bg-primary text-inverted shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
                         @click="majorHandMode = 'win'">
                         🏆 生涯最大和牌
                     </button>
@@ -812,7 +812,7 @@ const dealInTargetOption = computed(() => {
                     <!-- 左側：標題與得失點數 -->
                     <div class="flex items-baseline gap-2">
                         <span class="text-xl font-extrabold font-mono"
-                            :class="majorHandMode === 'win' ? 'text-primary-600 dark:text-primary-400' : 'text-rose-500'">
+                            :class="majorHandMode === 'win' ? 'text-primary' : 'text-rose-500'">
                             {{ currentMajorHand.title }}
                         </span>
                         <span class="text-xs text-gray-400 font-mono">
@@ -827,7 +827,7 @@ const dealInTargetOption = computed(() => {
                         <UButton v-if="currentMajorHand.paipuId"
                             :to="`https://game.maj-soul.com/1/?paipu=${currentMajorHand.paipuId}`" target="_blank"
                             size="xs" color="secondary" variant="soft" icon="i-lucide-external-link"
-                            class="font-mono text-gray-700 dark:text-gray-300 hover:text-primary-500">
+                            class="font-mono text-gray-700 dark:text-gray-300 hover:text-primary">
                             觀看牌譜
                         </UButton>
                     </div>
@@ -839,7 +839,7 @@ const dealInTargetOption = computed(() => {
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800/60">
                         <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
                         <span class="font-bold" :class="[
-                            yaku.isYakuman ? 'text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary-500' : 'text-rose-400')
+                            yaku.isYakuman ? 'text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary' : 'text-rose-400')
                         ]">
                             {{ yaku.label || `${yaku.han} 番` }}
                         </span>
