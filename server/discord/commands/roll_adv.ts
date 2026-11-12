@@ -2,7 +2,7 @@
 import type { H3Event } from 'h3'
 import { getInteractionOption } from '../utils'
 import { recordRoomPlayer } from '../room-player'
-import { evaluateDiceExpression } from '../dice'
+import { evaluateDiceExpression, isDiceExpression } from '../dice'
 import { getSupabase } from '~~/server/utils/supabase'
 
 /**
@@ -29,6 +29,21 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
   const channelType = interaction.channel?.type
   const currentChannelId = String(interaction.channel_id)
   const callerId = String(interaction.member?.user?.id || interaction.user?.id)
+
+  // "6 4d6k3" = roll 4d6k3 six times; anything else is one expression
+  const multiMatch = exprInput.match(/^(\d+)\s+([0-9a-zA-Z+\-\s]+)$/)
+  const diceExpr = multiMatch?.[2] ?? exprInput
+
+  // The parser skips what it can't read ("hello" would roll 0), so reject it first
+  if (!isDiceExpression(diceExpr)) {
+    return {
+      type: 4,
+      data: {
+        content: `⚠️ 無法解讀骰子表達式 \`${exprInput}\`！格式如：\`1d100\`、\`2d6+3\`、\`4d6k3\` 或 \`6 4d6k3\`。`,
+        flags: 64
+      }
+    }
+  }
 
   let gmThreadId: string | null = null
 
@@ -58,19 +73,16 @@ export async function handleRollAdv(interaction: any, event: H3Event) {
   // ========================================================================
   // 情況 A：多組批量投擲 (如 "6 4d6k3")
   // ========================================================================
-  const multiMatch = exprInput.match(/^(\d+)\s+([0-9a-zA-Z+\-\s]+)$/)
-
-  if (multiMatch && multiMatch[1] && multiMatch[2]) {
+  if (multiMatch?.[1]) {
     const repeatCount = Math.min(10, Math.max(1, parseInt(multiMatch[1], 10)))
-    const subExpr = multiMatch[2]
 
     const results: string[] = []
     for (let i = 0; i < repeatCount; i++) {
-      const { total, breakdown } = evaluateDiceExpression(subExpr)
-      results.push(`* **#${i + 1}**: **\`${total}\`** ← \`${breakdown}\``)
+      const { total, breakdown } = evaluateDiceExpression(diceExpr)
+      results.push(`* **#${i + 1}**: **\`${total}\`** ← ${breakdown}`)
     }
 
-    const content = `🎲 **${desc}**：重複投擲 \`${repeatCount}\` 次 (\`${subExpr}\`)\n` + results.join('\n')
+    const content = `🎲 **${desc}**：重複投擲 \`${repeatCount}\` 次 (\`${diceExpr}\`)\n` + results.join('\n')
 
     // ★★★ 核心同步：若是暗骰且存在 GM 私密子區，推播完整戰報！★★★
     if (isSecret && gmThreadId) {
