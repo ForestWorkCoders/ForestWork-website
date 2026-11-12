@@ -71,7 +71,7 @@ useHead({
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
             受限於行動裝置瀏覽器，為提供最佳的流暢滑動與閱讀體驗，請點擊下方按鈕以全螢幕模式開啟文件。
           </p>
-          <UButton :to="pdfUrl" target="_blank" color="emerald" size="xl" icon="i-lucide-external-link"
+          <UButton :to="pdfUrl" target="_blank" color="primary" size="xl" icon="i-lucide-external-link"
             class="font-bold tracking-widest shadow-md hover:shadow-lg transition-shadow"
             :ui="{ rounded: 'rounded-full' }">
             全螢幕開啟教學

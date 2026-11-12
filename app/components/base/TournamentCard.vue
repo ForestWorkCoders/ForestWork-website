@@ -60,7 +60,7 @@ defineProps({
 
     <!-- 右侧：按钮。移动端收敛 padding，在大屏保留完整 DETAILS 文字 -->
     <UButton
-      color="gray"
+      color="neutral"
       variant="ghost"
       trailing-icon="i-lucide-chevron-right"
       class="shrink-0 font-bold text-xs tracking-wider sm:tracking-widest text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors px-2 sm:px-3"
