@@ -1007,15 +1007,15 @@ useSeoMeta({
 // ==========================================
 const ctfDiscordEmbedPayload = {
   component: {
-    type: 17, // 主容器 Container[cite: 1]
+    type: 17, // 主容器 Container
     accent_color: 1096065, // #10B981 翡翠绿 (HEX 转十进制整数)
     spoiler: false,
     components: [
       {
-        type: 9, // Section 块[cite: 1]
+        type: 9, // Section 块
         components: [
           {
-            type: 10, // Text 终端字符说明[cite: 1]
+            type: 10, // Text 终端字符说明
             content: [
               '# FORESTWORK // CTF MAINFRAME',
               '`STATUS: ONLINE` · `ENV: POSIX_VFS_SANDBOX`',
@@ -1030,23 +1030,23 @@ const ctfDiscordEmbedPayload = {
           }
         ],
         accessory: {
-          type: 11, // Thumbnail 挂件[cite: 1]
+          type: 11, // Thumbnail 挂件
           media: {
             url: 'https://forestwork.vercel.app/images/share/forestwork-team.png' // 终端或林间专属 Logo 图标
           }
         }
       },
       {
-        type: 14, // 视觉分割线[cite: 1]
+        type: 14, // 视觉分割线
         spacing: 1,
         divider: true
       },
       {
-        type: 1, // Action Row 操作按钮容器[cite: 1]
+        type: 1, // Action Row 操作按钮容器
         components: [
           {
             type: 2,
-            style: 5, // Link Button[cite: 1]
+            style: 5, // Link Button
             label: '接入終端 (Launch Shell)',
             emoji: { name: '💻' },
             url: 'https://forestwork.vercel.app/games/ctf'
@@ -1063,10 +1063,10 @@ const ctfDiscordEmbedPayload = {
 useHead({
   script: [
     {
-      key: 'discord:component-embed', // 核心好品味：与 app.vue 相同 key 实施强力覆盖[cite: 1]
+      key: 'discord:component-embed', // 核心好品味：与 app.vue 相同 key 实施强力覆盖
       id: 'discord:component-embed',
       type: 'application/json',
-      innerHTML: () => JSON.stringify(ctfDiscordEmbedPayload).replace(/</g, '\\u003c') // 安全防爆转义[cite: 1]
+      innerHTML: () => JSON.stringify(ctfDiscordEmbedPayload).replace(/</g, '\\u003c') // 安全防爆转义
     }
   ]
 })
