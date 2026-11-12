@@ -6,7 +6,6 @@ import { handleRoll } from './roll'
 import { handleCc } from './cc'
 import { handleChoice } from './choice'
 import { handleArrange } from './arrange'
-import { handleDemoPager } from './demo-pager'
 import { handleRollAdv } from './roll_adv'
 import { handleMahjongPair } from './mahjong_pair'
 import { handleBookOfAnswers } from './book-of-answers'
@@ -29,7 +28,6 @@ export const commandRegistry: Record<string, CommandHandler> = {
   roll: handleRoll,
   choice: handleChoice,
   arrange: handleArrange,
-  pages: handleDemoPager,
   roll_adv: handleRollAdv,
   mahjong_pair: handleMahjongPair,
   解答之書: handleBookOfAnswers,
