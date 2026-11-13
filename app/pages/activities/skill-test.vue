@@ -994,27 +994,27 @@ onUnmounted(() => {
               <!-- Tab 内容区 B：全球天梯排行榜 (消灭外部独立弹窗，原生就地查阅) -->
               <div v-else class="p-4 bg-[#090b0e] space-y-1.5 max-h-[160px] overflow-y-auto">
                 <div
-                  class="grid grid-cols-12 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
-                  <span class="col-span-2">RANK</span>
-                  <span class="col-span-4">OPERATOR</span>
-                  <span class="col-span-3 text-right">SCORE</span>
-                  <span class="col-span-3 text-right">TIME</span>
+                  class="grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
+                  <span>RANK</span>
+                  <span>OPERATOR</span>
+                  <span class="text-right">SCORE</span>
+                  <span class="text-right">TIME</span>
                 </div>
 
                 <!-- 真实列表渲染 -->
                 <div v-for="entry in liveLeaderboard" :key="entry.discord_id" :class="[
-                  'grid grid-cols-12 items-center text-xs px-2 py-1 rounded transition-colors',
+                  'grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 items-center text-xs px-2 py-1 rounded transition-colors',
                   entry.discord_id === currentDiscordId
                     ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold'
                     : 'text-zinc-300'
                 ]">
-                  <span class="col-span-2 font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
-                  <span class="col-span-4 truncate flex items-center gap-1.5">
+                  <span class="font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
+                  <span class="truncate flex items-center gap-1.5">
                     <img :src="entry.avatar_url" class="w-3.5 h-3.5 rounded-full" alt="" />
-                    <span>{{ entry.operator_name }}</span>
+                    <span class="truncate">{{ entry.operator_name }}</span>
                   </span>
-                  <span class="col-span-3 text-right font-extrabold text-zinc-100">{{ entry.score.toLocaleString() }}</span>
-                  <span class="col-span-3 text-right text-xs text-zinc-500">
+                  <span class="text-right font-extrabold text-zinc-100">{{ entry.score.toLocaleString() }}</span>
+                  <span class="text-right text-xs text-zinc-500">
                     {{ new Date(entry.created_at).toLocaleDateString() }}
                   </span>
                 </div>
@@ -1081,28 +1081,28 @@ onUnmounted(() => {
 
         <div class="space-y-1.5">
           <div
-            class="grid grid-cols-12 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
-            <span class="col-span-2">RANK</span>
-            <span class="col-span-4">OPERATOR</span>
-            <span class="col-span-3 text-right">SCORE</span>
-            <span class="col-span-3 text-right">DATE</span>
+            class="grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
+            <span>RANK</span>
+            <span>OPERATOR</span>
+            <span class="text-right">SCORE</span>
+            <span class="text-right">DATE</span>
           </div>
 
           <!-- ★ 核心修复：彻底消灭内联假数组，绑定真实的 liveLeaderboard！ -->
           <div v-for="entry in liveLeaderboard" :key="entry.discord_id" :class="[
-            'grid grid-cols-12 items-center text-xs px-2 py-1.5 rounded transition-colors',
+            'grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 items-center text-xs px-2 py-1.5 rounded transition-colors',
             entry.discord_id === currentDiscordId
               ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold'
               : 'hover:bg-zinc-900/60 text-zinc-300'
           ]">
-            <span class="col-span-2 font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
-            <span class="col-span-4 truncate flex items-center gap-1.5">
+            <span class="font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
+            <span class="truncate flex items-center gap-1.5">
               <img :src="entry.avatar_url" class="w-3.5 h-3.5 rounded-full" alt="" />
-              <span>{{ entry.operator_name }}</span>
+              <span class="truncate">{{ entry.operator_name }}</span>
             </span>
-            <span class="col-span-3 text-right font-extrabold font-mono text-zinc-100">{{ entry.score.toLocaleString()
+            <span class="text-right font-extrabold font-mono text-zinc-100">{{ entry.score.toLocaleString()
             }}</span>
-            <span class="col-span-3 text-right text-xs text-zinc-500">
+            <span class="text-right text-xs text-zinc-500">
               {{ new Date(entry.created_at).toLocaleDateString() }}
             </span>
           </div>
