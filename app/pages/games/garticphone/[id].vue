@@ -246,7 +246,7 @@ onBeforeUnmount(() => {
                 &uarr;
             </button>
 
-            <!-- 中间水平行：切换故事链/玩家 -->
+            <!-- 底行（键盘倒 T 排列）：← ↓ → -->
             <div class="flex items-center gap-1.5">
                 <!-- 向左按键：上一位玩家/上一条链 -->
                 <button type="button" aria-label="Previous Chain (Left)" :disabled="!routes.left" @click="goLeft"
@@ -255,6 +255,15 @@ onBeforeUnmount(() => {
                         ? 'bg-white text-black hover:bg-gray-100 active:translate-x-0.5 cursor-pointer'
                         : 'bg-gray-700/60 text-gray-500 border-gray-600 shadow-none cursor-not-allowed pointer-events-none'">
                     &larr;
+                </button>
+
+                <!-- 向下按键：下一帧（封面点击自动进入第一链） -->
+                <button type="button" aria-label="Next Frame (Down)" :disabled="!routes.down" @click="goDown"
+                    class="border-2 border-black w-10 h-10 rounded-lg font-extrabold text-base shadow-[2px_2px_0px_0px_#000] transition-all flex items-center justify-center touch-manipulation"
+                    :class="routes.down
+                        ? 'bg-amber-400 text-black hover:bg-amber-300 active:translate-y-0.5 cursor-pointer'
+                        : 'bg-gray-700/60 text-gray-500 border-gray-600 shadow-none cursor-not-allowed pointer-events-none'">
+                    &darr;
                 </button>
 
                 <!-- 向右按键：下一位玩家/下一条链 -->
@@ -266,15 +275,6 @@ onBeforeUnmount(() => {
                     &rarr;
                 </button>
             </div>
-
-            <!-- 向下按键：下一帧（封面点击自动进入第一链） -->
-            <button type="button" aria-label="Next Frame (Down)" :disabled="!routes.down" @click="goDown"
-                class="border-2 border-black w-10 h-10 rounded-lg font-extrabold text-base shadow-[2px_2px_0px_0px_#000] transition-all flex items-center justify-center touch-manipulation"
-                :class="routes.down
-                    ? 'bg-amber-400 text-black hover:bg-amber-300 active:translate-y-0.5 cursor-pointer'
-                    : 'bg-gray-700/60 text-gray-500 border-gray-600 shadow-none cursor-not-allowed pointer-events-none'">
-                &darr;
-            </button>
         </div>
 
         <!-- Unknown session id (typo, old link): say so instead of an empty page -->
