@@ -36,7 +36,7 @@ defineProps({
         </h3>
 
         <!-- 2. 元数据区：移动端支持自然折行 (flex-wrap)，间距自适应 -->
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mt-3.5 sm:mt-4">
           <!-- Tier 标签 -->
           <span class="inline-flex items-center gap-1 font-medium whitespace-nowrap">
             <UIcon name="i-lucide-chart-column-increasing" class="w-3.5 h-3.5 shrink-0" />

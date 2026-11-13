@@ -50,7 +50,7 @@ useSeoMeta({
           林間靈魂繪師 精彩重現
         </h1>
       </div>
-      <p class="text-gray-300 font-bold text-lg mt-5 tracking-wide">
+      <p class="text-gray-300 font-bold text-lg mt-5 sm:mt-9 tracking-wide">
         選擇一個歷史對局，見證人類想像力的崩壞
       </p>
     </header>

@@ -173,7 +173,7 @@ useHead({
                     </div>
 
                     <div class="flex-1 w-full space-y-8">
-                        <h1 class="text-3xl md:text-5xl font-bold tracking-tight">{{ tourney.title }}</h1>
+                        <h1 class="text-3xl md:text-5xl font-bold tracking-tight md:mb-12">{{ tourney.title }}</h1>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-6">
 

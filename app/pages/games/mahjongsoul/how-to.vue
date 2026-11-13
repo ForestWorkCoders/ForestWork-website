@@ -44,7 +44,7 @@ useHead({
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
           參賽教學指南
         </h1>
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2 tracking-wide">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-8 md:mt-9 tracking-wide">
           Mahjong Soul Tournament How-To Guide
         </p>
       </div>
@@ -67,7 +67,7 @@ useHead({
             <UIcon name="i-lucide-search-alert"
               class="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <h3 class="text-xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-wide">在手機上閱讀指南</h3>
+          <h3 class="text-xl font-extrabold text-gray-900 dark:text-white mb-5 tracking-wide">在手機上閱讀指南</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
             受限於行動裝置瀏覽器，為提供最佳的流暢滑動與閱讀體驗，請點擊下方按鈕以全螢幕模式開啟文件。
           </p>
