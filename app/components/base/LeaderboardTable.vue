@@ -29,7 +29,7 @@
 
     <template #total-cell="{ row }">
       <div class="text-center font-bold text-sm sm:text-base font-mono"
-        :class="isDnfRow(row) ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-emerald-500 dark:text-emerald-400 font-extrabold'">
+        :class="isDnfRow(row) ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-primary font-extrabold'">
         {{ row.original.total }}
       </div>
     </template>
@@ -38,9 +38,9 @@
       <div class="text-center font-mono text-sm font-medium" :class="[
         isDnfRow(row) ? 'opacity-60' : 'opacity-100',
         row.original[col.key] > 0
-          ? 'text-emerald-600 dark:text-emerald-400'
+          ? 'text-success'
           : row.original[col.key] < 0
-            ? 'text-red-500 dark:text-red-400'
+            ? 'text-error'
             : 'text-gray-400 dark:text-gray-500'
       ]">
         {{ row.original[col.key] > 0 ? '+' : '' }}{{ row.original[col.key] ?? '-' }}
@@ -121,10 +121,10 @@ const getRankColor = (rank) => {
     return 'text-gray-500'
   }
   if (props.promotedRanks.includes(rank)) {
-    return 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20'
+    return 'text-success bg-success/10 border border-success/20'
   }
   if (props.disqualifiedRanks.includes(rank)) {
-    return 'text-red-400 bg-red-400/10 border border-red-400/20 opacity-75'
+    return 'text-error bg-error/10 border border-error/20 opacity-75'
   }
   return 'text-gray-500'
 }

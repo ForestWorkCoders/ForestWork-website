@@ -25,7 +25,7 @@ function renderSortIcon(isSorted: boolean, isDesc: boolean) {
       'stroke-width': '2',
       'stroke-linecap': 'round',
       'stroke-linejoin': 'round',
-      class: 'shrink-0 w-4 h-4 text-emerald-500 font-bold select-none'
+      class: 'shrink-0 w-4 h-4 text-primary font-bold select-none'
     }, isDesc ? [
       // 降序：arrow-down-wide-narrow 原生路径
       h('path', { d: 'm3 16 4 4 4-4' }),

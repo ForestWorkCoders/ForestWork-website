@@ -17,22 +17,22 @@ const props = defineProps({
       <UIcon name="i-lucide-minus" class="w-4 h-4" />
     </span>
 
-    <span v-else-if="diff > 0 && diff < 4" class="text-emerald-500 flex items-center">
+    <span v-else-if="diff > 0 && diff < 4" class="text-success flex items-center">
       <UIcon name="i-lucide-chevron-up" class="w-4 h-4" />
       {{ diff }}
     </span>
 
-    <span v-else-if="diff >= 4" class="text-emerald-500 flex items-center">
+    <span v-else-if="diff >= 4" class="text-success flex items-center">
       <UIcon name="i-lucide-chevrons-up" class="w-4 h-4" />
       {{ diff }}
     </span>
 
-    <span v-else-if="diff < 0 && diff > -4" class="text-red-500 flex items-center">
+    <span v-else-if="diff < 0 && diff > -4" class="text-error flex items-center">
       <UIcon name="i-lucide-chevron-down" class="w-4 h-4" />
       {{ Math.abs(diff) }}
     </span>
 
-    <span v-else-if="diff <= -4" class="text-red-500 flex items-center">
+    <span v-else-if="diff <= -4" class="text-error flex items-center">
       <UIcon name="i-lucide-chevrons-down" class="w-4 h-4" />
       {{ Math.abs(diff) }}
     </span>

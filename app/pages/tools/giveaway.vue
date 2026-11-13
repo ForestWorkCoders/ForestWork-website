@@ -283,9 +283,9 @@ const commitAndRemoveWinner = () => {
                 </div>
 
                 <!-- 本轮命中展示与移除确认 -->
-                <UCard v-if="currentWinner" class="w-full border-2 border-emerald-500 bg-emerald-950/20 text-center">
+                <UCard v-if="currentWinner" class="w-full border-2 border-primary bg-primary/10 text-center">
                     <div class="space-y-4 py-2">
-                        <div class="text-xs font-bold uppercase tracking-widest text-emerald-400">
+                        <div class="text-xs font-bold uppercase tracking-widest text-primary">
                             🎯 本輪中獎玩家
                         </div>
                         <div class="flex items-center justify-center gap-3">

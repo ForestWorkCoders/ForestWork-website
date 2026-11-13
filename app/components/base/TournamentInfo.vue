@@ -53,11 +53,11 @@ const parsedHtml = computed(() => {
   <div class="bg-white dark:bg-default text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
 
     <div v-if="pending" class="flex flex-col items-center justify-center py-12 text-gray-500">
-      <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin mb-4 text-emerald-500" />
+      <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin mb-4 text-primary" />
       <p>正在載入賽事簡介...</p>
     </div>
 
-    <div v-else-if="error" class="text-red-500 text-center py-8 font-bold">
+    <div v-else-if="error" class="text-error text-center py-8 font-bold">
       無法載入賽事內容，請確認檔案網址是否正確。
     </div>
 

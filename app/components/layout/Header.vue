@@ -102,8 +102,8 @@ const items = computed<NavigationMenuItem[]>(() => [
           <UButton color="secondary" variant="ghost"
             class="flex items-center gap-2 p-1 rounded-full hover:bg-elevated">
             <UAvatar :src="user.avatar || undefined" :alt="user.username" size="sm"
-              class="border border-emerald-500/50" />
-            <span class="text-xs font-mono text-emerald-400 font-bold hidden xl:inline-block pr-1">
+              class="border border-primary/50" />
+            <span class="text-xs font-mono text-primary font-bold hidden xl:inline-block pr-1">
               {{ user.username }}
             </span>
             <UIcon name="i-lucide-chevron-down" class="w-4 h-4 text-slate-400" />
@@ -112,7 +112,7 @@ const items = computed<NavigationMenuItem[]>(() => [
           <template #account="{ item }">
             <div class="text-left font-mono">
               <p class="text-xs text-slate-400">目前登入身份</p>
-              <p class="truncate font-bold text-xs text-emerald-400">
+              <p class="truncate font-bold text-xs text-primary">
                 {{ item.label }}
               </p>
             </div>
