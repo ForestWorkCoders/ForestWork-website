@@ -719,8 +719,8 @@ const dealInTargetOption = computed(() => {
         <!-- 5. 宏觀時序走勢區：近30戰順位走勢 (通欄獨佔，舒展呈現) -->
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">近期競技走勢 · Recent Form</h2>
                     <UBadge color="primary" variant="subtle" size="md">近 30 戰 (Recent 30 Matches)</UBadge>
                 </div>
@@ -742,8 +742,8 @@ const dealInTargetOption = computed(() => {
         <!-- 6. 最常同桌宿敵榜 (對齊牌譜屋圖 7，支援點擊直接切換視角) -->
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">最常同桌宿敵 · Frequent Opponents</h2>
                     <UBadge color="primary" variant="subtle" size="md">Top 12 遭遇記錄</UBadge>
                 </div>
@@ -783,7 +783,7 @@ const dealInTargetOption = computed(() => {
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm space-y-4">
             <div
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">極限戰局記錄 · Major Hands</h2>
                     <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="subtle" size="md">
                         {{ majorHandMode === 'win' ? '生涯最高打點' : '最近最大痛銃' }}
