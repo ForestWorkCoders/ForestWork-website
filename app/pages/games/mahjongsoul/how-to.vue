@@ -37,16 +37,12 @@ useHead({
 
 
       <div class="flex flex-col mb-8 pb-6 border-b border-gray-200 dark:border-gray-800">
-        <div class="flex items-center gap-2 mb-2">
-          <UIcon name="i-lucide-book-open" class="w-6 h-6 text-emerald-600 dark:text-emerald-500" />
-          <span class="text-sm font-bold text-emerald-600 dark:text-emerald-500 tracking-widest uppercase">Guide</span>
-        </div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+        <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">
+          Mahjong Soul · How-To Guide
+        </span>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mt-1">
           參賽教學指南
         </h1>
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-8 md:mt-9 tracking-wide">
-          Mahjong Soul Tournament How-To Guide
-        </p>
       </div>
 
       <div

@@ -37,16 +37,12 @@ useHead({
       
       <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8 pb-6 border-b border-gray-200 dark:border-gray-800">
         <div>
-          <div class="flex items-center gap-2 mb-2">
-            <UIcon name="i-lucide-file-text" class="w-6 h-6 text-amber-600 dark:text-amber-500" />
-            <span class="text-sm font-bold text-amber-600 dark:text-amber-500 tracking-widest uppercase">Rulebook</span>
-          </div>
-          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">
+            Plazma Burst 2 · Rulebook
+          </span>
+          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mt-1">
             賽事通用規則
           </h1>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-8 md:mt-9 tracking-wide">
-            Plazma Burst 2 General Tournament Rules & Regulations
-          </p>
         </div>
         
         <UButton 
