@@ -645,9 +645,9 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="h-screen w-screen bg-[#090a0f] text-zinc-100 flex flex-col justify-start overflow-hidden select-none font-sans relative">
+    class="h-screen w-screen bg-[#0D1117] text-zinc-100 flex flex-col justify-start overflow-hidden select-none font-sans relative">
     <div
-      class="absolute inset-0 bg-[linear-gradient(to_right,#18181b15_1px,transparent_1px),linear-gradient(to_bottom,#18181b15_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+      class="absolute inset-0 bg-[linear-gradient(to_right,#161B2215_1px,transparent_1px),linear-gradient(to_bottom,#161B2215_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
     <!-- ================================================================= -->
     <!-- 视图 1：10 槽位选拔大厅 (HUB VIEW) -->
@@ -655,8 +655,8 @@ onUnmounted(() => {
     <div v-if="viewMode === 'hub'" class="relative z-10 flex-1 flex flex-col h-full overflow-hidden">
       <!-- 极矮视口待机终端 -->
       <section
-        class="compact-standby-view w-full h-full flex flex-col justify-between p-4 bg-[#090a0f] font-mono select-none">
-        <div class="flex items-center justify-between text-xs border-b border-zinc-800 pb-2">
+        class="compact-standby-view w-full h-full flex flex-col justify-between p-4 bg-[#0D1117] font-mono select-none">
+        <div class="flex items-center justify-between text-xs border-b border-[#30363D] pb-2">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
             <span class="text-amber-400 font-bold tracking-wider">FW_OS // STANDBY_MODE</span>
@@ -669,11 +669,11 @@ onUnmounted(() => {
           </div>
           <p class="text-sm text-zinc-300 leading-relaxed max-w-xl">
             目前視窗高度受限，無法展開 10 槽位選手評定矩陣。<br>
-            請點擊下方控制列的 <span class="text-white font-bold bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700">⤢ 展開 /
+            請點擊下方控制列的 <span class="text-white font-bold bg-[#21262D] px-1.5 py-0.5 rounded border border-[#30363D]">⤢ 展開 /
               全螢幕</span> 按鈕以解除戰術限制。
           </p>
         </div>
-        <div class="text-xs text-zinc-600 flex justify-between items-center pt-2 border-t border-zinc-900">
+        <div class="text-xs text-zinc-600 flex justify-between items-center pt-2 border-t border-[#30363D]">
           <span class="animate-pulse">&gt; WAITING_FOR_DISPLAY_EXPANSION_</span>
           <span>DISCORD_EMBED_SEC_01</span>
         </div>
@@ -682,11 +682,11 @@ onUnmounted(() => {
       <!-- 标准大厅 -->
       <div class="normal-hub-view flex-1 flex flex-col h-full overflow-hidden">
         <header
-          class="shrink-0 w-full px-5 py-2.5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
+          class="shrink-0 w-full px-5 py-2.5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-[#30363D] bg-[#0D1117]/95 backdrop-blur-md">
           <div class="flex items-center gap-3">
             <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer"
               @click.prevent="openExternalUrl('https://forestwork.vercel.app/')"
-              class="group flex items-center gap-2 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
+              class="group flex items-center gap-2 bg-[#161B22] hover:bg-[#21262D] border border-[#30363D] hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
               title="開啟林間小鎮官方網站" aria-label="開啟林間小鎮官方網站">
               <span
                 class="text-xs font-mono font-bold text-emerald-400 group-hover:-translate-x-0.5 transition-transform">←</span>
@@ -722,8 +722,8 @@ onUnmounted(() => {
             <div v-for="slot in TRIAL_SLOTS" :key="slot.id" @click="openBriefing(slot)" :class="[
               'group relative flex flex-col justify-between p-2 sm:p-3 rounded-sm border transition-all duration-150 select-none overflow-hidden h-full min-h-0',
               slot.status === 'ready'
-                ? 'bg-[#10131a] hover:bg-[#151a24] border-zinc-800 cursor-pointer hover:shadow-lg'
-                : 'bg-[#0c0d12]/50 border-zinc-900/80 opacity-50 cursor-not-allowed'
+                ? 'bg-[#161B22] hover:bg-[#21262D] border-[#30363D] cursor-pointer hover:shadow-lg'
+                : 'bg-[#0D1117]/50 border-[#30363D] opacity-50 cursor-not-allowed'
             ]">
               <div
                 class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-zinc-600 group-hover:border-emerald-400 transition-colors" />
@@ -765,7 +765,7 @@ onUnmounted(() => {
               </div>
 
               <div
-                class="shrink-0 pt-1 border-t border-zinc-800/80 font-mono z-10 flex items-center justify-between leading-tight">
+                class="shrink-0 pt-1 border-t border-[#30363D] font-mono z-10 flex items-center justify-between leading-tight">
                 <div>
                   <div class="text-xs tracking-widest text-zinc-500 uppercase">PB</div>
                   <div
@@ -775,7 +775,7 @@ onUnmounted(() => {
                 </div>
 
                 <button v-if="slot.status === 'ready'" @mousedown.stop @click.stop="openScoreboard(slot)"
-                  class="p-1 rounded bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500 text-zinc-400 hover:text-emerald-400 transition-all shadow-sm"
+                  class="p-1 rounded bg-[#161B22] hover:bg-[#21262D] border border-[#30363D] hover:border-emerald-500 text-zinc-400 hover:text-emerald-400 transition-all shadow-sm"
                   title="檢視該項目排行榜 // SCOREBOARD">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -801,15 +801,15 @@ onUnmounted(() => {
       class="relative z-10 flex-1 flex flex-col h-full overflow-hidden font-mono">
       <!-- 简报顶栏 -->
       <header
-        class="shrink-0 w-full px-5 py-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
+        class="shrink-0 w-full px-5 py-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-[#30363D] bg-[#0D1117]/95 backdrop-blur-md">
         <div class="flex min-w-0 items-center gap-3">
           <button @click="viewMode = 'hub'" title="返回大廳 // HUB" aria-label="返回大廳"
-            class="group flex items-center gap-1.5 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all text-xs font-bold text-zinc-300 hover:text-white">
+            class="group flex items-center gap-1.5 bg-[#161B22] hover:bg-[#21262D] border border-[#30363D] hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all text-xs font-bold text-zinc-300 hover:text-white">
             <span class="text-emerald-400 group-hover:-translate-x-0.5 transition-transform">←</span>
             <span class="hidden sm:inline">[ESC // HUB]</span>
           </button>
           <span
-            class="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-2 border-l border-zinc-800 hidden lg:inline truncate">
+            class="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-2 border-l border-[#30363D] hidden lg:inline truncate">
             TRIAL BRIEFING // {{ currentSlot.code }}
           </span>
         </div>
@@ -833,17 +833,17 @@ onUnmounted(() => {
       <main class="flex-1 min-h-0 w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col sm:justify-center overflow-y-auto">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5 w-full sm:h-full sm:max-h-[460px] sm:min-h-0">
           <div v-for="(step, idx) in currentBriefing.columns" :key="idx"
-            class="relative flex flex-col justify-between bg-[#0e1117] border border-zinc-800 rounded-sm overflow-hidden shadow-2xl group hover:border-zinc-700 transition-colors">
+            class="relative flex flex-col justify-between bg-[#0D1117] border border-[#30363D] rounded-sm overflow-hidden shadow-2xl group hover:border-[#30363D] transition-colors">
             <!-- 工业战术卡头 (实色横条，致敬原图顶部米黄色块) -->
             <div
-              class="shrink-0 bg-[#d4af37] text-black px-3.5 py-2 flex items-center justify-between font-extrabold tracking-widest text-xs uppercase">
+              class="shrink-0 bg-[#D97706] text-black px-3.5 py-2 flex items-center justify-between font-extrabold tracking-widest text-xs uppercase">
               <span>{{ step.title }}</span>
               <span class="text-xs opacity-75 font-mono">{{ step.tag }}</span>
             </div>
 
             <!-- 卡片中央战术视觉展示区 -->
             <div
-              class="flex-1 min-h-[140px] flex flex-col items-center justify-center p-4 relative overflow-hidden bg-[#090b0e]">
+              class="flex-1 min-h-[140px] flex flex-col items-center justify-center p-4 relative overflow-hidden bg-[#0D1117]">
               <!-- 战术网格背景 -->
               <div
                 class="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:12px_12px] opacity-25" />
@@ -862,7 +862,7 @@ onUnmounted(() => {
 
             <!-- 卡片底栏：详细行动准则描述 -->
             <div
-              class="shrink-0 p-3.5 border-t border-zinc-800/80 bg-[#0e1117] text-sm leading-relaxed text-zinc-400">
+              class="shrink-0 p-3.5 border-t border-[#30363D] bg-[#0D1117] text-sm leading-relaxed text-zinc-400">
               {{ step.description }}
             </div>
           </div>
@@ -871,10 +871,10 @@ onUnmounted(() => {
 
       <!-- 底部动作条 (致敬原图底部 WATCH / PLAY 双按钮) -->
       <footer
-        class="shrink-0 w-full py-4 px-6 border-t border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md flex items-center justify-center gap-4">
+        class="shrink-0 w-full py-4 px-6 border-t border-[#30363D] bg-[#0D1117]/95 backdrop-blur-md flex items-center justify-center gap-4">
         <!-- 次要动作：返回大厅 -->
         <button @click="viewMode = 'hub'"
-          class="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-500 rounded-sm text-xs font-bold text-zinc-300 hover:text-white uppercase tracking-widest transition-all">
+          class="px-6 py-2.5 bg-[#161B22] hover:bg-[#21262D] border border-[#30363D] hover:border-zinc-500 rounded-sm text-xs font-bold text-zinc-300 hover:text-white uppercase tracking-widest transition-all">
           [ ← RETURN // 大廳 ]
         </button>
 
@@ -892,10 +892,10 @@ onUnmounted(() => {
     <div v-else class="relative z-10 flex-1 flex flex-col h-full overflow-hidden">
       <!-- 游戏顶栏 HUD -->
       <header
-        class="shrink-0 w-full max-w-4xl mx-auto flex items-center justify-between px-4 py-2.5 text-sm border-b border-zinc-800 bg-[#09090b]/90 z-20">
+        class="shrink-0 w-full max-w-4xl mx-auto flex items-center justify-between px-4 py-2.5 text-sm border-b border-[#30363D] bg-[#0D1117]/90 z-20">
         <div class="flex items-center gap-3">
           <button @click="exitToHub"
-            class="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded text-xs font-mono font-bold flex items-center gap-1 transition-colors">
+            class="px-3 py-1 bg-[#21262D] hover:bg-[#30363D] text-zinc-300 hover:text-white rounded text-xs font-mono font-bold flex items-center gap-1 transition-colors">
             <span>←</span> [ESC // HUB]
           </button>
           <span class="text-xs font-mono text-emerald-400 font-bold hidden sm:inline">
@@ -917,26 +917,26 @@ onUnmounted(() => {
         <div class="relative h-full max-h-full aspect-[4/3] max-w-full flex items-center justify-center">
           <canvas ref="canvasRef" width="800" height="600" @mousedown="handlePointerDown" @mousemove="handlePointerMove"
             @mouseleave="handlePointerLeave" @contextmenu.prevent
-            class="w-full h-full bg-[#18181b] border border-zinc-800 shadow-2xl cursor-crosshair block" />
+            class="w-full h-full bg-[#161B22] border border-[#30363D] shadow-2xl cursor-crosshair block" />
 
           <!-- ================================================================= -->
           <!-- ★ 核心成果：VALORANT VCT 殿堂级战术结算中心 (致敬 image_e9621c.png) -->
           <!-- ================================================================= -->
           <div v-if="isFinished"
-            class="absolute inset-0 z-30 bg-[#090a0f]/95 backdrop-blur-md flex flex-col items-center justify-between p-6 sm:p-8 font-mono select-none animate-fade-in">
+            class="absolute inset-0 z-30 bg-[#0D1117]/95 backdrop-blur-md flex flex-col items-center justify-between p-6 sm:p-8 font-mono select-none animate-fade-in">
             <!-- 1. 顶部：战术评级与超大 COMBAT SCORE (致敬原图 FLAWLESS ACE + 11,678) -->
             <div class="text-center space-y-1">
-              <h2 class="text-xl sm:text-2xl font-extrabold tracking-[0.25em] text-[#d4af37] uppercase">
+              <h2 class="text-xl sm:text-2xl font-extrabold tracking-[0.25em] text-[#D97706] uppercase">
                 {{ activeSummary.rating }}
               </h2>
-              <div class="text-5xl sm:text-7xl font-extrabold tracking-tight text-[#d4af37] drop-shadow-md">
+              <div class="text-5xl sm:text-7xl font-extrabold tracking-tight text-[#D97706] drop-shadow-md">
                 {{ score.toLocaleString() }}
               </div>
               <div class="text-xs font-bold tracking-[0.2em] text-zinc-400 uppercase">
                 COMBAT SCORE
               </div>
               <div class="flex items-center justify-center gap-2 pt-1 font-mono">
-                <span class="px-2 py-0.5 text-xs font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm uppercase">
+                <span class="px-2 py-0.5 text-xs font-extrabold bg-[#D97706] text-black rounded-sm shadow-sm uppercase">
                   {{ playerRankBadge }}
                 </span>
                 <span class="text-xs font-bold tracking-widest text-[#ef4444]">
@@ -947,30 +947,30 @@ onUnmounted(() => {
 
             <!-- 2. 中部：双 Tab 容器 (MATCH SUMMARY vs GLOBAL RANKING) -->
             <div
-              class="w-full max-w-2xl bg-[#0e1117] border border-zinc-800 rounded-sm overflow-hidden shadow-2xl my-auto">
+              class="w-full max-w-2xl bg-[#0D1117] border border-[#30363D] rounded-sm overflow-hidden shadow-2xl my-auto">
               <!-- Tab 切换头 (致敬原图顶栏色块) -->
               <div
-                class="grid grid-cols-2 text-center text-xs font-extrabold tracking-widest uppercase cursor-pointer border-b border-zinc-800">
+                class="grid grid-cols-2 text-center text-xs font-extrabold tracking-widest uppercase cursor-pointer border-b border-[#30363D]">
                 <button @click="settlementTab = 'summary'" :class="[
                   'py-3 transition-colors',
                   settlementTab === 'summary'
-                    ? 'bg-[#d4af37] text-black shadow-inner font-extrabold'
-                    : 'bg-[#12141a] text-zinc-400 hover:text-white'
+                    ? 'bg-[#D97706] text-black shadow-inner font-extrabold'
+                    : 'bg-[#161B22] text-zinc-400 hover:text-white'
                 ]">
                   MATCH SUMMARY
                 </button>
                 <button @click="settlementTab = 'ranking'" :class="[
                   'py-3 transition-colors',
                   settlementTab === 'ranking'
-                    ? 'bg-[#d4af37] text-black shadow-inner font-extrabold'
-                    : 'bg-[#12141a] text-zinc-400 hover:text-white'
+                    ? 'bg-[#D97706] text-black shadow-inner font-extrabold'
+                    : 'bg-[#161B22] text-zinc-400 hover:text-white'
                 ]">
                   GLOBAL RANKING
                 </button>
               </div>
 
               <!-- Tab 内容区 A：对局 4 维微观数据立柱 (致敬原图 ACC / AVG TTK / BEST TTK / WHIFFS) -->
-              <div v-if="settlementTab === 'summary'" class="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center bg-[#090b0e]">
+              <div v-if="settlementTab === 'summary'" class="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center bg-[#0D1117]">
                 <div v-for="(metric, idx) in activeSummary.metrics" :key="idx"
                   class="flex flex-col items-center justify-between space-y-1.5">
                   <!-- 指标主数值 -->
@@ -984,7 +984,7 @@ onUnmounted(() => {
                   <!-- 金色倍率胶囊 (x2.00 等) -->
                   <div class="h-5 flex items-center justify-center">
                     <span v-if="metric.badge"
-                      class="px-2 py-0.5 text-xs font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm">
+                      class="px-2 py-0.5 text-xs font-extrabold bg-[#D97706] text-black rounded-sm shadow-sm">
                       {{ metric.badge }}
                     </span>
                   </div>
@@ -992,9 +992,9 @@ onUnmounted(() => {
               </div>
 
               <!-- Tab 内容区 B：全球天梯排行榜 (消灭外部独立弹窗，原生就地查阅) -->
-              <div v-else class="p-4 bg-[#090b0e] space-y-1.5 max-h-[160px] overflow-y-auto">
+              <div v-else class="p-4 bg-[#0D1117] space-y-1.5 max-h-[160px] overflow-y-auto">
                 <div
-                  class="grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
+                  class="grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-[#30363D]">
                   <span>RANK</span>
                   <span>OPERATOR</span>
                   <span class="text-right">SCORE</span>
@@ -1030,20 +1030,20 @@ onUnmounted(() => {
             <div class="flex items-center gap-3 w-full max-w-sm justify-center">
               <!-- 返回大厅按钮 -->
               <button @click="exitToHub"
-                class="w-11 h-11 flex items-center justify-center bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700 hover:border-zinc-500 rounded-sm text-zinc-300 hover:text-white transition-colors shadow-md"
+                class="w-11 h-11 flex items-center justify-center bg-[#161B22] hover:bg-[#21262D] border border-[#30363D] hover:border-zinc-500 rounded-sm text-zinc-300 hover:text-white transition-colors shadow-md"
                 title="返回戰術大廳">
                 <span class="text-base font-bold">←</span>
               </button>
 
               <!-- 再次挑战主按钮 (加宽金色实心矩形) -->
               <button @click="launchSlot(currentSlot)"
-                class="flex-1 h-11 bg-[#d4af37] hover:bg-[#e6c14a] text-black font-extrabold text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] transform hover:-translate-y-0.5 flex items-center justify-center">
+                class="flex-1 h-11 bg-[#D97706] hover:bg-[#e6c14a] text-black font-extrabold text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-[0_0_20px_rgba(217,119,6,0.3)] hover:shadow-[0_0_25px_rgba(217,119,6,0.5)] transform hover:-translate-y-0.5 flex items-center justify-center">
                 PLAY AGAIN
               </button>
 
               <!-- 战绩分享/复制按钮 -->
               <button @click="shareScore"
-                class="w-11 h-11 flex items-center justify-center bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700 hover:border-zinc-500 rounded-sm text-zinc-300 hover:text-white transition-colors shadow-md group"
+                class="w-11 h-11 flex items-center justify-center bg-[#161B22] hover:bg-[#21262D] border border-[#30363D] hover:border-zinc-500 rounded-sm text-zinc-300 hover:text-white transition-colors shadow-md group"
                 title="複製戰報至剪貼板">
                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform text-zinc-300" viewBox="0 0 24 24"
                   fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1063,8 +1063,8 @@ onUnmounted(() => {
     <!-- ================================================================= -->
     <div v-if="isScoreboardOpen" @mousedown.stop @click.self="closeScoreboard"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm font-mono select-none">
-      <div class="relative w-full max-w-lg bg-[#0e1117] border border-zinc-700 rounded-sm shadow-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+      <div class="relative w-full max-w-lg bg-[#0D1117] border border-[#30363D] rounded-sm shadow-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#30363D] pb-3">
           <div>
             <div class="text-xs font-bold tracking-widest text-emerald-400 uppercase">
               // {{ scoreboardSlot.title }} SCOREBOARD
@@ -1074,14 +1074,14 @@ onUnmounted(() => {
             </div>
           </div>
           <button @click="closeScoreboard"
-            class="text-zinc-400 hover:text-white text-xs font-bold px-2 py-1 bg-zinc-800/80 hover:bg-zinc-700 rounded transition-colors">
+            class="text-zinc-400 hover:text-white text-xs font-bold px-2 py-1 bg-[#21262D] hover:bg-[#30363D] rounded transition-colors">
             [ESC / ✕]
           </button>
         </div>
 
         <div class="space-y-1.5">
           <div
-            class="grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
+            class="grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-[#30363D]">
             <span>RANK</span>
             <span>OPERATOR</span>
             <span class="text-right">SCORE</span>
@@ -1093,7 +1093,7 @@ onUnmounted(() => {
             'grid grid-cols-[2.5rem_minmax(0,1fr)_3.5rem_4.75rem] gap-x-2 items-center text-xs px-2 py-1.5 rounded transition-colors',
             entry.discord_id === currentDiscordId
               ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold'
-              : 'hover:bg-zinc-900/60 text-zinc-300'
+              : 'hover:bg-[#161B22] text-zinc-300'
           ]">
             <span class="font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
             <span class="truncate flex items-center gap-1.5">
@@ -1113,7 +1113,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-xs text-zinc-500">
+        <div class="pt-2 border-t border-[#30363D] flex items-center justify-between text-xs text-zinc-500">
           <span>STATUS: {{ liveLeaderboard.length ? 'LIVE // SUPABASE' : 'STANDBY // NO_DATA' }}</span>
           <span class="text-emerald-500/80">SUPABASE_SYNC: READY</span>
         </div>

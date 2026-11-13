@@ -15,7 +15,7 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] pt-24 pb-12 px-4 sm:px-6 animate-fade-in">
+  <div class="min-h-screen bg-gray-50 dark:bg-default pt-24 pb-12 px-4 sm:px-6 animate-fade-in">
 
     <UContainer class="max-w-5xl">
 
@@ -36,7 +36,7 @@ useHead({
       </div>
 
 
-      <div class="flex flex-col mb-8 pb-6 border-b border-gray-200 dark:border-gray-800">
+      <div class="flex flex-col mb-8 pb-6 border-b border-gray-200 dark:border-default">
         <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">
           Mahjong Soul · How-To Guide
         </span>
@@ -46,18 +46,18 @@ useHead({
       </div>
 
       <div
-        class="bg-white dark:bg-[#1e293b] rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700/50 flex flex-col relative group w-full">
+        class="bg-white dark:bg-elevated rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-default flex flex-col relative group w-full">
 
         <div class="hidden md:flex flex-col w-full relative" style="height: 75vh; min-height: 600px;">
           <iframe :src="`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`" class="w-full flex-1 border-0 z-10 bg-white"
             title="雀魂參賽教學指南"></iframe>
-          <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-[#18212f] z-0">
+          <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-elevated z-0">
             <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
           </div>
         </div>
 
         <div
-          class="flex md:hidden flex-col items-center justify-center py-20 px-6 text-center bg-gray-50 dark:bg-[#18212f]">
+          class="flex md:hidden flex-col items-center justify-center py-20 px-6 text-center bg-gray-50 dark:bg-elevated">
           <div
             class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner">
             <UIcon name="i-lucide-search-alert"
