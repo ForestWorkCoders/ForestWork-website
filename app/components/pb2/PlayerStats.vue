@@ -252,7 +252,7 @@ const top3Charts = computed(() => {
 
               <div class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400">
                 <UIcon name="i-lucide-crosshair" class="w-4 h-4 opacity-70" />
-                <span>综合战术评分</span>
+                <span>綜合戰術評分</span>
               </div>
             </div>
 

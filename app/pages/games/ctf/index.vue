@@ -608,7 +608,7 @@ const commands: Record<string, (args: string[]) => void> = {
 
             // 格式化输出卡片
             appendHistory(`[玩家檔案]
-  玩家昵稱 : ${res.accountId}
+  玩家暱稱 : ${res.accountId}
   目前名次 : #${res.rank}
   目前總分 : ${res.totalScore} 分
   解題題數 : ${res.solvesCount} 題

@@ -36,7 +36,7 @@ const contentUrl = computed(() => {
 const breadcrumbLinks = computed(() => {
     return [
         { label: '首頁 · Home', icon: 'i-lucide-home', to: '/' },
-        { label: '雀魂麻将 · Mahjong Soul', icon: 'i-lucide-trophy', to: '/games/mahjongsoul' },
+        { label: '雀魂麻將 · Mahjong Soul', icon: 'i-lucide-trophy', to: '/games/mahjongsoul' },
         { label: tourney.value?.title || '載入中...', icon: 'i-lucide-swords' }
     ]
 })

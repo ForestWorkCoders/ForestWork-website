@@ -40,7 +40,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     icon: 'i-lucide-box',
     defaultOpen: true,
     children: [
-      { label: '超极限生存竞赛', to: 'https://eaglepb2.gitbook.io/uhc_report/', target: '_blank' },
+      { label: '超極限生存競賽', to: 'https://eaglepb2.gitbook.io/uhc_report/', target: '_blank' },
       { label: '多人生存 · SMP', to: '/games/minecraftsmp' }
     ]
   },

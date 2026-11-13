@@ -37,7 +37,7 @@ async function onClick() {
         await navigator.clipboard.writeText(serverIp)
         show('已複製到剪貼簿！')
     } catch (err) {
-        console.error('复制失败:', err)
+        console.error('複製失敗:', err)
     }
 }
 
