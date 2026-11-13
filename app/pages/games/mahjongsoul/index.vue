@@ -106,7 +106,7 @@ useSeoMeta({
 
                                         <!-- 中文副标题：保持原有呼吸感与半透明对比度 -->
                                         <div v-if="item.description"
-                                            class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
+                                            class="text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
                                             {{ item.description }}
                                         </div>
                                     </div>

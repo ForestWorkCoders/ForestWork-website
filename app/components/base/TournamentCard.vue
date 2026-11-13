@@ -50,7 +50,7 @@ defineProps({
           </span>
 
           <!-- 日期范围：锁定单项不折断 (whitespace-nowrap) -->
-          <span class="inline-flex items-center gap-1 font-mono text-[11px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+          <span class="inline-flex items-center gap-1 font-mono text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
             <UIcon name="i-lucide-calendar" class="w-3.5 h-3.5 shrink-0" />
             {{ tourney.start_date }} - {{ tourney.end_date }}
           </span>

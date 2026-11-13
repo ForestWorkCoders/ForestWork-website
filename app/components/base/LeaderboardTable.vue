@@ -5,7 +5,7 @@
     <template #rank-cell="{ row }">
       <div class="flex items-center justify-center w-full px-1">
         <div v-if="isDnfRow(row)"
-          class="inline-block text-center font-bold text-[11px] font-mono tracking-wider px-2 py-0.5 rounded text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-elevated select-none">
+          class="inline-block text-center font-bold text-xs font-mono tracking-wider px-2 py-0.5 rounded text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-elevated select-none">
           DNF
         </div>
         <div v-else
@@ -19,7 +19,7 @@
     <template #name-cell="{ row }">
       <div class="flex items-center gap-2 sm:gap-3 w-full transition-opacity"
         :class="isDnfRow(row) ? 'opacity-60 grayscale-[30%]' : 'opacity-100'">
-        <UAvatar :src="row.original.avatar" :alt="row.original.name" size="2xs" class="sm:hidden" />
+        <UAvatar :src="row.original.avatar" :alt="row.original.name" size="xs" class="sm:hidden" />
         <UAvatar :src="row.original.avatar" :alt="row.original.name" size="sm" class="hidden sm:inline-flex" />
         <span class="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100 truncate">
           {{ row.original.name }}

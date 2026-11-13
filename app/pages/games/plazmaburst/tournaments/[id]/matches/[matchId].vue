@@ -278,7 +278,7 @@ const abnormalMatchMessage = computed(() => {
                 <div v-for="roundNum in totalRounds" :key="roundNum" class="flex flex-col gap-1 w-8 items-center">
 
                   <!-- 頂部回合數字 -->
-                  <div class="h-6 text-[10px] font-bold text-gray-400 flex items-end justify-center pb-1">
+                  <div class="h-6 text-xs font-bold text-gray-400 flex items-end justify-center pb-1">
                     {{ roundNum }}
                   </div>
 

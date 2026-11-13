@@ -77,7 +77,7 @@ const mockMontages = [
         <a v-for="arc in mockArchives" :key="arc.id" :href="arc.url" target="_blank" class="snap-start shrink-0 w-[280px] md:w-[320px] group flex flex-col gap-2">
           <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <img :src="arc.thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-white text-[11px] font-mono font-bold tracking-wider">
+            <div class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-white text-xs font-mono font-bold tracking-wider">
               {{ arc.duration }}
             </div>
           </div>
@@ -104,7 +104,7 @@ const mockMontages = [
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
             
             <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
-              <span class="text-white text-[11px] font-bold tracking-wider flex items-center gap-1">
+              <span class="text-white text-xs font-bold tracking-wider flex items-center gap-1">
                 <UIcon name="i-lucide-eye" class="w-3.5 h-3.5" /> {{ montage.views }}
               </span>
               <UIcon name="i-lucide-circle-play" class="w-6 h-6 text-white/80 group-hover:text-white transition-colors" />
