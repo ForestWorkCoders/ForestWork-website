@@ -99,7 +99,7 @@ const radarConfigs = computed(() => {
         ],
         radius: '65%', // 控制雷达图的大小留出文字空间
         splitNumber: 5,
-        axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 11, fontWeight: 'bold' },
+        axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 12, fontWeight: 'bold' },
         splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.15)' } },
         splitArea: { show: false }, // 隐藏背景色块交替
         axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
