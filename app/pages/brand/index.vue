@@ -220,7 +220,7 @@ const spacingRules = [
                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">留白與最小尺寸規範</h3>
                     <p class="text-sm text-slate-600 dark:text-slate-400 max-w-prose mt-5 text-justify">
                         標誌四周須保持至少 <code class="font-bold text-[#4C7766]">0.25x</code> 的安全留白，其中 <code
-                            class="font-bold text-[#4C7766]">x</code> 為標誌圖案的高度。任何文字或圖像元素均不得侵入此區域。頁首使用時，圖案標最小 28px (h-7)，字標 14–16px (h-3.5–h-4)。
+                            class="font-bold text-[#4C7766]">x</code> 為標誌圖案的高度。任何文字或圖像元素均不得侵入此區域。頁首使用時，圖案標 20px (h-5)，與右側圖示同高；字標 14px (h-3.5)。組合標誌內的英文字標依原稿比例縮放（約為中文字標高度的 0.3 倍），不受 14px 字標下限限制。
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
@@ -265,20 +265,20 @@ const spacingRules = [
                             </div>
                         </div>
 
-                        <!-- Vertical lockup: emblem h-14, ZH h-5, EN h-3.5 -->
+                        <!-- Vertical lockup at the master proportion: ZH ≈ 0.26 × emblem height, EN ≈ 0.3 × ZH height -->
                         <div
                             class="bg-white dark:bg-[#161B22] border border-slate-200 dark:border-[#30363D] p-5 rounded-xl space-y-4 flex flex-col justify-between">
                             <div
                                 class="h-32 bg-[#F7F9FC] dark:bg-[#0D1117] rounded-lg border border-slate-200/60 dark:border-[#30363D]/80 flex items-center justify-center p-4 shadow-sm overflow-hidden">
-                                <div class="flex flex-col items-center justify-center gap-1.5 max-w-full">
+                                <div class="flex flex-col items-center justify-center max-w-full">
                                     <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg"
                                         alt="ForestWork Emblem" class="h-14 w-auto shrink-0" />
                                     <UColorModeImage light="/brand/svg/text-zh-black.svg"
                                         dark="/brand/svg/text-zh-white.svg" alt="林間小鎮"
-                                        class="h-5 w-auto max-w-full object-contain" />
+                                        class="h-[15px] mt-2 w-auto max-w-full object-contain" />
                                     <UColorModeImage light="/brand/svg/text-en-black.svg"
                                         dark="/brand/svg/text-en-white.svg" alt="Forest Work"
-                                        class="h-3.5 w-auto max-w-full object-contain" />
+                                        class="h-[4.5px] mt-0.5 w-auto max-w-full object-contain" />
                                 </div>
                             </div>
                             <div class="space-y-1">

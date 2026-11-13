@@ -30,14 +30,14 @@
         light="/brand/svg/text-en-white.svg"
         dark="/brand/svg/text-en-white.svg"
         alt="ForestWork"
-        class="h-2 sm:h-3 md:h-4 w-auto object-contain opacity-90"
+        class="h-2.5 sm:h-3 md:h-3.5 w-auto object-contain opacity-90"
       />
     </div>
 
   </div>
 </div>
 
-    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-950 to-transparent">
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#F7F9FC] dark:from-(--ui-bg) to-transparent">
     </div>
   </div>
 
