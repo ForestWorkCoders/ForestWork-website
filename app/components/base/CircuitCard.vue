@@ -19,9 +19,9 @@ defineProps<{
     :target="item.to.startsWith('http') ? '_blank' : '_self'"
     class="group block cursor-pointer transition-all duration-300 hover:-translate-y-2"
   >
-    <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-10 flex flex-col items-center justify-center relative overflow-hidden h-64 shadow-sm border border-transparent group-hover:border-green-500/50">
+    <div class="bg-gray-100 dark:bg-elevated rounded-lg p-10 flex flex-col items-center justify-center relative overflow-hidden h-64 shadow-sm border border-transparent group-hover:border-green-500/50">
       
-      <div class="w-32 h-32 bg-white dark:bg-gray-700 rounded flex items-center justify-center shadow-inner mb-6 transition-transform group-hover:scale-110">
+      <div class="w-32 h-32 bg-white dark:bg-accented rounded flex items-center justify-center shadow-inner mb-6 transition-transform group-hover:scale-110">
         <UIcon :name="item.icon" class="size-16 text-gray-400 dark:text-gray-500" />
       </div>
 

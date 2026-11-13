@@ -38,6 +38,16 @@
 .dark {
   --ui-primary: var(--ui-color-primary-400);
   --ui-secondary: var(--ui-color-secondary-400);
+
+  /* Dark surfaces (see /brand): Ink Black page, #161B22 cards, #30363D borders.
+     Nuxt UI's defaults are slate-900 / slate-800, which read navy next to Ink Black. */
+  --ui-bg: #0D1117;
+  --ui-bg-muted: #161B22;
+  --ui-bg-elevated: #161B22;
+  --ui-bg-accented: #21262D;
+  --ui-border: #30363D;
+  --ui-border-muted: #21262D;
+  --ui-border-accented: #30363D;
 }
 
 /* 2. 斯巴达式原生实现，消除所有 @apply 魔法，直接读取 V4 变量 */

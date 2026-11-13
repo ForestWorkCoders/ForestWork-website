@@ -13,7 +13,7 @@ defineProps({
 
 <template>
   <div
-    class="flex items-center justify-between p-3 sm:p-4 bg-white/90 hover:bg-gray-50 dark:bg-[#0f172a]/80 dark:hover:bg-[#1e293b]/90 border border-gray-200 dark:border-slate-800 rounded-lg transition-all shadow-sm hover:shadow-md dark:shadow-none gap-3"
+    class="flex items-center justify-between p-3 sm:p-4 bg-white/90 hover:bg-gray-50 dark:bg-elevated dark:hover:bg-accented border border-gray-200 dark:border-default rounded-lg transition-all shadow-sm hover:shadow-md dark:shadow-none gap-3"
   >
     <!-- 左侧：图标 + 信息容器（必须加 min-w-0 防止被 flex 撑爆） -->
     <div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
