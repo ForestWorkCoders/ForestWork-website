@@ -54,8 +54,8 @@ useHead({
           target="_blank" 
           download="PB2 General Rules.pdf"
           icon="i-lucide-download" 
-          color="gray" 
-          variant="solid"
+          color="neutral" 
+          variant="outline"
           class="shrink-0 font-bold tracking-wider hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
         >
           下載 PDF 版
@@ -86,7 +86,7 @@ useHead({
           <UButton 
             :to="pdfUrl" 
             target="_blank" 
-            color="emerald" 
+            color="primary" 
             size="xl"
             icon="i-lucide-external-link"
             class="font-bold tracking-widest shadow-md hover:shadow-lg transition-shadow"

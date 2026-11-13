@@ -61,8 +61,8 @@ defineProps({
           :to="link.url"
           target="_blank"
           :icon="link.icon"
-          color="gray"
-          variant="solid"
+          color="neutral"
+          variant="soft"
           class="bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
         />
       </div>

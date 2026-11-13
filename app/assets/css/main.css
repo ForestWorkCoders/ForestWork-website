@@ -8,6 +8,38 @@
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
+/* Forest Emerald scale: #4C7766 is the 700 shade (its lightness matches Tailwind's 700).
+   Same hue throughout (oklch 167), chroma shaped like Tailwind green.
+   static: Nuxt UI reads these only from CSS it injects at runtime, which Tailwind can't see. */
+@theme static {
+  --color-forest-50: #F5FBF8;
+  --color-forest-100: #E9F6F0;
+  --color-forest-200: #D4EDE2;
+  --color-forest-300: #B3E0CD;
+  --color-forest-400: #8BCBB2;
+  --color-forest-500: #73B69C;
+  --color-forest-600: #5D9680;
+  --color-forest-700: #4C7766;
+  --color-forest-800: #3D5D50;
+  --color-forest-900: #334C42;
+  --color-forest-950: #1A2923;
+}
+
+/* Which shade is "primary" / "secondary" in each mode. Nuxt UI defaults to 500 / 400;
+   these rules sit outside any layer, so they win over its @layer theme.
+   Light: the exact brand colours (#4C7766 with white text, 5.1:1; #D97706).
+   Dark: lighter shades that read on Ink Black (#8BCBB2 10.2:1, #FBBF24 11.3:1). */
+:root,
+.light {
+  --ui-primary: var(--ui-color-primary-700);
+  --ui-secondary: var(--ui-color-secondary-600);
+}
+
+.dark {
+  --ui-primary: var(--ui-color-primary-400);
+  --ui-secondary: var(--ui-color-secondary-400);
+}
+
 /* 2. 斯巴达式原生实现，消除所有 @apply 魔法，直接读取 V4 变量 */
 .custom-scrollbar {
   scrollbar-width: thin;
@@ -40,5 +72,5 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-emerald-500);
+  background-color: var(--ui-primary);
 }
