@@ -5,7 +5,7 @@
     <template #rank-cell="{ row }">
       <div class="flex items-center justify-center w-full px-1">
         <div v-if="isDnfRow(row)"
-          class="inline-block text-center font-bold text-[11px] font-mono tracking-wider px-2 py-0.5 rounded text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800/50 select-none">
+          class="inline-block text-center font-bold text-[11px] font-mono tracking-wider px-2 py-0.5 rounded text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-elevated select-none">
           DNF
         </div>
         <div v-else
@@ -74,7 +74,7 @@ const tableColumns = computed(() => {
       accessorKey: 'rank',
       header: 'RANK',
       size: 72,
-      class: 'text-center w-[72px] min-w-[72px] max-w-[72px] z-[2] bg-white dark:bg-[#1e293b] border-r border-gray-100 dark:border-slate-800/80',
+      class: 'text-center w-[72px] min-w-[72px] max-w-[72px] z-[2] bg-white dark:bg-default border-r border-gray-100 dark:border-default',
       // 核心：自定义排序函数，将 DNF 映射为无穷大，其余按纯数字比较！
       sortingFn: (rowA, rowB, columnId) => {
         const valA = rowA.getValue(columnId)
@@ -92,7 +92,7 @@ const tableColumns = computed(() => {
       header: props.entityType === 'team' ? 'TEAM' : 'PLAYER',
       size: 150,
       // 核心：z-1 层级稍低，实色背景，给左侧留出充足 padding 避免贴脸
-      class: 'text-left w-[150px] min-w-[150px] z-[1] bg-white dark:bg-[#1e293b] pl-3'
+      class: 'text-left w-[150px] min-w-[150px] z-[1] bg-white dark:bg-default pl-3'
     },
     {
       id: 'total',

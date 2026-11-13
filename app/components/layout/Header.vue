@@ -95,12 +95,12 @@ const items = computed<NavigationMenuItem[]>(() => [
 
       <ClientOnly>
         <!-- 載入中骨架屏佔位 -->
-        <div v-if="isPending" class="w-8 h-8 rounded-full bg-slate-800 animate-pulse hidden lg:block" />
+        <div v-if="isPending" class="w-8 h-8 rounded-full bg-accented animate-pulse hidden lg:block" />
 
         <!-- 已登入：渲染 Discord 頭像與下拉操作選單 -->
         <UDropdownMenu v-else-if="user" :items="dropdownItems" :popper="{ placement: 'bottom-end' }">
           <UButton color="secondary" variant="ghost"
-            class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-800">
+            class="flex items-center gap-2 p-1 rounded-full hover:bg-elevated">
             <UAvatar :src="user.avatar || undefined" :alt="user.username" size="sm"
               class="border border-emerald-500/50" />
             <span class="text-xs font-mono text-emerald-400 font-bold hidden xl:inline-block pr-1">
@@ -126,7 +126,7 @@ const items = computed<NavigationMenuItem[]>(() => [
         </UButton>
 
         <template #fallback>
-          <div class="w-20 h-8 rounded-md bg-slate-800/50 animate-pulse hidden lg:block" />
+          <div class="w-20 h-8 rounded-md bg-accented animate-pulse hidden lg:block" />
         </template>
       </ClientOnly>
     </template>
@@ -147,7 +147,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     <template #body>
       <UNavigationMenu :items="items" orientation="vertical" class="px-2 mt-4" />
 
-      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 px-4">
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-default px-4">
         <UButton :to="DISCORD_SERVER_URL" target="_blank" color="primary"
           variant="solid" block>
           加入Discord

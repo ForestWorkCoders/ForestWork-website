@@ -50,7 +50,7 @@ const parsedHtml = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-[#1a1b26] text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+  <div class="bg-white dark:bg-default text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
 
     <div v-if="pending" class="flex flex-col items-center justify-center py-12 text-gray-500">
       <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin mb-4 text-emerald-500" />
@@ -71,7 +71,7 @@ const parsedHtml = computed(() => {
 </template>
 
 <style scoped>
-@reference "tailwindcss"; 
+@reference "~/assets/css/main.css";
 
 /* Linus 规则：绝对不要在这里写任何颜色和 dark: 前缀。
   所有的基础颜色由父组件的 div (text-gray-900 / dark:text-gray-100) 决定。
@@ -130,7 +130,7 @@ const parsedHtml = computed(() => {
 }
 
 .markdown-body :deep(thead) {
-  @apply bg-gray-50 dark:bg-[#18212f] text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700;
+  @apply bg-gray-50 dark:bg-elevated text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-default;
 }
 
 .markdown-body :deep(th) {
@@ -138,7 +138,7 @@ const parsedHtml = computed(() => {
 }
 
 .markdown-body :deep(tbody tr) {
-  @apply border-b border-gray-100 dark:border-gray-800/60 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors;
+  @apply border-b border-gray-100 dark:border-default hover:bg-gray-50 dark:hover:bg-white/5 transition-colors;
 }
 
 .markdown-body :deep(td) {
