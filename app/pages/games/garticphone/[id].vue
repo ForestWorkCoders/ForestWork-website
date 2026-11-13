@@ -134,6 +134,10 @@ async function initDeck() {
     const Reveal = (await import('reveal.js')).default
 
     const instance = new Reveal({
+        // The canvas is the viewport, so the scale is always 1 and the Tailwind
+        // breakpoints size the cards. A fixed 960×700 canvas shrank to 0.38 on phones.
+        width: '100%',
+        height: '100%',
         transition: 'slide',
         controls: true,
         progress: true,
@@ -308,7 +312,7 @@ onBeforeUnmount(() => {
                             <div
                                 class="bg-white border-4 border-black shadow-[6px_6px_0px_0px_#000] p-3 sm:p-4 rounded-xl max-w-2xl w-[92%] mx-auto">
                                 <img :src="`${sessionData.baseUrl}/${chain.id}/${frameName}`"
-                                    class="w-full border-2 border-black" alt="Gartic Frame">
+                                    class="block mx-auto max-w-full max-h-[60dvh] border-2 border-black" alt="Gartic Frame">
                                 <div
                                     class="mt-3 sm:mt-4 text-left font-extrabold text-black text-base sm:text-xl flex justify-between items-center">
                                     <span>Round {{ index + 1 }}</span>
@@ -326,7 +330,7 @@ onBeforeUnmount(() => {
                                 class="bg-amber-300 border-4 border-black shadow-[6px_6px_0px_0px_#000] p-3 sm:p-4 rounded-xl max-w-2xl w-[92%] mx-auto">
                                 <h2 class="text-xl sm:text-2xl font-extrabold text-black mb-5 sm:mb-6">完整動畫</h2>
                                 <img :src="`${sessionData.baseUrl}/${chain.id}/album.gif`"
-                                    class="w-full border-2 border-black" alt="Full Album">
+                                    class="block mx-auto max-w-full max-h-[60dvh] border-2 border-black" alt="Full Album">
                             </div>
                         </div>
                     </section>
