@@ -682,19 +682,19 @@ onUnmounted(() => {
       <!-- 标准大厅 -->
       <div class="normal-hub-view flex-1 flex flex-col h-full overflow-hidden">
         <header
-          class="shrink-0 w-full px-5 py-2.5 flex items-center justify-between border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
+          class="shrink-0 w-full px-5 py-2.5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
           <div class="flex items-center gap-3">
             <a href="https://forestwork.vercel.app/" target="_blank" rel="noopener noreferrer"
               @click.prevent="openExternalUrl('https://forestwork.vercel.app/')"
               class="group flex items-center gap-2 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all duration-150 shadow-sm"
-              title="開啟林間小鎮官方網站">
+              title="開啟林間小鎮官方網站" aria-label="開啟林間小鎮官方網站">
               <span
                 class="text-xs font-mono font-bold text-emerald-400 group-hover:-translate-x-0.5 transition-transform">←</span>
               <span
-                class="text-xs font-extrabold tracking-widest uppercase text-zinc-200 group-hover:text-white font-mono whitespace-nowrap">
+                class="hidden sm:inline text-xs font-extrabold tracking-widest uppercase text-zinc-200 group-hover:text-white font-mono whitespace-nowrap">
                 FORESTWORK.OS
               </span>
-              <span class="text-xs text-zinc-500 group-hover:text-emerald-400 font-mono">↗</span>
+              <span class="hidden sm:inline text-xs text-zinc-500 group-hover:text-emerald-400 font-mono">↗</span>
             </a>
           </div>
 
@@ -709,9 +709,9 @@ onUnmounted(() => {
             </p>
           </div>
 
-          <div class="hidden sm:flex items-center gap-2 font-mono text-xs whitespace-nowrap">
+          <div class="hidden sm:flex min-w-0 justify-end items-center gap-2 font-mono text-xs whitespace-nowrap">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span class="text-xs text-emerald-400 tracking-wider">
+            <span class="min-w-0 truncate text-xs text-emerald-400 tracking-wider">
               OP: {{ currentOperatorDisplay }}
             </span>
           </div>
@@ -801,15 +801,15 @@ onUnmounted(() => {
       class="relative z-10 flex-1 flex flex-col h-full overflow-hidden font-mono">
       <!-- 简报顶栏 -->
       <header
-        class="shrink-0 w-full px-5 py-3 flex items-center justify-between border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
-        <div class="flex items-center gap-3">
-          <button @click="viewMode = 'hub'"
+        class="shrink-0 w-full px-5 py-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-zinc-800/80 bg-[#090a0f]/95 backdrop-blur-md">
+        <div class="flex min-w-0 items-center gap-3">
+          <button @click="viewMode = 'hub'" title="返回大廳 // HUB" aria-label="返回大廳"
             class="group flex items-center gap-1.5 bg-[#12141a] hover:bg-[#1a1e27] border border-zinc-700/80 hover:border-emerald-500 px-3 py-1.5 rounded-sm transition-all text-xs font-bold text-zinc-300 hover:text-white">
             <span class="text-emerald-400 group-hover:-translate-x-0.5 transition-transform">←</span>
-            <span>[ESC // HUB]</span>
+            <span class="hidden sm:inline">[ESC // HUB]</span>
           </button>
           <span
-            class="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-2 border-l border-zinc-800 hidden sm:inline">
+            class="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-2 border-l border-zinc-800 hidden lg:inline truncate">
             TRIAL BRIEFING // {{ currentSlot.code }}
           </span>
         </div>
@@ -823,7 +823,7 @@ onUnmounted(() => {
           </p>
         </div>
 
-        <div class="flex items-center gap-2 text-xs">
+        <div class="flex min-w-0 justify-end items-center gap-2 text-xs">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           <span class="text-xs text-zinc-400 tracking-wider">ARMED</span>
         </div>
