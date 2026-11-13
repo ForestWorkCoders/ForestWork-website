@@ -53,7 +53,7 @@ const rawColumns = [
     header: 'Rank',
     // 关键：TanStack 尺寸与 CSS 尺寸必须绝对 1:1 对齐（60px），杜绝重叠穿模
     size: 60,
-    class: 'text-center w-[60px] min-w-[60px] max-w-[60px] z-[2] bg-white dark:bg-[#1e293b] border-r border-gray-100 dark:border-slate-800/80 px-1'
+    class: 'text-center w-[60px] min-w-[60px] max-w-[60px] z-[2] bg-white dark:bg-elevated border-r border-gray-100 dark:border-default px-1'
   },
   {
     id: 'player',
@@ -61,7 +61,7 @@ const rawColumns = [
     header: 'Player',
     // 关键：TanStack 尺寸必须严格等于 110px
     size: 110,
-    class: 'text-left w-[110px] min-w-[110px] max-w-[110px] z-[1] bg-white dark:bg-[#1e293b] pl-2 pr-1'
+    class: 'text-left w-[110px] min-w-[110px] max-w-[110px] z-[1] bg-white dark:bg-elevated pl-2 pr-1'
   },
   {
     id: 'score',
@@ -233,7 +233,7 @@ const top3Charts = computed(() => {
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div v-for="(chart, index) in top3Charts" :key="chart.name || index"
-            class="bg-white dark:bg-[#18212f] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col relative group">
+            class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm overflow-hidden flex flex-col relative group">
             <!-- 浮雕大名次水印 -->
             <div
               class="absolute -right-4 -top-8 text-[120px] font-extrabold text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
@@ -241,9 +241,9 @@ const top3Charts = computed(() => {
             </div>
 
             <!-- 卡片头部信息 -->
-            <div class="p-6 flex flex-col items-center z-10 border-b border-gray-100 dark:border-gray-800/50">
+            <div class="p-6 flex flex-col items-center z-10 border-b border-gray-100 dark:border-default">
               <UAvatar :src="chart.avatar" :alt="chart.name" size="xl"
-                class="ring-4 ring-gray-50 dark:ring-[#1e293b] shadow-lg mb-3 shrink-0 bg-gray-100 dark:bg-gray-800" />
+                class="ring-4 ring-gray-50 dark:ring-default shadow-lg mb-3 shrink-0 bg-gray-100 dark:bg-accented" />
               <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ chart.name }}</h3>
               <div class="mt-2 flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-extrabold text-2xl">
                 <span>{{ chart.overallScore }}</span>
@@ -276,7 +276,7 @@ const top3Charts = computed(() => {
 
       <!-- 2. 綜合數據表格區域 (100% 鏡像對齊雀魂的 DOM 結構) -->
       <section>
-        <div class="mb-6 border-b border-gray-200 dark:border-gray-800 pb-4 flex justify-between items-end">
+        <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
             綜合數據 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Overall Statistics</span>
           </h2>
@@ -284,7 +284,7 @@ const top3Charts = computed(() => {
 
         <!-- 核心修復：使用與雀魂完全相同的外層卡片容器，移除多餘的 bg-gray-900 與雙重邊框 -->
         <div
-          class="bg-white dark:bg-[#1e293b] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full overflow-hidden detailed-stats-section">
+          class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm w-full overflow-hidden detailed-stats-section">
 
           <!-- 模式切換 Tabs：不要在外層加 p-4 border-b，直接讓 Tabs 作為卡片頂部通欄 -->
           <UTabs :items="tabs" v-model="currentCategory" class="w-full">
@@ -321,7 +321,7 @@ const top3Charts = computed(() => {
             <template #player-cell="{ row }">
               <div class="flex items-center gap-1.5 w-full min-w-0">
                 <UAvatar :src="row.original.avatar" :alt="row.original.player" size="xs"
-                  class="shrink-0 ring-1 ring-gray-200 dark:ring-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold"
+                  class="shrink-0 ring-1 ring-gray-200 dark:ring-default bg-gray-100 dark:bg-accented text-gray-700 dark:text-gray-300 font-bold"
                   :ui="{ fallback: 'font-bold uppercase' }" />
                 <span class="font-bold text-xs text-gray-900 dark:text-gray-100 truncate block min-w-0">
                   {{ row.original.player }}

@@ -138,7 +138,7 @@ useHead({
     </div>
 
     <div v-else
-        class="min-h-screen bg-gray-50 dark:bg-[#1a1b26] bg-[url('/images/mahjongSoul/bg.png')] bg-cover bg-fixed bg-center">
+        class="min-h-screen bg-gray-50 dark:bg-default bg-[url('/images/mahjongSoul/bg.png')] bg-cover bg-fixed bg-center">
 
         <div class="min-h-screen bg-black/50 backdrop-blur-sm pt-20 pb-12">
 
@@ -158,7 +158,7 @@ useHead({
 
                 <!-- 賽事 Header -->
                 <div
-                    class="bg-white/90 dark:bg-[#1a1b26] text-gray-900 dark:text-white rounded-t-xl overflow-hidden shadow-2xl flex flex-col md:flex-row p-8 md:p-16 gap-12 items-center md:items-start border border-gray-200 dark:border-gray-800 transition-colors duration-300">
+                    class="bg-white/90 dark:bg-default text-gray-900 dark:text-white rounded-t-xl overflow-hidden shadow-2xl flex flex-col md:flex-row p-8 md:p-16 gap-12 items-center md:items-start border border-gray-200 dark:border-default transition-colors duration-300">
 
                     <div class="flex flex-col items-center gap-6 shrink-0">
                         <UAvatar :src="tourney.imageUrl" :alt="tourney.title" size="3xl"
@@ -211,7 +211,7 @@ useHead({
 
                 <!-- 導覽與內容區塊 -->
                 <div
-                    class="bg-white dark:bg-[#1a1c23] w-full border-x border-b border-gray-200 dark:border-gray-800 rounded-b-xl shadow-sm">
+                    class="bg-white dark:bg-elevated w-full border-x border-b border-gray-200 dark:border-default rounded-b-xl shadow-sm">
                     <div v-if="tabs.length > 1">
                         <!-- The bar scrolls sideways when the labels don't fit (phones), instead of cutting them to "…" -->
                         <UTabs :items="tabs" class="w-full" :ui="{

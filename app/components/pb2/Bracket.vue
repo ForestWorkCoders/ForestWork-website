@@ -137,7 +137,7 @@ const drawOrthogonalLine = (x1, y1, x2, y2, isDrop) => {
 </script>
 
 <template>
-  <div class="w-full overflow-auto [&::-webkit-scrollbar]:hidden relative bg-gray-50 dark:bg-[#0f1115] rounded-xl border border-gray-200 dark:border-gray-800 shadow-inner">
+  <div class="w-full overflow-auto [&::-webkit-scrollbar]:hidden relative bg-gray-50 dark:bg-default rounded-xl border border-gray-200 dark:border-default shadow-inner">
     
     <div class="relative" :style="{ minWidth: graphData.totalWidth + 'px', minHeight: graphData.totalHeight + 'px' }">
       
@@ -168,18 +168,18 @@ const drawOrthogonalLine = (x1, y1, x2, y2, isDrop) => {
         v-for="node in graphData.nodes" 
         :key="node.id"
         :to="`/games/plazmaburst/tournaments/${$route.params.id}/matches/${node.match.id}`"
-        class="absolute block bg-white dark:bg-[#1a1c23] border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm z-10 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer group"
+        class="absolute block bg-white dark:bg-elevated border border-gray-200 dark:border-default rounded-lg shadow-sm z-10 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer group"
         :style="{ left: node.x + 'px', top: node.y + 'px', width: CARD_W + 'px', height: CARD_H + 'px' }"
       >
         <div 
-          class="flex items-center justify-between p-2.5 border-b border-gray-100 dark:border-gray-800 transition-all duration-300" 
+          class="flex items-center justify-between p-2.5 border-b border-gray-100 dark:border-default transition-all duration-300" 
           :class="{ 'opacity-40 grayscale-[50%]': node.match.winner && node.match.winner !== 'A' }"
         >
           <div class="flex items-center gap-2">
             <div 
               class="w-1.5 h-6 rounded-sm transition-colors" 
               :style="node.match.winner === 'A' && node.match.colourA ? { backgroundColor: node.match.colourA } : {}" 
-              :class="node.match.winner === 'A' ? (node.match.colourA ? '' : 'bg-blue-500') : 'bg-gray-200 dark:bg-gray-800'"
+              :class="node.match.winner === 'A' ? (node.match.colourA ? '' : 'bg-blue-500') : 'bg-gray-200 dark:bg-accented'"
             ></div>
             <span 
               class="text-xs truncate w-28 transition-all" 
@@ -204,7 +204,7 @@ const drawOrthogonalLine = (x1, y1, x2, y2, isDrop) => {
             <div 
               class="w-1.5 h-6 rounded-sm transition-colors" 
               :style="node.match.winner === 'B' && node.match.colourB ? { backgroundColor: node.match.colourB } : {}" 
-              :class="node.match.winner === 'B' ? (node.match.colourB ? '' : 'bg-blue-500') : 'bg-gray-200 dark:bg-gray-800'"
+              :class="node.match.winner === 'B' ? (node.match.colourB ? '' : 'bg-blue-500') : 'bg-gray-200 dark:bg-accented'"
             ></div>
             <span 
               class="text-xs truncate w-28 transition-all" 

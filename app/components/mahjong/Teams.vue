@@ -25,7 +25,7 @@ const roleColor = {
   Chuken: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   Fukusho: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
   Taisho: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
-  Substitute: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+  Substitute: 'bg-gray-100 text-gray-700 dark:bg-accented dark:text-gray-400'
 }
 </script>
 
@@ -35,7 +35,7 @@ const roleColor = {
       <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 animate-spin text-gray-400" />
     </div>
 
-    <div v-else-if="!teams || teams.length === 0" class="text-center py-16 bg-gray-50 dark:bg-[#1e293b] rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+    <div v-else-if="!teams || teams.length === 0" class="text-center py-16 bg-gray-50 dark:bg-elevated rounded-xl border border-dashed border-gray-200 dark:border-default">
       <UIcon name="i-lucide-users" class="w-12 h-12 mx-auto text-gray-400 mb-3" />
       <h3 class="text-lg font-bold text-gray-900 dark:text-white">參賽隊伍尚未公佈</h3>
       <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Teams are yet to be announced.</p>
@@ -46,14 +46,14 @@ const roleColor = {
       <div 
         v-for="team in teams" 
         :key="team.id"
-        class="bg-white dark:bg-[#1e293b] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
+        class="bg-white dark:bg-elevated rounded-2xl border border-gray-200 dark:border-default shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
       >
-        <div class="p-6 flex items-center gap-4 border-b border-gray-100 dark:border-gray-800/60 bg-gray-50/50 dark:bg-gray-800/20">
+        <div class="p-6 flex items-center gap-4 border-b border-gray-100 dark:border-default bg-gray-50/50 dark:bg-accented">
           <UAvatar 
             :src="team.logo || 'https://avatars.githubusercontent.com/u/739984?v=4'" 
             :alt="team.name"
             size="xl" 
-            class="ring-2 ring-white dark:ring-[#1e293b] shadow-sm bg-white"
+            class="ring-2 ring-white dark:ring-default shadow-sm bg-white"
             :ui="{ rounded: 'rounded-full' }"
           />
           <div class="flex flex-col">

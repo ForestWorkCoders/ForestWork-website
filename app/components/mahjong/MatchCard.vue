@@ -8,23 +8,23 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="bg-white dark:bg-[#1e293b] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+  <div class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
     
-    <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700/50 flex justify-between items-center bg-gray-50/80 dark:bg-[#18212f]">
+    <div class="px-5 py-3 border-b border-gray-100 dark:border-default flex justify-between items-center bg-gray-50/80 dark:bg-elevated">
       <span class="font-extrabold tracking-widest text-sm text-blue-600 dark:text-blue-400 group-hover:text-blue-500 dark:group-hover:text-blue-300 transition-colors">
         {{ match.round }}
       </span>
       <NuxtLink :to="match.paipu_url" target="_blank" class="flex items-center gap-2 group cursor-pointer">
-        <span class="text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded group-hover:bg-gray-300 dark:group-hover:bg-gray-700 transition-colors">
+        <span class="text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-accented px-2 py-0.5 rounded group-hover:bg-gray-300 dark:group-hover:bg-accented transition-colors">
           雀魂牌譜
         </span>
       </NuxtLink>
       <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ match.time }}</span>
     </div>
 
-    <div class="p-0 flex-1 bg-white dark:bg-[#1e293b]">
+    <div class="p-0 flex-1 bg-white dark:bg-elevated">
       <table class="w-full text-sm text-left">
-        <thead class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
+        <thead class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-default">
           <tr>
             <th class="px-4 py-3 font-medium w-12">起莊</th>
             <th class="px-4 py-3 font-medium">玩家</th>
@@ -32,8 +32,8 @@ const props = defineProps({
             <th class="px-4 py-3 font-medium text-right">積分</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
-          <tr v-for="p in match.players" :key="p.seat" class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+        <tbody class="divide-y divide-gray-50 dark:divide-default">
+          <tr v-for="p in match.players" :key="p.seat" class="hover:bg-gray-50 dark:hover:bg-accented transition-colors">
             
             <td class="px-4 py-3 font-bold transition-colors" :class="{
               'text-amber-500 dark:text-amber-400 drop-shadow-sm': p.score === Math.max(...match.players.map(x => x.score)),
