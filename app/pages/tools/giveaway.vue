@@ -314,13 +314,13 @@ const commitAndRemoveWinner = () => {
                             <span class="font-bold text-sm text-gray-900 dark:text-white">
                                 🏆 獲獎名單
                             </span>
-                            <UBadge color="primary" variant="subtle" size="xs" class="font-mono">
+                            <UBadge color="primary" variant="subtle" size="md" class="font-mono">
                                 {{ winnersHistory.length }}
                             </UBadge>
                         </div>
 
                         <!-- 右侧：池内剩余人数独立状态徽章 -->
-                        <UBadge color="secondary" variant="soft" size="xs" class="font-mono text-gray-400">
+                        <UBadge color="secondary" variant="soft" size="md" class="font-mono text-gray-400">
                             池剩餘 {{ pool.length }} 人
                         </UBadge>
                     </div>
@@ -337,7 +337,7 @@ const commitAndRemoveWinner = () => {
                             <span class="text-xs font-mono text-primary font-bold">#{{ item.round }}</span>
                             <span class="font-medium text-gray-200">{{ item.winner.name }}</span>
                         </div>
-                        <span class="text-[10px] font-mono text-gray-500">{{ item.drawnAt }}</span>
+                        <span class="text-xs font-mono text-gray-500">{{ item.drawnAt }}</span>
                     </li>
                 </ul>
             </UCard>

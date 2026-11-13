@@ -473,7 +473,7 @@ const dealInTargetOption = computed(() => {
                 <div>
                     <div class="flex items-center gap-3">
                         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">三麻選手數據面板</h1>
-                        <UBadge v-if="isViewingSelf" color="primary" variant="solid" size="xs">
+                        <UBadge v-if="isViewingSelf" color="primary" variant="solid" size="md">
                             🀄 我的主頁 (You)
                         </UBadge>
                     </div>
@@ -719,10 +719,10 @@ const dealInTargetOption = computed(() => {
         <!-- 5. 宏觀時序走勢區：近30戰順位走勢 (通欄獨佔，舒展呈現) -->
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">近期競技走勢 · Recent Form</h2>
-                    <UBadge color="primary" variant="subtle" size="xs">近 30 戰 (Recent 30 Matches)</UBadge>
+                    <UBadge color="primary" variant="subtle" size="md">近 30 戰 (Recent 30 Matches)</UBadge>
                 </div>
                 <div class="text-xs text-gray-500 font-mono">
                     最新場次在右側，1位為波峰，3位為谷底
@@ -742,10 +742,10 @@ const dealInTargetOption = computed(() => {
         <!-- 6. 最常同桌宿敵榜 (對齊牌譜屋圖 7，支援點擊直接切換視角) -->
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">最常同桌宿敵 · Frequent Opponents</h2>
-                    <UBadge color="primary" variant="subtle" size="xs">Top 12 遭遇記錄</UBadge>
+                    <UBadge color="primary" variant="subtle" size="md">Top 12 遭遇記錄</UBadge>
                 </div>
                 <div class="text-xs text-gray-500 font-mono">
                     點擊選手可直接切換視角
@@ -767,7 +767,7 @@ const dealInTargetOption = computed(() => {
                     </div>
                     <div class="text-xs text-gray-500 dark:text-gray-400 shrink-0">
                         <span class="font-bold text-gray-900 dark:text-white">{{ opp.rate }}%</span>
-                        <span class="text-[11px] text-gray-400 ml-1">({{ opp.count }})</span>
+                        <span class="text-xs text-gray-400 ml-1">({{ opp.count }})</span>
                     </div>
                 </div>
             </div>
@@ -783,9 +783,9 @@ const dealInTargetOption = computed(() => {
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm space-y-4">
             <div
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">極限戰局記錄 · Major Hands</h2>
-                    <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="subtle" size="xs">
+                    <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="subtle" size="md">
                         {{ majorHandMode === 'win' ? '生涯最高打點' : '最近最大痛銃' }}
                     </UBadge>
                 </div>

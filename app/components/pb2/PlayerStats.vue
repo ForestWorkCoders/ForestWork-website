@@ -320,9 +320,9 @@ const top3Charts = computed(() => {
             <!-- 选手插槽：彻底锁定 min-w-0 确保单行优雅截断 -->
             <template #player-cell="{ row }">
               <div class="flex items-center gap-1.5 w-full min-w-0">
-                <UAvatar :src="row.original.avatar" :alt="row.original.player" size="2xs"
+                <UAvatar :src="row.original.avatar" :alt="row.original.player" size="xs"
                   class="shrink-0 ring-1 ring-gray-200 dark:ring-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold"
-                  :ui="{ fallback: 'font-bold text-[9px] uppercase' }" />
+                  :ui="{ fallback: 'font-bold uppercase' }" />
                 <span class="font-bold text-xs text-gray-900 dark:text-gray-100 truncate block min-w-0">
                   {{ row.original.player }}
                 </span>
