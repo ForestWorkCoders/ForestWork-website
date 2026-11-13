@@ -43,7 +43,7 @@ defineProps({
       <div class="bg-gray-50 dark:bg-elevated p-2 text-center border-b border-gray-200 dark:border-default transition-colors">
         <span class="font-bold text-sm text-gray-900 dark:text-white">DESCRIPTION · 遊戲簡介</span>
       </div>
-      <div class="p-4 text-xs text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed transition-colors">
+      <div class="p-4 text-sm text-gray-600 dark:text-gray-300 space-y-4 leading-relaxed transition-colors">
         <p v-for="(paragraph, index) in description" :key="index">
           {{ paragraph }}
         </p>
@@ -52,7 +52,7 @@ defineProps({
 
     <div v-if="links.length > 0" class="bg-white dark:bg-default border border-gray-200 dark:border-default rounded-lg overflow-hidden transition-colors duration-200 shadow-sm dark:shadow-none">
       <div class="bg-gray-50 dark:bg-elevated p-2 text-center border-b border-gray-200 dark:border-default transition-colors">
-        <span class="font-bold text-sm text-gray-900 dark:text-white">LINKS · 鏈接</span>
+        <span class="font-bold text-sm text-gray-900 dark:text-white">LINKS · 連結</span>
       </div>
       <div class="p-4 flex gap-2 justify-center">
         <UButton 
