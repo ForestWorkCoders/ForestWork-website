@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
                 <section>
                     <div
                         class="w-[90%] max-w-xl mx-auto bg-amber-300 border-4 border-black shadow-[6px_6px_0px_0px_#000] p-6 sm:p-8 rounded-xl">
-                        <h2 class="text-2xl sm:text-4xl font-extrabold text-black mb-4 uppercase tracking-wider">
+                        <h2 class="text-2xl sm:text-4xl font-extrabold text-black mb-6 sm:mb-9 uppercase tracking-wider">
                             {{ sessionData.title }}
                         </h2>
                         <div class="bg-white border-2 border-black p-2 mb-2 font-bold text-black text-sm sm:text-lg">
@@ -324,7 +324,7 @@ onBeforeUnmount(() => {
                         <div class="flex flex-col items-center justify-center h-full px-2">
                             <div
                                 class="bg-amber-300 border-4 border-black shadow-[6px_6px_0px_0px_#000] p-3 sm:p-4 rounded-xl max-w-2xl w-[92%] mx-auto">
-                                <h2 class="text-xl sm:text-2xl font-extrabold text-black mb-3">完整動畫</h2>
+                                <h2 class="text-xl sm:text-2xl font-extrabold text-black mb-5 sm:mb-6">完整動畫</h2>
                                 <img :src="`${sessionData.baseUrl}/${chain.id}/album.gif`"
                                     class="w-full border-2 border-black" alt="Full Album">
                             </div>

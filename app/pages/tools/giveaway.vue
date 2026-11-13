@@ -207,11 +207,11 @@ const commitAndRemoveWinner = () => {
 
 <template>
     <div class="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        <div class="text-center space-y-2">
+        <div class="text-center">
             <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
                 林間幸運轉盤 · Multi-Draw Giveaway
             </h1>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-gray-500 mt-8">
                 第一步拉取名單固定獎池，第二步可連續抽獎並隨時移出中獎者
             </p>
         </div>

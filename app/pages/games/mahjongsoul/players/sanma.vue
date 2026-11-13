@@ -477,7 +477,7 @@ const dealInTargetOption = computed(() => {
                             🀄 我的主頁 (You)
                         </UBadge>
                     </div>
-                    <p class="text-sm text-gray-500 mt-1">Sanma Player Dashboard & Career Highlights</p>
+                    <p class="text-sm text-gray-500 mt-6">Sanma Player Dashboard & Career Highlights</p>
                 </div>
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
@@ -636,7 +636,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3 mb-2">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">累計順位戰績 · Rank Distribution</h2>
-                        <p class="text-xs text-gray-500">所選區間內一位、二位、三位分佈佔比</p>
+                        <p class="text-xs text-gray-500 mt-4.5">所選區間內一位、二位、三位分佈佔比</p>
                     </div>
                 </div>
 
@@ -656,7 +656,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3 mb-2">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">四維選手畫像 · Performance Radar</h2>
-                        <p class="text-xs text-gray-500">攻 / 速 / 防 (滾動近100局) · 運 (近20局)</p>
+                        <p class="text-xs text-gray-500 mt-4.5">攻 / 速 / 防 (滾動近100局) · 運 (近20局)</p>
                     </div>
                 </div>
 
@@ -677,7 +677,7 @@ const dealInTargetOption = computed(() => {
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">和銃分佈體系 · Win & Deal-in Patterns</h2>
-                    <p class="text-xs text-gray-500">和牌時狀態 · 放銃時自身姿態 · 放銃至對手姿態</p>
+                    <p class="text-xs text-gray-500 mt-4.5">和牌時狀態 · 放銃時自身姿態 · 放銃至對手姿態</p>
                 </div>
             </div>
 
@@ -720,7 +720,7 @@ const dealInTargetOption = computed(() => {
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">近期競技走勢 · Recent Form</h2>
                     <UBadge color="primary" variant="subtle" size="md">近 30 戰 (Recent 30 Matches)</UBadge>
                 </div>
@@ -743,7 +743,7 @@ const dealInTargetOption = computed(() => {
         <div v-if="selectedPlayerId"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">最常同桌宿敵 · Frequent Opponents</h2>
                     <UBadge color="primary" variant="subtle" size="md">Top 12 遭遇記錄</UBadge>
                 </div>
@@ -783,7 +783,7 @@ const dealInTargetOption = computed(() => {
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm space-y-4">
             <div
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">極限戰局記錄 · Major Hands</h2>
                     <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="subtle" size="md">
                         {{ majorHandMode === 'win' ? '生涯最高打點' : '最近最大痛銃' }}

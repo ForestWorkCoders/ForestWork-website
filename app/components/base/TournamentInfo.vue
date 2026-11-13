@@ -18,6 +18,16 @@ const md = new MarkdownIt({
   typographer: true
 })
 
+// The page already has its own <h1> (the tournament title), so every
+// Markdown heading renders one level lower: # → h2, ## → h3, ### → h4.
+md.core.ruler.push('shift_headings', (state) => {
+  for (const t of state.tokens) {
+    if (t.type === 'heading_open' || t.type === 'heading_close') {
+      t.tag = `h${Math.min(Number(t.tag[1]) + 1, 6)}`
+    }
+  }
+})
+
 // 2. 從 Supabase Bucket 動態抓取 Markdown 檔案內容
 const { data: markdownRaw, pending, error } = await useAsyncData(
   `fetch-md-${props.contentUrl}`,
@@ -77,20 +87,22 @@ const parsedHtml = computed(() => {
   所有的基础颜色由父组件的 div (text-gray-900 / dark:text-gray-100) 决定。
 */
 
-.markdown-body :deep(h1) {
-  @apply text-3xl font-bold mb-6 mt-8;
+/* Markdown # / ## / ### render as h2 / h3 / h4 (see shift_headings).
+   Gap below each heading ≥ its font size (brand spacing rule). */
+.markdown-body :deep(h2) {
+  @apply text-3xl font-bold mb-8 mt-8;
   /* 自动继承 100% 不透明的父元素文字颜色 */
 }
 
-.markdown-body :deep(h2) {
-  @apply text-2xl font-bold mb-4 mt-8 border-b pb-2;
+.markdown-body :deep(h3) {
+  @apply text-2xl font-bold mb-6 mt-8 border-b pb-2;
   /* 用 currentColor 让边框颜色自动跟随文字颜色，只保留 20% 透明度 */
   border-color: currentColor;
   opacity: 0.9;
 }
 
-.markdown-body :deep(h3) {
-  @apply text-xl font-semibold mb-3 mt-6;
+.markdown-body :deep(h4) {
+  @apply text-xl font-semibold mb-5 mt-6;
 }
 
 .markdown-body :deep(p) {
