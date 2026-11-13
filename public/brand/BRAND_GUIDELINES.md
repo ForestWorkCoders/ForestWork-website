@@ -17,7 +17,7 @@ The same rules as the brand centre at https://forestwork.vercel.app/brand.
 - Light mode: page `#F7F9FC`, cards `#FFFFFF`, borders `slate-200`.
 - Dark mode: page `#0D1117`, cards `#161B22`, borders `#30363D`.
 - Neutral greys use a cool scale (Tailwind `slate`) to match Ink Black.
-- Status colours (win / loss, error, rank changes) may use red, blue and purple. They are not brand colours.
+- Status colours are not brand colours. Gains (rank up, positive points, promoted) use Nuxt UI `success` (green); losses, negative points and errors use `error` (red); other states may use blue and purple. Final-leaderboard medals keep gold, silver and bronze.
 - Game pages may keep their own accent colour, but use the brand typefaces, sizes, logo rules, language and dark background.
 
 ## 2. Typeface (字型)
