@@ -308,7 +308,7 @@ const RADAR_BENCHMARKS = {
     // 4000 點 (滿貫以下常規便宜手) 為 0 分，12000 點 (跳滿/倍滿平均) 為 100 分
     atk: { min: 4000, max: 12000, invert: false },
 
-    // 速 (SPD): 平均和了巡數 (巡) - 反向指標 (越小越強)
+    // 速 (SPD): 平均和牌巡數 (巡) - 反向指標 (越小越強)
     // 14 巡 (摸完牌山前夕) 為 0 分，7 巡 (極限速攻) 為 100 分
     spd: { min: 7, max: 14, invert: true },
 
@@ -579,7 +579,7 @@ const dealInTargetOption = computed(() => {
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-gray-800/40 p-3 rounded-lg border border-gray-100 dark:border-gray-800/80">
-                    <div class="text-xs text-gray-400">默胡率</div>
+                    <div class="text-xs text-gray-400">默聽率</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.damaRate }}%</div>
                 </div>
 
@@ -590,7 +590,7 @@ const dealInTargetOption = computed(() => {
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-gray-800/40 p-3 rounded-lg border border-gray-100 dark:border-gray-800/80">
-                    <div class="text-xs text-gray-400">流聽率</div>
+                    <div class="text-xs text-gray-400">流局聽牌率</div>
                     <div class="text-lg font-bold text-purple-400 mt-1">{{ basic.drawTenpaiRate }}%</div>
                 </div>
                 <div
@@ -611,7 +611,7 @@ const dealInTargetOption = computed(() => {
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-gray-800/40 p-3 rounded-lg border border-gray-100 dark:border-gray-800/80">
-                    <div class="text-xs text-gray-400">和了巡數</div>
+                    <div class="text-xs text-gray-400">平均和牌巡數</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.avgWinTurn }} 巡</div>
                 </div>
 
