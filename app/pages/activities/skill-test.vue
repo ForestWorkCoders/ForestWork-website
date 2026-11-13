@@ -661,19 +661,19 @@ onUnmounted(() => {
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
             <span class="text-amber-400 font-bold tracking-wider">FW_OS // STANDBY_MODE</span>
           </div>
-          <span class="text-[10px] text-zinc-500">RES_LIMIT: CRITICAL</span>
+          <span class="text-xs text-zinc-500">RES_LIMIT: CRITICAL</span>
         </div>
         <div class="my-auto py-2">
           <div class="text-xs text-emerald-400 font-bold tracking-widest uppercase mb-1">
             &gt; SYSTEM_HALT: VIEWPORT_GEOMETRY_RESTRICTED
           </div>
-          <p class="text-[11px] text-zinc-300 leading-relaxed max-w-xl">
+          <p class="text-sm text-zinc-300 leading-relaxed max-w-xl">
             目前視窗高度受限，無法展開 10 槽位選手評定矩陣。<br>
             請點擊下方控制列的 <span class="text-white font-bold bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700">⤢ 展開 /
               全螢幕</span> 按鈕以解除戰術限制。
           </p>
         </div>
-        <div class="text-[10px] text-zinc-600 flex justify-between items-center pt-2 border-t border-zinc-900">
+        <div class="text-xs text-zinc-600 flex justify-between items-center pt-2 border-t border-zinc-900">
           <span class="animate-pulse">&gt; WAITING_FOR_DISPLAY_EXPANSION_</span>
           <span>DISCORD_EMBED_SEC_01</span>
         </div>
@@ -694,7 +694,7 @@ onUnmounted(() => {
                 class="text-xs font-extrabold tracking-widest uppercase text-zinc-200 group-hover:text-white font-mono whitespace-nowrap">
                 FORESTWORK.OS
               </span>
-              <span class="text-[10px] text-zinc-500 group-hover:text-emerald-400 font-mono">↗</span>
+              <span class="text-xs text-zinc-500 group-hover:text-emerald-400 font-mono">↗</span>
             </a>
           </div>
 
@@ -704,14 +704,14 @@ onUnmounted(() => {
               CHOOSE YOUR TRIAL
             </h1>
             <p
-              class="text-[8px] sm:text-[9px] tracking-widest text-emerald-400 font-mono whitespace-nowrap hidden sm:block">
+              class="text-xs tracking-widest text-emerald-400 font-mono whitespace-nowrap hidden sm:block">
               選手實力評定沙盒 // 10 SLOTS MATRIX
             </p>
           </div>
 
-          <div class="flex items-center gap-2 font-mono text-xs whitespace-nowrap">
+          <div class="hidden sm:flex items-center gap-2 font-mono text-xs whitespace-nowrap">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span class="text-[10px] text-emerald-400 tracking-wider">
+            <span class="text-xs text-emerald-400 tracking-wider">
               OP: {{ currentOperatorDisplay }}
             </span>
           </div>
@@ -730,18 +730,18 @@ onUnmounted(() => {
               <div
                 class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-zinc-600 group-hover:border-emerald-400 transition-colors" />
 
-              <div class="shrink-0 flex justify-between items-start font-mono z-10 leading-tight">
-                <span class="text-[10px] sm:text-[11px] font-extrabold transition-colors"
+              <div class="shrink-0 flex justify-between items-start gap-2 font-mono z-10 leading-tight">
+                <span class="shrink-0 text-xs font-extrabold transition-colors"
                   :style="{ color: slot.status === 'ready' ? slot.accentColor : '#71717a' }">
                   // {{ slot.index }}
                 </span>
-                <div class="text-right">
+                <div class="min-w-0 text-right">
                   <div
-                    class="text-[10px] sm:text-[11px] font-bold tracking-wider text-zinc-200 group-hover:text-white truncate max-w-[80px] sm:max-w-none">
+                    class="text-xs font-bold tracking-wider text-zinc-200 group-hover:text-white truncate">
                     {{ slot.title }}
                   </div>
                   <div
-                    class="text-[7px] sm:text-[8px] text-zinc-500 tracking-tight uppercase truncate max-w-[70px] sm:max-w-none">
+                    class="hidden sm:block text-xs text-zinc-500 tracking-tight uppercase truncate">
                     {{ slot.category }}
                   </div>
                 </div>
@@ -754,7 +754,7 @@ onUnmounted(() => {
                   {{ slot.status === 'ready' ? '⚡' : '🔒' }}
                 </div>
                 <span v-if="slot.status === 'ready'"
-                  class="mt-0.5 px-1.5 py-0.2 text-[7px] sm:text-[8px] font-mono tracking-widest uppercase rounded border font-semibold"
+                  class="mt-0.5 px-1.5 py-0.2 text-xs font-mono tracking-widest uppercase rounded border font-semibold"
                   :style="{
                     backgroundColor: `${slot.accentColor}15`,
                     color: slot.accentColor,
@@ -767,9 +767,9 @@ onUnmounted(() => {
               <div
                 class="shrink-0 pt-1 border-t border-zinc-800/80 font-mono z-10 flex items-center justify-between leading-tight">
                 <div>
-                  <div class="text-[7px] sm:text-[8px] tracking-widest text-zinc-500 uppercase">PB</div>
+                  <div class="text-xs tracking-widest text-zinc-500 uppercase">PB</div>
                   <div
-                    class="text-[11px] sm:text-xs font-extrabold tracking-tight text-zinc-200 group-hover:text-white transition-colors">
+                    class="text-xs font-extrabold tracking-tight text-zinc-200 group-hover:text-white transition-colors">
                     {{ slot.bestScore }}
                   </div>
                 </div>
@@ -818,27 +818,27 @@ onUnmounted(() => {
           <h1 class="text-sm sm:text-lg font-extrabold tracking-[0.2em] text-white uppercase">
             {{ currentSlot.title }}
           </h1>
-          <p class="text-[9px] tracking-widest text-emerald-400 uppercase hidden sm:block">
+          <p class="text-xs tracking-widest text-emerald-400 uppercase hidden sm:block">
             {{ currentSlot.category }}
           </p>
         </div>
 
         <div class="flex items-center gap-2 text-xs">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span class="text-[10px] text-zinc-400 tracking-wider">ARMED</span>
+          <span class="text-xs text-zinc-400 tracking-wider">ARMED</span>
         </div>
       </header>
 
       <!-- 核心 3 列战术立柱容器 (致敬参考图 image_e95da3.jpg) -->
-      <main class="flex-1 min-h-0 w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col justify-center overflow-y-auto">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5 w-full h-full max-h-[460px] min-h-0">
+      <main class="flex-1 min-h-0 w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col sm:justify-center overflow-y-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5 w-full sm:h-full sm:max-h-[460px] sm:min-h-0">
           <div v-for="(step, idx) in currentBriefing.columns" :key="idx"
             class="relative flex flex-col justify-between bg-[#0e1117] border border-zinc-800 rounded-sm overflow-hidden shadow-2xl group hover:border-zinc-700 transition-colors">
             <!-- 工业战术卡头 (实色横条，致敬原图顶部米黄色块) -->
             <div
               class="shrink-0 bg-[#d4af37] text-black px-3.5 py-2 flex items-center justify-between font-extrabold tracking-widest text-xs uppercase">
               <span>{{ step.title }}</span>
-              <span class="text-[10px] opacity-75 font-mono">{{ step.tag }}</span>
+              <span class="text-xs opacity-75 font-mono">{{ step.tag }}</span>
             </div>
 
             <!-- 卡片中央战术视觉展示区 -->
@@ -862,7 +862,7 @@ onUnmounted(() => {
 
             <!-- 卡片底栏：详细行动准则描述 -->
             <div
-              class="shrink-0 p-3.5 border-t border-zinc-800/80 bg-[#0e1117] text-[11px] leading-relaxed text-zinc-400">
+              class="shrink-0 p-3.5 border-t border-zinc-800/80 bg-[#0e1117] text-sm leading-relaxed text-zinc-400">
               {{ step.description }}
             </div>
           </div>
@@ -932,11 +932,11 @@ onUnmounted(() => {
               <div class="text-5xl sm:text-7xl font-extrabold tracking-tight text-[#d4af37] drop-shadow-md">
                 {{ score.toLocaleString() }}
               </div>
-              <div class="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
+              <div class="text-xs font-bold tracking-[0.2em] text-zinc-400 uppercase">
                 COMBAT SCORE
               </div>
               <div class="flex items-center justify-center gap-2 pt-1 font-mono">
-                <span class="px-2 py-0.5 text-[10px] font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm uppercase">
+                <span class="px-2 py-0.5 text-xs font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm uppercase">
                   {{ playerRankBadge }}
                 </span>
                 <span class="text-xs font-bold tracking-widest text-[#ef4444]">
@@ -970,7 +970,7 @@ onUnmounted(() => {
               </div>
 
               <!-- Tab 内容区 A：对局 4 维微观数据立柱 (致敬原图 ACC / AVG TTK / BEST TTK / WHIFFS) -->
-              <div v-if="settlementTab === 'summary'" class="p-6 grid grid-cols-4 gap-4 text-center bg-[#090b0e]">
+              <div v-if="settlementTab === 'summary'" class="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center bg-[#090b0e]">
                 <div v-for="(metric, idx) in activeSummary.metrics" :key="idx"
                   class="flex flex-col items-center justify-between space-y-1.5">
                   <!-- 指标主数值 -->
@@ -978,13 +978,13 @@ onUnmounted(() => {
                     {{ metric.value }}
                   </div>
                   <!-- 指标标签 -->
-                  <div class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
+                  <div class="text-xs font-bold tracking-wider text-zinc-400 uppercase">
                     {{ metric.label }}
                   </div>
                   <!-- 金色倍率胶囊 (x2.00 等) -->
                   <div class="h-5 flex items-center justify-center">
                     <span v-if="metric.badge"
-                      class="px-2 py-0.5 text-[10px] font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm">
+                      class="px-2 py-0.5 text-xs font-extrabold bg-[#d4af37] text-black rounded-sm shadow-sm">
                       {{ metric.badge }}
                     </span>
                   </div>
@@ -994,11 +994,11 @@ onUnmounted(() => {
               <!-- Tab 内容区 B：全球天梯排行榜 (消灭外部独立弹窗，原生就地查阅) -->
               <div v-else class="p-4 bg-[#090b0e] space-y-1.5 max-h-[160px] overflow-y-auto">
                 <div
-                  class="grid grid-cols-12 text-[10px] text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
+                  class="grid grid-cols-12 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
                   <span class="col-span-2">RANK</span>
-                  <span class="col-span-5">OPERATOR</span>
+                  <span class="col-span-4">OPERATOR</span>
                   <span class="col-span-3 text-right">SCORE</span>
-                  <span class="col-span-2 text-right">TIME</span>
+                  <span class="col-span-3 text-right">TIME</span>
                 </div>
 
                 <!-- 真实列表渲染 -->
@@ -1009,12 +1009,12 @@ onUnmounted(() => {
                     : 'text-zinc-300'
                 ]">
                   <span class="col-span-2 font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
-                  <span class="col-span-5 truncate flex items-center gap-1.5">
+                  <span class="col-span-4 truncate flex items-center gap-1.5">
                     <img :src="entry.avatar_url" class="w-3.5 h-3.5 rounded-full" alt="" />
                     <span>{{ entry.operator_name }}</span>
                   </span>
                   <span class="col-span-3 text-right font-extrabold text-zinc-100">{{ entry.score.toLocaleString() }}</span>
-                  <span class="col-span-2 text-right text-[10px] text-zinc-500">
+                  <span class="col-span-3 text-right text-xs text-zinc-500">
                     {{ new Date(entry.created_at).toLocaleDateString() }}
                   </span>
                 </div>
@@ -1069,7 +1069,7 @@ onUnmounted(() => {
             <div class="text-xs font-bold tracking-widest text-emerald-400 uppercase">
               // {{ scoreboardSlot.title }} SCOREBOARD
             </div>
-            <div class="text-[10px] text-zinc-500 uppercase tracking-wider">
+            <div class="text-xs text-zinc-500 uppercase tracking-wider">
               {{ scoreboardSlot.category }} · TOP OPERATORS
             </div>
           </div>
@@ -1081,11 +1081,11 @@ onUnmounted(() => {
 
         <div class="space-y-1.5">
           <div
-            class="grid grid-cols-12 text-[10px] text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
+            class="grid grid-cols-12 text-xs text-zinc-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-zinc-900">
             <span class="col-span-2">RANK</span>
-            <span class="col-span-5">OPERATOR</span>
+            <span class="col-span-4">OPERATOR</span>
             <span class="col-span-3 text-right">SCORE</span>
-            <span class="col-span-2 text-right">DATE</span>
+            <span class="col-span-3 text-right">DATE</span>
           </div>
 
           <!-- ★ 核心修复：彻底消灭内联假数组，绑定真实的 liveLeaderboard！ -->
@@ -1096,13 +1096,13 @@ onUnmounted(() => {
               : 'hover:bg-zinc-900/60 text-zinc-300'
           ]">
             <span class="col-span-2 font-extrabold italic text-zinc-500">#{{ entry.global_rank }}</span>
-            <span class="col-span-5 truncate flex items-center gap-1.5">
+            <span class="col-span-4 truncate flex items-center gap-1.5">
               <img :src="entry.avatar_url" class="w-3.5 h-3.5 rounded-full" alt="" />
               <span>{{ entry.operator_name }}</span>
             </span>
             <span class="col-span-3 text-right font-extrabold font-mono text-zinc-100">{{ entry.score.toLocaleString()
             }}</span>
-            <span class="col-span-2 text-right text-[10px] text-zinc-500">
+            <span class="col-span-3 text-right text-xs text-zinc-500">
               {{ new Date(entry.created_at).toLocaleDateString() }}
             </span>
           </div>
@@ -1113,7 +1113,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-500">
+        <div class="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-xs text-zinc-500">
           <span>STATUS: {{ liveLeaderboard.length ? 'LIVE // SUPABASE' : 'STANDBY // NO_DATA' }}</span>
           <span class="text-emerald-500/80">SUPABASE_SYNC: READY</span>
         </div>
