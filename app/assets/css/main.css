@@ -28,7 +28,8 @@
 /* Which shade is "primary" / "secondary" in each mode. Nuxt UI defaults to 500 / 400;
    these rules sit outside any layer, so they win over its @layer theme.
    Light: the exact brand colours (#4C7766 with white text, 5.1:1; #D97706).
-   Dark: lighter shades that read on Ink Black (#8BCBB2 10.2:1, #FBBF24 11.3:1). */
+   Dark: primary uses a lighter shade that reads on Ink Black (#8BCBB2 10.2:1);
+   secondary stays the brand's own Amber Gold #D97706 (5.9:1 on #0D1117, 5.5:1 on #161B22). */
 :root,
 .light {
   --ui-primary: var(--ui-color-primary-700);
@@ -37,7 +38,7 @@
 
 .dark {
   --ui-primary: var(--ui-color-primary-400);
-  --ui-secondary: var(--ui-color-secondary-400);
+  --ui-secondary: var(--ui-color-secondary-600);
 
   /* Dark surfaces (see /brand): Ink Black page, #161B22 cards, #30363D borders.
      Nuxt UI's defaults are slate-900 / slate-800, which read navy next to Ink Black. */

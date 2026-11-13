@@ -121,7 +121,7 @@ const spacingRules = [
             <header
                 class="border-b border-slate-200 dark:border-[#30363D] pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#D97706]">
+                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">
                         BRAND GUIDANCE & ASSETS
                     </span>
                     <h1 class="text-4xl font-extrabold tracking-tight mt-1 text-slate-900 dark:text-white">
@@ -143,7 +143,7 @@ const spacingRules = [
             <!-- 1. Colour -->
             <section class="space-y-8">
                 <div>
-                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#D97706]">PALETTE</span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">PALETTE</span>
                     <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">主色調與中性色</h2>
                 </div>
 
@@ -211,7 +211,7 @@ const spacingRules = [
             <!-- 2. Logo -->
             <section class="space-y-10">
                 <div>
-                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#D97706]">PRIMARY
+                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">PRIMARY
                         LOCKUP</span>
                     <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">Logo 規範與應用場景</h2>
                 </div>
@@ -338,7 +338,7 @@ const spacingRules = [
                 </div>
 
                 <div
-                    class="bg-[#D97706]/10 border-l-4 border-[#D97706] p-4 rounded-r-xl text-sm text-slate-800 dark:text-slate-200">
+                    class="bg-secondary/10 border-l-4 border-secondary p-4 rounded-r-xl text-sm text-slate-800 dark:text-slate-200">
                     <span class="font-bold">僅限使用品牌庫中核准的標誌檔案。</span> 切勿重繪、改色、拉伸、旋轉、加邊框、添加陰影、更改 viewBox，或將標誌放置於低對比度的複雜背景圖上。
                 </div>
             </section>
@@ -348,7 +348,7 @@ const spacingRules = [
             <!-- 3. Typeface, size and spacing -->
             <section class="space-y-8">
                 <div>
-                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#D97706]">TYPEFACE</span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">TYPEFACE</span>
                     <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">Open Sans 與 JetBrains Mono</h2>
                 </div>
                 <div class="space-y-3 text-sm text-slate-600 dark:text-slate-400 max-w-prose text-justify">
@@ -359,7 +359,7 @@ const spacingRules = [
                 <!-- Type specimen (shows several sizes on purpose) -->
                 <div class="bg-[#0D1117] text-white p-8 sm:p-12 rounded-3xl space-y-16 border border-[#30363D] shadow-2xl">
                     <div>
-                        <div class="text-xs font-mono text-[#D97706] font-bold tracking-widest uppercase">XL 標題 (XL HEADLINE)</div>
+                        <div class="text-xs font-mono text-secondary font-bold tracking-widest uppercase">XL 標題 (XL HEADLINE)</div>
                         <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight mt-2">
                             林間小鎮電競賽事平台
                         </h1>
@@ -409,7 +409,7 @@ const spacingRules = [
                 </div>
 
                 <div
-                    class="bg-[#D97706]/10 border-l-4 border-[#D97706] p-4 rounded-r-xl text-sm text-slate-800 dark:text-slate-200">
+                    class="bg-secondary/10 border-l-4 border-secondary p-4 rounded-r-xl text-sm text-slate-800 dark:text-slate-200">
                     <span class="font-bold">階梯即訊息（Hierarchy is the message）。</span> 同一張卡片或同一區塊最多使用 3 種字級（含標題）；需要更多時，代表內容結構需要重組。唯一例外是字級樣本（例如上方的標題示範），它的用途就是展示字級階梯。
                 </div>
             </section>
@@ -419,7 +419,7 @@ const spacingRules = [
             <!-- 4. Language -->
             <section class="space-y-8">
                 <div>
-                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#D97706]">LANGUAGE</span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-secondary">LANGUAGE</span>
                     <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">用語規範</h2>
                 </div>
                 <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300 max-w-prose text-justify list-disc pl-5">
