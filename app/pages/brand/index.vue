@@ -410,7 +410,7 @@ const spacingRules = [
 
                 <div
                     class="bg-[#D97706]/10 border-l-4 border-[#D97706] p-4 rounded-r-xl text-sm text-slate-800 dark:text-slate-200">
-                    <span class="font-bold">階梯即訊息（Hierarchy is the message）。</span> 同一張卡片或同一區塊最多使用 3 種字級（含標題）；需要更多時，代表內容結構需要重組。
+                    <span class="font-bold">階梯即訊息（Hierarchy is the message）。</span> 同一張卡片或同一區塊最多使用 3 種字級（含標題）；需要更多時，代表內容結構需要重組。唯一例外是字級樣本（例如上方的標題示範），它的用途就是展示字級階梯。
                 </div>
             </section>
 

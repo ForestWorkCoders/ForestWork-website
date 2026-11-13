@@ -97,7 +97,7 @@ useSeoMeta({
           <div class="text-sm font-extrabold text-gray-700 flex justify-between items-center mt-6 pt-4 border-t-2 border-black/10">
             <span class="flex items-center gap-1.5">
               故事鏈數量: 
-              <span class="text-black font-extrabold text-base">{{ session.chainsCount }}</span> 
+              <span class="text-black font-extrabold">{{ session.chainsCount }}</span> 
               條
             </span>
             <span class="bg-black text-white px-3.5 py-1.5 rounded-lg text-xs font-extrabold group-hover:bg-rose-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]">

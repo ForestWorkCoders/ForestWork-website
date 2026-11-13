@@ -31,7 +31,7 @@ The same rules as the brand centre at https://forestwork.vercel.app/brand.
 - Body text and paragraphs: **14px minimum** (`text-sm`).
 - Labels, table cells, metadata and badges: **12px** (`text-xs`) allowed.
 - **Nothing below 12px** on screen. Print: 10pt minimum.
-- **At most 3 font sizes in one card or section**, headings included.
+- **At most 3 font sizes in one card or section**, headings included. Exception: a type specimen, whose job is to show the scale.
 
 ## 4. Spacing (間距)
 
