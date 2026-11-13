@@ -185,7 +185,7 @@ const top3Charts = computed(() => {
           ],
           radius: '65%',
           splitNumber: 5,
-          axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 11, fontWeight: 'bold' },
+          axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 12, fontWeight: 'bold' },
           splitLine: {
             lineStyle: {
               color: [

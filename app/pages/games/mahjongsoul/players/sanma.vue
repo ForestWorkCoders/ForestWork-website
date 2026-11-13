@@ -254,7 +254,7 @@ const lineOption = computed(() => {
             type: 'category',
             data: Array.from({ length: ranks.length }, (_, i) => i + 1),
             axisLine: { lineStyle: { color: '#374151' } },
-            axisLabel: { color: '#9ca3af', fontSize: 11 }
+            axisLabel: { color: '#9ca3af', fontSize: 12 }
         },
         yAxis: {
             type: 'value',
@@ -265,7 +265,7 @@ const lineOption = computed(() => {
             axisLabel: {
                 formatter: (v: number) => v === 1 ? '1位' : v === 2 ? '2位' : '3位',
                 color: '#9ca3af',
-                fontSize: 11
+                fontSize: 12
             },
             splitLine: { lineStyle: { color: '#1f2937' } }
         },
@@ -376,7 +376,7 @@ const radarOption = computed(() => {
             ],
             radius: '65%',
             splitNumber: 4,
-            axisName: { color: '#9ca3af', fontSize: 11, fontWeight: 'bold' },
+            axisName: { color: '#9ca3af', fontSize: 12, fontWeight: 'bold' },
             splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } },
             axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
         },
@@ -400,7 +400,7 @@ const winStyleOption = computed(() => {
     const total = ws.riichi + ws.dama + ws.fulo
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 11 } },
+        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
         series: [{
             type: 'pie',
             radius: ['45%', '72%'],
@@ -424,7 +424,7 @@ const dealInStyleOption = computed(() => {
     const total = ds.riichi + ds.fulo + ds.menzen
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 11 } },
+        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
         series: [{
             type: 'pie',
             radius: ['45%', '72%'],
@@ -448,7 +448,7 @@ const dealInTargetOption = computed(() => {
     const total = ts.riichi + ts.fulo + ts.dama
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 11 } },
+        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
         series: [{
             type: 'pie',
             radius: ['45%', '72%'],
