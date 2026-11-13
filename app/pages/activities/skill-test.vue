@@ -157,7 +157,7 @@ async function fetchLeaderboardAndPbs(targetModuleId: number) {
     if (res.success) {
       liveLeaderboard.value = res.leaderboard
 
-      console.log(`[PB Hydration] 选手 ${currentDiscordId.value} 的 PB 字典:`, res.personalBests)
+      console.log(`[PB Hydration] 選手 ${currentDiscordId.value} 的 PB 字典:`, res.personalBests)
 
       // 动态水合大厅 10 个槽位的真实 PB 分数
       for (const slot of TRIAL_SLOTS.value) {
@@ -167,7 +167,7 @@ async function fetchLeaderboardAndPbs(targetModuleId: number) {
       }
     }
   } catch (err) {
-    console.warn('[Leaderboard] 真实数据拉取降级:', err)
+    console.warn('[Leaderboard] 真實數據拉取降級:', err)
   } finally {
     isLeaderboardLoading.value = false
   }
@@ -320,7 +320,7 @@ const MODULE_BRIEFINGS: Record<number, ModuleBriefing> = {
     ]
   },
   5: {
-    overview: '融合紅綠燈、F1雙排起步燈、狙擊架點等 5 大賽事生理反應時基准。',
+    overview: '融合紅綠燈、F1雙排起步燈、狙擊架點等 5 大賽事生理反應時基準。',
     columns: [
       { tag: 'PHASE 01', title: 'READ SIGNALS', icon: '🚦', headline: '經歷 5 大階段', description: '隨機打亂並經歷 5 種截然不同的視覺突變（起步燈、架點橫穿、視野色變）。' },
       { tag: 'PHASE 02', title: 'REFLEX TRIGGER', icon: '⚡', headline: '信號觸發瞬間點擊', description: '只有在信號給出（綠燈/全熄滅/過線）瞬間按下左鍵，嚴禁任何提前搶跑！' },
@@ -515,7 +515,7 @@ function tick(now: number) {
         // 提交成功后重新拉取权威天梯并校准全槽位 PB
         fetchLeaderboardAndPbs(currentSlot.value.moduleId!)
       }).catch((err) => {
-        console.error('[Submit] 成绩写入失败:', err)
+        console.error('[Submit] 成績寫入失敗:', err)
       })
     }
     return

@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
             }
         }
     } catch (e) {
-        console.error('[Sitemap] 数据库拉取失败，降级使用纯静态路由:', e)
+        console.error('[Sitemap] 資料庫拉取失敗，降級使用純靜態路由:', e)
     }
 
     return urls
