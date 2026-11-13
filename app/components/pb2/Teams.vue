@@ -116,13 +116,13 @@ const roleColor = {
             >
               <span 
                 v-if="player.status !== 'active'" 
-                class="w-16 text-center text-xs font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                class="w-24 shrink-0 text-center text-xs font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
               >
                 {{ player.status }}
               </span>
               <span 
                 v-else
-                class="w-16 text-center text-xs font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm"
+                class="w-24 shrink-0 text-center text-xs font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm"
                 :class="roleColor[player.role] || roleColor.substitute"
               >
                 {{ roleDisplay[player.role] || player.role }}
