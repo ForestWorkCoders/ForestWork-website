@@ -30,7 +30,7 @@
         light="/brand/svg/text-en-white.svg"
         dark="/brand/svg/text-en-white.svg"
         alt="ForestWork"
-        class="h-5.5 sm:h-7 md:h-8.5 w-auto object-contain opacity-90"
+        class="h-2.5 sm:h-3 md:h-3.5 w-auto object-contain opacity-90"
       />
     </div>
 

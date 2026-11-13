@@ -51,13 +51,14 @@ Files are named by the colour of the artwork, not the background.
 
 | Use | Minimum height |
 |---|---|
-| Header | Emblem 28px (`h-7`), logotype 14–16px (`h-3.5`–`h-4`) |
+| Header | Emblem 20px (`h-5`), the same height as the header icons; logotype 14px (`h-3.5`) |
 | Horizontal lockup 橫向組合 | 45px |
-| Vertical lockup 直向組合 | 75px (emblem `h-14`, ZH `h-5`, EN `h-3.5`) |
+| Vertical lockup 直向組合 | 75px. The parts keep the master proportion: ZH ≈ 0.26 × emblem height, EN ≈ 0.3 × ZH height |
 | Emblem alone 純圖案 | 24px |
 
 - Black artwork on light backgrounds (`#FFFFFF`, `#F7F9FC`); white artwork on dark ones (`#0D1117`, `#161B22`, `#231F20`, Forest Emerald, dark photos).
 - Keep clear space of **0.25×** the emblem height on every side.
+- Inside a lockup, the EN logotype keeps the lockup proportion and is never enlarged on its own. The 14px logotype minimum applies to a standalone or header logotype.
 - Don't stretch, recolour, rotate, outline or add shadows; don't change the viewBox; don't place the logo on busy, low-contrast images.
 
 ## 6. Language (語言)
