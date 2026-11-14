@@ -945,9 +945,10 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <!-- 4:3 逻辑等比画布容器 -->
-      <main class="flex-1 min-h-0 w-full flex items-center justify-center p-2 sm:p-4 overflow-hidden relative">
-        <div class="relative h-full max-h-full aspect-[4/3] max-w-full flex items-center justify-center">
+      <!-- 4:3 stage: as wide as the space allows, but no wider than its height allows, so it never stretches -->
+      <main
+        class="flex-1 min-h-0 w-full flex items-center justify-center p-2 sm:p-4 overflow-hidden relative [container-type:size]">
+        <div class="relative w-[min(100cqw,calc(100cqh*4/3))] aspect-[4/3] flex items-center justify-center">
           <canvas ref="canvasRef" width="800" height="600" @mousedown="handlePointerDown" @mousemove="handlePointerMove"
             @mouseleave="handlePointerLeave" @contextmenu.prevent
             class="w-full h-full bg-[#161B22] border border-[#30363D] shadow-2xl cursor-crosshair block" />
