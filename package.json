@@ -20,29 +20,29 @@
   "dependencies": {
     "@discord/embedded-app-sdk": "^2.5.0",
     "@iconify-json/lucide": "^1.2.152",
-    "@iconify-json/simple-icons": "^1.2.90",
-    "@nuxt/ui": "^4.10.0",
-    "@nuxtjs/supabase": "^2.0.9",
+    "@iconify-json/simple-icons": "^1.2.101",
+    "@nuxt/ui": "^4.12.0",
+    "@nuxtjs/supabase": "^2.1.0",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/blob": "^2.8.0",
-    "@vercel/functions": "^3.9.9",
-    "@vercel/speed-insights": "^2.0.0",
+    "@vercel/blob": "^2.8.2",
+    "@vercel/functions": "^3.11.0",
+    "@vercel/speed-insights": "^2.1.0",
     "echarts": "^6.1.0",
     "markdown-it": "^14.3.0",
-    "nuxt": "^4.6.3",
+    "nuxt": "^4.6.4",
     "reveal.js": "^6.0.2",
-    "tailwindcss": "^4.3.2",
-    "vue-echarts": "^8.0.1"
+    "tailwindcss": "^4.3.5",
+    "vue-echarts": "^8.3.2"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.16.0",
+    "@nuxt/eslint": "^1.17.0",
     "@nuxtjs/sitemap": "^9.1.0",
-    "@supabase/supabase-js": "^2.116.0",
-    "@types/node": "^26.5.1",
-    "eslint": "^10.7.0",
+    "@supabase/supabase-js": "^2.119.0",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
     "sharp": "^0.35.5",
     "typescript": "^6.0.3",
-    "vue-tsc": "^3.3.7"
+    "vue-tsc": "^3.3.14"
   },
   "packageManager": "pnpm@11.13.1",
   "engines": {
