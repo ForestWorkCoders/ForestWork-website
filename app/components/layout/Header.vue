@@ -152,6 +152,14 @@ const items = computed<NavigationMenuItem[]>(() => [
           variant="solid" block>
           加入Discord
         </UButton>
+
+        <!-- 未登入：手機選單的 Discord 登入（桌面版按鈕在 lg 以下隱藏） -->
+        <ClientOnly>
+          <UButton v-if="!isPending && !user" color="primary" variant="outline" icon="i-simple-icons-discord"
+            block class="mt-3" @click="login">
+            Discord 登入
+          </UButton>
+        </ClientOnly>
       </div>
     </template>
   </UHeader>
