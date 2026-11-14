@@ -2,7 +2,6 @@
 import {
   STAGE_WIDTH,
   STAGE_HEIGHT,
-  STAGE_CENTER_X,
   type SkillModuleInstance,
   type SkillGameContext,
   type ModuleResultSummary,
@@ -53,7 +52,6 @@ export class Module8Tiles implements SkillModuleInstance {
   private currentStreak = 0
   private maxStreak = 0
 
-  isStarted = false
   private errorLane: number | null = null
   private errorUntil = 0
 
@@ -64,7 +62,6 @@ export class Module8Tiles implements SkillModuleInstance {
     this.currentStreak = 0
     this.maxStreak = 0
 
-    this.isStarted = false
     this.isCompleted = false
     this.errorLane = null
     this.errorUntil = 0
@@ -163,19 +160,6 @@ export class Module8Tiles implements SkillModuleInstance {
       ctx.fillStyle = (i === this.tiles[0]) ? '#38bdf8' : 'rgba(255, 255, 255, 0.25)'
       ctx.fillText(this.LANE_KEYS[i]!, cx, STAGE_HEIGHT - 24)
     }
-
-    // 8. 冷启动前置提示
-    if (!this.isStarted) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
-      ctx.fillRect(this.STAGE_X, 0, this.STAGE_W, STAGE_HEIGHT)
-
-      ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 22px ui-monospace, monospace'
-      ctx.fillText('按底端藍色鍵啟動', STAGE_CENTER_X, STAGE_HEIGHT / 2 - 14)
-      ctx.font = 'bold 15px ui-monospace, monospace'
-      ctx.fillStyle = '#93c5fd'
-      ctx.fillText('[ D ]  [ F ]  [ J ]  [ K ]', STAGE_CENTER_X, STAGE_HEIGHT / 2 + 22)
-    }
   }
 
   onKeyDown(code: string, e: KeyboardEvent): void {
@@ -186,7 +170,6 @@ export class Module8Tiles implements SkillModuleInstance {
     e.preventDefault()
 
     const now = performance.now()
-    this.isStarted = true
 
     // 判定是否命中当前底部目标 tiles[0]
     if (lane === this.tiles[0]) {
@@ -233,7 +216,6 @@ export class Module8Tiles implements SkillModuleInstance {
     this.mistakes = 0
     this.currentStreak = 0
     this.maxStreak = 0
-    this.isStarted = false
     this.isCompleted = false
   }
 
