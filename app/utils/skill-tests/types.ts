@@ -78,9 +78,8 @@ export interface SkillModuleInstance {
   readonly title: string
   readonly durationMs?: number
   isCompleted?: boolean
-  // false = still waiting for the player's first input; the host holds the clock until it turns true.
-  // Leave it undefined for modules that start at once.
-  isStarted?: boolean
+  // No start logic here: the host holds every module behind its start overlay and calls
+  // init() again on the first click, tap or key, so the module's timers start then.
 
   init(context: SkillGameContext): void
   update(dt: number, now: number, elapsed: number): void
