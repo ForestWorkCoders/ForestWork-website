@@ -134,6 +134,10 @@ async function initDeck() {
     const Reveal = (await import('reveal.js')).default
 
     const instance = new Reveal({
+        // The canvas is the viewport, so the scale is always 1 and the Tailwind
+        // breakpoints size the cards. A fixed 960×700 canvas shrank to 0.38 on phones.
+        width: '100%',
+        height: '100%',
         transition: 'slide',
         controls: true,
         progress: true,
@@ -242,7 +246,7 @@ onBeforeUnmount(() => {
                 &uarr;
             </button>
 
-            <!-- 中间水平行：切换故事链/玩家 -->
+            <!-- 底行（键盘倒 T 排列）：← ↓ → -->
             <div class="flex items-center gap-1.5">
                 <!-- 向左按键：上一位玩家/上一条链 -->
                 <button type="button" aria-label="Previous Chain (Left)" :disabled="!routes.left" @click="goLeft"
@@ -251,6 +255,15 @@ onBeforeUnmount(() => {
                         ? 'bg-white text-black hover:bg-gray-100 active:translate-x-0.5 cursor-pointer'
                         : 'bg-gray-700/60 text-gray-500 border-gray-600 shadow-none cursor-not-allowed pointer-events-none'">
                     &larr;
+                </button>
+
+                <!-- 向下按键：下一帧（封面点击自动进入第一链） -->
+                <button type="button" aria-label="Next Frame (Down)" :disabled="!routes.down" @click="goDown"
+                    class="border-2 border-black w-10 h-10 rounded-lg font-extrabold text-base shadow-[2px_2px_0px_0px_#000] transition-all flex items-center justify-center touch-manipulation"
+                    :class="routes.down
+                        ? 'bg-amber-400 text-black hover:bg-amber-300 active:translate-y-0.5 cursor-pointer'
+                        : 'bg-gray-700/60 text-gray-500 border-gray-600 shadow-none cursor-not-allowed pointer-events-none'">
+                    &darr;
                 </button>
 
                 <!-- 向右按键：下一位玩家/下一条链 -->
@@ -262,15 +275,6 @@ onBeforeUnmount(() => {
                     &rarr;
                 </button>
             </div>
-
-            <!-- 向下按键：下一帧（封面点击自动进入第一链） -->
-            <button type="button" aria-label="Next Frame (Down)" :disabled="!routes.down" @click="goDown"
-                class="border-2 border-black w-10 h-10 rounded-lg font-extrabold text-base shadow-[2px_2px_0px_0px_#000] transition-all flex items-center justify-center touch-manipulation"
-                :class="routes.down
-                    ? 'bg-amber-400 text-black hover:bg-amber-300 active:translate-y-0.5 cursor-pointer'
-                    : 'bg-gray-700/60 text-gray-500 border-gray-600 shadow-none cursor-not-allowed pointer-events-none'">
-                &darr;
-            </button>
         </div>
 
         <!-- Unknown session id (typo, old link): say so instead of an empty page -->
@@ -308,7 +312,7 @@ onBeforeUnmount(() => {
                             <div
                                 class="bg-white border-4 border-black shadow-[6px_6px_0px_0px_#000] p-3 sm:p-4 rounded-xl max-w-2xl w-[92%] mx-auto">
                                 <img :src="`${sessionData.baseUrl}/${chain.id}/${frameName}`"
-                                    class="w-full border-2 border-black" alt="Gartic Frame">
+                                    class="block mx-auto max-w-full max-h-[60dvh] border-2 border-black" alt="Gartic Frame">
                                 <div
                                     class="mt-3 sm:mt-4 text-left font-extrabold text-black text-base sm:text-xl flex justify-between items-center">
                                     <span>Round {{ index + 1 }}</span>
@@ -326,7 +330,7 @@ onBeforeUnmount(() => {
                                 class="bg-amber-300 border-4 border-black shadow-[6px_6px_0px_0px_#000] p-3 sm:p-4 rounded-xl max-w-2xl w-[92%] mx-auto">
                                 <h2 class="text-xl sm:text-2xl font-extrabold text-black mb-5 sm:mb-6">完整動畫</h2>
                                 <img :src="`${sessionData.baseUrl}/${chain.id}/album.gif`"
-                                    class="w-full border-2 border-black" alt="Full Album">
+                                    class="block mx-auto max-w-full max-h-[60dvh] border-2 border-black" alt="Full Album">
                             </div>
                         </div>
                     </section>
