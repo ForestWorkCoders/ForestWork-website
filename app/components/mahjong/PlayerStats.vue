@@ -99,7 +99,7 @@ const radarConfigs = computed(() => {
         ],
         radius: '65%', // 控制雷达图的大小留出文字空间
         splitNumber: 5,
-        axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 11, fontWeight: 'bold' },
+        axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 12, fontWeight: 'bold' },
         splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.15)' } },
         splitArea: { show: false }, // 隐藏背景色块交替
         axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
@@ -200,24 +200,24 @@ const playPercentStyles = [
 
       <!-- Early in a cup nobody has enough games yet; say so instead of showing an empty section -->
       <p v-if="!top3Players.length"
-        class="text-sm text-gray-500 dark:text-gray-400 py-6 text-center border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+        class="text-sm text-gray-500 dark:text-gray-400 py-6 text-center border border-dashed border-gray-200 dark:border-default rounded-xl">
         尚無選手打滿 {{ PODIUM_MIN_GAMES }} 場 · No player has {{ PODIUM_MIN_GAMES }} games yet
       </p>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div v-for="(player, index) in top3Players" :key="player.nickname || index"
-          class="bg-white dark:bg-[#18212f] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col relative group">
+          class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm overflow-hidden flex flex-col relative group">
 
           <div
-            class="absolute -right-4 -top-8 text-[120px] font-black text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
+            class="absolute -right-4 -top-8 text-[120px] font-extrabold text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
             #{{ index + 1 }}
           </div>
 
-          <div class="p-6 flex flex-col items-center z-10 border-b border-gray-100 dark:border-gray-800/50">
+          <div class="p-6 flex flex-col items-center z-10 border-b border-gray-100 dark:border-default">
             <UAvatar :src="player.avatar" :alt="player.nickname" size="xl"
-              class="ring-4 ring-gray-50 dark:ring-[#1e293b] shadow-lg mb-3" />
+              class="ring-4 ring-gray-50 dark:ring-default shadow-lg mb-3" />
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ player.nickname }}</h3>
-            <div class="mt-2 flex items-center gap-1 text-amber-500 dark:text-amber-400 font-black text-2xl">
+            <div class="mt-2 flex items-center gap-1 text-amber-500 dark:text-amber-400 font-extrabold text-2xl">
               <span>{{ player.avg_rank?.toFixed(2) ?? '-' }}</span>
               <span class="text-xs text-gray-400 font-medium tracking-widest ml-1">AVG RANK</span>
             </div>
@@ -247,14 +247,14 @@ const playPercentStyles = [
     </section>
 
     <section>
-      <div class="mb-6 border-b border-gray-200 dark:border-gray-800 pb-4 flex justify-between items-end">
+      <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
           綜合數據 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Overall Statistics</span>
         </h2>
       </div>
 
       <div
-        class="bg-white dark:bg-[#1e293b] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full overflow-hidden detailed-stats-section">
+        class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm w-full overflow-hidden detailed-stats-section">
         <UTabs :items="items" default-value="match_stats" class="w-full">
 
           <!-- 1. 宏观战绩 Tab -->
@@ -271,7 +271,7 @@ const playPercentStyles = [
 
               <!-- 平均顺位加粗高亮 -->
               <template #avg_rank-cell="{ row }">
-                <span class="font-mono font-black text-amber-500 dark:text-amber-400 text-sm">
+                <span class="font-mono font-extrabold text-amber-500 dark:text-amber-400 text-sm">
                   {{ row.original.avg_rank != null ? row.original.avg_rank.toFixed(2) : '-' }}
                 </span>
               </template>

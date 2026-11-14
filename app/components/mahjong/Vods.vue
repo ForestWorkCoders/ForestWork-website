@@ -36,7 +36,7 @@ const mockMontages = [
   <div class="px-4 md:px-6 mt-8 space-y-12 animate-fade-in pb-12">
 
     <section v-if="mockStreams.length > 0">
-      <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+      <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-default pb-2">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <span class="relative flex h-3 w-3">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -48,7 +48,7 @@ const mockMontages = [
       
       <div class="flex overflow-x-auto gap-5 pb-4 snap-x [&::-webkit-scrollbar]:hidden">
         <a v-for="stream in mockStreams" :key="stream.id" :href="stream.url" target="_blank" class="snap-start shrink-0 w-[300px] md:w-[400px] group flex flex-col gap-3">
-          <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-accented border border-gray-200 dark:border-default">
             <img :src="stream.thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
               <UIcon name="i-lucide-play" class="w-12 h-12 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all drop-shadow-lg" />
@@ -67,7 +67,7 @@ const mockMontages = [
     </section>
 
     <section v-if="mockArchives.length > 0">
-      <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+      <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-default pb-2">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white">
           賽事存檔 <span class="text-gray-400 dark:text-gray-500 font-normal text-sm ml-1">Archives</span>
         </h2>
@@ -75,9 +75,9 @@ const mockMontages = [
       
       <div class="flex overflow-x-auto gap-5 pb-4 snap-x [&::-webkit-scrollbar]:hidden">
         <a v-for="arc in mockArchives" :key="arc.id" :href="arc.url" target="_blank" class="snap-start shrink-0 w-[280px] md:w-[320px] group flex flex-col gap-2">
-          <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-accented border border-gray-200 dark:border-default">
             <img :src="arc.thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-white text-[11px] font-mono font-bold tracking-wider">
+            <div class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-white text-xs font-mono font-bold tracking-wider">
               {{ arc.duration }}
             </div>
           </div>
@@ -90,7 +90,7 @@ const mockMontages = [
     </section>
 
     <section v-if="mockMontages.length > 0">
-      <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+      <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-default pb-2">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-lucide-zap" class="w-5 h-5 text-amber-500" />
           精華短片 <span class="text-gray-400 dark:text-gray-500 font-normal text-sm ml-1">Shorts & Highlights</span>
@@ -99,12 +99,12 @@ const mockMontages = [
       
       <div class="flex overflow-x-auto gap-4 pb-4 snap-x [&::-webkit-scrollbar]:hidden">
         <a v-for="montage in mockMontages" :key="montage.id" :href="montage.url" target="_blank" class="snap-start shrink-0 w-[140px] md:w-[180px] group flex flex-col gap-2">
-          <div class="relative aspect-[9/16] rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div class="relative aspect-[9/16] rounded-xl overflow-hidden bg-gray-200 dark:bg-elevated border border-gray-200 dark:border-default shadow-sm">
             <img :src="montage.thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
             
             <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
-              <span class="text-white text-[11px] font-bold tracking-wider flex items-center gap-1">
+              <span class="text-white text-xs font-bold tracking-wider flex items-center gap-1">
                 <UIcon name="i-lucide-eye" class="w-3.5 h-3.5" /> {{ montage.views }}
               </span>
               <UIcon name="i-lucide-circle-play" class="w-6 h-6 text-white/80 group-hover:text-white transition-colors" />

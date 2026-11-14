@@ -49,7 +49,7 @@ const roleDisplay = { manager: 'manager', player: 'player', substitute: 'substit
 const roleColor = {
   manager: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800',
   player: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  substitute: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+  substitute: 'bg-gray-100 text-gray-700 dark:bg-accented dark:text-gray-400'
 }
 </script>
 
@@ -59,7 +59,7 @@ const roleColor = {
       <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-blue-500" />
     </div>
 
-    <div v-else-if="!teams || teams.length === 0" class="text-center py-16 bg-white dark:bg-[#1a1c23] rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+    <div v-else-if="!teams || teams.length === 0" class="text-center py-16 bg-white dark:bg-elevated rounded-xl border border-dashed border-gray-300 dark:border-default">
       <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Teams are yet to be announced.</p>
     </div>
 
@@ -68,11 +68,11 @@ const roleColor = {
       <div 
         v-for="team in teams" 
         :key="team.id"
-        class="bg-white dark:bg-[#1a1c23] rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden"
+        class="bg-white dark:bg-elevated rounded-xl shadow-sm border border-gray-200 dark:border-default overflow-hidden"
       >
         <button 
           @click="toggleTeam(team.id)"
-          class="w-full text-left p-4 md:p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors relative"
+          class="w-full text-left p-4 md:p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-accented transition-colors relative"
           :style="{ borderLeft: `4px solid ${team.colour || '#3b82f6'}` }"
         >
           <div class="flex items-center gap-4">
@@ -80,7 +80,7 @@ const roleColor = {
                         :style="{ backgroundColor: team.colour || 'transparent' }"></div>
             <UAvatar :src="team.logo || '/default-team-logo.png'" size="lg" class="bg-white" :ui="{ rounded: 'rounded-lg' }" />
             <div class="flex flex-col">
-              <h3 class="text-lg md:text-xl font-black text-gray-900 dark:text-white flex items-baseline gap-2">
+              <h3 class="text-lg md:text-xl font-extrabold text-gray-900 dark:text-white flex items-baseline gap-2">
                 <span v-if="team.short_sign" class="text-sm font-bold opacity-70" :style="{ color: team.colour }">[{{ team.short_sign }}]</span>
                 {{ team.name }}
               </h3>
@@ -98,13 +98,13 @@ const roleColor = {
 
         <div 
           v-show="expandedTeams.has(team.id)" 
-          class="border-t border-gray-100 dark:border-gray-800/60 bg-gray-50/30 dark:bg-black/10"
+          class="border-t border-gray-100 dark:border-default bg-gray-50/30 dark:bg-black/10"
         >
-          <div class="p-4 border-b border-gray-100 dark:border-gray-800/60 flex justify-center">
-            <div class="inline-flex bg-gray-200/50 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-bold">
-              <button @click="setActiveTab(team.id, 'main')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'main' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">Main</button>
-              <button @click="setActiveTab(team.id, 'sub')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'sub' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">Sub</button>
-              <button @click="setActiveTab(team.id, 'history')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'history' ? 'bg-white dark:bg-gray-700 text-red-500 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">History</button>
+          <div class="p-4 border-b border-gray-100 dark:border-default flex justify-center">
+            <div class="inline-flex bg-gray-200/50 dark:bg-accented p-1 rounded-lg border border-gray-200 dark:border-default text-xs font-bold">
+              <button @click="setActiveTab(team.id, 'main')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'main' ? 'bg-white dark:bg-accented text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">Main</button>
+              <button @click="setActiveTab(team.id, 'sub')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'sub' ? 'bg-white dark:bg-accented text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">Sub</button>
+              <button @click="setActiveTab(team.id, 'history')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'history' ? 'bg-white dark:bg-accented text-red-500 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">History</button>
             </div>
           </div>
 
@@ -112,17 +112,17 @@ const roleColor = {
             <div 
               v-for="player in getFilteredPlayers(team)" 
               :key="player.id || player.name"
-              class="flex items-center gap-4 hover:bg-white dark:hover:bg-gray-800/80 p-2 -mx-2 rounded-lg transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-700" 
+              class="flex items-center gap-4 hover:bg-white dark:hover:bg-accented p-2 -mx-2 rounded-lg transition-colors border border-transparent hover:border-gray-200 dark:hover:border-default" 
             >
               <span 
                 v-if="player.status !== 'active'" 
-                class="w-16 text-center text-[10px] font-black tracking-widest uppercase py-1.5 rounded shadow-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                class="w-24 shrink-0 text-center text-xs font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
               >
                 {{ player.status }}
               </span>
               <span 
                 v-else
-                class="w-16 text-center text-[10px] font-black tracking-widest uppercase py-1.5 rounded shadow-sm"
+                class="w-24 shrink-0 text-center text-xs font-extrabold tracking-widest uppercase py-1.5 rounded shadow-sm"
                 :class="roleColor[player.role] || roleColor.substitute"
               >
                 {{ roleDisplay[player.role] || player.role }}

@@ -37,7 +37,7 @@ async function onClick() {
         await navigator.clipboard.writeText(serverIp)
         show('已複製到剪貼簿！')
     } catch (err) {
-        console.error('复制失败:', err)
+        console.error('複製失敗:', err)
     }
 }
 
@@ -77,7 +77,7 @@ const navLinks: SeasonLink[] = [
 
         <!-- 3. 核心业务内容 -->
         <main class="relative z-10 max-w-md w-full flex flex-col items-center gap-6">
-            <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-white drop-shadow-md">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-md mb-3 sm:mb-6">
                 林間SMP
             </h1>
 

@@ -40,7 +40,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     icon: 'i-lucide-box',
     defaultOpen: true,
     children: [
-      { label: '超极限生存竞赛', to: 'https://eaglepb2.gitbook.io/uhc_report/', target: '_blank' },
+      { label: '超極限生存競賽', to: 'https://eaglepb2.gitbook.io/uhc_report/', target: '_blank' },
       { label: '多人生存 · SMP', to: '/games/minecraftsmp' }
     ]
   },
@@ -78,7 +78,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     <template #title>
       <div class="flex-shrink-0 flex items-center gap-2">
         <!-- 1. Emblem 图案标 -->
-        <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg" alt="ForestWork Emblem" class="h-4.75 w-auto" />
+        <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg" alt="ForestWork Emblem" class="h-5 w-auto" />
         <!-- 2. Text 文字标（取代原本的 HTML 纯文本，自动响应浅/深色模式） -->
         <!--    Show/hide sits on a wrapper: classes on UColorModeImage reach both of its images, so sm:block would un-hide the dark-mode one -->
         <span class="hidden sm:flex">
@@ -95,15 +95,15 @@ const items = computed<NavigationMenuItem[]>(() => [
 
       <ClientOnly>
         <!-- 載入中骨架屏佔位 -->
-        <div v-if="isPending" class="w-8 h-8 rounded-full bg-slate-800 animate-pulse hidden lg:block" />
+        <div v-if="isPending" class="w-8 h-8 rounded-full bg-accented animate-pulse hidden lg:block" />
 
         <!-- 已登入：渲染 Discord 頭像與下拉操作選單 -->
         <UDropdownMenu v-else-if="user" :items="dropdownItems" :popper="{ placement: 'bottom-end' }">
           <UButton color="secondary" variant="ghost"
-            class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-800">
+            class="flex items-center gap-2 p-1 rounded-full hover:bg-elevated">
             <UAvatar :src="user.avatar || undefined" :alt="user.username" size="sm"
-              class="border border-emerald-500/50" />
-            <span class="text-xs font-mono text-emerald-400 font-bold hidden xl:inline-block pr-1">
+              class="border border-primary/50" />
+            <span class="text-xs font-mono text-primary font-bold hidden xl:inline-block pr-1">
               {{ user.username }}
             </span>
             <UIcon name="i-lucide-chevron-down" class="w-4 h-4 text-slate-400" />
@@ -112,7 +112,7 @@ const items = computed<NavigationMenuItem[]>(() => [
           <template #account="{ item }">
             <div class="text-left font-mono">
               <p class="text-xs text-slate-400">目前登入身份</p>
-              <p class="truncate font-bold text-xs text-emerald-400">
+              <p class="truncate font-bold text-xs text-primary">
                 {{ item.label }}
               </p>
             </div>
@@ -126,7 +126,7 @@ const items = computed<NavigationMenuItem[]>(() => [
         </UButton>
 
         <template #fallback>
-          <div class="w-20 h-8 rounded-md bg-slate-800/50 animate-pulse hidden lg:block" />
+          <div class="w-20 h-8 rounded-md bg-accented animate-pulse hidden lg:block" />
         </template>
       </ClientOnly>
     </template>
@@ -147,7 +147,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     <template #body>
       <UNavigationMenu :items="items" orientation="vertical" class="px-2 mt-4" />
 
-      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 px-4">
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-default px-4">
         <UButton :to="DISCORD_SERVER_URL" target="_blank" color="primary"
           variant="solid" block>
           加入Discord

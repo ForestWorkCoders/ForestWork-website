@@ -207,11 +207,11 @@ const commitAndRemoveWinner = () => {
 
 <template>
     <div class="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        <div class="text-center space-y-2">
+        <div class="text-center">
             <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
                 林間幸運轉盤 · Multi-Draw Giveaway
             </h1>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-gray-500 mt-8">
                 第一步拉取名單固定獎池，第二步可連續抽獎並隨時移出中獎者
             </p>
         </div>
@@ -283,9 +283,9 @@ const commitAndRemoveWinner = () => {
                 </div>
 
                 <!-- 本轮命中展示与移除确认 -->
-                <UCard v-if="currentWinner" class="w-full border-2 border-emerald-500 bg-emerald-950/20 text-center">
+                <UCard v-if="currentWinner" class="w-full border-2 border-primary bg-primary/10 text-center">
                     <div class="space-y-4 py-2">
-                        <div class="text-xs font-bold uppercase tracking-widest text-emerald-400">
+                        <div class="text-xs font-bold uppercase tracking-widest text-primary">
                             🎯 本輪中獎玩家
                         </div>
                         <div class="flex items-center justify-center gap-3">
@@ -314,13 +314,13 @@ const commitAndRemoveWinner = () => {
                             <span class="font-bold text-sm text-gray-900 dark:text-white">
                                 🏆 獲獎名單
                             </span>
-                            <UBadge color="primary" variant="subtle" size="xs" class="font-mono">
+                            <UBadge color="primary" variant="subtle" size="md" class="font-mono">
                                 {{ winnersHistory.length }}
                             </UBadge>
                         </div>
 
                         <!-- 右侧：池内剩余人数独立状态徽章 -->
-                        <UBadge color="secondary" variant="soft" size="xs" class="font-mono text-gray-400">
+                        <UBadge color="secondary" variant="soft" size="md" class="font-mono text-gray-400">
                             池剩餘 {{ pool.length }} 人
                         </UBadge>
                     </div>
@@ -334,10 +334,10 @@ const commitAndRemoveWinner = () => {
                     <li v-for="item in winnersHistory" :key="item.winner.id"
                         class="pt-2 flex items-center justify-between text-sm">
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-mono text-primary-400 font-bold">#{{ item.round }}</span>
+                            <span class="text-xs font-mono text-primary font-bold">#{{ item.round }}</span>
                             <span class="font-medium text-gray-200">{{ item.winner.name }}</span>
                         </div>
-                        <span class="text-[10px] font-mono text-gray-500">{{ item.drawnAt }}</span>
+                        <span class="text-xs font-mono text-gray-500">{{ item.drawnAt }}</span>
                     </li>
                 </ul>
             </UCard>

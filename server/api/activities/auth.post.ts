@@ -81,9 +81,9 @@ export default defineEventHandler(async (event) => {
       }, {
         onConflict: 'discord_id'
       })
-    console.log(`[+] [Activity Auth] 成功同步玩家档案: ${rawUsername} (${user.id})`)
+    console.log(`[+] [Activity Auth] 成功同步玩家檔案: ${rawUsername} (${user.id})`)
   } catch (err: any) {
-    console.error('[-] [Activity Auth] Participant名册写入失败:', {
+    console.error('[-] [Activity Auth] Participant名冊寫入失敗:', {
       code: err.code,
       message: err.message,
       details: err.details

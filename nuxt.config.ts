@@ -32,6 +32,19 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  // @nuxt/fonts (bundled with Nuxt UI) self-hosts the families named in main.css.
+  // Open Sans tops out at 800. The Chinese fallbacks stay system fonts: never download them.
+  fonts: {
+    defaults: {
+      weights: [400, 600, 700, 800]
+    },
+    families: [
+      { name: 'PingFang TC', provider: 'none' },
+      { name: 'Microsoft JhengHei', provider: 'none' },
+      { name: 'Noto Sans TC', provider: 'none' }
+    ]
+  },
+
   supabase: {
     // 强制关闭所有对外部机器人的全局鉴权检查与重定向
     redirect: false,

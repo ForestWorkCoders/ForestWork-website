@@ -13,7 +13,7 @@
         <span class="hidden sm:inline text-gray-300 dark:text-zinc-700">|</span>
         <NuxtLink
           to="/brand"
-          class="hover:text-[#4C7766] dark:hover:text-emerald-400 font-bold transition-colors"
+          class="hover:text-primary font-bold transition-colors"
         >
           品牌資源
         </NuxtLink>
@@ -22,7 +22,7 @@
         <span class="hidden sm:inline text-gray-300 dark:text-zinc-700">|</span>
         <NuxtLink
           to="/tools/giveaway"
-          class="hover:text-[#4C7766] dark:hover:text-emerald-400 font-bold transition-colors"
+          class="hover:text-primary font-bold transition-colors"
         >
           幸運轉盤
         </NuxtLink>

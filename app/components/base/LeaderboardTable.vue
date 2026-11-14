@@ -5,11 +5,11 @@
     <template #rank-cell="{ row }">
       <div class="flex items-center justify-center w-full px-1">
         <div v-if="isDnfRow(row)"
-          class="inline-block text-center font-bold text-[11px] font-mono tracking-wider px-2 py-0.5 rounded text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800/50 select-none">
+          class="inline-block text-center font-bold text-xs font-mono tracking-wider px-2 py-0.5 rounded text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-elevated select-none">
           DNF
         </div>
         <div v-else
-          class="inline-block text-center font-black text-base sm:text-lg italic px-2 py-0.5 rounded transition-colors"
+          class="inline-block text-center font-extrabold text-base sm:text-lg italic px-2 py-0.5 rounded transition-colors"
           :class="getRankColor(row.original.rank)">
           #{{ row.original.rank }}
         </div>
@@ -19,7 +19,7 @@
     <template #name-cell="{ row }">
       <div class="flex items-center gap-2 sm:gap-3 w-full transition-opacity"
         :class="isDnfRow(row) ? 'opacity-60 grayscale-[30%]' : 'opacity-100'">
-        <UAvatar :src="row.original.avatar" :alt="row.original.name" size="2xs" class="sm:hidden" />
+        <UAvatar :src="row.original.avatar" :alt="row.original.name" size="xs" class="sm:hidden" />
         <UAvatar :src="row.original.avatar" :alt="row.original.name" size="sm" class="hidden sm:inline-flex" />
         <span class="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100 truncate">
           {{ row.original.name }}
@@ -29,7 +29,7 @@
 
     <template #total-cell="{ row }">
       <div class="text-center font-bold text-sm sm:text-base font-mono"
-        :class="isDnfRow(row) ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-emerald-500 dark:text-emerald-400 font-black'">
+        :class="isDnfRow(row) ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-primary font-extrabold'">
         {{ row.original.total }}
       </div>
     </template>
@@ -38,9 +38,9 @@
       <div class="text-center font-mono text-sm font-medium" :class="[
         isDnfRow(row) ? 'opacity-60' : 'opacity-100',
         row.original[col.key] > 0
-          ? 'text-emerald-600 dark:text-emerald-400'
+          ? 'text-success'
           : row.original[col.key] < 0
-            ? 'text-red-500 dark:text-red-400'
+            ? 'text-error'
             : 'text-gray-400 dark:text-gray-500'
       ]">
         {{ row.original[col.key] > 0 ? '+' : '' }}{{ row.original[col.key] ?? '-' }}
@@ -74,7 +74,7 @@ const tableColumns = computed(() => {
       accessorKey: 'rank',
       header: 'RANK',
       size: 72,
-      class: 'text-center w-[72px] min-w-[72px] max-w-[72px] z-[2] bg-white dark:bg-[#1e293b] border-r border-gray-100 dark:border-slate-800/80',
+      class: 'text-center w-[72px] min-w-[72px] max-w-[72px] z-[2] bg-white dark:bg-default border-r border-gray-100 dark:border-default',
       // 核心：自定义排序函数，将 DNF 映射为无穷大，其余按纯数字比较！
       sortingFn: (rowA, rowB, columnId) => {
         const valA = rowA.getValue(columnId)
@@ -92,7 +92,7 @@ const tableColumns = computed(() => {
       header: props.entityType === 'team' ? 'TEAM' : 'PLAYER',
       size: 150,
       // 核心：z-1 层级稍低，实色背景，给左侧留出充足 padding 避免贴脸
-      class: 'text-left w-[150px] min-w-[150px] z-[1] bg-white dark:bg-[#1e293b] pl-3'
+      class: 'text-left w-[150px] min-w-[150px] z-[1] bg-white dark:bg-default pl-3'
     },
     {
       id: 'total',
@@ -121,10 +121,10 @@ const getRankColor = (rank) => {
     return 'text-gray-500'
   }
   if (props.promotedRanks.includes(rank)) {
-    return 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20'
+    return 'text-success bg-success/10 border border-success/20'
   }
   if (props.disqualifiedRanks.includes(rank)) {
-    return 'text-red-400 bg-red-400/10 border border-red-400/20 opacity-75'
+    return 'text-error bg-error/10 border border-error/20 opacity-75'
   }
   return 'text-gray-500'
 }

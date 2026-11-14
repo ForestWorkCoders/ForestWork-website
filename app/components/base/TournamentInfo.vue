@@ -18,6 +18,16 @@ const md = new MarkdownIt({
   typographer: true
 })
 
+// The page already has its own <h1> (the tournament title), so every
+// Markdown heading renders one level lower: # → h2, ## → h3, ### → h4.
+md.core.ruler.push('shift_headings', (state) => {
+  for (const t of state.tokens) {
+    if (t.type === 'heading_open' || t.type === 'heading_close') {
+      t.tag = `h${Math.min(Number(t.tag[1]) + 1, 6)}`
+    }
+  }
+})
+
 // 2. 從 Supabase Bucket 動態抓取 Markdown 檔案內容
 const { data: markdownRaw, pending, error } = await useAsyncData(
   `fetch-md-${props.contentUrl}`,
@@ -50,14 +60,14 @@ const parsedHtml = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-[#1a1b26] text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+  <div class="bg-white dark:bg-default text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
 
     <div v-if="pending" class="flex flex-col items-center justify-center py-12 text-gray-500">
-      <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin mb-4 text-emerald-500" />
+      <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin mb-4 text-primary" />
       <p>正在載入賽事簡介...</p>
     </div>
 
-    <div v-else-if="error" class="text-red-500 text-center py-8 font-bold">
+    <div v-else-if="error" class="text-error text-center py-8 font-bold">
       無法載入賽事內容，請確認檔案網址是否正確。
     </div>
 
@@ -71,26 +81,28 @@ const parsedHtml = computed(() => {
 </template>
 
 <style scoped>
-@reference "tailwindcss"; 
+@reference "~/assets/css/main.css";
 
 /* Linus 规则：绝对不要在这里写任何颜色和 dark: 前缀。
   所有的基础颜色由父组件的 div (text-gray-900 / dark:text-gray-100) 决定。
 */
 
-.markdown-body :deep(h1) {
-  @apply text-3xl font-bold mb-6 mt-8;
+/* Markdown # / ## / ### render as h2 / h3 / h4 (see shift_headings).
+   Gap below each heading ≥ its font size (brand spacing rule). */
+.markdown-body :deep(h2) {
+  @apply text-3xl font-bold mb-8 mt-8;
   /* 自动继承 100% 不透明的父元素文字颜色 */
 }
 
-.markdown-body :deep(h2) {
-  @apply text-2xl font-bold mb-4 mt-8 border-b pb-2;
+.markdown-body :deep(h3) {
+  @apply text-2xl font-bold mb-6 mt-8 border-b pb-2;
   /* 用 currentColor 让边框颜色自动跟随文字颜色，只保留 20% 透明度 */
   border-color: currentColor;
   opacity: 0.9;
 }
 
-.markdown-body :deep(h3) {
-  @apply text-xl font-semibold mb-3 mt-6;
+.markdown-body :deep(h4) {
+  @apply text-xl font-semibold mb-5 mt-6;
 }
 
 .markdown-body :deep(p) {
@@ -130,7 +142,7 @@ const parsedHtml = computed(() => {
 }
 
 .markdown-body :deep(thead) {
-  @apply bg-gray-50 dark:bg-[#18212f] text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700;
+  @apply bg-gray-50 dark:bg-elevated text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-default;
 }
 
 .markdown-body :deep(th) {
@@ -138,7 +150,7 @@ const parsedHtml = computed(() => {
 }
 
 .markdown-body :deep(tbody tr) {
-  @apply border-b border-gray-100 dark:border-gray-800/60 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors;
+  @apply border-b border-gray-100 dark:border-default hover:bg-gray-50 dark:hover:bg-white/5 transition-colors;
 }
 
 .markdown-body :deep(td) {

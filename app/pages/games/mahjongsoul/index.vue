@@ -61,17 +61,17 @@ watch(searchQuery, () => {
 })
 
 useSeoMeta({
-    title: '雀魂麻将 | MahjongSoul | Forestwork',
-    ogTitle: () => '雀魂麻将 | MahjongSoul | Forestwork',
-    description: () => `查看雀魂麻将的即時戰況、積分排行榜與對局紀錄。`,
-    ogDescription: () => `查看雀魂麻将的即時戰況、積分排行榜與對局紀錄。`,
+    title: '雀魂麻將 | MahjongSoul | Forestwork',
+    ogTitle: () => '雀魂麻將 | MahjongSoul | Forestwork',
+    description: () => `查看雀魂麻將的即時戰況、積分排行榜與對局紀錄。`,
+    ogDescription: () => `查看雀魂麻將的即時戰況、積分排行榜與對局紀錄。`,
     ogImage: () => 'https://forestwork.vercel.app/images/mahjongSoul/logo-white.png'
 })
 </script>
 
 <template>
     <div
-        class="flex-1 flex flex-col bg-gray-50 dark:bg-[#1a1b26] bg-[url('/images/mahjongSoul/bg.png')] bg-cover bg-fixed bg-center transition-colors duration-300">
+        class="flex-1 flex flex-col bg-gray-50 dark:bg-default bg-[url('/images/mahjongSoul/bg.png')] bg-cover bg-fixed bg-center transition-colors duration-300">
         <!-- 内层蒙版：同样 flex-1 flex flex-col 铺满，负责毛玻璃与透光度 -->
         <div
             class="flex-1 flex flex-col bg-white/70 dark:bg-black/60 backdrop-blur-md py-8 transition-colors duration-300">
@@ -82,7 +82,7 @@ useSeoMeta({
 
                         <UTabs :items="items" class="w-full" :ui="{
                             // 1. 核心修复：拍平成类名字符串，绝不在内部套伪造的 { background: ... }
-                            list: 'bg-gray-100 dark:bg-[#0f172a]',
+                            list: 'bg-gray-100 dark:bg-default',
                             // 翡翠绿指示药丸，选中时自带白字高亮
                             indicator: 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm'
                         }">
@@ -106,7 +106,7 @@ useSeoMeta({
 
                                         <!-- 中文副标题：保持原有呼吸感与半透明对比度 -->
                                         <div v-if="item.description"
-                                            class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
+                                            class="text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
                                             {{ item.description }}
                                         </div>
                                     </div>
@@ -120,7 +120,7 @@ useSeoMeta({
                                     <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Ongoing Tournaments..." color="info" variant="outline"
                                         class="w-full" :ui="{
-                                            base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
+                                            base: 'bg-white dark:bg-default border-gray-200 dark:border-default text-gray-900 dark:text-white transition-colors duration-200',
                                             leadingIcon: 'text-gray-500 dark:text-gray-400 transition-colors'
                                         }" />
                                 </div>
@@ -133,7 +133,7 @@ useSeoMeta({
                                     </div>
 
                                     <div v-else
-                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-default rounded-lg bg-white/50 dark:bg-default">
                                         <UIcon name="i-lucide-calendar-days"
                                             class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">
@@ -148,7 +148,7 @@ useSeoMeta({
                                     <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Past Tournaments..." color="info" variant="outline"
                                         class="w-full" :ui="{
-                                            base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
+                                            base: 'bg-white dark:bg-default border-gray-200 dark:border-default text-gray-900 dark:text-white transition-colors duration-200',
                                             leadingIcon: 'text-gray-500 dark:text-gray-400 transition-colors'
                                         }" />
                                 </div>
@@ -165,7 +165,7 @@ useSeoMeta({
                                         <!-- 分页组件的 total 必须绑定 filteredPast.length -->
                                         <!-- 历史赛事分页器：直接显式接管事件，拒绝黑盒断流 -->
                                         <div v-if="filteredPast.length > itemsPerPage"
-                                            class="flex justify-center pt-4 mt-6 border-t border-gray-200 dark:border-slate-800 transition-colors duration-200">
+                                            class="flex justify-center pt-4 mt-6 border-t border-gray-200 dark:border-default transition-colors duration-200">
                                             <UPagination :page="currentPage" :total="filteredPast.length"
                                                 :items-per-page="itemsPerPage" color="neutral" variant="subtle"
                                                 @update:page="(val: number) => currentPage = val" />
@@ -173,7 +173,7 @@ useSeoMeta({
                                     </div>
 
                                     <div v-else
-                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-default rounded-lg bg-white/50 dark:bg-default">
                                         <UIcon name="i-lucide-inbox" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">
                                             {{ searchQuery ? '找不到符合條件的歷史賽事' : '尚無歷史賽事紀錄' }}
@@ -187,7 +187,7 @@ useSeoMeta({
                                     <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Future Tournaments..." color="info" variant="outline"
                                         class="w-full" :ui="{
-                                            base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
+                                            base: 'bg-white dark:bg-default border-gray-200 dark:border-default text-gray-900 dark:text-white transition-colors duration-200',
                                             leadingIcon: 'text-gray-500 dark:text-gray-400 transition-colors'
                                         }" />
                                 </div>
@@ -200,7 +200,7 @@ useSeoMeta({
                                     </div>
 
                                     <div v-else
-                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-default rounded-lg bg-white/50 dark:bg-default">
                                         <UIcon name="i-lucide-calendar-days"
                                             class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">

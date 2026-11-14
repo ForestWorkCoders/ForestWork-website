@@ -3,12 +3,12 @@ import { ref } from 'vue'
 
 // 定義給 Sidebar 的資料
 const plazmaBurstSidebarData = {
-    name: '超时空战士 2 · Plazma Burst 2',
+    name: '超時空戰士 2 · Plazma Burst 2',
     image_light: '/images/plazmaBurst/logo-black.png',
     image_dark: '/images/plazmaBurst/logo-white.png',
     desc: [
         'Plazma Burst 2 (usually abbreviated as PB2) is a side-scroller flash game created by Eric Gurt, initially released as beta version on January 26, 2011, March 10, 2011 as standard version and March 25, 2011 for Y8 Games. This was the second game in Eric Gurt\'s Plazma Burst series of games and a sequel to Forward to the Past, which will likely be succeeded by Plazma Burst 3 or Plazma Burst 2.5.',
-        '《超時空戰士2》是一款由Eric Gurt所製作的橫向2D射擊游戲。從2012年開始開發到現在。期間社區辦了大大小小的比賽。'
+        '《超時空戰士2》是一款由Eric Gurt所製作的橫向2D射擊遊戲。從2012年開始開發到現在。期間社區辦了大大小小的比賽。'
     ],
     socialLinks: [
         { icon: 'i-lucide-globe', url: 'https://www.plazmaburst2.com/' }, // 官網
@@ -73,7 +73,7 @@ useSeoMeta({
 <template>
 
     <div
-        class="flex-1 flex flex-col bg-gray-50 dark:bg-[#1a1b26] bg-[url('/images/plazmaBurst/bg.webp')] bg-cover bg-fixed bg-center transition-colors duration-300">
+        class="flex-1 flex flex-col bg-gray-50 dark:bg-default bg-[url('/images/plazmaBurst/bg.webp')] bg-cover bg-fixed bg-center transition-colors duration-300">
         <!-- 内层蒙版：同样 flex-1 flex flex-col 铺满，负责毛玻璃与透光度 -->
         <div
             class="flex-1 flex flex-col bg-white/70 dark:bg-black/60 backdrop-blur-md py-8 transition-colors duration-300">
@@ -84,7 +84,7 @@ useSeoMeta({
 
                         <UTabs :items="items" class="w-full" :ui="{
                             // 1. 核心修复：拍平成类名字符串，绝不在内部套伪造的 { background: ... }
-                            list: 'bg-gray-100 dark:bg-[#0f172a]',
+                            list: 'bg-gray-100 dark:bg-default',
                             // 翡翠绿指示药丸，选中时自带白字高亮
                             indicator: 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm'
                         }">
@@ -108,7 +108,7 @@ useSeoMeta({
 
                                         <!-- 中文副标题：保持原有呼吸感与半透明对比度 -->
                                         <div v-if="item.description"
-                                            class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
+                                            class="text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
                                             {{ item.description }}
                                         </div>
                                     </div>
@@ -123,7 +123,7 @@ useSeoMeta({
                                     <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Ongoing Tournaments..." color="info" variant="outline"
                                         class="w-full" :ui="{
-                                            base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
+                                            base: 'bg-white dark:bg-default border-gray-200 dark:border-default text-gray-900 dark:text-white transition-colors duration-200',
                                             leadingIcon: 'text-gray-500 dark:text-gray-400 transition-colors'
                                         }" />
                                 </div>
@@ -134,7 +134,7 @@ useSeoMeta({
                                     </div>
 
                                     <div v-else
-                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-default rounded-lg bg-white/50 dark:bg-default">
                                         <UIcon name="i-lucide-calendar-days"
                                             class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">目前沒有進行中的賽事</p>
@@ -147,7 +147,7 @@ useSeoMeta({
                                     <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Past Tournaments..." color="info" variant="outline"
                                         class="w-full" :ui="{
-                                            base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
+                                            base: 'bg-white dark:bg-default border-gray-200 dark:border-default text-gray-900 dark:text-white transition-colors duration-200',
                                             leadingIcon: 'text-gray-500 dark:text-gray-400 transition-colors'
                                         }" />
                                 </div>
@@ -160,7 +160,7 @@ useSeoMeta({
                                         </div>
 
                                         <div v-if="allTournaments.past.length > itemsPerPage"
-                                            class="flex justify-center pt-4 mt-6 border-t border-gray-200 dark:border-slate-800 transition-colors duration-200">
+                                            class="flex justify-center pt-4 mt-6 border-t border-gray-200 dark:border-default transition-colors duration-200">
                                             <UPagination :page="currentPage" :total="allTournaments.past.length"
                                                 :items-per-page="itemsPerPage" color="neutral" variant="subtle"
                                                 @update:page="(val: number) => currentPage = val" />
@@ -169,7 +169,7 @@ useSeoMeta({
                                     </div>
 
                                     <div v-else
-                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-default rounded-lg bg-white/50 dark:bg-default">
                                         <UIcon name="i-lucide-inbox" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">尚無歷史賽事紀錄</p>
                                     </div>
@@ -182,7 +182,7 @@ useSeoMeta({
                                     <UInput v-model="searchQuery" icon="i-lucide-search"
                                         placeholder="Search Future Tournaments..." color="info" variant="outline"
                                         class="w-full" :ui="{
-                                            base: 'bg-white dark:bg-[#0f172a] border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white transition-colors duration-200',
+                                            base: 'bg-white dark:bg-default border-gray-200 dark:border-default text-gray-900 dark:text-white transition-colors duration-200',
                                             leadingIcon: 'text-gray-500 dark:text-gray-400 transition-colors'
                                         }" />
                                 </div>
@@ -193,7 +193,7 @@ useSeoMeta({
                                     </div>
 
                                     <div v-else
-                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-[#0f172a]/50">
+                                        class="mt-4 p-12 text-center border border-gray-200 dark:border-default rounded-lg bg-white/50 dark:bg-default">
                                         <UIcon name="i-lucide-calendar-days"
                                             class="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                         <p class="text-gray-500 dark:text-gray-400">目前沒有即將開始的賽事</p>

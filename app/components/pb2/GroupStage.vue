@@ -20,12 +20,12 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
     <section>
       <div class="flex items-center gap-3 pl-2 mb-8">
         <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Group Standings</h2>
+        <h2 class="text-2xl font-extrabold tracking-widest uppercase text-gray-900 dark:text-white">Group Standings</h2>
       </div>
       <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="border-b border-gray-200 dark:border-gray-800 text-sm text-gray-500">
+            <tr class="border-b border-gray-200 dark:border-default text-sm text-gray-500">
               <th class="p-3 font-medium">#</th>
               <th class="p-3 font-medium">Team</th>
               <th class="p-3 font-medium">P</th>
@@ -38,13 +38,13 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
           </thead>
           <tbody>
             <tr v-for="team in data.standings" :key="team.id"
-              class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              class="border-b border-gray-100 dark:border-default hover:bg-gray-50 dark:hover:bg-accented transition-colors"
               :class="{ 'border-l-4': team.qualified }"
               :style="team.qualified ? { borderLeftColor: team.colour || '#3b82f6' } : {}">
               <td class="p-3">{{ team.rank }}</td>
               <td class="p-3 font-bold">
                 <UAvatar :src="team.logo || '/default-team-logo.png'" :alt="team.name" size="sm"
-                  class="bg-white ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm flex-shrink-0"
+                  class="bg-white ring-1 ring-gray-200 dark:ring-default shadow-sm flex-shrink-0"
                   :ui="{ rounded: 'rounded-md' }" />
                 <span class="mr-2"> </span>{{ team.name }}
               </td>
@@ -63,7 +63,7 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
     <section>
       <div class="flex items-center gap-3 pl-2 mb-8">
         <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-gray-900 dark:text-white">Matches</h2>
+        <h2 class="text-2xl font-extrabold tracking-widest uppercase text-gray-900 dark:text-white">Matches</h2>
       </div>
       <div class="space-y-6">
         <div v-for="round in data.rounds" :key="round.roundName">
@@ -71,13 +71,13 @@ const { data, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${
           <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <li v-for="match in round.matches" :key="match.id">
               <NuxtLink :to="`/games/plazmaburst/tournaments/${tournamentId}/matches/${match.id}`"
-                class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-500 transition-colors">
+                class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-default bg-white dark:bg-elevated hover:border-blue-500 transition-colors">
                 
                 <span class="truncate font-medium text-left" :style="{ color: match.colorA }">
                   {{ match.teamA }}
                 </span>
 
-                <div class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded font-mono font-bold text-sm whitespace-nowrap justify-self-center">
+                <div class="px-3 py-1 bg-gray-100 dark:bg-accented rounded font-mono font-bold text-sm whitespace-nowrap justify-self-center">
                   <template v-if="match.status.includes('Walkover')">
                     <span class="text-amber-500">W/O</span>
                   </template>
