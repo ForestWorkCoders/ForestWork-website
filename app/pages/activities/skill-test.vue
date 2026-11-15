@@ -188,6 +188,7 @@ interface TrialSlot {
   moduleId?: number
   bestScore: number | string
   accentColor: string
+  art?: string // Minecraft character behind the card text; cards without art show ⚡
 }
 
 const settlementTab = ref<'summary' | 'ranking'>('summary')
@@ -258,14 +259,14 @@ function shareScore() {
 }
 
 const TRIAL_SLOTS = ref<TrialSlot[]>([
-  { id: 1, index: '01', title: 'PRECISION', code: 'MOD_AIM_01', category: 'TARGET ACQUISITION', status: 'ready', moduleId: 1, bestScore: '---', accentColor: '#10B981' },
-  { id: 2, index: '02', title: 'DUAL AXIS', code: 'MOD_CTRL_02', category: 'MOTOR COORDINATION', status: 'ready', moduleId: 2, bestScore: '---', accentColor: '#38BDF8' },
-  { id: 3, index: '03', title: 'TRAIL LINK', code: 'MOD_SCAN_03', category: 'COGNITIVE SEQUENCE', status: 'ready', moduleId: 3, bestScore: '---', accentColor: '#FACC15' },
-  { id: 4, index: '04', title: 'ODD PAIR', code: 'MOD_PERC_04', category: 'ANOMALY DETECTION', status: 'ready', moduleId: 4, bestScore: '---', accentColor: '#F43F5E' },
+  { id: 1, index: '01', title: 'PRECISION', code: 'MOD_AIM_01', category: 'TARGET ACQUISITION', status: 'ready', moduleId: 1, bestScore: '---', accentColor: '#10B981', art: '/images/skill-test/terrible_creeper.png' },
+  { id: 2, index: '02', title: 'DUAL AXIS', code: 'MOD_CTRL_02', category: 'MOTOR COORDINATION', status: 'ready', moduleId: 2, bestScore: '---', accentColor: '#38BDF8', art: '/images/skill-test/danta.png' },
+  { id: 3, index: '03', title: 'TRAIL LINK', code: 'MOD_SCAN_03', category: 'COGNITIVE SEQUENCE', status: 'ready', moduleId: 3, bestScore: '---', accentColor: '#FACC15', art: '/images/skill-test/eaglepb2.png' },
+  { id: 4, index: '04', title: 'ODD PAIR', code: 'MOD_PERC_04', category: 'ANOMALY DETECTION', status: 'ready', moduleId: 4, bestScore: '---', accentColor: '#F43F5E', art: '/images/skill-test/carbon.png' },
   { id: 5, index: '05', title: 'REACTION', code: 'MOD_REACT_05', category: 'REFLEX KINETICS', status: 'ready', moduleId: 5, bestScore: '---', accentColor: '#A855F7' },
-  { id: 6, index: '06', title: 'APEX TRACK', code: 'MOD_TRACK_06', category: 'DYNAMIC PURSUIT', status: 'ready', moduleId: 6, bestScore: '---', accentColor: '#EC4899' },
+  { id: 6, index: '06', title: 'APEX TRACK', code: 'MOD_TRACK_06', category: 'DYNAMIC PURSUIT', status: 'ready', moduleId: 6, bestScore: '---', accentColor: '#EC4899', art: '/images/skill-test/vivian_0w0.png' },
   { id: 7, index: '07', title: 'BUFFER FLUSH', code: 'SYS_LOCK_07', category: 'MEMORY CAPACITY', status: 'locked', bestScore: '---', accentColor: '#52525B' },
-  { id: 8, index: '08', title: 'PIANO CADENCE', code: 'MOD_TILES_08', category: 'FOUR-LANE CADENCE', status: 'ready', moduleId: 8, bestScore: '---', accentColor: '#52525B' },
+  { id: 8, index: '08', title: 'PIANO CADENCE', code: 'MOD_TILES_08', category: 'FOUR-LANE CADENCE', status: 'ready', moduleId: 8, bestScore: '---', accentColor: '#52525B', art: '/images/skill-test/ken.png' },
   { id: 9, index: '09', title: 'CHRONO TAP', code: 'MOD_CPS_09', category: 'TEMPORAL CADENCE', status: 'ready', moduleId: 9, bestScore: '---', accentColor: '#06B6D4' },
   { id: 10, index: '10', title: 'OVERCLOCK', code: 'SYS_LOCK_10', category: 'LIMITER BREAKTHROUGH', status: 'locked', bestScore: '---', accentColor: '#52525B' }
 ])
@@ -763,6 +764,9 @@ onUnmounted(() => {
               <div
                 class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-zinc-600 group-hover:border-emerald-400 transition-colors" />
 
+              <img v-if="slot.art" :src="slot.art" alt="" aria-hidden="true" loading="lazy" draggable="false"
+                class="absolute inset-0 w-full h-full object-contain object-bottom pointer-events-none [image-rendering:pixelated] blur-[2px] brightness-[.4] transition duration-200 group-hover:blur-none group-hover:brightness-75 group-focus-within:blur-none group-focus-within:brightness-75" />
+
               <div class="shrink-0 flex justify-between items-start gap-2 font-mono z-10 leading-tight">
                 <span class="shrink-0 text-xs font-extrabold transition-colors"
                   :style="{ color: slot.status === 'ready' ? slot.accentColor : '#71717a' }">
@@ -781,7 +785,7 @@ onUnmounted(() => {
               </div>
 
               <div class="flex-1 min-h-0 flex flex-col items-center justify-center py-0.5 overflow-hidden relative">
-                <div
+                <div v-if="!slot.art"
                   class="text-xl sm:text-2xl font-extrabold font-mono transition-transform duration-200 group-hover:scale-110 select-none"
                   :style="{ color: slot.status === 'ready' ? slot.accentColor : '#3f3f46' }">
                   {{ slot.status === 'ready' ? '⚡' : '🔒' }}
@@ -789,7 +793,7 @@ onUnmounted(() => {
                 <span v-if="slot.status === 'ready'"
                   class="mt-0.5 px-1.5 py-0.2 text-xs font-mono tracking-widest uppercase rounded border font-semibold"
                   :style="{
-                    backgroundColor: `${slot.accentColor}15`,
+                    backgroundColor: slot.art ? '#0D1117E6' : `${slot.accentColor}15`,
                     color: slot.accentColor,
                     borderColor: `${slot.accentColor}40`
                   }">
