@@ -134,8 +134,9 @@ const items = computed<NavigationMenuItem[]>(() => [
     <!-- 🟢 3. 彻底拔掉静态 SVG 身上有害的 <ClientOnly> -->
     <template #toggle="{ open, toggle, ui }">
       <UButton size="sm" variant="ghost" color="neutral" square :class="ui.toggle({ toggleSide: 'right' })"
-        @click="toggle">
+        :aria-label="open ? '關閉選單' : '開啟選單'" :aria-expanded="open" @click="toggle">
         <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          aria-hidden="true"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="4" y1="6" x2="20" y2="6" />
           <line x1="4" y1="12" x2="20" y2="12" />
@@ -152,6 +153,14 @@ const items = computed<NavigationMenuItem[]>(() => [
           variant="solid" block>
           加入Discord
         </UButton>
+
+        <!-- 未登入：手機選單的 Discord 登入（桌面版按鈕在 lg 以下隱藏） -->
+        <ClientOnly>
+          <UButton v-if="!isPending && !user" color="primary" variant="outline" icon="i-simple-icons-discord"
+            block class="mt-3" @click="login">
+            Discord 登入
+          </UButton>
+        </ClientOnly>
       </div>
     </template>
   </UHeader>

@@ -2,6 +2,52 @@
 import type { H3Event } from 'h3'
 import { getSupabase } from '../../utils/supabase'
 
+// -------------------------------------------------------------
+// 共用排行榜 Embed：每個榜只提供資料，版面由這裡統一
+// -------------------------------------------------------------
+const BOARD_COLOR = 0x4C7766 // Forest Emerald
+const BOARD_ICON = 'https://forestwork.vercel.app/android-chrome-192x192.png'
+const RANK_EMOJI = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+
+interface Leaderboard {
+  title: string // 例：口吐芬芳 · 次數榜 · 2026
+  scoreLabel: string // 每列分數前的標籤，例：次數
+  rows: { name: string, score: string }[] // 前 10 名，分數已格式化
+  empty: string // 沒有任何資料時的說明
+  me: { rank: number | null, stats: [string, string][], unranked: string } | null // null = 不顯示個人區塊
+  note: string // 頁尾：「<名稱> · <提示>」
+}
+
+// 名字放在欄位標題裡，跳脫 Markdown 符號免得變成粗體或刪除線
+const escapeName = (name: string) => name.replace(/([\\*_~`|>])/g, '\\$1')
+
+const displayName =(username: string | null | undefined, userId: unknown) =>
+  username || `用戶_${String(userId).slice(-4)}`
+
+export function buildLeaderboardEmbed(board: Leaderboard) {
+  const fields = board.rows.map((row, i) => ({
+    name: `${RANK_EMOJI[i] ?? `#${i + 1}`} ${escapeName(row.name)}`,
+    value: `${board.scoreLabel}: ${row.score}`
+  }))
+
+  if (board.me) {
+    fields.push({
+      name: '--- 你的排名 ---',
+      value: board.me.rank ? `第 ${board.me.rank} 名` : board.me.unranked
+    })
+    for (const [name, value] of board.me.stats) fields.push({ name, value })
+  }
+
+  return {
+    title: `🏅【${board.title}】`,
+    description: board.rows.length ? `以下是【${board.title}】的排名` : board.empty,
+    color: BOARD_COLOR,
+    fields,
+    footer: { text: board.note, icon_url: BOARD_ICON },
+    timestamp: new Date().toISOString()
+  }
+}
+
 /**
  * 構造單一複合下拉選單 ActionRow (好品味：狀態自包含，當前選中項自動高亮 default: true)
  */
@@ -63,112 +109,56 @@ export function buildCurseLeaderboardComponents(currentYear: number, currentMode
 }
 
 /**
- * 核心渲染純函數：傳入 (年份, 模式, 觀察者ID)，產出 (Embed + Components)
+ * 口吐芬芳榜：次數榜，或百分比榜 (只算發言至少 5 則的人，免得 1 則就 100%)
  */
 export async function renderCurseLeaderboardPayload(
   queryYear: number,
   mode: 'count' | 'ratio',
   viewerId: string
 ) {
-  const supabase = getSupabase()
+  type Row = { user_id: string, username: string | null, count: number, total_messages: number }
   const isRatio = mode === 'ratio'
+  const ratio = (r: Row) => (r.total_messages > 0 ? r.count / r.total_messages : 0)
+  const pct = (r: Row) => `${(ratio(r) * 100).toFixed(2)}%`
+  const value = isRatio ? ratio : (r: Row) => r.count
 
-  // 1. 精準拉取前 10 名
-  let topQuery = supabase
+  // 一年約一百多人，整年一次拉完，排名、前 10 與個人都從同一份資料算
+  const { data } = await getSupabase()
     .schema('trpg')
     .from('curse_stats')
     .select('user_id, username, count, total_messages')
     .eq('year', queryYear)
+  const all: Row[] = data || []
+  const pool = isRatio ? all.filter(r => r.total_messages >= 5) : all
+  const ranked = [...pool].sort((a, b) => value(b) - value(a))
 
-  let top10: any[] = []
+  const me = all.find(r => String(r.user_id) === String(viewerId) && r.count > 0)
 
-  if (isRatio) {
-    const { data: ratioData } = await topQuery
-      .gte('total_messages', 5)
-      .order('count', { ascending: false })
-      .limit(50)
-
-    if (ratioData) {
-      top10 = [...ratioData]
-        .sort((a, b) => {
-          const rA = a.total_messages > 0 ? a.count / a.total_messages : 0
-          const rB = b.total_messages > 0 ? b.count / b.total_messages : 0
-          return rB - rA
-        })
-        .slice(0, 10)
-    }
-  } else {
-    const { data: countData } = await topQuery
-      .order('count', { ascending: false })
-      .limit(10)
-    top10 = countData || []
+  const board: Leaderboard = {
+    title: `口吐芬芳 · ${isRatio ? '百分比榜' : '次數榜'} · ${queryYear}`,
+    scoreLabel: isRatio ? '百分比' : '次數',
+    rows: ranked.slice(0, 10).map(r => ({
+      name: displayName(r.username, r.user_id),
+      score: isRatio ? `\`${pct(r)}\` (${r.count}/${r.total_messages})` : `\`${r.count}\` 次`
+    })),
+    empty: `${queryYear} 年尚無統計數據！`,
+    me: {
+      // 只有在榜上的人才有名次：百分比榜不收發言未滿 5 則的人
+      rank: me && pool.includes(me) ? pool.filter(r => value(r) > value(me)).length + 1 : null,
+      stats: !me
+        ? []
+        : isRatio
+          ? [['百分比', `\`${pct(me)}\``], ['次數', `\`${me.count}/${me.total_messages}\``]]
+          : [['次數', `\`${me.count}\``], ['總訊息', `\`${me.total_messages}\``]],
+      unranked: me
+        ? '未入榜 (百分比榜只計算發言至少 5 則的成員)'
+        : `未入榜 (閣下在 ${queryYear} 年尚未在監控頻道發表帶有口吐芬芳的訊息)`
+    },
+    note: '口吐芬芳統計 · 每年 1 月 1 日重置'
   }
 
-  // 構造前 10 名文本
-  let rankContent = ''
-  if (top10.length === 0) {
-    rankContent = `📊 **${queryYear} 年度口吐芬芳排行榜** 尚無統計數據！`
-  } else {
-    rankContent = top10.map((item, idx) => {
-      const name = item.username || `用戶_${String(item.user_id).slice(-4)}`
-      if (isRatio) {
-        const pct = item.total_messages > 0 ? ((item.count / item.total_messages) * 100).toFixed(2) : '0.00'
-        return `#${idx + 1} **${name}**\n口吐芬芳百分比: \`${pct}%\` (${item.count}/${item.total_messages})`
-      } else {
-        return `#${idx + 1} **${name}**\n口吐芬芳次數: \`${item.count}\` 次`
-      }
-    }).join('\n\n')
-  }
-
-  // 2. 獨立查詢當前操作者的個人戰績
-  let personalRankBlock = ''
-  const { data: myData } = await supabase
-    .schema('trpg')
-    .from('curse_stats')
-    .select('user_id, username, count, total_messages')
-    .eq('year', queryYear)
-    .eq('user_id', viewerId)
-    .maybeSingle()
-
-  if (myData && myData.count > 0) {
-    let myRank = 1
-    if (!isRatio) {
-      const { count: higherCount } = await supabase
-        .schema('trpg')
-        .from('curse_stats')
-        .select('*', { count: 'exact', head: true })
-        .eq('year', queryYear)
-        .gt('count', myData.count)
-
-      myRank = (higherCount || 0) + 1
-      personalRankBlock = `\n\n--- **你的排名** ---\n第 **${myRank}** 名\n次數: \`${myData.count}\`  總訊息: \`${myData.total_messages}\``
-    } else {
-      const myRate = myData.total_messages > 0 ? myData.count / myData.total_messages : 0
-      const myPct = (myRate * 100).toFixed(2)
-
-      const { data: allRatio } = await supabase
-        .schema('trpg')
-        .from('curse_stats')
-        .select('count, total_messages')
-        .eq('year', queryYear)
-        .gte('total_messages', 5)
-
-      if (allRatio) {
-        const higher = allRatio.filter(r => (r.count / r.total_messages) > myRate).length
-        myRank = higher + 1
-      }
-      personalRankBlock = `\n\n--- **你的排名** ---\n第 **${myRank}** 名\n百分比: \`${myPct}%\`  次數: \`${myData.count}/${myData.total_messages}\``
-    }
-  } else {
-    personalRankBlock = `\n\n--- **你的排名** ---\n未入榜 (閣下在 ${queryYear} 年尚未在監控頻道發表帶有口吐芬芳的訊息)`
-  } const title = isRatio ? `📊 口吐芬芳 百分比排行榜 (${queryYear})`
-    : `📊 口吐芬芳 次數排行榜 (${queryYear})`
   return {
-    embeds: [{
-      title, description: rankContent + personalRankBlock, color: isRatio ? 0x3498DB : 0x2ECC71, footer: {
-        text: `更新時間: ${new Date().toISOString().replace('T', ' ').slice(0, 19)} · 每年 1 月 1 日重置`
-      }
-    }],
+    embeds: [buildLeaderboardEmbed(board)],
     components: buildCurseLeaderboardComponents(queryYear, mode)
   }
 }
@@ -208,53 +198,21 @@ export function buildQuasoLeaderboardComponents(currentMode: 'received' | 'sent'
 }
 
 /**
- * 渲染 Quaso 排行榜 Payload (純函數)
+ * Quaso 榜：收到最多 (團寵) 或送出最多 (大善人)
  */
 export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', viewerId: string) {
   const supabase = getSupabase()
   const isReceived = mode === 'received'
 
-  // 1. 呼叫 Postgres 聚合 RPC 拿前 10 名
-  const { data: topList, error } = await supabase.schema('trpg').rpc('get_quaso_leaderboard', {
+  // 送過或收過 Quaso 的人只有幾十個：拉完整份，前 10、個人累計與排名都從這份算
+  const { data } = await supabase.schema('trpg').rpc('get_quaso_leaderboard', {
     p_mode: mode,
-    p_limit: 10
+    p_limit: 1000
   })
+  const all: { user_id: string, username: string | null, total: number }[] = data || []
+  const myTotal = Number(all.find(r => String(r.user_id) === String(viewerId))?.total ?? 0)
 
-  let rankContent = ''
-  if (error || !topList || topList.length === 0) {
-    rankContent = `🥐 **Quaso ${isReceived ? '團寵人氣榜' : '大善人奉獻榜'}** 尚無統計數據！快使用右鍵選單投遞第一個 Quaso 吧！`
-  } else {
-    rankContent = topList.map((item: any, idx: number) => {
-      const medals = ['🥇', '🥈', '🥉']
-      const prefix = medals[idx] || `\`#${idx + 1}\``
-      const name = item.username || `用戶_${String(item.user_id).slice(-4)}`
-      const actionText = isReceived ? '累計收穫' : '慷慨送出'
-      return `${prefix} **${name}** ➔ ${actionText} \`${item.total}\` 個 🥐`
-    }).join('\n')
-  }
-
-  // 2. 獨立查詢發起者個人戰績與今日剩餘 Quaso 額度
-  let personalBlock = ''
-  
-  // 查個人總量
-  let personalTotal = 0
-  if (isReceived) {
-    const { data } = await supabase
-      .schema('trpg')
-      .from('quaso_transactions')
-      .select('amount')
-      .eq('receiver_id', viewerId)
-    personalTotal = data?.reduce((acc, cur) => acc + cur.amount, 0) || 0
-  } else {
-    const { data } = await supabase
-      .schema('trpg')
-      .from('quaso_transactions')
-      .select('amount')
-      .eq('giver_id', viewerId)
-    personalTotal = data?.reduce((acc, cur) => acc + cur.amount, 0) || 0
-  }
-
-  // 查今日剩餘額度
+  // 今日剩餘額度
   const todayStr = new Date().toISOString().split('T')[0]
   const { data: todayRecords } = await supabase
     .schema('trpg')
@@ -262,30 +220,30 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
     .select('amount')
     .eq('giver_id', viewerId)
     .eq('give_date', todayStr)
-  
   const todayUsed = todayRecords?.reduce((acc, cur) => acc + cur.amount, 0) || 0
   const remainingToday = Math.max(0, 3 - todayUsed)
 
-  personalBlock = [
-    '',
-    '--- **你的 Quaso 檔案** ---',
-    `個人累計: ${isReceived ? '獲得' : '送出'} \`${personalTotal}\` 個 🥐`,
-    `今日可用額度: \`${remainingToday}/3\` 枚 (午夜 00:00 刷新)`
-  ].join('\n')
-
-  const title = isReceived ? '🥐 Quaso 團寵人氣排行榜 (收到最多)' : '✨ Quaso 大善人奉獻排行榜 (送出最多)'
+  const board: Leaderboard = {
+    title: `Quaso · ${isReceived ? '團寵人氣榜' : '大善人奉獻榜'}`,
+    scoreLabel: isReceived ? '累計收穫' : '慷慨送出',
+    rows: all.slice(0, 10).map(r => ({
+      name: displayName(r.username, r.user_id),
+      score: `\`${r.total}\` 個 🥐`
+    })),
+    empty: '尚無統計數據！快使用右鍵選單投遞第一個 Quaso 吧！',
+    me: {
+      rank: myTotal > 0 ? all.filter(r => Number(r.total) > myTotal).length + 1 : null,
+      stats: [
+        [isReceived ? '個人累計獲得' : '個人累計送出', `\`${myTotal}\` 個 🥐`],
+        ['今日可用額度', `\`${remainingToday}/3\` 枚 (午夜 00:00 刷新)`]
+      ],
+      unranked: isReceived ? '未入榜 (尚未收到 Quaso)' : '未入榜 (尚未送出 Quaso)'
+    },
+    note: 'Quaso 社交激勵 · 對成員右鍵點選「Apps ➔ 🥐 送 1 個 Quaso」即可投遞'
+  }
 
   return {
-    embeds: [{
-      title,
-      description: rankContent + '\n' + personalBlock,
-      color: isReceived ? 0xE67E22 : 0xF1C40F,
-      footer: {
-        text: '林間小鎮 社交激勵系統 · 對成員右鍵點選「Apps ➔ 🥐 送 1 個 Quaso」即可投遞',
-        // icon_url: FORESTWORK_ICON_URL
-      },
-      timestamp: new Date().toISOString()
-    }],
+    embeds: [buildLeaderboardEmbed(board)],
     components: buildQuasoLeaderboardComponents(mode)
   }
 }
@@ -412,116 +370,73 @@ export function buildSkillLeaderboardComponents(currentModuleId: number) {
 }
 
 /**
- * 核心渲染純函數：拉取該科目全球前 10 榜單與查詢者個人 PB
+ * 技能評定榜：該科目全服前 10 與查詢者的個人最佳 (PB)
  */
 export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: string) {
   const mod = SKILL_MODULES[moduleId] || SKILL_MODULES[1]!
-  const supabase = getSupabase()
+  const title = `技能評定 · ${mod.emoji} ${mod.title} // ${mod.category}`
+  const note = 'ForestWork 技能評定 · 點擊下方按鈕直接啟動 Activity'
+  const components = buildSkillLeaderboardComponents(mod.id)
 
-  // 1. 若為鎖定模組，直接給出斯巴達式安全告知
+  // 鎖定模組：沒有排名，只有告知
   if (mod.status === 'locked') {
-    return {
-      embeds: [{
-        title: `${mod.emoji} ${mod.title} // ${mod.category}`,
-        description: `🔒 **【SYS_LOCK // 機密限制】**\n\n該科目核心物理矩陣正在整備調試中，尚未向外場操作員開放。\n請切換至其他就緒模組進行評定。`,
-        color: mod.color,
-        footer: { text: 'ForestWork // Tactical Benchmark Matrix' }
-      }],
-      components: buildSkillLeaderboardComponents(mod.id)
+    const board: Leaderboard = {
+      title,
+      scoreLabel: '分數',
+      rows: [],
+      empty: '🔒 **【SYS_LOCK // 機密限制】**\n\n該科目核心物理矩陣正在整備調試中，尚未向外場操作員開放。\n請切換至其他就緒模組進行評定。',
+      me: null,
+      note
     }
+    return { embeds: [buildLeaderboardEmbed(board)], components }
   }
 
-  // 2. 查詢該科目全服排名前 10 戰績
-  const { data: topList, error } = await supabase
+  const supabase = getSupabase()
+  const { data: topList } = await supabase
     .schema('trpg')
     .from('v_skill_leaderboard')
     .select('global_rank, discord_id, operator_name, score, rating, created_at')
     .eq('module_id', mod.id)
     .order('global_rank', { ascending: true })
     .limit(10)
+  const top = topList || []
 
-  let rankContent = ''
-  if (error || !topList || topList.length === 0) {
-    rankContent = `// 該科目暫無評定記錄 · 等待首位特工登頂`
-  } else {
-    const medals = ['🥇', '🥈', '🥉']
-    rankContent = topList.map(item => {
-      const prefix = medals[item.global_rank - 1] || `\`#${item.global_rank}\``
-      return `${prefix} **${item.operator_name}** ➔ \`${item.score.toLocaleString()}\` PTS \`[${item.rating}]\``
-    }).join('\n')
-  }
-
-  // 3. 查詢當前呼叫者在該科目的個人歷史最佳戰績 (PB)
-  let personalBlock = ''
+  // 個人 PB：在前 10 名裡就直接用，不在才單獨反查
+  let mine: { global_rank: number, score: number, rating: string | null } | null = null
   if (viewerId) {
-    let myRank: number | null = null
-    let myScore: number | null = null
-    let myRating: string = 'COMBAT READY'
-
-    // ① 第一優先：如果在剛剛拉取的前 10 強中，直接內存命中！0 次額外網路請求！
-    const inTopEntry = topList?.find(item => String(item.discord_id) === String(viewerId))
-    if (inTopEntry) {
-      myRank = inTopEntry.global_rank
-      myScore = inTopEntry.score
-      myRating = inTopEntry.rating || 'COMBAT READY'
-    } 
-    // ② 第二優先：若未進入前 10 強，直接向 v_skill_leaderboard 單表反查該選手的全服權威位次
-    else {
-      const { data: myRankEntry, error: rankErr } = await supabase
+    mine = top.find(item => String(item.discord_id) === String(viewerId)) || null
+    if (!mine) {
+      const { data, error } = await supabase
         .schema('trpg')
         .from('v_skill_leaderboard')
         .select('global_rank, score, rating')
         .eq('module_id', mod.id)
         .eq('discord_id', String(viewerId))
         .maybeSingle()
-
-      if (rankErr) {
-        console.error('[-] 個人戰術檔案反查異常:', rankErr.message)
-      } else if (myRankEntry) {
-        myRank = myRankEntry.global_rank
-        myScore = myRankEntry.score
-        myRating = myRankEntry.rating || 'COMBAT READY'
-      }
-    }
-
-    // 格式化輸出個人檔案
-    if (myScore !== null && myRank !== null) {
-      personalBlock = [
-        '',
-        '--- **你的戰術檔案 // PERSONAL RECORD** ---',
-        `個人最佳: \`${myScore.toLocaleString()} PTS\` · 全服位次: **#${myRank}** \`[${myRating}]\``
-      ].join('\n')
-    } else {
-      personalBlock = [
-        '',
-        '--- **你的戰術檔案 // PERSONAL RECORD** ---',
-        `尚未完成該科目評定 · 點擊下方按鈕啟動 Activity 開始測試！`
-      ].join('\n')
+      if (error) console.error('[-] 個人戰術檔案反查異常:', error.message)
+      mine = data
     }
   }
 
-  return {
-    embeds: [{
-      title: `${mod.emoji} ${mod.title} // ${mod.category}`,
-      description: rankContent + (personalBlock ? '\n' + personalBlock : ''),
-      color: mod.color,
-      fields: [
-        {
-          name: '科目代號',
-          value: `\`${mod.code}\``,
-          inline: true
-        },
-        {
-          name: '狀態標籤',
-          value: '`DEPLOYABLE`',
-          inline: true
+  const board: Leaderboard = {
+    title,
+    scoreLabel: '分數',
+    rows: top.map(item => ({
+      name: displayName(item.operator_name, item.discord_id),
+      score: `\`${item.score.toLocaleString()}\` PTS \`[${item.rating}]\``
+    })),
+    empty: '該科目暫無評定記錄 · 等待首位特工登頂',
+    me: viewerId
+      ? {
+          rank: mine ? mine.global_rank : null,
+          stats: mine
+            ? [['個人最佳', `\`${mine.score.toLocaleString()} PTS\``], ['評級', `\`[${mine.rating || 'COMBAT READY'}]\``]]
+            : [],
+          unranked: '尚未完成該科目評定 · 點擊下方按鈕啟動 Activity 開始測試！'
         }
-      ],
-      footer: {
-        text: 'ForestWork // Skill Sandbox · 點擊下方按鈕直接啟動 Activity'
-      },
-      timestamp: new Date().toISOString()
-    }],
-    components: buildSkillLeaderboardComponents(mod.id)
+      : null,
+    note
   }
+
+  return { embeds: [buildLeaderboardEmbed(board)], components }
 }

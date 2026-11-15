@@ -394,7 +394,42 @@ let activeModule: SkillModuleInstance = defaultModule
 let animationFrameId: number
 let startTime = 0
 let lastTime = 0
+// Every module waits behind the start overlay until the first click, tap or key
+let isWaiting = true
 const floatingTexts: FloatingText[] = []
+
+function resetRun() {
+  score.value = 0
+  floatingTexts.length = 0
+  isFinished.value = false
+  startTime = performance.now()
+  lastTime = startTime
+  activeModule.init({
+    canvas: canvasRef.value!,
+    ctx: canvasRef.value!.getContext('2d')!,
+    addScore
+  })
+}
+
+// The input that starts a run is not passed to the module, so it can't count as a miss.
+// init() runs again here so the module's own timers start now, not when the stage opened.
+function startRun() {
+  isWaiting = false
+  resetRun()
+}
+
+function drawStartOverlay(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = 'rgba(13, 17, 23, 0.72)'
+  ctx.fillRect(0, 0, 800, 600)
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#ffffff'
+  ctx.font = 'bold 40px ui-monospace, monospace'
+  ctx.fillText('點擊或按任意鍵開始', 400, 280)
+  ctx.fillStyle = '#8BCBB2'
+  ctx.font = 'bold 28px ui-monospace, monospace'
+  ctx.fillText(activeModule.title, 400, 336)
+}
 
 function addScore(delta: number, x?: number, y?: number, color = '#10b981') {
   score.value += delta
@@ -412,6 +447,7 @@ function addScore(delta: number, x?: number, y?: number, color = '#10b981') {
 
 function handlePointerDown(e: MouseEvent) {
   if (!canvasRef.value || isFinished.value) return
+  if (isWaiting) return startRun()
   const rect = canvasRef.value.getBoundingClientRect()
   activeModule.onPointerDown?.(
     (e.clientX - rect.left) * (800 / rect.width),
@@ -455,12 +491,16 @@ function handleKeyDown(e: KeyboardEvent) {
   }
 
   if (viewMode.value === 'playing' && !isScoreboardOpen.value) {
+    if (isWaiting) {
+      if (!e.repeat) startRun()
+      return
+    }
     activeModule.onKeyDown?.(e.code, e)
   }
 }
 
 function handleKeyUp(e: KeyboardEvent) {
-  if (viewMode.value === 'playing' && !isScoreboardOpen.value) {
+  if (viewMode.value === 'playing' && !isScoreboardOpen.value && !isWaiting) {
     activeModule.onKeyUp?.(e.code, e)
   }
 }
@@ -468,8 +508,8 @@ function handleKeyUp(e: KeyboardEvent) {
 function tick(now: number) {
   const dt = Math.min((now - lastTime) / 1000, 0.1)
   lastTime = now
-  // A module waiting for its first input (e.g. PIANO CADENCE) doesn't use up its time
-  if (activeModule.isStarted === false) startTime = now
+  // Waiting behind the start overlay doesn't use up the module's time
+  if (isWaiting) startTime = now
   const elapsed = now - startTime
 
   const moduleDuration = activeModule.durationMs ?? 60000
@@ -526,9 +566,11 @@ function tick(now: number) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  activeModule.update(dt, now, elapsed)
+  // While waiting the scene is drawn but frozen: nothing moves or spawns before the start
+  if (!isWaiting) activeModule.update(dt, now, elapsed)
   ctx.clearRect(0, 0, 800, 600)
   activeModule.render(ctx, now, elapsed)
+  if (isWaiting) drawStartOverlay(ctx)
 
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -574,17 +616,8 @@ function launchSlot(slot: TrialSlot) {
     activeModule.cleanup?.()
     activeModule = targetModule
 
-    score.value = 0
-    floatingTexts.length = 0
-    isFinished.value = false
-    startTime = performance.now()
-    lastTime = startTime
-
-    activeModule.init({
-      canvas: canvasRef.value,
-      ctx: canvasRef.value.getContext('2d')!,
-      addScore
-    })
+    isWaiting = true
+    resetRun()
 
     cancelAnimationFrame(animationFrameId)
     animationFrameId = requestAnimationFrame(tick)
@@ -912,9 +945,10 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <!-- 4:3 逻辑等比画布容器 -->
-      <main class="flex-1 min-h-0 w-full flex items-center justify-center p-2 sm:p-4 overflow-hidden relative">
-        <div class="relative h-full max-h-full aspect-[4/3] max-w-full flex items-center justify-center">
+      <!-- 4:3 stage: as wide as the space allows, but no wider than its height allows, so it never stretches -->
+      <main
+        class="flex-1 min-h-0 w-full flex items-center justify-center p-2 sm:p-4 overflow-hidden relative [container-type:size]">
+        <div class="relative w-[min(100cqw,calc(100cqh*4/3))] aspect-[4/3] flex items-center justify-center">
           <canvas ref="canvasRef" width="800" height="600" @mousedown="handlePointerDown" @mousemove="handlePointerMove"
             @mouseleave="handlePointerLeave" @contextmenu.prevent
             class="w-full h-full bg-[#161B22] border border-[#30363D] shadow-2xl cursor-crosshair block" />
