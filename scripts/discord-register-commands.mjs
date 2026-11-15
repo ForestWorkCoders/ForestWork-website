@@ -310,6 +310,12 @@ const cocCommands = [
                         description: '調閱伺服器其他玩家的角色卡 (可選)',
                         type: 6, // USER
                         required: false
+                    },
+                    {
+                        name: 'full',
+                        description: '顯示完整生平 (可選，預設只顯示開頭)',
+                        type: 5, // BOOLEAN
+                        required: false
                     }
                 ]
             },
@@ -345,35 +351,17 @@ const cocCommands = [
                 ]
             },
             {
-                name: 'avatar',
-                description: '設定當前出戰或指定調查員的立繪頭像',
-                type: 1, // SUB_COMMAND
-                options: [
-                    {
-                        name: 'image',
-                        description: '直接拖曳上傳圖片 (自動轉存至永久雲端儲存)',
-                        type: 11, // ATTACHMENT
-                        required: false
-                    },
-                    {
-                        name: 'url',
-                        description: '或直接填寫公開圖片直鏈 (例如 Imgur)',
-                        type: 3, // STRING
-                        required: false
-                    },
-                    {
-                        name: 'name',
-                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
-                        type: 3, // STRING
-                        required: false
-                    },
-                ]
-            },
-            {
                 name: 'edit',
-                description: '修改當前出戰或指定調查員的狀態、屬性或技能',
+                description: '修改指定調查員的狀態、屬性、技能、生平或立繪',
                 type: 1, // ★ 子指令本身是 type: 1 (SUB_COMMAND)
                 options: [
+                    {
+                        name: 'name', // 必填選項必須排在最前面
+                        description: '要編輯的角色姓名 (從清單選擇)',
+                        type: 3, // STRING
+                        required: true,
+                        autocomplete: true
+                    },
                     {
                         name: 'hp', // [0]
                         description: '調整體力值 (支援相對增減如 -3, +2 或絕對數值如 12)',
@@ -417,32 +405,15 @@ const cocCommands = [
                         required: false
                     },
                     {
-                        name: 'name', // [6]
-                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
-                        type: 3, // STRING
+                        name: 'bio',
+                        description: '開啟視窗編寫生平背景 (支援 Markdown)',
+                        type: 5, // BOOLEAN
                         required: false
-                    }
-                ]
-            },
-            {
-                name: 'bio',
-                description: '檢視或編輯調查員的生平背景故事 (支援 Markdown 排版)',
-                type: 1, // SUB_COMMAND
-                options: [
-                    {
-                        name: 'action',
-                        description: '操作類型 (view: 檢視故事 ｜ edit: 開啟編輯視窗)',
-                        type: 3, // STRING
-                        required: true,
-                        choices: [
-                            { name: '檢視背景故事 (View)', value: 'view' },
-                            { name: '編寫/修改故事 (Edit)', value: 'edit' }
-                        ]
                     },
                     {
-                        name: 'name',
-                        description: '指定角色姓名 (可選，預設為當前出戰卡)',
-                        type: 3, // STRING
+                        name: 'avatar',
+                        description: '開啟視窗更換立繪 (上傳圖片或填寫網址)',
+                        type: 5, // BOOLEAN
                         required: false
                     }
                 ]
