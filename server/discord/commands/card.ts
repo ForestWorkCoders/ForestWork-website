@@ -4,86 +4,140 @@ import { put } from '@vercel/blob'
 import { COC_SKILL_CATEGORIES, BASE_ATTR_KEYS } from '../assets/coc-skills'
 import { parseCharacterCard } from '../utils/cocParser'
 import { getSupabase } from '../../utils/supabase'
-import { FORESTWORK_ICON_URL } from '../utils'
 
-// 2. 格式化单张角色卡为精美的 Discord Embed (完整防弹版，消灭 ReferenceError)
-function buildCharacterEmbed(char: any, fallbackAvatar?: string) {
+// Discord embed limits: 25 fields, 1024 per field value, 4096 description, 6000 in total.
+const EMBED_MAX_FIELDS = 25
+const FIELD_VALUE_MAX = 1024
+const DESCRIPTION_MAX = 4096
+const EMBED_TOTAL_MAX = 6000
+const BIO_PREVIEW_CHARS = 300
+
+const ATTR_NAMES: Record<string, string> = {
+  STR: '力量', CON: '體質', DEX: '敏捷', APP: '外貌', POW: '意志',
+  INT: '智力', SIZ: '體型', EDU: '教育', LUK: '幸運'
+}
+
+// Cut to `max` UTF-16 units (the stricter count) without splitting an emoji in half.
+function clip(text: string, max: number, tail = '…'): string {
+  if (text.length <= max) return text
+  let out = ''
+  for (const ch of text) {
+    if (out.length + ch.length > max - tail.length) break
+    out += ch
+  }
+  return out + tail
+}
+
+// Split a line longer than one field value at its ' ｜ ' separators.
+function splitLine(line: string, sep = ' ｜ '): string[] {
+  if (line.length <= FIELD_VALUE_MAX) return [line]
+  const parts: string[] = []
+  let cur = ''
+  for (const item of line.split(sep)) {
+    if (cur && cur.length + sep.length + item.length > FIELD_VALUE_MAX) {
+      parts.push(cur)
+      cur = item
+    } else {
+      cur = cur ? cur + sep + item : item
+    }
+  }
+  return cur ? [...parts, cur] : parts
+}
+
+// Pack lines into as few field values as fit: at most `maxFields` values and `maxChars` in all.
+// Lines that don't fit are dropped and the last value ends with 「…」.
+function packLines(lines: string[], maxFields: number, maxChars: number): string[] {
+  const out: string[] = []
+  let used = 0
+  for (const raw of lines.flatMap(l => splitLine(l))) {
+    const line = clip(raw, Math.min(FIELD_VALUE_MAX, maxChars - used))
+    const last = out.length - 1
+    const joins = last >= 0 && out[last]!.length + 1 + line.length <= FIELD_VALUE_MAX
+    const cost = line.length + (joins ? 1 : 0)
+    if (line.length === 0 || used + cost > maxChars || (!joins && out.length >= maxFields)) {
+      if (last >= 0 && !out[last]!.endsWith('…')) out[last] = out[last]!.slice(0, FIELD_VALUE_MAX - 1) + '…'
+      break
+    }
+    if (joins) out[last] += '\n' + line
+    else out.push(line)
+    used += cost
+  }
+  return out
+}
+
+function embedLength(e: any): number {
+  return (e.title?.length || 0) + (e.description?.length || 0) + (e.author?.name?.length || 0)
+    + (e.footer?.text?.length || 0)
+    + e.fields.reduce((n: number, f: any) => n + f.name.length + f.value.length, 0)
+}
+
+// 2. 單張角色卡：生平 + 狀態 + 八圍 + 技能 (WL16)
+function buildCharacterEmbed(char: any, fallbackAvatar?: string, opts: { fullBio?: boolean } = {}) {
   const attrs = char.attributes || {}
   const skills = char.skills || {}
   const displayAvatar = char.avatar_url || fallbackAvatar
-  // 八围排版
-  const attrText = BASE_ATTR_KEYS.map(k => `**${k}**: \`${attrs[k] || 0}\``).join(' | ')
   const hasInsanity = Boolean(char.insanity && char.insanity.trim().length > 0)
-  const mentalStatusTag = hasInsanity 
-    ? `🔥 **精神狀態**: \`【${char.insanity}】\`` 
-    : `🟢 **精神狀態**: \`正常\``
-  
   const mythosVal = Number(skills['克蘇魯神話'] || skills['克苏鲁神话'] || 0)
   const maxSan = Math.max(0, 99 - mythosVal)
 
   const fields: any[] = [
-    {
-      name: '📌 當前生存狀態',
-      value: `❤️ **HP**: \`${char.hp}\` ｜ 🔮 **MP**: \`${char.mp}\` ｜ 🧠 **SAN**: \`${char.san} /${maxSan}\` ` + `*(神話: \`${mythosVal}%\`)*\n${mentalStatusTag}`,
-      inline: false
-    },
-    {
-      name: '📊 基礎屬性 (八圍 + 幸運)',
-      value: attrText || '無數據',
-      inline: false
-    }
+    { name: '📌 當前生存狀態', value: '-----------' },
+    { name: '❤️ HP', value: String(char.hp ?? 0), inline: true },
+    { name: '🔮 MP', value: String(char.mp ?? 0), inline: true },
+    { name: '🧠 SAN', value: `${char.san ?? 0} /${maxSan} (神話: ${mythosVal}%)` },
+    hasInsanity
+      ? { name: '🔥 精神狀態', value: `【${char.insanity}】`, inline: true }
+      : { name: '🟢 精神狀態', value: '正常', inline: true },
+    { name: '📊 基礎屬性 (八圍 + 幸運)', value: '-----------' },
+    ...BASE_ATTR_KEYS.map(k => ({ name: `${k}（${ATTR_NAMES[k]}）`, value: String(attrs[k] || 0), inline: true }))
   ]
 
-  // 11 大技能分类排版
-  let validSkillCount = 0
-  const renderedSkills = new Set<string>()
-
+  // 技能：每個類別一行，其餘歸入自訂；每項技能只出現一次
+  const listed = new Set<string>()
+  const lines: string[] = []
   for (const [catName, catSkills] of Object.entries(COC_SKILL_CATEGORIES)) {
-    const matched: string[] = []
-    for (const sk of catSkills) {
-      if (skills[sk] && skills[sk] > 0) {
-        matched.push(`${sk} \`${skills[sk]}\``)
-        validSkillCount++
-      }
-    }
-    if (matched.length > 0) {
-      fields.push({
-        name: catName,
-        value: matched.join(' ｜ '),
-        inline: false
-      })
-    }
+    const matched = catSkills.filter(sk => Number(skills[sk]) > 0)
+    matched.forEach(sk => listed.add(sk))
+    if (matched.length > 0) lines.push(`**${catName}**: ${matched.map(sk => `${sk} \`${skills[sk]}\``).join(' ｜ ')}`)
   }
+  const custom = Object.entries(skills).filter(([sk, v]) => !listed.has(sk) && typeof v === 'number' && v > 0)
+  custom.forEach(([sk]) => listed.add(sk))
+  if (custom.length > 0) lines.push(`**🌟 自訂與特殊技能**: ${custom.map(([sk, v]) => `${sk} \`${v}\``).join(' ｜ ')}`)
 
-  const customSkills: string[] = []
-  for (const [sk, val] of Object.entries(skills)) {
-    if (!renderedSkills.has(sk) && typeof val === 'number' && val > 0) {
-      customSkills.push(`${sk}: \`${val}\``)
-      validSkillCount++
-    }
-  }
-
-  if (customSkills.length > 0) {
-    fields.push({
-      name: '🌟 自訂與特殊技能',
-      value: customSkills.join(' ｜ '),
-      inline: false
-    })
-  }
-
-  const embedColor = hasInsanity ? 0x9B59B6 : (char.is_active ? 0x2ECC71 : 0x3498DB)
-
-  return {
-    title: `📜 調查員檔案：${char.name}${char.is_active ? ' ⭐ [當前出戰]' : ''}`,
-    color: embedColor,
+  const embed: any = {
+    author: char.is_active ? { name: '⭐ [當前出戰]' } : undefined,
+    title: `📜 調查員檔案：${char.name}`,
+    color: hasInsanity ? 0x9B59B6 : (char.is_active ? 0x2ECC71 : 0x3498DB),
     thumbnail: displayAvatar ? { url: displayAvatar } : undefined,
     fields,
     footer: {
-      text: `林間小鎮 TRPG · 共載入 ${validSkillCount} 項有效技能`,
+      text: `林間小鎮 TRPG · 共載入 ${listed.size} 項有效技能`,
       icon_url: fallbackAvatar
     },
     timestamp: new Date().toISOString()
   }
+
+  // 技能欄位：填滿剩餘欄位數，並先為生平保留空間 (full 時保留整篇)
+  const story = (char.story || '').trim()
+  const head = '## 生平\n\n'
+  const hint = '\n\n*（使用 `/card view full:True` 看全文）*'
+  const bioReserve = 100 + (opts.fullBio
+    ? Math.min(DESCRIPTION_MAX, head.length + story.length)
+    : head.length + BIO_PREVIEW_CHARS + hint.length)
+  packLines(lines, EMBED_MAX_FIELDS - fields.length, EMBED_TOTAL_MAX - embedLength(embed) - bioReserve)
+    .forEach((value, i) => fields.push({ name: i === 0 ? '🎯 技能' : '🎯 技能（續）', value }))
+
+  // 生平：預設只顯示開頭，full 時顯示到總長上限為止
+  const room = Math.min(DESCRIPTION_MAX, EMBED_TOTAL_MAX - embedLength(embed)) - head.length
+  if (!story) {
+    embed.description = `${head}*（尚未記錄生平。使用 \`/card edit name:${char.name} bio:True\` 撰寫。）*`
+  } else if (opts.fullBio || story.length <= BIO_PREVIEW_CHARS) {
+    embed.description = head + clip(story, room)
+  } else {
+    embed.description = head + clip(story, Math.min(BIO_PREVIEW_CHARS, room - hint.length)) + hint
+  }
+
+  return embed
 }
 
 // 3. 統一解析相對變動 (+3, -5) 與絕對賦值 (12)
@@ -98,31 +152,88 @@ function applyDeltaOrValue(current: number, input?: string): number {
   return isNaN(val) ? current : Math.max(0, val)
 }
 
-function buildCharacterBioEmbed(char: any) {
-  const hp = char.hp ?? '?'
-  const san = char.san ?? '?'
-  const isActiveText = char.is_active ? '⭐ 當前出戰' : '待命'
+// 檔案彈窗 (WL17)：只放入要求的部分。custom_id 用角色 id，避免中文姓名編碼後超過 100 字元。
+const PROFILE_MODAL_PREFIX = 'trpg_profile_modal:'
+const AVATAR_MAX_BYTES = 4.5 * 1024 * 1024
 
-  return {
-    title: `📖 調查員生平檔案：${char.name}`,
-    description: char.story && char.story.trim().length > 0
-      ? char.story
-      : '*（該調查員目前尚未記錄任何生平背景故事。使用 `/card bio action: edit` 開始撰寫。）*',
-    color: 0x9B59B6, // 神秘紫
-    thumbnail: char.avatar_url ? { url: char.avatar_url } : undefined,
-    fields: [
-      {
-        name: '📌 基礎身份',
-        value: `❤️ **HP**: \`${hp}\` ｜ 🧠 **SAN**: \`${san}\` ｜ 狀態: \`${isActiveText}\``,
-        inline: false
+function buildProfileModal(char: any, parts: { bio: boolean, avatar: boolean }) {
+  const components: any[] = []
+  if (parts.bio) {
+    components.push({
+      type: 18, // LABEL
+      label: '角色生平背景',
+      description: '支援 Discord Markdown 語法，最多 4000 字',
+      component: {
+        type: 4, // TEXT_INPUT
+        custom_id: 'story',
+        style: 2,
+        max_length: 4000,
+        required: false,
+        value: char.story || undefined,
+        placeholder: '# 早期經歷\n出生於波士頓，熱愛研究古代文獻。'
       }
-    ],
-    footer: {
-      text: '林間小鎮 TRPG · 調查員傳記紀錄室',
-      icon_url: FORESTWORK_ICON_URL
-    },
-    timestamp: new Date().toISOString()
+    })
   }
+  if (parts.avatar) {
+    components.push({
+      type: 18,
+      label: '上傳立繪圖片',
+      description: '選填；與下方網址同時填寫時以上傳圖片為準',
+      component: {
+        type: 19, // FILE_UPLOAD
+        custom_id: 'avatar_file',
+        max_values: 1,
+        required: false,
+        file_types: ['image']
+      }
+    }, {
+      type: 18,
+      label: '或填寫圖片網址',
+      description: '選填；必須是 https:// 開頭的公開圖片連結',
+      component: {
+        type: 4,
+        custom_id: 'avatar_url',
+        style: 1,
+        max_length: 500,
+        required: false,
+        placeholder: 'https://i.imgur.com/example.png'
+      }
+    })
+  }
+  return {
+    type: 9, // APPLICATION_MODAL
+    data: {
+      custom_id: `${PROFILE_MODAL_PREFIX}${char.id}`,
+      title: clip(`編輯【${char.name}】的檔案`, 45),
+      components
+    }
+  }
+}
+
+// 把上傳的圖片轉存到 Vercel Blob，回傳永久網址
+async function storeAvatar(attachment: any, callerId: string): Promise<string> {
+  const isImage = attachment.content_type
+    ? String(attachment.content_type).startsWith('image/')
+    : /\.(png|jpe?g|gif|webp)$/i.test(attachment.filename || '')
+  if (!isImage) throw new Error('只接受圖片檔案')
+  if (attachment.size && attachment.size > AVATAR_MAX_BYTES) throw new Error('圖片大小超過 4.5MB 限制，請壓縮後重試')
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+  if (!blobToken) throw new Error('服務端缺少 BLOB_READ_WRITE_TOKEN 配置')
+
+  const res = await fetch(attachment.url)
+  if (!res.ok) throw new Error(`從 Discord 下載圖片失敗 (HTTP ${res.status})`)
+  const buffer = Buffer.from(await res.arrayBuffer())
+  const ext = attachment.filename?.split('.').pop() || 'png'
+  const blob = await put(`trpg-avatars/${callerId}/${Date.now()}.${ext}`, buffer, {
+    access: 'public',
+    contentType: attachment.content_type || 'image/png',
+    token: blobToken
+  })
+  return blob.url
+}
+
+function isHttpsUrl(text: string): boolean {
+  try { return new URL(text).protocol === 'https:' } catch { return false }
 }
 
 // 4. 处理 /card 所有子命令分发
@@ -222,138 +333,13 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
   const supabase = getSupabase()
 
   // -------------------------------------------------------------
-  // 子指令 2: /card avatar (专属立绘绑定：Vercel Blob 永久托管)
-  // -------------------------------------------------------------
-  if (subCommand === 'avatar') {
-    const attachmentId = getSubOption('image')
-    let imageUrl = getSubOption('url')?.trim()
-    const targetName = getSubOption('name')?.trim()
-
-    // 情况 A：用户只传了 URL，耗时极短（<100ms），走同步极速通道
-    if (!attachmentId && imageUrl) {
-      let query = supabase.schema('trpg').from('characters').update({ avatar_url: imageUrl }).eq('discord_id', callerId)
-      if (targetName) query = query.eq('name', targetName)
-      else query = query.eq('is_active', true)
-
-      const { data: updated, error: dbError } = await query.select().maybeSingle()
-      if (dbError || !updated) {
-        return { type: 4, data: { content: `❌ 更新角色卡失敗：${dbError?.message || '查無相關角色卡'}`, flags: 64 } }
-      }
-
-      return {
-        type: 4,
-        data: {
-          content: `🎨 已成功為調查員 **${updated.name}** 綁定立繪！`,
-          embeds: [buildCharacterEmbed(updated, imageUrl)]
-        }
-      }
-    }
-
-    // 情况 B：用户上传了图片附件，耗时长，启动 Discord 原生 Deferred 异步通道！
-    if (attachmentId) {
-      const attachment = interaction.data?.resolved?.attachments?.[attachmentId]
-      if (!attachment?.url) {
-        return { type: 4, data: { content: '❌ 無法獲取上傳的圖片檔案！', flags: 64 } }
-      }
-
-      // 邊界防禦：嚴格限制圖片小於 4.5MB (防止突破 Vercel Payload 上限)
-      if (attachment.size && attachment.size > 4.5 * 1024 * 1024) {
-        return {
-          type: 4,
-          data: { content: '⚠️ 圖片大小超過 4.5MB 限制，請壓縮後重試！', flags: 64 }
-        }
-      }
-
-      try {
-        const blobToken = process.env.BLOB_READ_WRITE_TOKEN
-        if (!blobToken) {
-          return {
-            type: 4,
-            data: { content: '❌ 系統錯誤：服務端缺少 BLOB_READ_WRITE_TOKEN 配置！', flags: 64 }
-          }
-        }
-
-        // A. 抓取 Discord 圖片 (約 100~200ms)
-        const res = await fetch(attachment.url)
-        if (!res.ok) throw new Error(`從 Discord 下載圖片失敗 (HTTP ${res.status})`)
-        const arrayBuffer = await res.arrayBuffer()
-        const buffer = Buffer.from(arrayBuffer)
-
-        // B. 構造持久化路徑
-        const ext = attachment.filename?.split('.').pop() || 'png'
-        const pathname = `trpg-avatars/${callerId}/${Date.now()}.${ext}`
-
-        // C. 同步寫入 Vercel Blob (約 150~250ms)
-        const blob = await put(pathname, buffer, {
-          access: 'public',
-          contentType: attachment.content_type || 'image/png',
-          token: blobToken
-        })
-
-        imageUrl = blob.url
-
-      } catch (err: any) {
-        console.error('[Avatar Sync Upload Failed]:', err)
-        return {
-          type: 4,
-          data: { content: `❌ 圖片轉存失敗：${err?.message || '內部錯誤'}`, flags: 64 }
-        }
-      }
-    }
-
-    if (!imageUrl) {
-      return {
-        type: 4,
-        data: { content: '⚠️ 請至少拖入一張圖片檔案，或在 url 參數填寫公開圖片網址！', flags: 64 }
-      }
-    }
-
-    // 2. 同步寫入 Supabase (約 80~120ms)
-    try {
-      let query = supabase.schema('trpg').from('characters').update({ avatar_url: imageUrl }).eq('discord_id', callerId)
-      if (targetName) query = query.ilike('name', `%${targetName}%`)
-      else query = query.eq('is_active', true)
-
-      const { data: updated, error: dbError } = await query.select().maybeSingle()
-
-      if (dbError) {
-        console.error('[Avatar DB Error]:', dbError)
-        return {
-          type: 4,
-          data: { content: `❌ 資料庫寫入失敗：${dbError.message}`, flags: 64 }
-        }
-      }
-
-      if (!updated) {
-        return {
-          type: 4,
-          data: { content: '⚠️ 找不到匹配的角色卡！請確認姓名或先使用 `/card create` 建立角色。', flags: 64 }
-        }
-      }
-
-      // 3. ★★★ 核心好品味：同步交付 Type 4，總耗時不到 500ms，直接回顯帶立繪的卡片！★★★
-      return {
-        type: 4,
-        data: {
-          content: `🎨 已成功為調查員 **${updated.name}** 綁定永久立繪！`,
-          embeds: [buildCharacterEmbed(updated, imageUrl)]
-        }
-      }
-    } catch (err: any) {
-      console.error('[Avatar DB Crash]:', err)
-      return {
-        type: 4,
-        data: { content: `💥 寫入資料庫時遭遇異常：${err?.message || '內部錯誤'}`, flags: 64 }
-      }
-    }
-  }
-
-  // -------------------------------------------------------------
   // 子指令 3: /card view
   // -------------------------------------------------------------
   if (subCommand === 'view') {
     const targetName = getSubOption('name')?.trim()
     const targetUserId = getSubOption('user') || callerId
+
+    const fullBio = getSubOption('full') === true
 
     let query = supabase.schema('trpg').from('characters').select('*').eq('discord_id', targetUserId)
     if (targetName) {
@@ -376,7 +362,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
 
     return {
       type: 4,
-      data: { embeds: [buildCharacterEmbed(char, userDiscordAvatar)] }
+      data: { embeds: [buildCharacterEmbed(char, userDiscordAvatar, { fullBio })] }
     }
   }
 
@@ -484,7 +470,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
   }
 
   // -------------------------------------------------------------
-  // 子指令 7: /card edit (局部狀態微調與數值增減)
+  // 子指令 7: /card edit (狀態、屬性、技能；bio / avatar 開啟檔案彈窗)
   // -------------------------------------------------------------
   if (subCommand === 'edit') {
     const targetName = getSubOption('name')?.trim()
@@ -495,18 +481,35 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
     const inputAttr = getSubOption('attr')?.trim()
     const inputValue = getSubOption('value')
     const inputInsanity = getSubOption('insanity')?.trim()
+    const wantBio = getSubOption('bio') === true
+    const wantAvatar = getSubOption('avatar') === true
 
-    // 1. 查出目標角色卡
-    let query = supabase.schema('trpg').from('characters').select('*').eq('discord_id', callerId)
-    if (targetName) query = query.eq('name', targetName)
-    else query = query.eq('is_active', true)
+    if (!targetName) {
+      return { type: 4, data: { content: '⚠️ 請指定要編輯的角色姓名 (`name`)。', flags: 64 } }
+    }
 
-    const { data: char, error: fetchErr } = await query.maybeSingle()
+    // 1. 查出目標角色卡 (姓名完全相符；name 由自動完成提供)
+    const { data: char, error: fetchErr } = await supabase
+      .schema('trpg').from('characters').select('*')
+      .eq('discord_id', callerId).eq('name', targetName)
+      .maybeSingle()
     if (fetchErr || !char) {
       return {
         type: 4,
-        data: { content: '❌ 找不到匹配的角色卡！請確認姓名或先使用 `/card create` 建立角色。', flags: 64 }
+        data: { content: `❌ 閣下名下查無名為 **${targetName}** 的角色卡！請從自動完成清單選擇，或先使用 \`/card create\` 建立角色。`, flags: 64 }
       }
+    }
+
+    // 2. bio / avatar：開啟檔案彈窗 (彈窗無法同時回報其他變更，因此不可混用)
+    if (wantBio || wantAvatar) {
+      const scalarGiven = [inputHp, inputSan, inputMp, inputSkill, inputAttr, inputValue, inputInsanity].some(v => v !== undefined)
+      if (scalarGiven) {
+        return {
+          type: 4,
+          data: { content: '⚠️ `bio` / `avatar` 會開啟編輯視窗，不能與 hp、san、mp、skill、attr、value、insanity 同時使用。請分兩次執行。', flags: 64 }
+        }
+      }
+      return buildProfileModal(char, { bio: wantBio, avatar: wantAvatar })
     }
 
     const changes: string[] = []
@@ -584,7 +587,7 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
       return {
         type: 4,
         data: {
-          content: '⚠️ 未檢測到任何有效的變更參數！請至少提供 `hp`、`san`、`mp` 或 `skill + value` 進行修改。',
+          content: '⚠️ 未檢測到任何有效的變更參數！請至少提供 `hp`、`san`、`mp`、`insanity`、`skill + value`、`attr + value`，或使用 `bio:True` / `avatar:True` 開啟編輯視窗。',
           flags: 64
         }
       }
@@ -613,123 +616,6 @@ export async function handleCardCommand(interaction: any, event: H3Event) {
         content: `✏️ 調查員 **${updated.name}** 檔案變更已同步：\n${changes.join('\n')}`,
         embeds: [buildCharacterEmbed(updated)]
       }
-    }
-  }
-
-  // -------------------------------------------------------------
-  // 子指令 8: /card bio (檢視或開啟彈窗編寫背景故事)
-  // -------------------------------------------------------------
-  if (subCommand === 'bio') {
-    // ★ 好品味 AST 歸一化提取：
-    // 情況 1：如果是子命令組結構 (/card bio view)，動作名稱在 options[0].options[0].name
-    const nestedSubCommand = interaction.data?.options?.[0]?.options?.[0]?.name
-    // 情況 2：如果是參數結構 (/card bio action:view)，動作名稱在 getSubOption('action')
-    const actionParam = getSubOption('action')
-
-    // 歸一化判定當前動作（預設為 'view'）
-    const action = nestedSubCommand === 'edit' || actionParam === 'edit' ? 'edit' : 'view'
-
-    // 提取目標角色姓名（自適應從內層或外層 options 抓取）
-    const targetName = (
-      getSubOption('name') ||
-      interaction.data?.options?.[0]?.options?.[0]?.options?.find((o: any) => o.name === 'name')?.value
-    )?.trim()
-
-    // -----------------------------------------------------------
-    // 分支 A: 檢視背景故事 (View)
-    // -----------------------------------------------------------
-    if (action === 'view') {
-      try {
-        let query = supabase.schema('trpg').from('characters').select('*').eq('discord_id', callerId)
-        if (targetName) query = query.ilike('name', `%${targetName}%`)
-        else query = query.eq('is_active', true)
-
-        const { data: char, error } = await query.maybeSingle()
-
-        if (error) {
-          console.error('[Bio View DB Error]:', error)
-          return {
-            type: 4,
-            data: { content: `❌ 查詢失敗：${error.message}`, flags: 64 }
-          }
-        }
-
-        if (!char) {
-          return {
-            type: 4,
-            data: { content: '❌ 查無相關角色卡！請確認姓名或使用 `/card create` 建立角色。', flags: 64 }
-          }
-        }
-
-        return {
-          type: 4,
-          data: { embeds: [buildCharacterBioEmbed(char)] }
-        }
-      } catch (err: any) {
-        console.error('[Bio View Crash]:', err)
-        return {
-          type: 4,
-          data: { content: `💥 檢視生平故事時發生異常：${err?.message || '內部錯誤'}`, flags: 64 }
-        }
-      }
-    }
-
-    // -----------------------------------------------------------
-    // 分支 B: 編輯背景故事 (Edit -> 彈出 4000 字符 Modal)
-    // -----------------------------------------------------------
-    if (action === 'edit') {
-      try {
-        let query = supabase.schema('trpg').from('characters').select('name, story').eq('discord_id', callerId)
-        if (targetName) query = query.ilike('name', `%${targetName}%`)
-        else query = query.eq('is_active', true)
-
-        const { data: char, error } = await query.maybeSingle()
-
-        if (error || !char) {
-          return {
-            type: 4,
-            data: { content: '❌ 找不到要編輯故事的角色卡！請先使用 `/card create` 建立角色。', flags: 64 }
-          }
-        }
-
-        return {
-          type: 9, // APPLICATION_MODAL
-          data: {
-            custom_id: `trpg_bio_modal:${encodeURIComponent(char.name)}`,
-            title: `撰寫【${char.name}】的背景故事`,
-            components: [
-              {
-                type: 1,
-                components: [
-                  {
-                    type: 4,
-                    custom_id: 'story_content',
-                    label: '角色生平背景 (支援 Discord Markdown 語法)',
-                    style: 2, // Paragraph
-                    min_length: 0,
-                    max_length: 4000,
-                    required: false,
-                    value: char.story || '',
-                    placeholder: '# 早期經歷\n出生於波士頓，熱愛研究古代文獻。\n\n> 「有些真相，永遠埋在泥土下會更好。」'
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      } catch (err: any) {
-        console.error('[Bio Edit Modal Crash]:', err)
-        return {
-          type: 4,
-          data: { content: `💥 開啟編輯視窗失敗：${err?.message || '內部錯誤'}`, flags: 64 }
-        }
-      }
-    }
-
-    // ★ 核心保底防線：杜絕任何靜默穿透與空包
-    return {
-      type: 4,
-      data: { content: `⚠️ 未知的 bio 動作：\`${action}\``, flags: 64 }
     }
   }
 
@@ -802,40 +688,94 @@ export async function handleCardCreateModal(interaction: any, event: H3Event) {
   }
 }
 
+
+// 收集彈窗欄位：同時支援 Label (component) 與舊的 Action Row (components)
+function collectModalValues(nodes: any[], out: Record<string, any> = {}): Record<string, any> {
+  for (const node of nodes || []) {
+    if (node.component) collectModalValues([node.component], out)
+    if (node.components) collectModalValues(node.components, out)
+    if (node.custom_id) out[node.custom_id] = node.values ?? node.value
+  }
+  return out
+}
+
 /**
- * 處理 Bio 表單提交持久化
+ * 處理檔案彈窗提交 (WL17)：生平與立繪
  */
-export async function handleCardBioModal(interaction: any, event: H3Event) {
+export async function handleCardProfileModal(interaction: any, event: H3Event) {
   const callerId = interaction.member?.user?.id || interaction.user?.id
-  const customId = interaction.data?.custom_id || ''
-  const charName = decodeURIComponent(customId.replace('trpg_bio_modal:', ''))
+  const charId = (interaction.data?.custom_id || '').slice(PROFILE_MODAL_PREFIX.length)
+  const fields = collectModalValues(interaction.data?.components)
+  const update: Record<string, any> = {}
+  const changes: string[] = []
 
-  const storyContent = interaction.data?.components?.[0]?.components?.[0]?.value?.trim() || ''
+  // 生平：欄位存在才更新 (空白即清除)
+  if (typeof fields.story === 'string') {
+    update.story = fields.story.trim()
+    changes.push(update.story ? '🖋️ 生平背景已更新' : '🖋️ 生平背景已清除')
+  }
 
-  const supabase = getSupabase()
+  // 立繪：上傳優先，其次網址
+  const fileId = Array.isArray(fields.avatar_file) ? fields.avatar_file[0] : undefined
+  const avatarUrl = typeof fields.avatar_url === 'string' ? fields.avatar_url.trim() : ''
+  try {
+    if (fileId) {
+      const attachment = interaction.data?.resolved?.attachments?.[fileId]
+      if (!attachment?.url) throw new Error('無法獲取上傳的圖片檔案')
+      update.avatar_url = await storeAvatar(attachment, callerId)
+      changes.push('🎨 立繪已更新 (上傳圖片)')
+    } else if (avatarUrl) {
+      if (!isHttpsUrl(avatarUrl)) throw new Error('圖片網址必須以 https:// 開頭')
+      update.avatar_url = avatarUrl
+      changes.push('🎨 立繪已更新 (圖片網址)')
+    }
+  } catch (err: any) {
+    console.error('[Profile Avatar Failed]:', err)
+    return { type: 4, data: { content: `❌ 立繪更新失敗：${err?.message || '內部錯誤'}`, flags: 64 } }
+  }
 
-  // 更新該調查員的 story 欄位
-  const { data: updated, error } = await supabase
-    .schema('trpg')
-    .from('characters')
-    .update({ story: storyContent })
-    .eq('discord_id', callerId)
-    .eq('name', charName)
-    .select()
-    .single()
+  if (changes.length === 0) {
+    return { type: 4, data: { content: 'ℹ️ 未填寫任何內容，角色卡沒有變更。', flags: 64 } }
+  }
+
+  const { data: updated, error } = await getSupabase()
+    .schema('trpg').from('characters')
+    .update(update)
+    .eq('id', charId).eq('discord_id', callerId)
+    .select().maybeSingle()
 
   if (error || !updated) {
-    return {
-      type: 4,
-      data: { content: `❌ 儲存背景故事失敗：${error?.message || '內部錯誤'}`, flags: 64 }
-    }
+    return { type: 4, data: { content: `❌ 儲存角色檔案失敗：${error?.message || '查無相關角色卡'}`, flags: 64 } }
   }
 
   return {
     type: 4,
     data: {
-      content: `🖋️ 已成功更新調查員 **${charName}** 的生平背景檔案！`,
-      embeds: [buildCharacterBioEmbed(updated)]
+      content: `✏️ 調查員 **${updated.name}** 檔案變更已同步：\n${changes.join('\n')}`,
+      embeds: [buildCharacterEmbed(updated, undefined, { fullBio: typeof fields.story === 'string' })]
     }
   }
+}
+
+/**
+ * 角色姓名自動完成 (/card edit name)：列出呼叫者自己的角色，出戰角色優先
+ */
+export async function handleCardAutocomplete(interaction: any) {
+  const callerId = interaction.member?.user?.id || interaction.user?.id
+  const options = interaction.data?.options?.[0]?.options || []
+  const typed = String(options.find((o: any) => o.focused)?.value || '').trim().toLowerCase()
+
+  const { data } = await getSupabase()
+    .schema('trpg').from('characters')
+    .select('name, is_active')
+    .eq('discord_id', callerId)
+    .order('is_active', { ascending: false })
+    .order('created_at', { ascending: true })
+
+  const choices = (data || [])
+    .filter(c => c.name.toLowerCase().includes(typed))
+    .slice(0, 25)
+    .map(c => ({ name: clip(c.is_active ? `⭐ ${c.name}` : c.name, 100), value: c.name }))
+
+  return { type: 8, data: { choices } } // APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
 }
