@@ -1,5 +1,6 @@
 // app/utils/skill-tests/module2-dual.ts
 import {
+  px,
   STAGE_WIDTH,
   STAGE_HEIGHT,
   STAGE_CENTER_X,
@@ -326,7 +327,7 @@ export class Module2Dual implements SkillModuleInstance {
 
     // 4. 控制指南微型水印
     ctx.fillStyle = '#71717a'
-    ctx.font = '12px ui-monospace, monospace'
+    ctx.font = `${px(ctx, 12, 24)}px ui-monospace, monospace`
     ctx.textAlign = 'left'
     ctx.fillText('P1: [A / D]', 12, STAGE_HEIGHT - 12)
     ctx.textAlign = 'right'

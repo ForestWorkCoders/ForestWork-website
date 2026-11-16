@@ -1,5 +1,6 @@
 // app/utils/skill-tests/module8-tiles.ts
 import {
+  px,
   STAGE_WIDTH,
   STAGE_HEIGHT,
   type SkillModuleInstance,
@@ -152,7 +153,7 @@ export class Module8Tiles implements SkillModuleInstance {
     ctx.strokeRect(this.STAGE_X, 0, this.STAGE_W, STAGE_HEIGHT)
 
     // 7. 轨道底端键位水印 (DFJK)
-    ctx.font = 'bold 24px ui-monospace, monospace'
+    ctx.font = `bold ${px(ctx, 24, 36)}px ui-monospace, monospace`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     for (let i = 0; i < 4; i++) {
