@@ -60,7 +60,7 @@ const getRankColor = (rank) => (rank <= 9 ? 'text-green-400' : 'text-gray-400')
         <div class="text-left font-extrabold text-lg italic" :class="getRankColor(row.original.rank)">
           #{{ row.original.rank }}
         </div>
-        <BaseRankTrend :diff="row.original.rank_diff" />
+        <MahjongRankTrend :diff="row.original.rank_diff" />
       </template>
 
       <template #name-cell="{ row }">

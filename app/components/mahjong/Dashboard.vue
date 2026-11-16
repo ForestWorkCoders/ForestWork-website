@@ -46,7 +46,7 @@ const isDefaultTournament = computed(() => {
         <UAlert v-if="isDefaultTournament" icon="i-lucide-info" color="neutral" variant="subtle" title="排名規則說明"
           description="選手需完成至少 8 場對局始可列入正式排名；出賽未達標者標記為 DNF 並順延至後段。" class="mb-4 text-xs" />
 
-        <BaseLeaderboardTable :entity-type="dashboardData.config.entity_type" :columns="dashboardData.config.columns"
+        <MahjongLeaderboardTable :entity-type="dashboardData.config.entity_type" :columns="dashboardData.config.columns"
           :data="dashboardData.data[phase.id]?.leaderboard || []" :is-final="phase.is_final"
           :promoted-ranks="phase.promoted_ranks" :disqualified-ranks="phase.disqualified_ranks" />
 
@@ -54,7 +54,7 @@ const isDefaultTournament = computed(() => {
           <span class="text-sm font-medium tracking-wide">備註保留區塊</span>
         </div> -->
 
-        <BaseMatchGrid :matches="dashboardData.data[phase.id]?.matches || []" />
+        <MahjongMatchGrid :matches="dashboardData.data[phase.id]?.matches || []" />
 
       </section>
     </template>

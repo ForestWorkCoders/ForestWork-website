@@ -129,7 +129,7 @@ useSeoMeta({
                                 </div>
                                 <div class="mt-4 space-y-4">
                                     <div v-if="allTournaments?.ongoing?.length" class="space-y-3">
-                                        <BaseTournamentCard v-for="tourney in allTournaments.ongoing" :key="tourney.id"
+                                        <TournamentCard v-for="tourney in allTournaments.ongoing" :key="tourney.id"
                                             :tourney="tourney" game-slug="plazmaburst" />
                                     </div>
 
@@ -155,7 +155,7 @@ useSeoMeta({
 
                                     <div v-if="allTournaments?.past?.length">
                                         <div class="space-y-3">
-                                            <BaseTournamentCard v-for="tourney in paginatedPastTournaments"
+                                            <TournamentCard v-for="tourney in paginatedPastTournaments"
                                                 :key="tourney.id" :tourney="tourney" game-slug="plazmaburst" />
                                         </div>
 
@@ -188,7 +188,7 @@ useSeoMeta({
                                 </div>
                                 <div class="mt-4">
                                     <div v-if="allTournaments?.upcoming?.length" class="space-y-3">
-                                        <BaseTournamentCard v-for="tourney in allTournaments.upcoming" :key="tourney.id"
+                                        <TournamentCard v-for="tourney in allTournaments.upcoming" :key="tourney.id"
                                             :tourney="tourney" game-slug="plazmaburst" />
                                     </div>
 
