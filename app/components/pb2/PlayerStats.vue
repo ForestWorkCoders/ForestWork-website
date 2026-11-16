@@ -1,13 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { use } from 'echarts/core'
-import { RadarChart } from 'echarts/charts'
-import { TooltipComponent } from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
-import VChart from 'vue-echarts'
 import { createSortableColumns } from '~/utils/table'
-
-use([RadarChart, TooltipComponent, CanvasRenderer])
 
 const props = defineProps({
   tournamentId: { type: String, required: true }
@@ -143,76 +136,23 @@ const currentTableData = computed(() => {
 })
 
 // ----------------------------------------------------
-// 雷达图配置 (Top 3 领奖台)
+// Top 3 podium: overall score + one radar axis per weapon class (0–100)
 // ----------------------------------------------------
-const top3Charts = computed(() => {
-  if (!players.value) return []
+const RADAR_AXES = [
+  ['Arena', 'arena'], ['Rails', 'rails'], ['Snipers', 'snipers'], ['Rockets', 'rockets'], ['Rays', 'rays']
+]
 
-  return players.value.slice(0, 3).map(p => {
-    const rawData = [
-      Number((p.scores?.arena ?? 0).toFixed(2)),
-      Number((p.scores?.rails ?? 0).toFixed(2)),
-      Number((p.scores?.snipers ?? 0).toFixed(2)),
-      Number((p.scores?.rockets ?? 0).toFixed(2)),
-      Number((p.scores?.rays ?? 0).toFixed(2))
-    ]
-
-    return {
-      name: p.nickname,
-      avatar: p.avatar,
-      overallScore: p.scores?.overall ? Number(p.scores.overall).toFixed(2) : '0.00',
-      option: {
-        tooltip: {
-          trigger: 'item',
-          backgroundColor: 'rgba(17, 24, 39, 0.9)',
-          textStyle: { color: 'rgba(255, 255, 255, 0.8)', fontWeight: 'bold' },
-          borderWidth: 0,
-          formatter: () => `
-            Arena: ${rawData[0]}<br/>
-            Rails: ${rawData[1]}<br/>
-            Snipers: ${rawData[2]}<br/>
-            Rockets: ${rawData[3]}<br/>
-            Rays: ${rawData[4]}
-          `
-        },
-        radar: {
-          indicator: [
-            { name: 'Arena', max: 100 },
-            { name: 'Rails', max: 100 },
-            { name: 'Snipers', max: 100 },
-            { name: 'Rockets', max: 100 },
-            { name: 'Rays', max: 100 }
-          ],
-          radius: '65%',
-          splitNumber: 5,
-          axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 12, fontWeight: 'bold' },
-          splitLine: {
-            lineStyle: {
-              color: [
-                'transparent',
-                'transparent',
-                'rgba(156, 163, 175, 0.2)',
-                'rgba(156, 163, 175, 0.2)',
-                'rgba(156, 163, 175, 0.2)'
-              ]
-            }
-          },
-          splitArea: { show: false },
-          axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
-        },
-        series: [{
-          type: 'radar',
-          data: [{
-            value: rawData,
-            itemStyle: { color: 'rgb(16, 185, 129)' },
-            areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
-            lineStyle: { width: 2 }
-          }]
-        }]
-      }
-    }
+const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => ({
+  key: p.nickname,
+  name: p.nickname,
+  avatar: p.avatar,
+  value: p.scores?.overall ? Number(p.scores.overall).toFixed(2) : '0.00',
+  sub: '綜合戰術評分',
+  axes: RADAR_AXES.map(([name, key]) => {
+    const v = Number((p.scores?.[key] ?? 0).toFixed(2))
+    return { name, max: 100, value: v, display: v }
   })
-})
+})))
 </script>
 
 <template>
@@ -223,56 +163,8 @@ const top3Charts = computed(() => {
     </div>
 
     <template v-else-if="players && players.length > 0">
-      <!-- 1. 頂尖選手领奖台区域 (与雀魂完全对齐的卡片层级) -->
-      <section>
-        <div class="flex flex-col sm:flex-row sm:items-end gap-3 mb-6">
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-            頂尖選手 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Top Performers</span>
-          </h2>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div v-for="(chart, index) in top3Charts" :key="chart.name || index"
-            class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm overflow-hidden flex flex-col relative group">
-            <!-- 浮雕大名次水印 -->
-            <div
-              class="absolute -right-4 -top-8 text-[120px] font-extrabold text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
-              #{{ index + 1 }}
-            </div>
-
-            <!-- 卡片头部信息 -->
-            <div class="p-6 flex flex-col items-center z-10 border-b border-gray-100 dark:border-default">
-              <UAvatar :src="chart.avatar" :alt="chart.name" size="xl"
-                class="ring-4 ring-gray-50 dark:ring-default shadow-lg mb-3 shrink-0 bg-gray-100 dark:bg-accented" />
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ chart.name }}</h3>
-              <div class="mt-2 flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-extrabold text-2xl">
-                <span>{{ chart.overallScore }}</span>
-                <span class="text-xs text-gray-400 font-medium tracking-widest ml-1">SCORE</span>
-              </div>
-
-              <div class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400">
-                <UIcon name="i-lucide-crosshair" class="w-4 h-4 opacity-70" />
-                <span>綜合戰術評分</span>
-              </div>
-            </div>
-
-            <!-- 雷达图容器 (统一呼吸感底色) -->
-            <div
-              class="p-6 flex-1 flex flex-col items-center justify-center min-h-[280px] bg-gray-50/50 dark:bg-transparent">
-              <div class="relative w-full aspect-square max-w-[220px]">
-                <ClientOnly>
-                  <VChart v-if="chart.option" :option="chart.option" class="w-full h-full" autoresize />
-                  <template #fallback>
-                    <div class="w-full h-full flex items-center justify-center">
-                      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
-                    </div>
-                  </template>
-                </ClientOnly>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <TournamentPodium :entries="podiumEntries" value-label="SCORE" value-class="text-emerald-500 dark:text-emerald-400"
+        sub-icon="i-lucide-crosshair" />
 
       <!-- 2. 綜合數據表格區域 (100% 鏡像對齊雀魂的 DOM 結構) -->
       <section>
