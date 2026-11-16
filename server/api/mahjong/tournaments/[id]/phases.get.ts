@@ -12,21 +12,25 @@ const row = ({ rank, account_id, team_id, name, avatar, last_score, ...stats }: 
     stats
 })
 
-// Matches come as "Game N"; one round per game, in game order
+// Matches come as "Game N"; one round per game, in the engine's order
+// (player phases newest game first, relay phases in game order, as the site has always shown them)
 function rounds(matches: any[]): Round[] {
     const byGame = new Map<number, Round>()
     for (const m of matches) {
         const n = Number(m.round.replace('Game ', ''))
+        const top = Math.max(...m.players.map((p: any) => p.score))
         if (!byGame.has(n)) byGame.set(n, { id: `game_${n}`, title: m.round, matches: [] })
         byGame.get(n)!.matches.push({
             id: m.id,
             title: m.round,
             time: m.time,
             url: m.paipu_url,
-            sides: m.players.map((p: any) => ({ seat: p.seat, entrant: { name: p.name }, score: p.score, points: p.pts }))
+            sides: m.players.map((p: any) => ({
+                seat: p.seat, entrant: { name: p.name }, score: p.score, points: p.pts, winner: p.score === top
+            }))
         })
     }
-    return [...byGame.entries()].sort((a, b) => a[0] - b[0]).map(([, r]) => r)
+    return [...byGame.values()]
 }
 
 export default defineEventHandler(async (event): Promise<Phase[]> => {
@@ -40,7 +44,10 @@ export default defineEventHandler(async (event): Promise<Phase[]> => {
     if (format === 'event') return []
 
     const entrant = config.entity_type === 'team' || format === 'relay' ? 'team' : 'player'
-    const columns = [...config.columns, { key: 'total', label: 'TOTAL' }]
+    const columns = [
+        { key: 'total', label: 'TOTAL', main: true },
+        ...config.columns.map((c: any) => ({ ...c, signed: true }))
+    ]
 
     return config.phases.map((p: any): Phase => {
         const { leaderboard = [], matches = [] } = data[p.id] ?? {}

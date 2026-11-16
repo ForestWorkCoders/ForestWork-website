@@ -1,5 +1,6 @@
 // scripts/compare-phases.mjs
-// WL2f check: the new /phases endpoints show the same results as the old ones, for every tournament.
+// WL2f check: /phases shows the same results as the old endpoints, for every tournament.
+// Mahjong moved to /phases in WL2g-1 (its old endpoint is gone); PB2 is still compared until WL2g-2.
 //
 //   node scripts/compare-phases.mjs                       old vs /phases on BASE_URL (default http://localhost:3100)
 //   node scripts/compare-phases.mjs --against <url>       old endpoints on BASE_URL vs the same on <url>, byte for byte
@@ -23,19 +24,6 @@ const ids = async (game) => {
 }
 
 // ---------- the same lines from the old and the new shape ----------
-
-const side = s => `${s.seat ?? ''}${s.name}:${s.score}:${s.pts ?? ''}`
-
-const mahjongOld = ({ config, data }) => config.phases.flatMap(p => [
-  ...(data[p.id]?.leaderboard ?? []).map(r => `${p.id} row ${r.rank} ${r.name} total=${r.total} played=${r.played ?? ''}`),
-  ...(data[p.id]?.matches ?? []).map(m => `${p.id} match ${m.id} ${m.round} ${m.players.map(side).join(' ')}`)
-])
-
-const mahjongNew = phases => phases.flatMap(p => p.groups.flatMap(g => [
-  ...(g.standings ?? []).map(r => `${p.id} row ${r.rank} ${r.entrant.name} total=${r.stats.total} played=${r.stats.played ?? ''}`),
-  ...g.rounds.flatMap(rd => rd.matches.map(m =>
-    `${p.id} match ${m.id} ${rd.title} ${m.sides.map(s => side({ seat: s.seat, name: s.entrant?.name, score: s.score, pts: s.points })).join(' ')}`))
-]))
 
 const duelOld = (m, winner) => `match ${m.id} ${m.teamA || null}:${m.scoreA} ${m.teamB || null}:${m.scoreB}${winner ? ` winner=${m.winner}` : ''}`
 const statsOld = t => `row ${t.rank} ${t.name} ${t.pld}/${t.w}/${t.d}/${t.l} ${t.diff} ${t.pts}${t.qualified ? ' Q' : ''}`
@@ -69,19 +57,6 @@ const pb2New = (phases) => {
 // ---------- per tournament ----------
 
 const GAMES = {
-  mahjong: {
-    old: ['dashboard'],
-    async compare(id) {
-      const [{ format }, old, phases] = await Promise.all([
-        get(BASE_URL, `/api/mahjong/tournaments/${id}`),
-        get(BASE_URL, `/api/mahjong/tournaments/${id}/dashboard`),
-        get(BASE_URL, `/api/mahjong/tournaments/${id}/phases`)
-      ])
-      // An event has no results tab: /phases says so with an empty list
-      if (format === 'event') return { a: [], b: phases.map(p => `phase ${p.id}`) }
-      return { a: mahjongOld(old), b: mahjongNew(phases) }
-    }
-  },
   plazmaburst: {
     old: ['group-stage', 'bracket'],
     async compare(id) {

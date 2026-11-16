@@ -17,6 +17,8 @@ export interface Entrant {
 export interface Column {
   key: string
   label: string
+  main?: boolean    // the number the table is ranked by (drawn bold)
+  signed?: boolean  // a gain or loss: shown with +, green or red
 }
 
 export interface Row {

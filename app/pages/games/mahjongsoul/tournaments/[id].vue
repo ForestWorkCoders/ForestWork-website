@@ -9,9 +9,9 @@ const route = useRoute()
 const { data: tourney, pending, error } = await useFetch(`/api/mahjong/tournaments/${route.params.id}`)
 
 // ==========================================
-// 1b. 增强数据：安全拉取 Dashboard（即使后端挂掉，也不允许破坏 SSR）
+// 1b. 增强数据：安全拉取賽事結果 (phases)，給結果分頁與 Discord embed 共用（即使后端挂掉，也不允许破坏 SSR）
 // ==========================================
-const { data: dashboardRes } = await useFetch(`/api/mahjong/tournaments/${route.params.id}/dashboard`, {
+const { data: phases } = await useFetch(`/api/mahjong/tournaments/${route.params.id}/phases`, {
     // 核心防御：即使接口返回 404 或 500，绝不中断 SSR 流程
     default: () => null
 })
@@ -63,13 +63,10 @@ const embedPayload = computed(() => {
     })
 
     // 提取对应阶段的真实排行榜数据 (无论是个人赛还是接力赛)
-    let rawLeaderboard = []
-    if (dashboardRes.value?.data) {
-        const phases = dashboardRes.value?.config?.phases || []
-        const activePhase = phases.find(p => p.is_final) || phases[0]
-        const phaseKey = activePhase?.id || 'MAIN'
-        rawLeaderboard = dashboardRes.value?.data?.[phaseKey]?.leaderboard || []
-    }
+    const list = phases.value || []
+    const activePhase = list.find(p => p.final) || list[0]
+    const rawLeaderboard = (activePhase?.groups[0]?.standings || [])
+        .map(r => ({ rank: r.rank, name: r.entrant.name, total: r.stats.total }))
 
     return buildTournamentDiscordEmbed({
         title: title,
@@ -104,7 +101,12 @@ useHead({
             <MahjongTeams :tournament-id="route.params.id" />
         </template>
         <template #result>
-            <MahjongDashboard :tournament-id="route.params.id" />
+            <TournamentPhases :phases="phases">
+                <template #notice="{ phase }">
+                    <UAlert v-if="phase.id === 'MAIN'" icon="i-lucide-info" color="neutral" variant="subtle" title="排名規則說明"
+                        description="選手需完成至少 8 場對局始可列入正式排名；出賽未達標者標記為 DNF 並順延至後段。" class="text-xs" />
+                </template>
+            </TournamentPhases>
         </template>
         <template #stats>
             <MahjongPlayerStats :tournament-id="route.params.id" />
