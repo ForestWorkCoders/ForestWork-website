@@ -128,7 +128,7 @@ useSeoMeta({
                                 <div class="mt-4 space-y-4">
                                     <!-- 改用 filteredOngoing -->
                                     <div v-if="filteredOngoing.length" class="space-y-3">
-                                        <BaseTournamentCard v-for="tourney in filteredOngoing" :key="tourney.id"
+                                        <TournamentCard v-for="tourney in filteredOngoing" :key="tourney.id"
                                             :tourney="tourney" game-slug="mahjongsoul" />
                                     </div>
 
@@ -158,7 +158,7 @@ useSeoMeta({
                                     <div v-if="filteredPast.length">
                                         <div class="space-y-3">
                                             <!-- paginatedPastTournaments 已经基于 filteredPast 做了精准切片 -->
-                                            <BaseTournamentCard v-for="tourney in paginatedPastTournaments"
+                                            <TournamentCard v-for="tourney in paginatedPastTournaments"
                                                 :key="tourney.id" :tourney="tourney" game-slug="mahjongsoul" />
                                         </div>
 
@@ -195,7 +195,7 @@ useSeoMeta({
                                 <div class="mt-4">
                                     <!-- 改用 filteredUpcoming -->
                                     <div v-if="filteredUpcoming.length" class="space-y-3">
-                                        <BaseTournamentCard v-for="tourney in filteredUpcoming" :key="tourney.id"
+                                        <TournamentCard v-for="tourney in filteredUpcoming" :key="tourney.id"
                                             :tourney="tourney" game-slug="mahjongsoul" />
                                     </div>
 

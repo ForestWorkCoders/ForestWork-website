@@ -221,7 +221,7 @@ useHead({
                             <!-- 賽事資訊 -->
                             <template #info>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <BaseTournamentInfo :content-url="contentUrl" />
+                                    <TournamentInfo :content-url="contentUrl" />
                                 </div>
                             </template>
 
@@ -262,7 +262,7 @@ useHead({
                         </UTabs>
                     </div>
                     <div v-else>
-                        <BaseTournamentInfo :content-url="contentUrl" />
+                        <TournamentInfo :content-url="contentUrl" />
                     </div>
                 </div>
             </UContainer>
