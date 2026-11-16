@@ -256,7 +256,7 @@ useHead({
                             <!-- 直播記錄 -->
                             <template #vods>
                                 <div class="px-6 py-8 animate-fade-in">
-                                    <MahjongVods :tournament-id="route.params.id" />
+                                    <TournamentVods />
                                 </div>
                             </template>
                         </UTabs>
