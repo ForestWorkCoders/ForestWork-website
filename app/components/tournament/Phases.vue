@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // A tournament's results: a toggle when there is more than one phase (opens on the final, else the last),
-// then the phase's heading, standings and matches.
+// then the phase's heading, standings, bracket and matches.
 // Slot `notice` ({ phase }) goes between the heading and the standings.
 import type { Phase } from '~/types/phases'
 
@@ -40,6 +40,7 @@ const phase = computed(() =>
     <div v-for="group in phase.groups" :key="group.id" class="space-y-10">
       <h3 v-if="group.title" class="text-xl font-bold text-gray-900 dark:text-white">{{ group.title }}</h3>
       <TournamentStandings v-if="group.standings" :phase="phase" :rows="group.standings" />
+      <TournamentBracket v-if="group.sections?.length" :sections="group.sections" />
       <TournamentMatches :rounds="group.rounds" />
     </div>
   </div>

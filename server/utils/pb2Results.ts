@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '~/types/database.types'
 
 // PB2 tournament results: the league weeks and the playoff bracket.
-// Shared by /group-stage and /bracket (the old shapes) and /phases (the WL2f shape).
+// Mapped to the shared phase shape by /api/plazmaburst/tournaments/[id]/phases.
 
 export async function pb2GroupStage(supabase: SupabaseClient<Database>, tournamentId: string) {
     // 1. 獲取所有小組賽 (假設 phase_tag 以 'Week' 或 'Group' 開頭)

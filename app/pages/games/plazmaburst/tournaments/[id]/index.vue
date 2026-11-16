@@ -2,6 +2,7 @@
 const route = useRoute()
 
 const { data: tourney, pending, error } = await useFetch(`/api/plazmaburst/tournaments/${route.params.id}`)
+const { data: phases } = await useFetch(`/api/plazmaburst/tournaments/${route.params.id}/phases`, { default: () => null })
 
 const GAME = {
     name: 'Plazma Burst 2',
@@ -36,7 +37,7 @@ useSeoMeta({
             <Pb2Teams :tournament-id="route.params.id" />
         </template>
         <template #result>
-            <Pb2StageToggle :tournament-id="route.params.id" />
+            <TournamentPhases :phases="phases" />
         </template>
         <template #stats>
             <Pb2PlayerStats :tournament-id="route.params.id" />

@@ -12,9 +12,12 @@ const signed = (v: number) => (v > 0 ? `+${v}` : `${v}`)
 <template>
   <div
     class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-    <div v-if="match.time || match.url"
+    <div v-if="match.time || match.url || match.label"
       class="px-4 py-2 border-b border-gray-100 dark:border-default flex justify-between items-center gap-2 bg-gray-50/80 dark:bg-elevated">
-      <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ match.time }}</span>
+      <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">
+        {{ match.time }}
+        <span v-if="match.label" class="font-bold text-amber-500">{{ match.label }}</span>
+      </span>
       <NuxtLink v-if="match.url" :to="match.url" :target="external ? '_blank' : undefined"
         class="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-accented px-2 py-0.5 rounded hover:bg-gray-300 dark:hover:bg-accented transition-colors">
         <UIcon :name="external ? 'i-lucide-external-link' : 'i-lucide-arrow-right'" class="w-3 h-3" />
