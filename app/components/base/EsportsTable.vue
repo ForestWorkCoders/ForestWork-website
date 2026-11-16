@@ -11,7 +11,7 @@
         root: 'overflow-x-auto w-full relative',
         // 核心：w-full 必须写在最前面，大屏撑满 100%，小屏靠 minWidthClass 兜底
         base: ['w-full border-separate border-spacing-0', minWidthClass || 'min-w-[850px]'].join(' '),
-        th: 'whitespace-nowrap px-4 py-3.5 font-bold tracking-wider text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-elevated',
+        th: 'whitespace-nowrap px-4 py-3.5 font-bold tracking-wider text-gray-500 dark:text-gray-400 bg-elevated',
         td: 'whitespace-nowrap px-4 py-3 text-gray-900 dark:text-gray-200 border-b border-gray-50 dark:border-default bg-white dark:bg-default'
       }"
     >

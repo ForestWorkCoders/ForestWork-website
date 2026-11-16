@@ -1,13 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { createSortableColumns } from '~/utils/table'
-import { use } from 'echarts/core'
-import { RadarChart } from 'echarts/charts'
-import { TooltipComponent } from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
-import VChart from 'vue-echarts'
-
-use([RadarChart, TooltipComponent, CanvasRenderer])
 
 const props = defineProps({
   tournamentId: { type: String, required: true }
@@ -41,81 +34,30 @@ const top3Players = computed(() => {
     .slice(0, 3)
 })
 
-// ====== 雷达图数据引擎 ======
-// ----------------------------------------------------
-// 魔法引擎：将麻将的真实数据，转化为 0-100 的雷达图分数
-// ----------------------------------------------------
-const radarConfigs = computed(() => {
-  if (!top3Players.value || !playstyleData.value) return []
+// Radar axes from the player's playstyle row. Each axis has its own full mark;
+// 放銃 is reversed (0% dealt in = full 20, 20% or more = 0) so bigger is always better.
+function playstyleAxes(p) {
+  if (!p) return null
+  const n = (v) => Number(v) || 0
+  const dealIn = n(p.deal_in_rate)
+  return [
+    { name: '和牌', max: 50, value: n(p.win_rate), display: `${n(p.win_rate)}%` },
+    { name: '打點', max: 10000, value: n(p.avg_win_score), display: n(p.avg_win_score) },
+    { name: '副露', max: 80, value: n(p.call_rate), display: `${n(p.call_rate)}%` },
+    { name: '放銃', max: 20, value: Math.max(20 - dealIn, 0), display: `${dealIn}%` },
+    { name: '立直', max: 80, value: n(p.riichi_rate), display: `${n(p.riichi_rate)}%` },
+    { name: '自摸', max: 80, value: n(p.tsumo_rate), display: `${n(p.tsumo_rate)}%` }
+  ]
+}
 
-  return top3Players.value.map(matchPlayer => {
-
-    const tacticalData = playstyleData.value.find(
-      p => p.player_id === matchPlayer.player_id
-    )
-
-    // 如果因为极端原因没找到这个人，返回防爆数据
-    if (!tacticalData) return null
-
-    // 1. 提取真实数据 (注意：现在是从 tacticalData 里取值，而不是 matchPlayer)
-    const rawData = {
-      win: Number(tacticalData.win_rate) || 0,
-      power: Number(tacticalData.avg_win_score) || 0,
-      call: Number(tacticalData.call_rate) || 0,
-      def: Number(tacticalData.deal_in_rate) || 0,
-      riichi: Number(tacticalData.riichi_rate) || 0,
-      tsumo: Number(tacticalData.tsumo_rate) || 0
-    }
-
-    // 2. 防御轴单独做数学反转 (满分20，0放铳=20，20放铳=0)
-    const reversedDef = Math.max(20 - rawData.def, 0)
-
-    // 3. 返回 ECharts 专属的声明式 Option
-    return {
-      tooltip: {
-        trigger: 'item',
-        backgroundColor: 'rgba(17, 24, 39, 0.9)',
-        textStyle: { color: 'rgba(255, 255, 255, 0.8)', fontWeight: 'bold' },
-        borderWidth: 0,
-        // 自定义 Tooltip 显示真实的业务数据
-        formatter: () => `
-          和牌: ${rawData.win}%<br/>
-          打點: ${rawData.power}<br/>
-          副露: ${rawData.call}%<br/>
-          放銃: ${rawData.def}% <br/>
-          立直: ${rawData.riichi}%<br/>
-          自摸: ${rawData.tsumo}%
-        `
-      },
-      radar: {
-        // ECharts 天生支持给每个维度设定独立的满分线！
-        indicator: [
-          { name: '和牌', max: 50 },     // 50% 为满格
-          { name: '打點', max: 10000 },   // 10000 分满格
-          { name: '副露', max: 80 },     // 80% 为满格
-          { name: '放銃', max: 20 },     // 反转后的放铳值（20为满格）
-          { name: '立直', max: 80 },     // 80% 为满格
-          { name: '自摸', max: 80 }      // 80% 为满格
-        ],
-        radius: '65%', // 控制雷达图的大小留出文字空间
-        splitNumber: 5,
-        axisName: { color: 'rgba(156, 163, 175, 0.8)', fontSize: 12, fontWeight: 'bold' },
-        splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.15)' } },
-        splitArea: { show: false }, // 隐藏背景色块交替
-        axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
-      },
-      series: [{
-        type: 'radar',
-        data: [{
-          value: [rawData.win, rawData.power, rawData.call, reversedDef, rawData.riichi, rawData.tsumo],
-          itemStyle: { color: 'rgb(16, 185, 129)' }, // Emerald 500
-          areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
-          lineStyle: { width: 2 }
-        }]
-      }]
-    }
-  })
-})
+const podiumEntries = computed(() => top3Players.value.map(player => ({
+  key: player.player_id ?? player.nickname,
+  name: player.nickname,
+  avatar: player.avatar,
+  value: player.avg_rank?.toFixed(2) ?? '-',
+  sub: `${player.play_count} 場對局`,
+  axes: playstyleAxes(playstyleData.value?.find(p => p.player_id === player.player_id))
+})))
 
 const items = [{
   value: 'match_stats',
@@ -191,60 +133,10 @@ const playPercentStyles = [
 <template>
   <div class="px-4 md:px-6 mt-8 space-y-8 animate-fade-in pb-12">
 
-    <section>
-      <div class="flex flex-col sm:flex-row sm:items-end gap-3 mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-          頂尖選手 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Top Performers</span>
-        </h2>
-      </div>
-
-      <!-- Early in a cup nobody has enough games yet; say so instead of showing an empty section -->
-      <p v-if="!top3Players.length"
-        class="text-sm text-gray-500 dark:text-gray-400 py-6 text-center border border-dashed border-gray-200 dark:border-default rounded-xl">
-        尚無選手打滿 {{ PODIUM_MIN_GAMES }} 場 · No player has {{ PODIUM_MIN_GAMES }} games yet
-      </p>
-
-      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div v-for="(player, index) in top3Players" :key="player.nickname || index"
-          class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm overflow-hidden flex flex-col relative group">
-
-          <div
-            class="absolute -right-4 -top-8 text-[120px] font-extrabold text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
-            #{{ index + 1 }}
-          </div>
-
-          <div class="p-6 flex flex-col items-center z-10 border-b border-gray-100 dark:border-default">
-            <UAvatar :src="player.avatar" :alt="player.nickname" size="xl"
-              class="ring-4 ring-gray-50 dark:ring-default shadow-lg mb-3" />
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ player.nickname }}</h3>
-            <div class="mt-2 flex items-center gap-1 text-amber-500 dark:text-amber-400 font-extrabold text-2xl">
-              <span>{{ player.avg_rank?.toFixed(2) ?? '-' }}</span>
-              <span class="text-xs text-gray-400 font-medium tracking-widest ml-1">AVG RANK</span>
-            </div>
-
-            <div class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400">
-              <UIcon name="i-lucide-swords" class="w-4 h-4 opacity-70" />
-              <span>{{ player.play_count }} 場對局</span>
-            </div>
-          </div>
-
-          <div
-            class="p-6 flex-1 flex flex-col items-center justify-center min-h-[280px] bg-gray-50/50 dark:bg-transparent">
-            <div class="relative w-full aspect-square max-w-[220px]">
-              <ClientOnly>
-                <VChart v-if="radarConfigs[index]" :option="radarConfigs[index]" class="w-full h-full" autoresize />
-                <template #fallback>
-                  <div class="w-full h-full flex items-center justify-center">
-                    <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
-                  </div>
-                </template>
-              </ClientOnly>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
+    <!-- Early in a cup nobody has enough games yet; the podium says so instead of showing nothing -->
+    <TournamentPodium :entries="podiumEntries" value-label="AVG RANK" value-class="text-amber-500 dark:text-amber-400"
+      sub-icon="i-lucide-swords"
+      :empty-text="`尚無選手打滿 ${PODIUM_MIN_GAMES} 場 · No player has ${PODIUM_MIN_GAMES} games yet`" />
 
     <section>
       <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">

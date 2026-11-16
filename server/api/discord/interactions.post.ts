@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { commandRegistry } from '../../discord/commands'
-import { handleCardCommand, handleCardCreateModal, handleCardBioModal } from '../../discord/commands/card'
+import { handleCardCommand, handleCardCreateModal, handleCardProfileModal, handleCardAutocomplete } from '../../discord/commands/card'
 import { handleLinerBattleCommand, handleLinerBattleButton, handleLinerBattleModal } from '../../discord/commands/linerbattle'
 import { handleGiveQuasoContextMenu } from '../../discord/commands/quaso'
 import { handleRoomCommand } from '../../discord/commands/room'
@@ -158,13 +158,26 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 4. 自動完成 (type: 4 = APPLICATION_COMMAND_AUTOCOMPLETE)
+  if (interaction.type === 4) {
+    setHeader(event, 'content-type', 'application/json')
+    if (interaction.data?.name === 'card') {
+      try {
+        return await handleCardAutocomplete(interaction)
+      } catch (err: any) {
+        console.error('[Discord Autocomplete Error]:', err?.stack || err)
+      }
+    }
+    return { type: 8, data: { choices: [] } }
+  }
+
   if (interaction.type === 5) {
     const customId = interaction.data?.custom_id
     if (customId === 'trpg_card_create_modal') {
       return await handleCardCreateModal(interaction, event)
     }
-    if (customId.startsWith('trpg_bio_modal:')) {
-      return await handleCardBioModal(interaction, event)
+    if (customId.startsWith('trpg_profile_modal:')) {
+      return await handleCardProfileModal(interaction, event)
     }
     if (customId.startsWith('lb_modal:')) {
       return await handleLinerBattleModal(interaction, event)

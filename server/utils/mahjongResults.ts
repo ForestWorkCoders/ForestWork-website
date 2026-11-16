@@ -1,7 +1,9 @@
-import { serverSupabaseClient } from '#supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '~/types/database.types'
 import { calculateMahjongPoints } from '~~/server/utils/mahjongScoreEngine'
 import { fetchPlayerDict } from '~~/server/utils/mahjongPlayer'
+
+// Mahjong tournament results: standings and matches per phase, mapped to the shared shape by /phases.
 
 // ============================================================================
 // 1. 基礎設施層 (Infrastructure Layer) - 永遠不要讓我再看到你 Copy-Paste 這些代碼
@@ -199,15 +201,10 @@ async function processTeamMatches(supabase: any, tournamentId: string, matches: 
     return data
 }
 
-
 // ============================================================================
 // 3. 主控制器 (The Controller)
 // ============================================================================
-export default defineEventHandler(async (event) => {
-    const id = getRouterParam(event, 'id')
-    if (!id) throw createError({ statusCode: 400, statusMessage: '缺少賽事 ID' })
-
-    const supabase = await serverSupabaseClient<Database>(event)
+export async function mahjongResults(supabase: SupabaseClient<Database>, id: string) {
 
     // 1. 拿取賽事基礎設定與完美 JSON 契約
     const { data: tourney } = await supabase
@@ -285,7 +282,7 @@ export default defineEventHandler(async (event) => {
     const playerDict = await fetchPlayerDict(supabase, accountIds)
 
     // 4. 路由到正確的計算引擎
-    let dashboardData = {}
+    let dashboardData: Record<string, any> = {}
 
     if (config.entity_type === 'team' || tourney.format === 'relay') {
         // Relay 走隊伍加總與繼承引擎
@@ -296,9 +293,5 @@ export default defineEventHandler(async (event) => {
         dashboardData = await processPlayerMatches(matches || [], ruleData, config, playerDict, dnfThreshold)
     }
 
-    // 5. 吐出完美的、前端最喜歡的形狀
-    return {
-        config: config,
-        data: dashboardData
-    }
-})
+    return { format: tourney.format, config, data: dashboardData }
+}

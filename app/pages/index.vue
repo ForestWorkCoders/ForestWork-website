@@ -42,6 +42,8 @@
   </div>
 
   <UContainer class="py-20">
+    <TournamentOngoing />
+
     <div class="text-center mb-12">
       <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Circuits · 競賽清單</h2>
       <p class="text-gray-500">探索林間小鎮的多元賽事與社群活動</p>
