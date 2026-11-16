@@ -2,30 +2,42 @@ import { serverSupabaseClient } from '#supabase/server'
 import type { Match, Phase, Section } from '~/types/phases'
 import { pb2Bracket, pb2GroupStage } from '~~/server/utils/pb2Results'
 
-// PB2 results as phases (WL2f): a duel league (the weeks), then the playoff bracket.
+// PB2 results as phases: a duel league (the weeks), then the playoff bracket.
 // A phase with no matches is left out.
 
 const COLUMNS = [
     { key: 'pld', label: 'P' }, { key: 'w', label: 'W' }, { key: 'd', label: 'D' },
-    { key: 'l', label: 'L' }, { key: 'diff', label: '+/-' }, { key: 'pts', label: 'Pts' }
+    { key: 'l', label: 'L' }, { key: 'diff', label: '+/-', signed: true }, { key: 'pts', label: 'Pts', main: true }
 ]
 
-// Both old shapes name the sides A (red) and B (blue)
-const duel = (m: any): Match => ({
-    id: m.id,
-    status: m.status ?? null,
-    next: m.nextMatchId ?? null,
-    nextLoser: m.nextLoserMatchId ?? null,
-    sides: (['A', 'B'] as const).map(s => ({
-        entrant: m[`team${s}`] ? { name: m[`team${s}`], colour: m[`colour${s}`] ?? m[`color${s}`] ?? null } : null,
-        score: m[`score${s}`] ?? null,
-        ...(m.winner !== undefined && { winner: m.winner === s })
-    }))
-})
+// League matches carry a status; bracket matches already carry `winner`
+const WALKOVER: Record<string, 'A' | 'B'> = { Walkover_Red: 'A', Walkover_Blue: 'B' }
+
+function leagueWinner(m: any): 'A' | 'B' | null {
+    const walkover = WALKOVER[m.status]
+    if (walkover) return walkover
+    if (m.status !== 'Completed' || m.scoreA === m.scoreB) return null
+    return m.scoreA > m.scoreB ? 'A' : 'B'
+}
 
 export default defineEventHandler(async (event): Promise<Phase[]> => {
     const tournamentId = getRouterParam(event, 'id')
     if (!tournamentId) throw createError({ statusCode: 400, statusMessage: 'Tournament ID required' })
+
+    // Both old shapes name the sides A (red) and B (blue)
+    const duel = (m: any, winner: 'A' | 'B' | null): Match => ({
+        id: m.id,
+        status: m.status ?? null,
+        label: WALKOVER[m.status] ? 'W/O' : undefined,
+        url: `/games/plazmaburst/tournaments/${tournamentId}/matches/${m.id}`,
+        next: m.nextMatchId ?? null,
+        nextLoser: m.nextLoserMatchId ?? null,
+        sides: (['A', 'B'] as const).map(s => ({
+            entrant: m[`team${s}`] ? { name: m[`team${s}`], colour: m[`colour${s}`] ?? m[`color${s}`] ?? null } : null,
+            score: m[`score${s}`] ?? null,
+            winner: winner === s
+        }))
+    })
 
     const supabase = await serverSupabaseClient(event)
     const [league, bracket] = await Promise.all([pb2GroupStage(supabase, tournamentId), pb2Bracket(supabase, tournamentId)])
@@ -46,7 +58,9 @@ export default defineEventHandler(async (event): Promise<Phase[]> => {
                 entrant: { id: String(id), name, short: short_sign, colour, avatar: logo },
                 stats: { pld, w, d, l, diff, pts }
             })),
-            rounds: league.rounds.map((r: any) => ({ id: r.roundName, title: r.roundName, matches: r.matches.map(duel) }))
+            rounds: league.rounds.map((r: any) => ({
+                id: r.roundName, title: r.roundName, matches: r.matches.map((m: any) => duel(m, leagueWinner(m)))
+            }))
         }]
     })
 
@@ -57,7 +71,9 @@ export default defineEventHandler(async (event): Promise<Phase[]> => {
         .filter(s => s.rounds.length)
         .map(s => ({
             ...s,
-            rounds: s.rounds.map((r: any, i: number) => ({ id: `${s.id}_${i + 1}`, title: r.title, matches: r.matches.map(duel) }))
+            rounds: s.rounds.map((r: any, i: number) => ({
+                id: `${s.id}_${i + 1}`, title: r.title, matches: r.matches.map((m: any) => duel(m, m.winner))
+            }))
         }))
 
     if (sections.length) phases.push({

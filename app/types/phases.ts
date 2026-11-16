@@ -41,7 +41,8 @@ export interface Match {
   title?: string
   time?: string | null
   status?: string | null
-  url?: string | null       // mahjong: replay (paipu)
+  url?: string | null       // a replay (mahjong paipu) or the match page (PB2)
+  label?: string            // short note on the card, e.g. W/O for a walkover
   sides: Side[]
   next?: string | null      // bracket: where the winner goes
   nextLoser?: string | null // bracket: where the loser goes
