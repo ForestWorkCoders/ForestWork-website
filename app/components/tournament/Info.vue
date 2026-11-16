@@ -60,7 +60,7 @@ const parsedHtml = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-default text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+  <div class="text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
 
     <div v-if="pending" class="flex flex-col items-center justify-center py-12 text-gray-500">
       <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin mb-4 text-primary" />

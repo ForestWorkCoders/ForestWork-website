@@ -95,7 +95,7 @@ const breadcrumb = computed(() => [
         </div>
 
         <div
-          class="bg-white dark:bg-elevated w-full border-x border-b border-gray-200 dark:border-default rounded-b-xl shadow-sm">
+          class="bg-white dark:bg-default w-full border-x border-b border-gray-200 dark:border-default rounded-b-xl shadow-sm">
           <!-- The bar scrolls sideways when the labels don't fit (phones), instead of cutting them to "…" -->
           <UTabs v-if="allTabs.length > 1" :items="allTabs" class="w-full" :ui="{
             list: 'overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
