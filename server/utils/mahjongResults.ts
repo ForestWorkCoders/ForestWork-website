@@ -3,8 +3,7 @@ import type { Database } from '~/types/database.types'
 import { calculateMahjongPoints } from '~~/server/utils/mahjongScoreEngine'
 import { fetchPlayerDict } from '~~/server/utils/mahjongPlayer'
 
-// Mahjong tournament results: standings and matches per phase.
-// Shared by /dashboard (the old shape) and /phases (the WL2f shape).
+// Mahjong tournament results: standings and matches per phase, mapped to the shared shape by /phases.
 
 // ============================================================================
 // 1. 基礎設施層 (Infrastructure Layer) - 永遠不要讓我再看到你 Copy-Paste 這些代碼
