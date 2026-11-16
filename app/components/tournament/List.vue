@@ -39,7 +39,7 @@ const shown = (key: Key) => key === 'past'
 <template>
   <UTabs :items="TABS" class="w-full" :ui="{
     list: 'bg-gray-100 dark:bg-default',
-    indicator: 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm'
+    indicator: 'shadow-sm'
   }">
     <template #default="{ item }">
       <div class="text-center py-1.5 sm:py-2 transition-colors duration-200">
@@ -47,7 +47,7 @@ const shown = (key: Key) => key === 'past'
           <!-- Short word on phones, so the label is never cut -->
           <span class="inline sm:hidden">{{ item.shortLabel }}</span>
           <span class="hidden sm:inline">{{ item.label }}</span>
-          <div class="text-xs text-gray-500 dark:text-gray-200 mt-0.5 sm:mt-1 transition-colors opacity-90">
+          <div class="text-xs mt-0.5 sm:mt-1 opacity-80">
             {{ item.description }}
           </div>
         </div>
