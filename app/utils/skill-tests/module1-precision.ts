@@ -17,7 +17,7 @@ interface PrecisionTarget extends Point {
 
 export class Module1Precision implements SkillModuleInstance {
   readonly id = 1
-  readonly title = 'Circle Precision // 准度測驗'
+  readonly title = 'Circle Precision // 準度測驗'
   readonly durationMs = 60000
   isCompleted = false
 
