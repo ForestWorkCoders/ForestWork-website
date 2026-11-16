@@ -17,10 +17,11 @@ const MEDALS: Record<number, string> = {
   3: 'text-amber-600 bg-amber-600/10'
 }
 
+// Every badge is the same: coloured text on a 10% fill of that colour. Only the colour differs.
 const rankClass = (rank: number) => {
   if (props.phase.final) return MEDALS[rank] ?? 'text-gray-500'
-  if (props.phase.promotedRanks?.includes(rank)) return 'text-success bg-success/10 border border-success/20'
-  if (props.phase.disqualifiedRanks?.includes(rank)) return 'text-error bg-error/10 border border-error/20 opacity-75'
+  if (props.phase.promotedRanks?.includes(rank)) return 'text-success bg-success/10'
+  if (props.phase.disqualifiedRanks?.includes(rank)) return 'text-error bg-error/10'
   return 'text-gray-500'
 }
 
