@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { DiscordSDK } from '@discord/embedded-app-sdk'
 import type { SkillModuleInstance, FloatingText, ModuleResultSummary } from '~/utils/skill-tests/types'
-import { px } from '~/utils/skill-tests/types'
+import { px, STAGE_WIDTH } from '~/utils/skill-tests/types'
 import { Module1Precision } from '~/utils/skill-tests/module1-precision'
 import { Module2Dual } from '~/utils/skill-tests/module2-dual'
 import { Module3Trail } from '~/utils/skill-tests/module3-trail'
@@ -589,7 +589,10 @@ function tick(now: number) {
     ctx.save()
     ctx.globalAlpha = Math.max(0, 1 - p)
     ctx.fillStyle = ft.color
-    ctx.fillText(ft.text, ft.x, ft.y - p * 30)
+    // A score popped near the edge would be cut off, so keep the whole text on the stage.
+    const half = ctx.measureText(ft.text).width / 2
+    const x = Math.min(Math.max(ft.x, half), STAGE_WIDTH - half)
+    ctx.fillText(ft.text, x, ft.y - p * 30)
     ctx.restore()
   }
 
