@@ -273,7 +273,7 @@ export class Module9Cps implements SkillModuleInstance {
       ctx.fillText(String(this.validClicks), c.x, c.y + 22)
 
       const leftSec = Math.max(0, (this.stageDurationMs - (now - this.startTime)) / 1000).toFixed(1)
-      ctx.font = `bold ${px(ctx, 16, 24)}px ui-monospace, monospace`
+      ctx.font = `bold ${px(ctx, 16, 22)}px ui-monospace, monospace`
       ctx.fillStyle = '#facc15'
       ctx.fillText(`REMAINING: ${leftSec}s`, c.x, c.y + 70)
     } else {
