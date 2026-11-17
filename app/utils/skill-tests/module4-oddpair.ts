@@ -1,5 +1,6 @@
 // app/utils/skill-tests/module4-oddpair.ts
 import {
+  px,
   STAGE_WIDTH,
   STAGE_HEIGHT,
   STAGE_CENTER_X,
@@ -253,7 +254,7 @@ export class Module4OddPair implements SkillModuleInstance {
     // 1. 绘制当前关卡水印
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
-    ctx.font = 'bold 14px ui-monospace, monospace'
+    ctx.font = `bold ${px(ctx, 14, 26)}px ui-monospace, monospace`
     ctx.fillStyle = '#facc15'
     ctx.fillText(`CURRENT LEVEL: [ ${this.level} ]`, 16, 16)
 

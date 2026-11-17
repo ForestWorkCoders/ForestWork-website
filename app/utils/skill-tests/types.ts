@@ -8,6 +8,13 @@ export const STAGE_HEIGHT = 600
 export const STAGE_CENTER_X = STAGE_WIDTH / 2  // 400
 export const STAGE_CENTER_Y = STAGE_HEIGHT / 2 // 300
 
+// A phone draws the 800×600 stage at about 0.43×, so a 14px label shows at about 6px.
+// Each text picks its own two sizes: the desktop size, and the size to use when the
+// stage is drawn narrower than COMPACT_STAGE_WIDTH CSS px.
+export const COMPACT_STAGE_WIDTH = 600
+export const px = (ctx: CanvasRenderingContext2D, desktop: number, phone: number) =>
+  ctx.canvas.clientWidth < COMPACT_STAGE_WIDTH ? phone : desktop
+
 // ==========================================
 // 2. 核心基础几何图元 (Primitives)
 // ==========================================

@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { DiscordSDK } from '@discord/embedded-app-sdk'
 import type { SkillModuleInstance, FloatingText, ModuleResultSummary } from '~/utils/skill-tests/types'
+import { px, STAGE_WIDTH } from '~/utils/skill-tests/types'
 import { Module1Precision } from '~/utils/skill-tests/module1-precision'
 import { Module2Dual } from '~/utils/skill-tests/module2-dual'
 import { Module3Trail } from '~/utils/skill-tests/module3-trail'
@@ -425,10 +426,10 @@ function drawStartOverlay(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillStyle = '#ffffff'
-  ctx.font = 'bold 40px ui-monospace, monospace'
+  ctx.font = `bold ${px(ctx, 40, 48)}px ui-monospace, monospace`
   ctx.fillText('點擊或按任意鍵開始', 400, 280)
   ctx.fillStyle = '#8BCBB2'
-  ctx.font = 'bold 28px ui-monospace, monospace'
+  ctx.font = `bold ${px(ctx, 28, 36)}px ui-monospace, monospace`
   ctx.fillText(activeModule.title, 400, 336)
 }
 
@@ -575,7 +576,7 @@ function tick(now: number) {
 
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.font = 'bold 20px ui-monospace, monospace'
+  ctx.font = `bold ${px(ctx, 20, 32)}px ui-monospace, monospace`
 
   for (let i = floatingTexts.length - 1; i >= 0; i--) {
     const ft = floatingTexts[i]
@@ -588,7 +589,10 @@ function tick(now: number) {
     ctx.save()
     ctx.globalAlpha = Math.max(0, 1 - p)
     ctx.fillStyle = ft.color
-    ctx.fillText(ft.text, ft.x, ft.y - p * 30)
+    // A score popped near the edge would be cut off, so keep the whole text on the stage.
+    const half = ctx.measureText(ft.text).width / 2
+    const x = Math.min(Math.max(ft.x, half), STAGE_WIDTH - half)
+    ctx.fillText(ft.text, x, ft.y - p * 30)
     ctx.restore()
   }
 

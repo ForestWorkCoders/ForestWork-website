@@ -1,5 +1,6 @@
 // app/utils/skill-tests/module5-reaction.ts
 import {
+  px,
   STAGE_WIDTH,
   STAGE_HEIGHT,
   STAGE_CENTER_X,
@@ -59,9 +60,9 @@ export class Module5Reaction implements SkillModuleInstance {
 
   // 2. 交互图元结构收敛为标准 Rect
   private readonly nextBtn: Rect = {
-    x: 280,
+    x: 220,
     y: 380,
-    w: 240,
+    w: 360,
     h: 54
   }
 
@@ -261,10 +262,10 @@ export class Module5Reaction implements SkillModuleInstance {
   render(ctx: CanvasRenderingContext2D, now: number): void {
     if (this.status === 'PENALTY_FREEZE') {
       ctx.fillStyle = '#ef4444'
-      ctx.font = 'bold 36px ui-monospace, monospace'
+      ctx.font = `bold ${px(ctx, 36, 40)}px ui-monospace, monospace`
       ctx.textAlign = 'center'
       ctx.fillText('搶跑 / 提前點擊！', STAGE_CENTER_X, 280)
-      ctx.font = '20px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 20, 30)}px ui-monospace, monospace`
       ctx.fillStyle = '#fca5a5'
       ctx.fillText('階段重置中，請等待信號...', STAGE_CENTER_X, 330)
       return
@@ -275,7 +276,7 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.textAlign = 'center'
 
       ctx.fillStyle = '#a1a1aa'
-      ctx.font = '20px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 20, 30)}px ui-monospace, monospace`
       ctx.fillText(`${this.STAGE_NAMES[stageId] ?? ''} 測定完成`, STAGE_CENTER_X, 180)
 
       ctx.fillStyle = '#a855f7'
@@ -290,7 +291,7 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.strokeRect(btn.x, btn.y, btn.w, btn.h)
 
       ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 18px ui-monospace, monospace'
+      ctx.font = `bold ${px(ctx, 18, 26)}px ui-monospace, monospace`
       const isLast = this.stepIndex === 4
       ctx.fillText(isLast ? '查看總評成績' : '下一關 (Next Level)', btn.x + btn.w / 2, btn.y + btn.h / 2 + 6)
       return
@@ -301,7 +302,7 @@ export class Module5Reaction implements SkillModuleInstance {
     // 绘制顶端微型进度指示
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
-    ctx.font = 'bold 14px ui-monospace, monospace'
+    ctx.font = `bold ${px(ctx, 14, 26)}px ui-monospace, monospace`
     ctx.fillStyle = '#a855f7'
     ctx.fillText(`STAGE: [ ${this.stepIndex + 1} / 5 ] // ${this.STAGE_NAMES[stageId]}`, 16, 16)
 
@@ -313,13 +314,13 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.fill()
 
       ctx.fillStyle = '#f4f4f5'
-      ctx.font = '24px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 24, 32)}px ui-monospace, monospace`
       ctx.textAlign = 'center'
       ctx.fillText(isGreen ? '立即點擊！' : '等待變綠...', STAGE_CENTER_X, 450)
     } else if (stageId === 1) {
       const lightsActive = this.status === 'ACTIVE'
       ctx.textAlign = 'center'
-      ctx.font = '24px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 24, 32)}px ui-monospace, monospace`
       ctx.fillStyle = '#f4f4f5'
       ctx.fillText(lightsActive ? '熄滅！點擊！' : '等待紅燈全熄滅...', STAGE_CENTER_X, 140)
 
@@ -392,7 +393,7 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.restore()
 
       ctx.fillStyle = '#f4f4f5'
-      ctx.font = '22px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 22, 30)}px ui-monospace, monospace`
       ctx.textAlign = 'center'
       ctx.fillText('目標越過中線瞬間點擊！', cx, 60)
     } else if (stageId === 3) {
@@ -409,7 +410,7 @@ export class Module5Reaction implements SkillModuleInstance {
       }
 
       ctx.fillStyle = '#f4f4f5'
-      ctx.font = '22px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 22, 30)}px ui-monospace, monospace`
       ctx.textAlign = 'center'
       ctx.fillText('全視野任意方塊變黃瞬間點擊！', STAGE_CENTER_X, 40)
     } else if (stageId === 4) {
@@ -419,7 +420,7 @@ export class Module5Reaction implements SkillModuleInstance {
       ctx.fill()
 
       ctx.fillStyle = '#f4f4f5'
-      ctx.font = '22px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 22, 30)}px ui-monospace, monospace`
       ctx.textAlign = 'center'
       ctx.fillText(this.s5Data.isGreen ? '綠燈已出現！點擊！' : '只有變綠才准點！', STAGE_CENTER_X, 450)
     }

@@ -1,5 +1,6 @@
 // app/utils/skill-tests/module6-tracking.ts
 import {
+  px,
   STAGE_WIDTH,
   STAGE_HEIGHT,
   STAGE_CENTER_X,
@@ -189,7 +190,7 @@ export class Module6Tracking implements SkillModuleInstance {
     // 绘制跟踪状态 HUD
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
-    ctx.font = 'bold 14px ui-monospace, monospace'
+    ctx.font = `bold ${px(ctx, 14, 26)}px ui-monospace, monospace`
     ctx.fillStyle = this.isOnTarget ? '#22c55e' : '#ef4444'
     ctx.fillText(`TARGET_LOCK: ${this.isOnTarget ? 'LOCKED [ON]' : 'SEARCHING...'}`, 16, 16)
   }

@@ -1,5 +1,6 @@
 // app/utils/skill-tests/module3-trail.ts
 import {
+  px,
   STAGE_WIDTH,
   STAGE_HEIGHT,
   type SkillModuleInstance,
@@ -148,14 +149,14 @@ export class Module3Trail implements SkillModuleInstance {
     // 1. 绘制当前目标提示水印
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
-    ctx.font = 'bold 14px ui-monospace, monospace'
+    ctx.font = `bold ${px(ctx, 14, 26)}px ui-monospace, monospace`
     ctx.fillStyle = '#facc15'
     ctx.fillText(`NEXT TARGET: [ ${this.expectedNumber} ]`, 16, 16)
 
     // 2. 绘制数字圆圈
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.font = 'bold 20px ui-monospace, monospace'
+    ctx.font = `bold ${px(ctx, 20, 28)}px ui-monospace, monospace`
 
     for (let i = 0; i < this.circles.length; i++) {
       const c = this.circles[i]
