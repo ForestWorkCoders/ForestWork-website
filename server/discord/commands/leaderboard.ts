@@ -12,7 +12,7 @@ const RANK_EMOJI = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7�
 interface Leaderboard {
   title: string // 例：口吐芬芳 · 次數榜 · 2026
   scoreLabel: string // 每列分數前的標籤，例：次數
-  rows: { name: string, score: string }[] // 前 10 名，分數已格式化
+  rows: { rank: number, name: string, score: string }[] // 前 10 名，分數已格式化；同分同名次 (1, 1, 3)
   empty: string // 沒有任何資料時的說明
   me: { rank: number | null, stats: [string, string][], unranked: string } | null // null = 不顯示個人區塊
   note: string // 頁尾：「<名稱> · <提示>」
@@ -25,8 +25,8 @@ const displayName =(username: string | null | undefined, userId: unknown) =>
   username || `用戶_${String(userId).slice(-4)}`
 
 export function buildLeaderboardEmbed(board: Leaderboard) {
-  const fields = board.rows.map((row, i) => ({
-    name: `${RANK_EMOJI[i] ?? `#${i + 1}`} ${escapeName(row.name)}`,
+  const fields = board.rows.map(row => ({
+    name: `${RANK_EMOJI[row.rank - 1] ?? `#${row.rank}`} ${escapeName(row.name)}`,
     value: `${board.scoreLabel}: ${row.score}`
   }))
 
@@ -133,18 +133,21 @@ export async function renderCurseLeaderboardPayload(
   const ranked = [...pool].sort((a, b) => value(b) - value(a))
 
   const me = all.find(r => String(r.user_id) === String(viewerId) && r.count > 0)
+  // 名次 = 分數比他高的人數 + 1，所以同分的人共用名次與獎牌
+  const rankOf = (r: Row) => pool.filter(x => value(x) > value(r)).length + 1
 
   const board: Leaderboard = {
     title: `口吐芬芳 · ${isRatio ? '百分比榜' : '次數榜'} · ${queryYear}`,
     scoreLabel: isRatio ? '百分比' : '次數',
     rows: ranked.slice(0, 10).map(r => ({
+      rank: rankOf(r),
       name: displayName(r.username, r.user_id),
       score: isRatio ? `\`${pct(r)}\` (${r.count}/${r.total_messages})` : `\`${r.count}\` 次`
     })),
     empty: `${queryYear} 年尚無統計數據！`,
     me: {
       // 只有在榜上的人才有名次：百分比榜不收發言未滿 5 則的人
-      rank: me && pool.includes(me) ? pool.filter(r => value(r) > value(me)).length + 1 : null,
+      rank: me && pool.includes(me) ? rankOf(me) : null,
       stats: !me
         ? []
         : isRatio
@@ -211,6 +214,8 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
   })
   const all: { user_id: string, username: string | null, total: number }[] = data || []
   const myTotal = Number(all.find(r => String(r.user_id) === String(viewerId))?.total ?? 0)
+  // 名次 = 累計比他多的人數 + 1，所以同分的人共用名次與獎牌
+  const rankOf = (total: number) => all.filter(r => Number(r.total) > total).length + 1
 
   // 今日剩餘額度
   const todayStr = new Date().toISOString().split('T')[0]
@@ -227,12 +232,13 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
     title: `Quaso · ${isReceived ? '團寵人氣榜' : '大善人奉獻榜'}`,
     scoreLabel: isReceived ? '累計收穫' : '慷慨送出',
     rows: all.slice(0, 10).map(r => ({
+      rank: rankOf(Number(r.total)),
       name: displayName(r.username, r.user_id),
       score: `\`${r.total}\` 個 🥐`
     })),
     empty: '尚無統計數據！快使用右鍵選單投遞第一個 Quaso 吧！',
     me: {
-      rank: myTotal > 0 ? all.filter(r => Number(r.total) > myTotal).length + 1 : null,
+      rank: myTotal > 0 ? rankOf(myTotal) : null,
       stats: [
         [isReceived ? '個人累計獲得' : '個人累計送出', `\`${myTotal}\` 個 🥐`],
         ['今日可用額度', `\`${remainingToday}/3\` 枚 (午夜 00:00 刷新)`]
@@ -422,6 +428,8 @@ export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: 
     title,
     scoreLabel: '分數',
     rows: top.map(item => ({
+      // 同分時 v_skill_leaderboard 已按先達成者排前，所以這裡沒有並列
+      rank: item.global_rank,
       name: displayName(item.operator_name, item.discord_id),
       score: `\`${item.score.toLocaleString()}\` PTS \`[${item.rating}]\``
     })),
