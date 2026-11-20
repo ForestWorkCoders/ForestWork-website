@@ -17,7 +17,8 @@ const TABS = [
     { label: '參賽隊伍 · Teams', slot: 'teams' },
     { label: '賽事結果 · Result', slot: 'result' },
     { label: '玩家數據 · Player Stats', slot: 'stats' },
-    { label: '直播記錄 · VODs', slot: 'vods' }
+    // Hidden until there is VOD data to pass to TournamentVods (WL21)
+    { label: '直播記錄 · VODs', slot: 'vods', hidden: true }
 ]
 
 useSeoMeta({
