@@ -850,7 +850,7 @@ const dealInTargetOption = computed(() => {
 
                 <!-- 役種 3 欄式方陣 (對齊牌譜屋排版) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2.5 font-mono text-xs pt-1">
-                    <div v-for="(yaku, idx) in currentMajorHand.yakus" :key="idx"
+                    <div v-for="(yaku, idx) in (currentMajorHand?.yakus ?? [])" :key="idx"
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-default">
                         <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
                         <span class="font-bold" :class="[
