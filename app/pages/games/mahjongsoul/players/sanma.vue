@@ -301,12 +301,11 @@ interface Achievement { title: string; event: string; date: string; iconUrl: str
 const achievements = computed<Achievement[]>(() => {
     return (statsData.value as any)?.achievements || []
 })
-// 圖示載入失敗的項目索引，退回預設獎盃
-const failedAchievementIcons = ref(new Set<number>())
-const onAchievementIconError = (idx: number) => {
-    failedAchievementIcons.value = new Set(failedAchievementIcons.value).add(idx)
+// 載入失敗的圖示網址，退回預設獎盃 (以網址記錄，換選手或重新查詢都不必重置)
+const failedAchievementIcons = ref(new Set<string>())
+const onAchievementIconError = (url: string) => {
+    failedAchievementIcons.value = new Set(failedAchievementIcons.value).add(url)
 }
-watch(achievements, () => { failedAchievementIcons.value = new Set() })
 
 // 好品味互動：點擊對手卡片瞬間切換主視角，全頁自動重算該對手數據
 const inspectOpponent = (oppAccountId: number) => {
@@ -884,9 +883,9 @@ const dealInTargetOption = computed(() => {
                 <div v-for="(ach, idx) in achievements" :key="idx"
                     class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-accented border border-gray-100 dark:border-default">
                     <div class="w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-secondary/10">
-                        <img v-if="ach.iconUrl && !failedAchievementIcons.has(idx)" :src="ach.iconUrl" loading="lazy"
+                        <img v-if="ach.iconUrl && !failedAchievementIcons.has(ach.iconUrl)" :src="ach.iconUrl" loading="lazy"
                             decoding="async" :alt="ach.title" class="w-8 h-8 object-contain"
-                            @error="onAchievementIconError(idx)">
+                            @error="onAchievementIconError(ach.iconUrl)">
                         <UIcon v-else name="i-lucide-trophy" class="w-5 h-5 text-secondary" />
                     </div>
                     <div class="min-w-0">
