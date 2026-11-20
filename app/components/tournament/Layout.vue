@@ -68,7 +68,9 @@ function updateFade() {
   fadeRight.value = !!list && list.scrollLeft + list.clientWidth < list.scrollWidth - 1
 }
 
-function revealActive() {
+const FADE_PX = 40 // width of the right-edge fade (2.5rem); the active tab stays clear of it
+
+function revealActive(smooth: boolean) {
   const list = getList()
   const trigger = list?.querySelector<HTMLElement>('[role="tab"][data-state="active"]')
   if (!list || !trigger) return
@@ -76,10 +78,10 @@ function revealActive() {
   const t = trigger.getBoundingClientRect()
   let delta = 0
   if (t.left < l.left) delta = t.left - l.left
-  else if (t.right > l.right) delta = t.right - l.right
+  else if (t.right > l.right - FADE_PX) delta = t.right - (l.right - FADE_PX)
   if (delta) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    list.scrollBy({ left: delta, behavior: reduce ? 'auto' : 'smooth' })
+    list.scrollBy({ left: delta, behavior: smooth && !reduce ? 'smooth' : 'auto' })
   }
 }
 
@@ -96,10 +98,12 @@ watch(tabsRoot, (el) => {
     observer.disconnect()
   }
   updateFade()
-  revealActive()
+  // Jump straight to the active tab on load, and again once web fonts have changed the tab widths
+  revealActive(false)
+  document.fonts?.ready.then(() => revealActive(false))
 }, { flush: 'post' })
 
-watch(activeTab, () => nextTick(revealActive))
+watch(activeTab, () => nextTick(() => revealActive(true)))
 onBeforeUnmount(() => stopListening?.())
 
 const breadcrumb = computed(() => [
