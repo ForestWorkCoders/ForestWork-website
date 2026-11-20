@@ -56,6 +56,15 @@ const items = computed<NavigationMenuItem[]>(() => [
     ]
   },
   {
+    label: 'Plazma Burst 2',
+    icon: 'i-lucide-crosshair',
+    defaultOpen: true,
+    children: [
+      { label: '戰報一覽', to: '/games/plazmaburst' },
+      { label: '賽事規章', to: '/games/plazmaburst/rules' }
+    ]
+  },
+  {
     label: '繪畫系列',
     icon: 'i-lucide-palette',
     defaultOpen: true,
@@ -81,13 +90,16 @@ const items = computed<NavigationMenuItem[]>(() => [
         <UColorModeImage light="/brand/svg/logo-black.svg" dark="/brand/svg/logo-white.svg" alt="ForestWork Emblem" class="h-5 w-auto" />
         <!-- 2. Text 文字标（取代原本的 HTML 纯文本，自动响应浅/深色模式） -->
         <!--    Show/hide sits on a wrapper: classes on UColorModeImage reach both of its images, so sm:block would un-hide the dark-mode one -->
-        <span class="hidden sm:flex">
+        <!--    lg–xl: the full nav needs the room, so only the emblem shows there -->
+        <span class="hidden sm:flex lg:hidden xl:flex">
           <UColorModeImage light="/brand/svg/text-en-black.svg" dark="/brand/svg/text-en-white.svg" alt="ForestWork" class="h-3.5 w-auto" />
         </span>
       </div>
     </template>
 
-    <UNavigationMenu :items="items" class="w-full justify-center" content-orientation="vertical" />
+    <!-- lg–xl: six groups only fit beside the logo and login without their icons -->
+    <UNavigationMenu :items="items" class="w-full justify-center" content-orientation="vertical"
+      :ui="{ linkLeadingIcon: 'lg:max-xl:hidden' }" />
 
     <!-- 🟢 2. 使用 ClientOnly 防御 SSR 与客户端身份状态脱节引发的水合警告 -->
     <template #right>
@@ -121,7 +133,7 @@ const items = computed<NavigationMenuItem[]>(() => [
 
         <!-- 未登入：Discord 登入按鈕 -->
         <UButton v-else color="primary" variant="solid" icon="i-simple-icons-discord"
-          class="hidden lg:inline-flex font-mono text-xs font-bold" @click="login">
+          class="hidden lg:inline-flex whitespace-nowrap font-mono text-xs font-bold" @click="login">
           Discord 登入
         </UButton>
 

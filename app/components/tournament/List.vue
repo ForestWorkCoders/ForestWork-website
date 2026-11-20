@@ -11,11 +11,20 @@ const props = defineProps<{
 
 type Key = 'ongoing' | 'past' | 'upcoming'
 
-const TABS: { slot: Key; label: string; shortLabel: string; description: string; placeholder: string; emptyIcon: string; empty: string; noMatch: string }[] = [
-  { slot: 'ongoing', label: 'ONGOING TOURNAMENTS', shortLabel: 'ONGOING', description: '進行中的比賽', placeholder: 'Search Ongoing Tournaments...', emptyIcon: 'i-lucide-calendar-days', empty: '目前沒有進行中的賽事', noMatch: '找不到符合條件的進行中賽事' },
-  { slot: 'past', label: 'PAST TOURNAMENTS', shortLabel: 'PAST', description: '已結束的比賽', placeholder: 'Search Past Tournaments...', emptyIcon: 'i-lucide-inbox', empty: '尚無歷史賽事紀錄', noMatch: '找不到符合條件的歷史賽事' },
-  { slot: 'upcoming', label: 'UPCOMING TOURNAMENTS', shortLabel: 'UPCOMING', description: '即將開始的比賽', placeholder: 'Search Future Tournaments...', emptyIcon: 'i-lucide-calendar-days', empty: '目前沒有即將開始的賽事', noMatch: '找不到符合條件的即將開始賽事' },
+const TABS: { slot: Key; value: Key; label: string; shortLabel: string; description: string; placeholder: string; emptyIcon: string; empty: string; noMatch: string }[] = [
+  { slot: 'ongoing', value: 'ongoing', label: 'ONGOING TOURNAMENTS', shortLabel: 'ONGOING', description: '進行中的比賽', placeholder: 'Search Ongoing Tournaments...', emptyIcon: 'i-lucide-calendar-days', empty: '目前沒有進行中的賽事', noMatch: '找不到符合條件的進行中賽事' },
+  { slot: 'past', value: 'past', label: 'PAST TOURNAMENTS', shortLabel: 'PAST', description: '已結束的比賽', placeholder: 'Search Past Tournaments...', emptyIcon: 'i-lucide-inbox', empty: '尚無歷史賽事紀錄', noMatch: '找不到符合條件的歷史賽事' },
+  { slot: 'upcoming', value: 'upcoming', label: 'UPCOMING TOURNAMENTS', shortLabel: 'UPCOMING', description: '即將開始的比賽', placeholder: 'Search Future Tournaments...', emptyIcon: 'i-lucide-calendar-days', empty: '目前沒有即將開始的賽事', noMatch: '找不到符合條件的即將開始賽事' },
 ]
+
+// Open on the first tab that has anything: ongoing, then past, then upcoming
+const defaultTab = computed<Key>(() => {
+  const t = props.tournaments
+  if (t?.ongoing?.length) return 'ongoing'
+  if (t?.past?.length) return 'past'
+  if (t?.upcoming?.length) return 'upcoming'
+  return 'ongoing'
+})
 
 const PAGE_SIZE = 7
 const query = ref('')
@@ -37,16 +46,16 @@ const shown = (key: Key) => key === 'past'
 </script>
 
 <template>
-  <UTabs :items="TABS" class="w-full" :ui="{
+  <UTabs :items="TABS" :default-value="defaultTab" class="w-full" :ui="{
     list: 'bg-gray-100 dark:bg-default',
     indicator: 'shadow-sm'
   }">
     <template #default="{ item }">
       <div class="text-center py-1.5 sm:py-2 transition-colors duration-200">
         <div class="font-bold text-xs sm:text-sm tracking-wider uppercase transition-colors">
-          <!-- Short word on phones, so the label is never cut -->
-          <span class="inline sm:hidden">{{ item.shortLabel }}</span>
-          <span class="hidden sm:inline">{{ item.label }}</span>
+          <!-- Short word below xl, so the label is never cut -->
+          <span class="inline xl:hidden">{{ item.shortLabel }}</span>
+          <span class="hidden xl:inline">{{ item.label }}</span>
           <div class="text-xs mt-0.5 sm:mt-1 opacity-80">
             {{ item.description }}
           </div>
