@@ -163,7 +163,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
     </div>
 
     <template v-else-if="players && players.length > 0">
-      <TournamentPodium :entries="podiumEntries" value-label="SCORE" value-class="text-emerald-700 dark:text-emerald-400"
+      <TournamentPodium :entries="podiumEntries" value-label="SCORE"
         sub-icon="i-lucide-crosshair" />
 
       <!-- 2. 綜合數據表格區域 (100% 鏡像對齊雀魂的 DOM 結構) -->

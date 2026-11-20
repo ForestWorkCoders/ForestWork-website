@@ -68,6 +68,10 @@ export function createSortableColumns(columns: ColumnConfig[]) {
     const isRight = col.class?.includes('text-right')
 
     return {
+      cell: ({ getValue }: any) => {
+        const v = getValue()
+        return v == null || v === '' ? '–' : v
+      },
       ...col,
       id: col.id || col.accessorKey,
       accessorKey: col.accessorKey,

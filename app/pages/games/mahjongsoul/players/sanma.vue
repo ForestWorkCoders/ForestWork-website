@@ -192,6 +192,51 @@ const basic = computed(() => statsData.value?.basicStats || {
     mrLabel: '當前賽季'
 })
 
+interface StatTile { label: string; value: string | number; cls?: string }
+interface TileGroup { label: string; span: string; cols: string; tiles: StatTile[] }
+
+const tileGroups = computed<TileGroup[]>(() => [
+    {
+        label: '綜合 · Overall', span: 'lg:col-span-3', cols: 'sm:grid-cols-3',
+        tiles: [
+            { label: '平均順位', value: basic.value.avgRank },
+            { label: '被飛率', value: `${basic.value.bustingRate}%` },
+            { label: `天梯等級 (${basic.value.mrLabel})`, value: basic.value.mrRating, cls: 'text-primary' }
+        ]
+    },
+    {
+        label: '和牌 · Winning', span: 'lg:col-span-4', cols: 'sm:grid-cols-4',
+        tiles: [
+            { label: '和牌率', value: `${basic.value.winRate}%` },
+            { label: '自摸率', value: `${basic.value.tsumoRate}%` },
+            { label: '平均打點', value: basic.value.avgWinScore.toLocaleString() },
+            { label: '平均和牌巡數', value: `${basic.value.avgWinTurn} 巡` }
+        ]
+    },
+    {
+        label: '放銃 · Deal-in', span: 'lg:col-span-2', cols: 'sm:grid-cols-2',
+        tiles: [
+            { label: '放銃率', value: `${basic.value.dealInRate}%` },
+            { label: '平均銃點', value: basic.value.avgDealInScore.toLocaleString() }
+        ]
+    },
+    {
+        label: '打法 · Style', span: 'lg:col-span-3', cols: 'sm:grid-cols-3',
+        tiles: [
+            { label: '立直率', value: `${basic.value.riichiRate}%` },
+            { label: '副露率', value: `${basic.value.callRate}%` },
+            { label: '默聽率', value: `${basic.value.damaRate}%` }
+        ]
+    },
+    {
+        label: '流局 · Draws', span: 'lg:col-span-2', cols: 'sm:grid-cols-2',
+        tiles: [
+            { label: '流局率', value: `${basic.value.drawRate}%` },
+            { label: '流局聽牌率', value: `${basic.value.drawTenpaiRate}%` }
+        ]
+    }
+])
+
 // 預設檢視模式：'win' (最大和牌) 或 'dealIn' (最近大銃)
 const majorHandMode = ref<'win' | 'dealIn'>('win')
 
@@ -215,24 +260,31 @@ const currentMajorHand = computed(() => {
 const colorMode = useColorMode()
 const sliceGap = computed(() => colorMode.value === 'dark' ? '#161B22' : '#ffffff')
 
+// Brand-aligned chart palette (forest = primary, amber = 副露, slate = neutral)
+const chart = computed(() => colorMode.value === 'dark'
+    ? { forest: '#8BCBB2', amber: '#D97706', slate: '#94a3b8', red: '#ef4444', empty: '#30363D', text: '#94a3b8', axis: '#30363D', grid: '#21262D' }
+    : { forest: '#4C7766', amber: '#D97706', slate: '#64748b', red: '#dc2626', empty: '#e2e8f0', text: '#475569', axis: '#cbd5e1', grid: '#e2e8f0' })
+const forestRgb = computed(() => colorMode.value === 'dark' ? '139, 203, 178' : '76, 119, 102')
+
 // 6.1 順位餅圖
 const pieOption = computed(() => {
     const p = statsData.value?.placements || { rank1: 0, rank2: 0, rank3: 0, total: 0 }
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}場 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af' } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: p.total > 0 ? [
-                { value: p.rank1, name: '一位 (1st)', itemStyle: { color: '#10b981' } },
-                { value: p.rank2, name: '二位 (2nd)', itemStyle: { color: '#64748b' } },
-                { value: p.rank3, name: '三位 (3rd)', itemStyle: { color: '#ef4444' } }
+                { value: p.rank1, name: '一位 (1st)', itemStyle: { color: chart.value.forest } },
+                { value: p.rank2, name: '二位 (2nd)', itemStyle: { color: chart.value.slate } },
+                { value: p.rank3, name: '三位 (3rd)', itemStyle: { color: chart.value.red } }
             ] : [
-                { value: 1, name: '無出賽記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無出賽記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -246,15 +298,15 @@ const lineOption = computed(() => {
             trigger: 'axis',
             formatter: '第 {b} 場: 第 {c} 位',
             backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            borderColor: '#374151',
+            borderColor: chart.value.axis,
             textStyle: { color: '#f3f4f6', fontSize: 12 }
         },
         grid: { left: '40', right: '30', top: '25', bottom: '30' },
         xAxis: {
             type: 'category',
             data: Array.from({ length: ranks.length }, (_, i) => i + 1),
-            axisLine: { lineStyle: { color: '#374151' } },
-            axisLabel: { color: '#9ca3af', fontSize: 12 }
+            axisLine: { lineStyle: { color: chart.value.axis } },
+            axisLabel: { color: chart.value.text, fontSize: 12 }
         },
         yAxis: {
             type: 'value',
@@ -264,29 +316,20 @@ const lineOption = computed(() => {
             interval: 1,
             axisLabel: {
                 formatter: (v: number) => v === 1 ? '1位' : v === 2 ? '2位' : '3位',
-                color: '#9ca3af',
+                color: chart.value.text,
                 fontSize: 12
             },
-            splitLine: { lineStyle: { color: '#1f2937' } }
+            splitLine: { lineStyle: { color: chart.value.grid } }
         },
         series: [{
             data: ranks,
             type: 'line',
-            smooth: 0.25, // 微平滑，避免過度彎曲
+            smooth: false,
             showSymbol: true,
             symbolSize: 6, // 點多時自動收縮點徑，保持乾淨
-            itemStyle: { color: '#3b82f6' },
-            lineStyle: { width: 2.5, color: '#3b82f6' },
-            areaStyle: {
-                color: {
-                    type: 'linear',
-                    x: 0, y: 0, x2: 0, y2: 1,
-                    colorStops: [
-                        { offset: 0, color: 'rgba(59, 130, 246, 0.25)' },
-                        { offset: 1, color: 'rgba(59, 130, 246, 0.0)' }
-                    ]
-                }
-            }
+            itemStyle: { color: chart.value.forest },
+            // No area fill: with the inverted axis it shades towards 1st place, which means nothing for a rank
+            lineStyle: { width: 2.5, color: chart.value.forest }
         }]
     }
 })
@@ -354,6 +397,7 @@ function normalizeRadarMetric(val: number, config: { min: number; max: number; i
 }
 
 // 3. ECharts 雷達配置
+const radarLine = computed(() => colorMode.value === 'dark' ? 'rgba(148, 163, 184, 0.2)' : 'rgba(100, 116, 139, 0.25)')
 const radarOption = computed(() => {
     const raw = statsData.value?.radarStats || { atk: 0, spd: 0, def: 0, luk: 0 }
 
@@ -368,10 +412,10 @@ const radarOption = computed(() => {
         tooltip: {
             trigger: 'item',
             backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            borderColor: '#374151',
+            borderColor: chart.value.axis,
             textStyle: { color: '#f3f4f6', fontSize: 12 },
             formatter: () => `
-        <div class="font-bold border-b border-gray-700 pb-1 mb-1 text-emerald-400">四維作風指標 (基準量綱: 0 ~ 100)</div>
+        <div class="font-bold border-b border-gray-700 pb-1 mb-1" style="color:#8BCBB2">四維作風指標 (基準量綱: 0 ~ 100)</div>
         <div>攻 (ATK): ${scores[0]}分 <span class="text-xs text-muted">(場均打點 ${raw.atk.toLocaleString()}點)</span></div>
         <div>速 (SPD): ${scores[1]}分 <span class="text-xs text-muted">(平均和巡 ${raw.spd}巡)</span></div>
         <div>防 (DEF): ${scores[2]}分 <span class="text-xs text-muted">(放銃率 ${raw.def}%)</span></div>
@@ -387,18 +431,18 @@ const radarOption = computed(() => {
             ],
             radius: '65%',
             splitNumber: 4,
-            axisName: { color: '#9ca3af', fontSize: 12, fontWeight: 'bold' },
-            splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } },
-            axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
+            axisName: { color: chart.value.text, fontSize: 12, fontWeight: 'bold' },
+            splitLine: { lineStyle: { color: radarLine.value } },
+            axisLine: { lineStyle: { color: radarLine.value } }
         },
         series: [{
             type: 'radar',
             data: [{
                 value: scores,
                 name: '選手風格',
-                itemStyle: { color: '#10b981' },
-                areaStyle: { color: 'rgba(16, 185, 129, 0.25)' },
-                lineStyle: { width: 2, color: '#10b981' },
+                itemStyle: { color: chart.value.forest },
+                areaStyle: { color: `rgba(${forestRgb.value}, 0.25)` },
+                lineStyle: { width: 2, color: chart.value.forest },
                 symbolSize: 6
             }]
         }]
@@ -411,19 +455,20 @@ const winStyleOption = computed(() => {
     const total = ws.riichi + ws.dama + ws.fulo
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text, fontSize: 12 } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: total > 0 ? [
-                { value: ws.riichi, name: '立直', itemStyle: { color: '#0f4c81' } },
-                { value: ws.fulo, name: '副露', itemStyle: { color: '#7c3aed' } },
-                { value: ws.dama, name: '默聽', itemStyle: { color: '#f43f5e' } }
+                { value: ws.riichi, name: '立直', itemStyle: { color: chart.value.forest } },
+                { value: ws.fulo, name: '副露', itemStyle: { color: chart.value.amber } },
+                { value: ws.dama, name: '默聽', itemStyle: { color: chart.value.slate } }
             ] : [
-                { value: 1, name: '無和牌記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無和牌記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -435,19 +480,20 @@ const dealInStyleOption = computed(() => {
     const total = ds.riichi + ds.fulo + ds.menzen
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text, fontSize: 12 } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: total > 0 ? [
-                { value: ds.riichi, name: '立直時', itemStyle: { color: '#0f4c81' } },
-                { value: ds.fulo, name: '副露時', itemStyle: { color: '#7c3aed' } },
-                { value: ds.menzen, name: '門清時', itemStyle: { color: '#f43f5e' } }
+                { value: ds.riichi, name: '立直時', itemStyle: { color: chart.value.forest } },
+                { value: ds.fulo, name: '副露時', itemStyle: { color: chart.value.amber } },
+                { value: ds.menzen, name: '門清時', itemStyle: { color: chart.value.slate } }
             ] : [
-                { value: 1, name: '無放銃記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無放銃記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -459,19 +505,20 @@ const dealInTargetOption = computed(() => {
     const total = ts.riichi + ts.fulo + ts.dama
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text, fontSize: 12 } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: total > 0 ? [
-                { value: ts.riichi, name: '放銃至立直', itemStyle: { color: '#0f4c81' } },
-                { value: ts.fulo, name: '放銃至副露', itemStyle: { color: '#7c3aed' } },
-                { value: ts.dama, name: '放銃至默聽', itemStyle: { color: '#f43f5e' } }
+                { value: ts.riichi, name: '放銃至立直', itemStyle: { color: chart.value.forest } },
+                { value: ts.fulo, name: '放銃至副露', itemStyle: { color: chart.value.amber } },
+                { value: ts.dama, name: '放銃至默聽', itemStyle: { color: chart.value.slate } }
             ] : [
-                { value: 1, name: '無放銃記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無放銃記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -566,80 +613,17 @@ const dealInTargetOption = computed(() => {
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 font-mono">
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">平均順位</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.avgRank }}</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">和牌率</div>
-                    <div class="text-lg font-bold text-emerald-700 dark:text-emerald-500 mt-1">{{ basic.winRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">放銃率</div>
-                    <div class="text-lg font-bold text-rose-700 dark:text-rose-400 mt-1">{{ basic.dealInRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">立直率</div>
-                    <div class="text-lg font-bold text-blue-700 dark:text-blue-400 mt-1">{{ basic.riichiRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">副露率</div>
-                    <div class="text-lg font-bold text-amber-700 dark:text-amber-500 mt-1">{{ basic.callRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">默聽率</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.damaRate }}%</div>
-                </div>
-
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">自摸率</div>
-                    <div class="text-lg font-bold text-emerald-700 dark:text-emerald-400 mt-1">{{ basic.tsumoRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">流局聽牌率</div>
-                    <div class="text-lg font-bold text-purple-700 dark:text-purple-400 mt-1">{{ basic.drawTenpaiRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">流局率</div>
-                    <div class="text-lg font-bold text-muted mt-1">{{ basic.drawRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">平均打點</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{
-                        basic.avgWinScore.toLocaleString() }}</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">平均銃點</div>
-                    <div class="text-lg font-bold text-rose-700 dark:text-rose-400 mt-1">{{ basic.avgDealInScore.toLocaleString() }}</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">平均和牌巡數</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.avgWinTurn }} 巡</div>
-                </div>
-
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">被飛率</div>
-                    <div class="text-lg font-bold text-rose-700 dark:text-rose-400 mt-1">{{ basic.bustingRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-muted">天梯等級 ({{ basic.mrLabel }})</div>
-                    <div class="text-lg font-bold text-primary mt-1">{{ basic.mrRating }}</div>
-                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-7 gap-x-6 gap-y-5">
+                <section v-for="group in tileGroups" :key="group.label" :class="group.span">
+                    <h3 class="text-xs font-bold text-toned tracking-wider mb-2">{{ group.label }}</h3>
+                    <div class="grid gap-3 font-mono grid-cols-2" :class="group.cols">
+                        <div v-for="tile in group.tiles" :key="tile.label"
+                            class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
+                            <div class="text-xs text-muted">{{ tile.label }}</div>
+                            <div class="text-lg font-bold mt-1" :class="tile.cls || 'text-gray-900 dark:text-white'">{{ tile.value }}</div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
 
