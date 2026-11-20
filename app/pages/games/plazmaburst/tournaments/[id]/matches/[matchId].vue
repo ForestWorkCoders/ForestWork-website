@@ -116,7 +116,7 @@ const breadcrumbLinks = computed(() => {
       // 直接读取后端喂过来的赛事标题。使用可选链 (?.) 和回退操作符 (||) 防止白屏崩溃
       label: match.value?.tournamentTitle || '賽事主頁 · Tournament',
       icon: 'i-lucide-trophy',
-      to: `/games/plazmaburst/tournaments/${tournamentId}`
+      to: `/games/plazmaburst/tournaments/${tournamentId}?tab=result`
     },
     {
       // 動態顯示當前對戰的兩支隊伍
