@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
   // ==========================================
   // 1.1 批次查詢賽事字典與役種繁體中文維度表 (Promise.all 併發)
   // ==========================================
-  const [tourneyRes, yakuDictRes] = await Promise.all([
+  const [tourneyRes, yakuDictRes, achievementsRes] = await Promise.all([
     supabase
       .schema('mahjong')
       .from('tournaments')
@@ -143,8 +143,26 @@ export default defineEventHandler(async (event) => {
     supabase
       .schema('mahjong')
       .from('paipu_yaku_dict')
-      .select('id, name_chs_t')
+      .select('id, name_chs_t'),
+    // 榮譽與成就 (WL5)：生涯全期，不套用日期/生涯篩選
+    supabase
+      .schema('mahjong')
+      .from('achievements')
+      .select('title, event, achieved_on, icon_url')
+      .eq('account_id', accountId)
+      .order('achieved_on', { ascending: false })
+      .order('id', { ascending: false })
   ])
+
+  if (achievementsRes.error) {
+    console.error('[sanma] achievements query failed:', achievementsRes.error.message)
+  }
+  const achievements = (achievementsRes.error ? [] : achievementsRes.data || []).map(a => ({
+    title: a.title,
+    event: a.event,
+    date: a.achieved_on,
+    iconUrl: a.icon_url
+  }))
 
   const tourneyMap = new Map((tourneyRes.data || []).map(t => [String(t.id).toLowerCase(), t]))
   const yakuMap = new Map<number, string>(
@@ -573,6 +591,7 @@ export default defineEventHandler(async (event) => {
     dealInStyles: { riichi: dealInSelfRiichi, fulo: dealInSelfFulo, menzen: dealInSelfMenzen },
     dealInTargetStyles: { riichi: dealInToRiichi, fulo: dealInToFulo, dama: dealInToDama },
     frequentOpponents,
-    majorHands
+    majorHands,
+    achievements
   }
 })

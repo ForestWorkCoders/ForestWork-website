@@ -175,6 +175,44 @@ export type Database = {
   }
   mahjong: {
     Tables: {
+      achievements: {
+        Row: {
+          account_id: number
+          achieved_on: string
+          created_at: string
+          event: string
+          icon_url: string | null
+          id: number
+          title: string
+        }
+        Insert: {
+          account_id: number
+          achieved_on: string
+          created_at?: string
+          event: string
+          icon_url?: string | null
+          id?: number
+          title: string
+        }
+        Update: {
+          account_id?: number
+          achieved_on?: string
+          created_at?: string
+          event?: string
+          icon_url?: string | null
+          id?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["account_id"]
+          },
+        ]
+      }
       fwmp_configs: {
         Row: {
           month: number

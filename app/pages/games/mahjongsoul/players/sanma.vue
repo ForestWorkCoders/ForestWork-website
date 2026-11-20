@@ -296,6 +296,18 @@ const frequentOpponents = computed<FrequentOpponent[]>(() => {
     return (statsData.value as any)?.frequentOpponents || []
 })
 
+// 8. 榮譽與成就 (WL5：生涯全期，無資料時整張卡片隱藏)
+interface Achievement { title: string; event: string; date: string; iconUrl: string | null }
+const achievements = computed<Achievement[]>(() => {
+    return (statsData.value as any)?.achievements || []
+})
+// 圖示載入失敗的項目索引，退回預設獎盃
+const failedAchievementIcons = ref(new Set<number>())
+const onAchievementIconError = (idx: number) => {
+    failedAchievementIcons.value = new Set(failedAchievementIcons.value).add(idx)
+}
+watch(achievements, () => { failedAchievementIcons.value = new Set() })
+
 // 好品味互動：點擊對手卡片瞬間切換主視角，全頁自動重算該對手數據
 const inspectOpponent = (oppAccountId: number) => {
     if (!oppAccountId) return
@@ -854,6 +866,35 @@ const dealInTargetOption = computed(() => {
             <!-- 空態防禦 -->
             <div v-else class="text-center py-8 text-sm text-gray-400 font-mono">
                 當前選定區間內暫無{{ majorHandMode === 'win' ? '和牌' : '放銃' }}記錄
+            </div>
+        </div>
+
+        <!-- 8. 榮譽與成就 (WL5：mahjong.achievements，主辦手動維護) -->
+        <div v-if="selectedPlayerId && achievements.length > 0"
+            class="bg-white dark:bg-elevated border border-gray-200 dark:border-default rounded-xl p-6 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">榮譽與成就 · Achievements</h2>
+                    <UBadge color="primary" variant="subtle" size="md">{{ achievements.length }} 項榮譽</UBadge>
+                </div>
+                <div class="text-xs text-gray-500 font-mono">賽事主辦手動維護</div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                <div v-for="(ach, idx) in achievements" :key="idx"
+                    class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-accented border border-gray-100 dark:border-default">
+                    <div class="w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-secondary/10">
+                        <img v-if="ach.iconUrl && !failedAchievementIcons.has(idx)" :src="ach.iconUrl" loading="lazy"
+                            decoding="async" :alt="ach.title" class="w-8 h-8 object-contain"
+                            @error="onAchievementIconError(idx)">
+                        <UIcon v-else name="i-lucide-trophy" class="w-5 h-5 text-secondary" />
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-sm font-bold text-gray-900 dark:text-white truncate" :title="ach.title">{{ ach.title }}</div>
+                        <div class="text-xs font-mono text-primary truncate" :title="ach.event">{{ ach.event }}</div>
+                        <div class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ ach.date }}</div>
+                    </div>
+                </div>
             </div>
         </div>
 
