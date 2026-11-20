@@ -891,7 +891,7 @@ const dealInTargetOption = computed(() => {
                     <div class="min-w-0">
                         <div class="text-sm font-bold text-gray-900 dark:text-white truncate" :title="ach.title">{{ ach.title }}</div>
                         <NuxtLink :to="`/games/mahjongsoul/tournaments/${ach.tournamentId}`"
-                            class="block text-xs font-mono text-primary truncate hover:underline" :title="ach.tournamentTitle">{{ ach.tournamentTitle }}</NuxtLink>
+                            class="block text-xs font-mono text-primary truncate hover:underline focus-visible:underline" :title="ach.tournamentTitle">{{ ach.tournamentTitle }}</NuxtLink>
                         <div class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ ach.date }}</div>
                     </div>
                 </div>
