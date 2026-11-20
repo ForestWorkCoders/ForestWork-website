@@ -54,7 +54,7 @@ const podiumEntries = computed(() => top3Players.value.map(player => ({
   key: player.player_id ?? player.nickname,
   name: player.nickname,
   avatar: player.avatar,
-  value: player.avg_rank?.toFixed(2) ?? '-',
+  value: player.avg_rank?.toFixed(2) ?? '–',
   sub: `${player.play_count} 場對局`,
   axes: playstyleAxes(playstyleData.value?.find(p => p.player_id === player.player_id))
 })))
@@ -134,7 +134,7 @@ const playPercentStyles = [
   <div class="px-4 md:px-6 mt-8 space-y-8 animate-fade-in pb-12">
 
     <!-- Early in a cup nobody has enough games yet; the podium says so instead of showing nothing -->
-    <TournamentPodium :entries="podiumEntries" value-label="AVG RANK" value-class="text-amber-700 dark:text-amber-400"
+    <TournamentPodium :entries="podiumEntries" value-label="AVG RANK" value-class="text-gray-900 dark:text-white"
       sub-icon="i-lucide-swords"
       :empty-text="`尚無選手打滿 ${PODIUM_MIN_GAMES} 場 · No player has ${PODIUM_MIN_GAMES} games yet`" />
 
@@ -163,29 +163,29 @@ const playPercentStyles = [
 
               <!-- 平均顺位加粗高亮 -->
               <template #avg_rank-cell="{ row }">
-                <span class="font-mono font-extrabold text-amber-700 dark:text-amber-400 text-sm">
-                  {{ row.original.avg_rank != null ? row.original.avg_rank.toFixed(2) : '-' }}
+                <span class="font-mono font-extrabold text-gray-900 dark:text-white text-sm">
+                  {{ row.original.avg_rank != null ? row.original.avg_rank.toFixed(2) : '–' }}
                 </span>
               </template>
 
               <!-- 核心优化：动态驱动所有百分比字段（一位率、连对率、避四率、被飞率），带防空与 % -->
               <template v-for="col in matchPercentStyles" #[`${col.key}-cell`]="{ row }" :key="col.key">
                 <span :class="['font-mono text-sm', col.color]">
-                  {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '-' }}
+                  {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '–' }}
                 </span>
               </template>
 
               <!-- 最高马点（正分高光绿） -->
               <template #highest_point-cell="{ row }">
                 <span class="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
-                  {{ row.original.highest_point != null ? `+${row.original.highest_point}` : '-' }}
+                  {{ row.original.highest_point != null ? `+${row.original.highest_point}` : '–' }}
                 </span>
               </template>
 
               <!-- 最低马点（负分警示红） -->
               <template #lowest_point-cell="{ row }">
                 <span class="font-mono font-semibold text-red-700 dark:text-red-400">
-                  {{ row.original.lowest_point ?? '-' }}
+                  {{ row.original.lowest_point ?? '–' }}
                 </span>
               </template>
             </BaseEsportsTable>
@@ -204,25 +204,25 @@ const playPercentStyles = [
 
               <template v-for="col in playPercentStyles" #[`${col.key}-cell`]="{ row }" :key="col.key">
                 <span :class="['font-mono', col.color]">
-                  {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '-' }}
+                  {{ row.original[col.key] != null ? `${row.original[col.key]}%` : '–' }}
                 </span>
               </template>
 
               <template #avg_win_score-cell="{ row }">
                 <span class="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
-                  {{ row.original.avg_win_score != null ? `+${row.original.avg_win_score}` : '-' }}
+                  {{ row.original.avg_win_score != null ? `+${row.original.avg_win_score}` : '–' }}
                 </span>
               </template>
 
               <template #avg_deal_in_score-cell="{ row }">
                 <span class="font-mono font-semibold text-red-700 dark:text-red-400">
-                  {{ row.original.avg_deal_in_score != null ? `-${row.original.avg_deal_in_score}` : '-' }}
+                  {{ row.original.avg_deal_in_score != null ? `-${row.original.avg_deal_in_score}` : '–' }}
                 </span>
               </template>
 
               <template #avg_baopai-cell="{ row }">
                 <span class="font-mono font-bold text-amber-700 dark:text-amber-500">
-                  {{ row.original.avg_baopai ?? '-' }}
+                  {{ row.original.avg_baopai ?? '–' }}
                 </span>
               </template>
             </BaseEsportsTable>

@@ -33,10 +33,13 @@ const props = defineProps<{
   emptyText?: string
 }>()
 
-const AXIS_GREY = 'rgba(156, 163, 175, 0.8)'
-const LINE_GREY = 'rgba(156, 163, 175, 0.2)'
+const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
 
 function radarOption(axes: PodiumAxis[]) {
+  const dark = isDark.value
+  const AXIS_GREY = dark ? '#94a3b8' : '#475569'
+  const LINE_GREY = dark ? 'rgba(148, 163, 184, 0.2)' : 'rgba(100, 116, 139, 0.25)'
   return {
     tooltip: {
       trigger: 'item',
@@ -50,7 +53,7 @@ function radarOption(axes: PodiumAxis[]) {
       radius: '65%',
       splitNumber: 5,
       axisName: { color: AXIS_GREY, fontSize: 12, fontWeight: 'bold' },
-      splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.15)' } },
+      splitLine: { lineStyle: { color: LINE_GREY } },
       splitArea: { show: false },
       axisLine: { lineStyle: { color: LINE_GREY } },
     },
@@ -58,16 +61,15 @@ function radarOption(axes: PodiumAxis[]) {
       type: 'radar',
       data: [{
         value: axes.map(a => a.value),
-        itemStyle: { color: 'rgb(16, 185, 129)' },
-        areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
-        lineStyle: { width: 2 },
+        itemStyle: { color: dark ? '#8BCBB2' : '#4C7766' },
+        areaStyle: { color: dark ? 'rgba(139, 203, 178, 0.2)' : 'rgba(76, 119, 102, 0.2)' },
+        lineStyle: { width: 2, color: dark ? '#8BCBB2' : '#4C7766' },
       }],
     }],
   }
 }
 
-const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? radarOption(e.axes) : null })))
-</script>
+const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? radarOption(e.axes) : null })))</script>
 
 <template>
   <section>
@@ -106,11 +108,11 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
           </div>
         </div>
 
-        <div
+        <div v-if="card.option"
           class="p-6 flex-1 flex flex-col items-center justify-center min-h-[280px] bg-gray-50/50 dark:bg-transparent">
           <div class="relative w-full aspect-square max-w-[220px]">
             <ClientOnly>
-              <VChart v-if="card.option" :option="card.option" class="w-full h-full" autoresize />
+              <VChart :option="card.option" class="w-full h-full" autoresize />
               <template #fallback>
                 <div class="w-full h-full flex items-center justify-center">
                   <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-dimmed animate-spin" />
