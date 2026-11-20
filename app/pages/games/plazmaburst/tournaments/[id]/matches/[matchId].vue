@@ -198,14 +198,15 @@ const abnormalMatchMessage = computed(() => {
 
     <template v-else>
       <!-- 1. 地圖切換 Tabs (Wireframe 頂部) -->
-      <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+      <!-- One row that scrolls sideways on phones, instead of wrapping into a pile or running off the screen -->
+      <div class="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button @click="activeTab = 'all'"
-          class="px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
+          class="shrink-0 whitespace-nowrap px-4 md:px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
           :class="activeTab === 'all' ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
           All Maps
         </button>
         <button v-for="game in match.games" :key="game.id" @click="activeTab = game.gameNumber"
-          class="px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
+          class="shrink-0 whitespace-nowrap px-4 md:px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
           :class="activeTab === game.gameNumber ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
           Map {{ game.gameNumber }} - {{ game.map.name }}
         </button>
@@ -219,31 +220,33 @@ const abnormalMatchMessage = computed(() => {
         <div class="flex items-center justify-between">
 
           <!-- 紅隊 (左側) -->
-          <div class="flex items-center gap-4 flex-1">
+          <!-- min-w-0 lets the column shrink below the name's width; long names take 2 lines on phones, 1 line + "…" from md -->
+          <div class="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
             <!-- 分數：動態讀取，並注入隊伍主題色 -->
-            <div class="text-4xl md:text-5xl font-extrabold w-12 text-center"
+            <div class="text-4xl md:text-5xl font-extrabold w-10 md:w-12 shrink-0 text-center"
               :style="{ color: match.redTeam.colour || '#ef4444' }">
               {{ displayData.scoreRed ?? '-' }}
             </div>
-            <UAvatar :src="match.redTeam.logo" size="lg" class="hidden md:block bg-white shadow-sm"
+            <UAvatar :src="match.redTeam.logo" size="lg" class="hidden md:block shrink-0 bg-white shadow-sm"
               :ui="{ rounded: 'rounded-md' }" />
-            <div class="font-extrabold text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate">
+            <div :title="match.redTeam.name"
+              class="min-w-0 font-extrabold text-lg md:text-3xl leading-tight tracking-tight text-gray-900 dark:text-white line-clamp-2 break-words md:line-clamp-1">
               {{ match.redTeam.name }}
             </div>
           </div>
 
           <!-- VS 標籤 -->
-          <div class="px-4 text-gray-400 font-extrabold text-sm uppercase tracking-widest opacity-50">VS</div>
+          <div class="shrink-0 px-2 md:px-4 text-gray-400 font-extrabold text-sm uppercase tracking-widest opacity-50">VS</div>
 
           <!-- 藍隊 (右側) -->
-          <div class="flex items-center gap-4 flex-1 justify-end">
-            <div
-              class="font-extrabold text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate text-right">
+          <div class="flex items-center gap-2 md:gap-4 flex-1 min-w-0 justify-end">
+            <div :title="match.blueTeam.name"
+              class="min-w-0 font-extrabold text-lg md:text-3xl leading-tight tracking-tight text-gray-900 dark:text-white line-clamp-2 break-words md:line-clamp-1 text-right">
               {{ match.blueTeam.name }}
             </div>
-            <UAvatar :src="match.blueTeam.logo" size="lg" class="hidden md:block bg-white shadow-sm"
+            <UAvatar :src="match.blueTeam.logo" size="lg" class="hidden md:block shrink-0 bg-white shadow-sm"
               :ui="{ rounded: 'rounded-md' }" />
-            <div class="text-4xl md:text-5xl font-extrabold w-12 text-center"
+            <div class="text-4xl md:text-5xl font-extrabold w-10 md:w-12 shrink-0 text-center"
               :style="{ color: match.blueTeam.colour || '#3b82f6' }">
               {{ displayData.scoreBlue ?? '-' }}
             </div>
