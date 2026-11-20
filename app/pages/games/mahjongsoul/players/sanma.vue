@@ -296,6 +296,17 @@ const frequentOpponents = computed<FrequentOpponent[]>(() => {
     return (statsData.value as any)?.frequentOpponents || []
 })
 
+// 8. 榮譽與成就 (WL5：生涯全期，無資料時整張卡片隱藏)
+interface Achievement { title: string; tournamentId: string; tournamentTitle: string; date: string; iconUrl: string | null }
+const achievements = computed<Achievement[]>(() => {
+    return (statsData.value as any)?.achievements || []
+})
+// 載入失敗的圖示網址，退回預設獎盃 (以網址記錄，換選手或重新查詢都不必重置)
+const failedAchievementIcons = ref(new Set<string>())
+const onAchievementIconError = (url: string) => {
+    failedAchievementIcons.value = new Set(failedAchievementIcons.value).add(url)
+}
+
 // 好品味互動：點擊對手卡片瞬間切換主視角，全頁自動重算該對手數據
 const inspectOpponent = (oppAccountId: number) => {
     if (!oppAccountId) return
@@ -839,7 +850,7 @@ const dealInTargetOption = computed(() => {
 
                 <!-- 役種 3 欄式方陣 (對齊牌譜屋排版) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2.5 font-mono text-xs pt-1">
-                    <div v-for="(yaku, idx) in currentMajorHand.yakus" :key="idx"
+                    <div v-for="(yaku, idx) in (currentMajorHand?.yakus ?? [])" :key="idx"
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-default">
                         <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
                         <span class="font-bold" :class="[
@@ -854,6 +865,36 @@ const dealInTargetOption = computed(() => {
             <!-- 空態防禦 -->
             <div v-else class="text-center py-8 text-sm text-gray-400 font-mono">
                 當前選定區間內暫無{{ majorHandMode === 'win' ? '和牌' : '放銃' }}記錄
+            </div>
+        </div>
+
+        <!-- 8. 榮譽與成就 (WL5：mahjong.achievements，主辦手動維護) -->
+        <div v-if="selectedPlayerId && achievements.length > 0"
+            class="bg-white dark:bg-elevated border border-gray-200 dark:border-default rounded-xl p-6 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">榮譽與成就 · Achievements</h2>
+                    <UBadge color="primary" variant="subtle" size="md">{{ achievements.length }} 項榮譽</UBadge>
+                </div>
+                <div class="text-xs text-gray-500 font-mono">賽事主辦手動維護</div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                <div v-for="(ach, idx) in achievements" :key="idx"
+                    class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-accented border border-gray-100 dark:border-default">
+                    <div class="w-10 h-10 shrink-0 rounded-lg flex items-center justify-center bg-secondary/10">
+                        <img v-if="ach.iconUrl && !failedAchievementIcons.has(ach.iconUrl)" :src="ach.iconUrl" loading="lazy"
+                            decoding="async" :alt="ach.title" class="w-8 h-8 object-contain"
+                            @error="onAchievementIconError(ach.iconUrl)">
+                        <UIcon v-else name="i-lucide-trophy" class="w-5 h-5 text-secondary" />
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-sm font-bold text-gray-900 dark:text-white truncate" :title="ach.title">{{ ach.title }}</div>
+                        <NuxtLink :to="`/games/mahjongsoul/tournaments/${ach.tournamentId}`"
+                            class="block text-xs font-mono text-primary truncate hover:underline focus-visible:underline" :title="ach.tournamentTitle">{{ ach.tournamentTitle }}</NuxtLink>
+                        <div class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ ach.date }}</div>
+                    </div>
+                </div>
             </div>
         </div>
 

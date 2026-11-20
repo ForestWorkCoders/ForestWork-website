@@ -1,5 +1,6 @@
 // app/utils/skill-tests/module9-cps.ts
 import {
+  px,
   STAGE_WIDTH,
   STAGE_CENTER_X,
   STAGE_CENTER_Y,
@@ -67,15 +68,15 @@ export class Module9Cps implements SkillModuleInstance {
     r: 120
   }
   private readonly nextBtn: Rect = {
-    x: (STAGE_WIDTH - 240) / 2, // 280 (自动居中)
+    x: (STAGE_WIDTH - 360) / 2, // 220 (自动居中)
     y: 390,
-    w: 240,
+    w: 360,
     h: 54
   }
   private readonly finishBtn: Rect = {
-    x: (STAGE_WIDTH - 240) / 2,
+    x: (STAGE_WIDTH - 360) / 2,
     y: 460,
-    w: 240,
+    w: 360,
     h: 50
   }
 
@@ -174,7 +175,7 @@ export class Module9Cps implements SkillModuleInstance {
 
       ctx.textAlign = 'center'
       ctx.fillStyle = '#a1a1aa'
-      ctx.font = '20px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 20, 30)}px ui-monospace, monospace`
       ctx.fillText(`${res.stageName} 測定完成`, STAGE_CENTER_X, 170)
 
       ctx.fillStyle = '#4ade80'
@@ -182,7 +183,7 @@ export class Module9Cps implements SkillModuleInstance {
       ctx.fillText(`${res.cps} CPS`, STAGE_CENTER_X, 250)
 
       ctx.fillStyle = '#e4e4e7'
-      ctx.font = '18px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 18, 24)}px ui-monospace, monospace`
       ctx.fillText(`有效點擊: ${res.clicks} 次 | 本段戰術分: ${res.score} PTS`, STAGE_CENTER_X, 310)
 
       const btn = this.nextBtn
@@ -193,7 +194,7 @@ export class Module9Cps implements SkillModuleInstance {
       ctx.strokeRect(btn.x, btn.y, btn.w, btn.h)
 
       ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 18px ui-monospace, monospace'
+      ctx.font = `bold ${px(ctx, 18, 24)}px ui-monospace, monospace`
       ctx.fillText('進入蝴蝶點測試 (Stage 2) →', btn.x + btn.w / 2, btn.y + btn.h / 2 + 6)
       return
     }
@@ -204,11 +205,11 @@ export class Module9Cps implements SkillModuleInstance {
     if (this.status === 'FINISHED') {
       ctx.textAlign = 'center'
       ctx.fillStyle = '#f4f4f5'
-      ctx.font = '28px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 28, 32)}px ui-monospace, monospace`
       ctx.fillText('CHRONO TAP // 爆發點擊基準完成', STAGE_CENTER_X, 90)
 
       const totalScore = this.stageResults.reduce((sum, r) => sum + r.score, 0)
-      ctx.font = 'bold 26px ui-monospace, monospace'
+      ctx.font = `bold ${px(ctx, 26, 32)}px ui-monospace, monospace`
       ctx.fillStyle = '#4ade80'
       ctx.fillText(`總獲得積分: ${totalScore} PTS`, STAGE_CENTER_X, 140)
 
@@ -220,16 +221,16 @@ export class Module9Cps implements SkillModuleInstance {
         const y = startY + i * 75
 
         ctx.fillStyle = '#facc15'
-        ctx.font = 'bold 18px ui-monospace, monospace'
-        ctx.fillText(r.stageName, 180, y)
+        ctx.font = `bold ${px(ctx, 18, 24)}px ui-monospace, monospace`
+        ctx.fillText(r.stageName, 160, y)
 
-        ctx.font = '16px ui-monospace, monospace'
+        ctx.font = `${px(ctx, 16, 22)}px ui-monospace, monospace`
         ctx.fillStyle = '#e4e4e7'
-        ctx.fillText(`有效點擊: ${r.clicks} 次`, 180, y + 26)
-        ctx.fillText(`速度: ${r.cps} CPS`, 380, y + 26)
+        ctx.fillText(`有效點擊: ${r.clicks} 次`, 160, y + 26)
+        ctx.fillText(`速度: ${r.cps} CPS`, 390, y + 26)
 
         ctx.fillStyle = '#38bdf8'
-        ctx.fillText(`+${r.score} 分`, 560, y + 26)
+        ctx.fillText(`+${r.score} 分`, 600, y + 26)
       }
 
       // 确认关闭按钮
@@ -242,7 +243,7 @@ export class Module9Cps implements SkillModuleInstance {
 
       ctx.textAlign = 'center'
       ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 16px ui-monospace, monospace'
+      ctx.font = `bold ${px(ctx, 16, 24)}px ui-monospace, monospace`
       ctx.fillText('結算總評成績 // SUBMIT', btn.x + btn.w / 2, btn.y + btn.h / 2 + 6)
       return
     }
@@ -272,25 +273,25 @@ export class Module9Cps implements SkillModuleInstance {
       ctx.fillText(String(this.validClicks), c.x, c.y + 22)
 
       const leftSec = Math.max(0, (this.stageDurationMs - (now - this.startTime)) / 1000).toFixed(1)
-      ctx.font = 'bold 16px ui-monospace, monospace'
+      ctx.font = `bold ${px(ctx, 16, 22)}px ui-monospace, monospace`
       ctx.fillStyle = '#facc15'
       ctx.fillText(`REMAINING: ${leftSec}s`, c.x, c.y + 70)
     } else {
       ctx.fillStyle = '#f4f4f5'
-      ctx.font = 'bold 26px ui-monospace, monospace'
+      ctx.font = `bold ${px(ctx, 26, 32)}px ui-monospace, monospace`
       ctx.fillText('首擊啟動', c.x, c.y - 12)
-      ctx.font = '16px ui-monospace, monospace'
+      ctx.font = `${px(ctx, 16, 22)}px ui-monospace, monospace`
       ctx.fillStyle = '#a1a1aa'
       ctx.fillText('CLICK TO ENGAGE', c.x, c.y + 24)
     }
 
     // 顶部战术指引
     ctx.fillStyle = '#facc15'
-    ctx.font = '20px ui-monospace, monospace'
+    ctx.font = `${px(ctx, 20, 30)}px ui-monospace, monospace`
     ctx.fillText(cfg.name, STAGE_CENTER_X, 70)
 
     ctx.fillStyle = '#e4e4e7'
-    ctx.font = '15px ui-monospace, monospace'
+    ctx.font = `${px(ctx, 15, 28)}px ui-monospace, monospace`
     ctx.fillText(cfg.instruction, STAGE_CENTER_X, 105)
   }
 
