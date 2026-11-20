@@ -106,6 +106,9 @@ watch(tabsRoot, (el) => {
 watch(activeTab, () => nextTick(() => revealActive(true)))
 onBeforeUnmount(() => stopListening?.())
 
+// Load error: re-run the page's fetches
+const retry = () => refreshNuxtData()
+
 const breadcrumb = computed(() => [
   { label: '首頁 · Home', icon: 'i-lucide-home', to: '/' },
   { label: props.game.name, icon: props.game.icon, to: props.game.to },
@@ -114,12 +117,17 @@ const breadcrumb = computed(() => [
 </script>
 
 <template>
-  <div v-if="error" class="min-h-screen flex items-center justify-center text-white">
-    <p class="text-xl font-bold text-red-700 dark:text-red-400">載入失敗：{{ error.message }}</p>
+  <div v-if="error" role="alert" class="min-h-screen flex flex-col items-center justify-center gap-3 text-center px-6">
+    <UIcon name="i-lucide-triangle-alert" class="w-8 h-8 text-red-700 dark:text-red-400" aria-hidden="true" />
+    <p class="text-lg font-bold text-gray-900 dark:text-white">無法載入賽事資料 · Couldn't load this tournament</p>
+    <p class="text-sm text-muted">{{ error.message }}</p>
+    <UButton color="primary" variant="outline" icon="i-lucide-refresh-cw" @click="retry">
+      重新載入 · Retry
+    </UButton>
   </div>
 
-  <div v-else-if="pending || !tournament" class="min-h-screen flex items-center justify-center text-white">
-    <UIcon name="i-lucide-refresh-cw" class="animate-spin w-8 h-8" />
+  <div v-else-if="pending || !tournament" class="min-h-screen flex items-center justify-center">
+    <UIcon name="i-lucide-refresh-cw" class="animate-spin w-8 h-8 text-dimmed" />
   </div>
 
   <div v-else class="min-h-screen bg-gray-50 dark:bg-default bg-cover bg-fixed bg-center"

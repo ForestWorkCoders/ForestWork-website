@@ -34,13 +34,24 @@ const tableRows = computed(() => {
       total: p.points,
     }
     displayMonths.forEach(m => {
-      row[`month_${m.val}`] = p.months[m.val] || '-'
+      row[`month_${m.val}`] = p.months[m.val] || '–'
     })
     return row
   })
 })
 
-const getRankColor = (rank) => (rank <= 9 ? 'text-green-700 dark:text-green-400' : 'text-muted')
+const QUALIFY_RANKS = 9
+
+const getRankColor = (rank) => (rank <= QUALIFY_RANKS ? 'text-green-700 dark:text-green-400' : 'text-muted')
+
+// 資格線：第 9 名下方加分隔線（border-separate 表格需畫在 td 上）
+const tableMeta = {
+  class: {
+    tr: (row) => (row.original.rank === QUALIFY_RANKS
+      ? '[&>td]:border-b-2 [&>td]:border-b-green-600 dark:[&>td]:border-b-green-500'
+      : '')
+  }
+}
 </script>
 
 <template>
@@ -48,10 +59,32 @@ const getRankColor = (rank) => (rank <= 9 ? 'text-green-700 dark:text-green-400'
     <div class="border-b border-gray-200 dark:border-default pb-4">
       <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">參賽資格積分榜 · Invitational Standings</h2>
       <p class="text-sm text-muted mt-1">年度月賽積分明細累計排名。</p>
+      <p class="text-xs text-muted flex flex-wrap gap-x-4 gap-y-1 mt-2">
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block w-4 h-0.5 bg-green-600 dark:bg-green-500 align-middle" aria-hidden="true" />
+          #1–#{{ QUALIFY_RANKS }} 取得邀請賽資格 · Top {{ QUALIFY_RANKS }} qualify
+        </span>
+        <span class="flex items-center gap-1.5">
+          <UIcon name="i-lucide-chevron-up" class="w-4 h-4 text-green-700 dark:text-green-400" aria-hidden="true" />
+          <UIcon name="i-lucide-chevron-down" class="w-4 h-4 text-red-700 dark:text-red-400" aria-hidden="true" />
+          較上月排名變化 · Change vs last month
+        </span>
+        <span class="flex items-center gap-1.5">
+          <UIcon name="i-lucide-minus" class="w-4 h-4" aria-hidden="true" />
+          持平 · No change
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="flex items-center justify-center text-blue-700 dark:text-blue-400 bg-blue-500/20 px-1.5 py-0.5 rounded text-xs gap-1" aria-hidden="true">
+            <UIcon name="i-lucide-plus" class="w-3 h-3" />
+          </span>
+          新進榜 · New
+        </span>
+      </p>
     </div>
 
     <BaseEsportsTable
       :columns="leaderboardColumns"
+      :meta="tableMeta"
       :data="tableRows"
       :loading="pending"
       :empty-state="{ icon: 'i-lucide-database', label: '尚無玩家獲得積分' }"
@@ -77,7 +110,7 @@ const getRankColor = (rank) => (rank <= 9 ? 'text-green-700 dark:text-green-400'
       </template>
 
       <template v-for="m in response?.meta?.months || []" :key="m.val" #[`month_${m.val}-cell`]="{ row }">
-        <div class="text-left font-mono text-sm" :class="row.original[`month_${m.val}`] !== '-' ? 'text-gray-300 font-bold' : 'text-gray-600/30'">
+        <div class="text-left font-mono text-sm" :class="row.original[`month_${m.val}`] !== '–' ? 'text-gray-900 dark:text-gray-300 font-bold' : 'text-muted'">
           {{ row.original[`month_${m.val}`] }}
         </div>
       </template>
