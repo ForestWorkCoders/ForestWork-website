@@ -538,7 +538,7 @@ const dealInTargetOption = computed(() => {
             class="bg-white dark:bg-elevated border border-gray-200 dark:border-default rounded-xl p-6 shadow-sm space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                         <h1 class="min-w-0 break-words text-2xl font-bold text-gray-900 dark:text-white">{{ currentPlayer?.label ?? '三麻選手數據' }}</h1>
                         <UBadge v-if="isViewingSelf" color="primary" variant="solid" size="md">
                             我的主頁 · You
