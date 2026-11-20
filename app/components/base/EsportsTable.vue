@@ -6,6 +6,7 @@
       :data="data"
       :loading="loading"
       :empty-state="emptyState"
+      :meta="meta"
       class="w-full"
       :ui="{
         root: 'overflow-x-auto w-full relative',
@@ -33,6 +34,7 @@ const props = withDefaults(
     emptyState?: { icon: string; label: string }
     minWidthClass?: string
     pinnedLeft?: string[]
+    meta?: Record<string, any>
   }>(),
   {
     loading: false,

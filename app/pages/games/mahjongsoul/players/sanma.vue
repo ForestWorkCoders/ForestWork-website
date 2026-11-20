@@ -548,9 +548,11 @@ const dealInTargetOption = computed(() => {
                         回我的主頁
                     </UButton>
 
-                    <div class="w-full md:w-64">
-                        <USelectMenu v-model="selectedPlayerId" :items="playerItems" value-key="id"
-                            placeholder="選擇選手..." class="w-full" />
+                    <div class="w-full md:w-auto flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                        <label for="sanma-player-picker" class="text-xs font-bold text-toned whitespace-nowrap">選手 · Player</label>
+                        <USelectMenu id="sanma-player-picker" v-model="selectedPlayerId" :items="playerItems"
+                            value-key="id" placeholder="選擇選手..."
+                            class="w-full md:w-64" />
                     </div>
                 </div>
             </div>
@@ -753,14 +755,13 @@ const dealInTargetOption = computed(() => {
 
             <div v-if="frequentOpponents.length > 0"
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 font-mono">
-                <div v-for="opp in frequentOpponents" :key="opp.accountId"
-                    class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-accented border border-gray-100 dark:border-default hover:border-primary/50 hover:bg-primary/5 transition-all group cursor-pointer"
+                <button v-for="opp in frequentOpponents" :key="opp.accountId" type="button"
+                    class="w-full text-left flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-accented border border-gray-100 dark:border-default hover:border-primary/50 hover:bg-primary/5 transition-all group cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    :aria-label="`${opp.nickname}，同桌 ${opp.rate}% (${opp.count})，切換至該選手數據 · View ${opp.nickname}'s stats`"
                     @click="inspectOpponent(opp.accountId)">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <UIcon name="i-lucide-menu"
-                            class="w-4 h-4 text-primary shrink-0 group-hover:scale-110 transition-transform" />
                         <span
-                            class="text-sm font-bold text-green-700 dark:text-green-400 truncate group-hover:underline">
+                            class="text-sm font-bold text-green-700 dark:text-green-400 truncate group-hover:underline group-focus-visible:underline">
                             {{ opp.nickname }}
                         </span>
                     </div>
@@ -768,7 +769,7 @@ const dealInTargetOption = computed(() => {
                         <span class="font-bold text-gray-900 dark:text-white">{{ opp.rate }}%</span>
                         <span class="text-xs text-muted ml-1">({{ opp.count }})</span>
                     </div>
-                </div>
+                </button>
             </div>
 
             <!-- 空態防禦 -->
