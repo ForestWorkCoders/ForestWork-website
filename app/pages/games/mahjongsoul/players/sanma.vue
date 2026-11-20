@@ -297,7 +297,7 @@ const frequentOpponents = computed<FrequentOpponent[]>(() => {
 })
 
 // 8. 榮譽與成就 (WL5：生涯全期，無資料時整張卡片隱藏)
-interface Achievement { title: string; event: string; date: string; iconUrl: string | null }
+interface Achievement { title: string; tournamentId: string; tournamentTitle: string; date: string; iconUrl: string | null }
 const achievements = computed<Achievement[]>(() => {
     return (statsData.value as any)?.achievements || []
 })
@@ -890,7 +890,8 @@ const dealInTargetOption = computed(() => {
                     </div>
                     <div class="min-w-0">
                         <div class="text-sm font-bold text-gray-900 dark:text-white truncate" :title="ach.title">{{ ach.title }}</div>
-                        <div class="text-xs font-mono text-primary truncate" :title="ach.event">{{ ach.event }}</div>
+                        <NuxtLink :to="`/games/mahjongsoul/tournaments/${ach.tournamentId}`"
+                            class="block text-xs font-mono text-primary truncate hover:underline" :title="ach.tournamentTitle">{{ ach.tournamentTitle }}</NuxtLink>
                         <div class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ ach.date }}</div>
                     </div>
                 </div>

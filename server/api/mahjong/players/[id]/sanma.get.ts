@@ -148,7 +148,7 @@ export default defineEventHandler(async (event) => {
     supabase
       .schema('mahjong')
       .from('achievements')
-      .select('title, event, achieved_on, icon_url')
+      .select('title, achieved_on, icon_url, tournament_id, tournament:tournaments(title)')
       .eq('account_id', accountId)
       .order('achieved_on', { ascending: false })
       .order('id', { ascending: false })
@@ -157,9 +157,11 @@ export default defineEventHandler(async (event) => {
   if (achievementsRes.error) {
     console.error('[sanma] achievements query failed:', achievementsRes.error.message)
   }
+  // tournament_id 為 NOT NULL，每項榮譽必屬於一場賽事
   const achievements = (achievementsRes.error ? [] : achievementsRes.data || []).map(a => ({
     title: a.title,
-    event: a.event,
+    tournamentId: a.tournament_id,
+    tournamentTitle: a.tournament?.title ?? '',
     date: a.achieved_on,
     iconUrl: a.icon_url
   }))
