@@ -172,7 +172,8 @@ const abnormalMatchMessage = computed(() => {
     加載失敗：{{ error.message }}
   </div>
 
-  <div v-else-if="match" class="max-w-6xl mx-auto p-4 md:p-8 space-y-6 animate-fade-in">
+  <!-- w-full: in the layout's flex column, mx-auto stops the stretch, so without it the page sizes to its widest content -->
+  <div v-else-if="match" class="w-full max-w-6xl mx-auto p-4 md:p-8 space-y-6 animate-fade-in">
 
     <div class="mb-8 px-2 animate-fade-in">
       <UBreadcrumb :items="breadcrumbLinks" separator="i-lucide-chevron-right" :ui="{
