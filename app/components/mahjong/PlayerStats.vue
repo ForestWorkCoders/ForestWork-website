@@ -134,7 +134,7 @@ const playPercentStyles = [
   <div class="px-4 md:px-6 mt-8 space-y-8 animate-fade-in pb-12">
 
     <!-- Early in a cup nobody has enough games yet; the podium says so instead of showing nothing -->
-    <TournamentPodium :entries="podiumEntries" value-label="AVG RANK" value-class="text-gray-900 dark:text-white"
+    <TournamentPodium :entries="podiumEntries" value-label="AVG RANK"
       sub-icon="i-lucide-swords"
       :empty-text="`尚無選手打滿 ${PODIUM_MIN_GAMES} 場 · No player has ${PODIUM_MIN_GAMES} games yet`" />
 

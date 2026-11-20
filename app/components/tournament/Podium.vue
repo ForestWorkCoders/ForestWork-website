@@ -28,7 +28,6 @@ export interface PodiumEntry {
 const props = defineProps<{
   entries: PodiumEntry[]
   valueLabel: string       // e.g. AVG RANK, SCORE
-  valueClass: string       // headline colour
   subIcon: string
   emptyText?: string
 }>()
@@ -69,6 +68,14 @@ function radarOption(axes: PodiumAxis[]) {
   }
 }
 
+// Gold / silver / bronze by place: the headline uses the Standings medal shades (AA in both modes),
+// the big #n watermark the same hue, faint
+const MEDALS = [
+  { value: 'text-yellow-700 dark:text-yellow-400', mark: 'text-yellow-500/20 dark:text-yellow-400/10' },
+  { value: 'text-slate-500 dark:text-slate-300', mark: 'text-slate-400/25 dark:text-slate-300/10' },
+  { value: 'text-amber-800 dark:text-amber-600', mark: 'text-amber-700/20 dark:text-amber-600/10' },
+]
+
 const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? radarOption(e.axes) : null })))</script>
 
 <template>
@@ -89,7 +96,8 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
         class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm overflow-hidden flex flex-col relative group">
 
         <div
-          class="absolute -right-4 -top-8 text-[120px] font-extrabold text-gray-50 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
+          class="absolute -right-4 -top-8 text-[120px] font-extrabold pointer-events-none transition-transform group-hover:scale-110"
+          :class="MEDALS[index]?.mark">
           #{{ index + 1 }}
         </div>
 
@@ -97,7 +105,7 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
           <UAvatar :src="card.avatar" :alt="card.name" size="xl"
             class="ring-4 ring-gray-50 dark:ring-default shadow-lg mb-3 shrink-0 bg-gray-100 dark:bg-accented" />
           <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ card.name }}</h3>
-          <div class="mt-2 flex items-center gap-1 font-extrabold text-2xl" :class="valueClass">
+          <div class="mt-2 flex items-center gap-1 font-extrabold text-2xl" :class="MEDALS[index]?.value">
             <span>{{ card.value }}</span>
             <span class="text-xs text-muted font-medium tracking-widest ml-1">{{ valueLabel }}</span>
           </div>
