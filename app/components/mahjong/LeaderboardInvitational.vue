@@ -40,14 +40,14 @@ const tableRows = computed(() => {
   })
 })
 
-const getRankColor = (rank) => (rank <= 9 ? 'text-green-400' : 'text-gray-400')
+const getRankColor = (rank) => (rank <= 9 ? 'text-green-700 dark:text-green-400' : 'text-muted')
 </script>
 
 <template>
   <div class="space-y-6">
     <div class="border-b border-gray-200 dark:border-default pb-4">
       <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">參賽資格積分榜 · Invitational Standings</h2>
-      <p class="text-sm text-gray-500 mt-1">年度月賽積分明細累計排名。</p>
+      <p class="text-sm text-muted mt-1">年度月賽積分明細累計排名。</p>
     </div>
 
     <BaseEsportsTable
@@ -71,7 +71,7 @@ const getRankColor = (rank) => (rank <= 9 ? 'text-green-400' : 'text-gray-400')
       </template>
 
       <template #total-cell="{ row }">
-        <div class="text-left font-extrabold text-lg font-mono text-emerald-400 dark:text-emerald-500">
+        <div class="text-left font-extrabold text-lg font-mono text-emerald-700 dark:text-emerald-500">
           {{ row.original.total }}
         </div>
       </template>

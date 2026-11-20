@@ -92,10 +92,10 @@ const matchColumns = createSortableColumns([
 ])
 
 const matchPercentStyles = [
-  { key: 'top_rate_pct', color: 'text-amber-500 dark:text-amber-400 font-semibold' },
-  { key: 'top2_rate_pct', color: 'text-blue-500 dark:text-blue-400 font-semibold' },
-  { key: 'avoid_last_rate_pct', color: 'text-emerald-500 dark:text-emerald-400 font-semibold' },
-  { key: 'busting_rate', color: 'text-red-500 dark:text-red-400 font-semibold' }
+  { key: 'top_rate_pct', color: 'text-amber-700 dark:text-amber-400 font-semibold' },
+  { key: 'top2_rate_pct', color: 'text-blue-700 dark:text-blue-400 font-semibold' },
+  { key: 'avoid_last_rate_pct', color: 'text-emerald-700 dark:text-emerald-400 font-semibold' },
+  { key: 'busting_rate', color: 'text-red-700 dark:text-red-400 font-semibold' }
 ]
 
 const playstyleColumns = createSortableColumns([
@@ -117,16 +117,16 @@ const playstyleColumns = createSortableColumns([
 ])
 
 const playPercentStyles = [
-  { key: 'win_rate', color: 'text-emerald-500 dark:text-emerald-400' },
-  { key: 'deal_in_rate', color: 'text-red-500 dark:text-red-400' },
-  { key: 'tsumo_rate', color: 'text-blue-500 dark:text-blue-400' },
-  { key: 'dama_rate', color: 'text-purple-500 dark:text-purple-400' },
-  { key: 'exhaustive_draw_rate', color: 'text-gray-500 dark:text-gray-400' },
-  { key: 'draw_tenpai_rate', color: 'text-amber-500 dark:text-amber-400' },
-  { key: 'call_rate', color: 'text-orange-500 dark:text-orange-400' },
-  { key: 'riichi_rate', color: 'text-rose-500 dark:text-rose-400' },
-  { key: 'babei_rate_pct', color: 'text-teal-500 dark:text-teal-400' },
-  { key: 'li_baopai_rate_pct', color: 'text-pink-500 dark:text-pink-400' }
+  { key: 'win_rate', color: 'text-emerald-700 dark:text-emerald-400' },
+  { key: 'deal_in_rate', color: 'text-red-700 dark:text-red-400' },
+  { key: 'tsumo_rate', color: 'text-blue-700 dark:text-blue-400' },
+  { key: 'dama_rate', color: 'text-purple-700 dark:text-purple-400' },
+  { key: 'exhaustive_draw_rate', color: 'text-muted' },
+  { key: 'draw_tenpai_rate', color: 'text-amber-700 dark:text-amber-400' },
+  { key: 'call_rate', color: 'text-orange-700 dark:text-orange-400' },
+  { key: 'riichi_rate', color: 'text-rose-700 dark:text-rose-400' },
+  { key: 'babei_rate_pct', color: 'text-teal-700 dark:text-teal-400' },
+  { key: 'li_baopai_rate_pct', color: 'text-pink-700 dark:text-pink-400' }
 ]
 </script>
 
@@ -134,14 +134,14 @@ const playPercentStyles = [
   <div class="px-4 md:px-6 mt-8 space-y-8 animate-fade-in pb-12">
 
     <!-- Early in a cup nobody has enough games yet; the podium says so instead of showing nothing -->
-    <TournamentPodium :entries="podiumEntries" value-label="AVG RANK" value-class="text-amber-500 dark:text-amber-400"
+    <TournamentPodium :entries="podiumEntries" value-label="AVG RANK" value-class="text-amber-700 dark:text-amber-400"
       sub-icon="i-lucide-swords"
       :empty-text="`尚無選手打滿 ${PODIUM_MIN_GAMES} 場 · No player has ${PODIUM_MIN_GAMES} games yet`" />
 
     <section>
       <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-          綜合數據 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Overall Statistics</span>
+          綜合數據 <span class="text-muted font-normal text-lg ml-2">Overall Statistics</span>
         </h2>
       </div>
 
@@ -163,7 +163,7 @@ const playPercentStyles = [
 
               <!-- 平均顺位加粗高亮 -->
               <template #avg_rank-cell="{ row }">
-                <span class="font-mono font-extrabold text-amber-500 dark:text-amber-400 text-sm">
+                <span class="font-mono font-extrabold text-amber-700 dark:text-amber-400 text-sm">
                   {{ row.original.avg_rank != null ? row.original.avg_rank.toFixed(2) : '-' }}
                 </span>
               </template>
@@ -177,14 +177,14 @@ const playPercentStyles = [
 
               <!-- 最高马点（正分高光绿） -->
               <template #highest_point-cell="{ row }">
-                <span class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                <span class="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
                   {{ row.original.highest_point != null ? `+${row.original.highest_point}` : '-' }}
                 </span>
               </template>
 
               <!-- 最低马点（负分警示红） -->
               <template #lowest_point-cell="{ row }">
-                <span class="font-mono font-semibold text-red-600 dark:text-red-400">
+                <span class="font-mono font-semibold text-red-700 dark:text-red-400">
                   {{ row.original.lowest_point ?? '-' }}
                 </span>
               </template>
@@ -209,19 +209,19 @@ const playPercentStyles = [
               </template>
 
               <template #avg_win_score-cell="{ row }">
-                <span class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                <span class="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
                   {{ row.original.avg_win_score != null ? `+${row.original.avg_win_score}` : '-' }}
                 </span>
               </template>
 
               <template #avg_deal_in_score-cell="{ row }">
-                <span class="font-mono font-semibold text-red-600 dark:text-red-400">
+                <span class="font-mono font-semibold text-red-700 dark:text-red-400">
                   {{ row.original.avg_deal_in_score != null ? `-${row.original.avg_deal_in_score}` : '-' }}
                 </span>
               </template>
 
               <template #avg_baopai-cell="{ row }">
-                <span class="font-mono font-bold text-amber-500">
+                <span class="font-mono font-bold text-amber-700 dark:text-amber-500">
                   {{ row.original.avg_baopai ?? '-' }}
                 </span>
               </template>

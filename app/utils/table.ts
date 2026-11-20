@@ -52,7 +52,7 @@ function renderSortIcon(isSorted: boolean, isDesc: boolean) {
     'stroke-width': '2',
     'stroke-linecap': 'round',
     'stroke-linejoin': 'round',
-    class: 'shrink-0 w-3.5 h-3.5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity select-none'
+    class: 'shrink-0 w-3.5 h-3.5 text-dimmed opacity-0 group-hover:opacity-100 transition-opacity select-none'
   }, [
     h('path', { d: 'm7 15 5 5 5-5' }),
     h('path', { d: 'm7 9 5-5 5 5' })
@@ -90,7 +90,7 @@ export function createSortableColumns(columns: ColumnConfig[]) {
               'font-bold tracking-wider whitespace-nowrap transition-colors select-none',
               isSorted
                 ? 'text-gray-900 dark:text-white'
-                : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                : 'text-muted group-hover:text-gray-900 dark:group-hover:text-white'
             ].join(' ')
           }, col.header),
 

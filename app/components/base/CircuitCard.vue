@@ -22,12 +22,12 @@ defineProps<{
     <div class="bg-gray-100 dark:bg-elevated rounded-lg p-10 flex flex-col items-center justify-center relative overflow-hidden h-68 shadow-sm border border-transparent group-hover:border-primary/50">
       
       <div class="w-32 h-32 bg-white dark:bg-accented rounded flex items-center justify-center shadow-inner mb-3 transition-transform group-hover:scale-110">
-        <UIcon :name="item.icon" class="size-16 text-gray-400 dark:text-gray-500" />
+        <UIcon :name="item.icon" class="size-16 text-dimmed" />
       </div>
 
       <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">{{ item.title }}</h3>
       
-      <p class="text-sm text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity mt-2 text-center px-4 absolute bottom-2">
+      <p class="text-sm text-muted opacity-0 group-hover:opacity-100 transition-opacity mt-2 text-center px-4 absolute bottom-2">
         {{ item.description }}
       </p>
     </div>

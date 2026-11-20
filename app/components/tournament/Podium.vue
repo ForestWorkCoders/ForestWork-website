@@ -73,12 +73,12 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
   <section>
     <div class="flex flex-col sm:flex-row sm:items-end gap-3 mb-6">
       <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-        頂尖選手 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Top Performers</span>
+        頂尖選手 <span class="text-muted font-normal text-lg ml-2">Top Performers</span>
       </h2>
     </div>
 
     <p v-if="!cards.length"
-      class="text-sm text-gray-500 dark:text-gray-400 py-6 text-center border border-dashed border-gray-200 dark:border-default rounded-xl">
+      class="text-sm text-muted py-6 text-center border border-dashed border-gray-200 dark:border-default rounded-xl">
       {{ emptyText }}
     </p>
 
@@ -97,10 +97,10 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
           <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ card.name }}</h3>
           <div class="mt-2 flex items-center gap-1 font-extrabold text-2xl" :class="valueClass">
             <span>{{ card.value }}</span>
-            <span class="text-xs text-gray-400 font-medium tracking-widest ml-1">{{ valueLabel }}</span>
+            <span class="text-xs text-muted font-medium tracking-widest ml-1">{{ valueLabel }}</span>
           </div>
 
-          <div class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400">
+          <div class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-muted">
             <UIcon :name="subIcon" class="w-4 h-4 opacity-70" />
             <span>{{ card.sub }}</span>
           </div>
@@ -113,7 +113,7 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
               <VChart v-if="card.option" :option="card.option" class="w-full h-full" autoresize />
               <template #fallback>
                 <div class="w-full h-full flex items-center justify-center">
-                  <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
+                  <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-dimmed animate-spin" />
                 </div>
               </template>
             </ClientOnly>

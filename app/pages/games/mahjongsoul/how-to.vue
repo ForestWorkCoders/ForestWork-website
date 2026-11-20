@@ -27,10 +27,10 @@ useHead({
                         wrapper: 'flex flex-wrap items-center gap-1.5',
                         li: 'flex items-center gap-1.5',
                         base: 'text-sm font-semibold tracking-wide transition-colors',
-                        active: 'text-emerald-500 dark:text-emerald-400 cursor-default drop-shadow-md',
-                        inactive: 'text-gray-400 hover:text-emerald-500 dark:text-gray-500 dark:hover:text-emerald-400',
-                        icon: { base: 'w-4 h-4', active: 'text-emerald-500', inactive: 'text-gray-500' },
-                        separator: { base: 'w-4 h-4 text-gray-500' }
+                        active: 'text-emerald-700 dark:text-emerald-400 cursor-default drop-shadow-md',
+                        inactive: 'text-muted hover:text-emerald-700 dark:text-gray-400 dark:hover:text-emerald-400',
+                        icon: { base: 'w-4 h-4', active: 'text-emerald-700 dark:text-emerald-500', inactive: 'text-dimmed' },
+                        separator: { base: 'w-4 h-4 text-dimmed' }
                     }"
                 />
       </div>
@@ -52,7 +52,7 @@ useHead({
           <iframe :src="`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`" class="w-full flex-1 border-0 z-10 bg-white"
             title="雀魂參賽教學指南"></iframe>
           <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-elevated z-0">
-            <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-gray-400 animate-spin" />
+            <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 text-dimmed animate-spin" />
           </div>
         </div>
 
@@ -61,10 +61,10 @@ useHead({
           <div
             class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner">
             <UIcon name="i-lucide-search-alert"
-              class="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+              class="w-10 h-10 text-emerald-700 dark:text-emerald-400" />
           </div>
           <h3 class="text-xl font-extrabold text-gray-900 dark:text-white mb-5 tracking-wide">在手機上閱讀指南</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+          <p class="text-sm text-muted mb-8 leading-relaxed">
             受限於行動裝置瀏覽器，為提供最佳的流暢滑動與閱讀體驗，請點擊下方按鈕以全螢幕模式開啟文件。
           </p>
           <UButton :to="pdfUrl" target="_blank" color="primary" size="xl" icon="i-lucide-external-link"

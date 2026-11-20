@@ -32,13 +32,13 @@ const roleColor = {
 <template>
   <section class="animate-fade-in">
     <div v-if="pending" class="flex justify-center py-12">
-      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 animate-spin text-gray-400" />
+      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 animate-spin text-dimmed" />
     </div>
 
     <div v-else-if="!teams || teams.length === 0" class="text-center py-16 bg-gray-50 dark:bg-elevated rounded-xl border border-dashed border-gray-200 dark:border-default">
-      <UIcon name="i-lucide-users" class="w-12 h-12 mx-auto text-gray-400 mb-3" />
+      <UIcon name="i-lucide-users" class="w-12 h-12 mx-auto text-dimmed mb-3" />
       <h3 class="text-lg font-bold text-gray-900 dark:text-white">參賽隊伍尚未公佈</h3>
-      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Teams are yet to be announced.</p>
+      <p class="text-muted text-sm mt-1">Teams are yet to be announced.</p>
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -59,8 +59,8 @@ const roleColor = {
           <div class="flex flex-col">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ team.name }}</h3>
             <div v-if="team.notes" class="flex items-center gap-1.5 mt-1 opacity-75">
-              <UIcon name="i-lucide-trophy" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
-              <span class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate max-w-[200px]" :title="team.notes">
+              <UIcon name="i-lucide-trophy" class="w-4 h-4 text-dimmed" />
+              <span class="text-sm font-medium text-muted truncate max-w-[200px]" :title="team.notes">
                 {{ team.notes }}
               </span>
             </div>
@@ -80,13 +80,13 @@ const roleColor = {
             
             <div class="flex items-center gap-3 flex-1 min-w-0">
               <UAvatar :src="player.avatar" :alt="player.name" size="sm" />
-              <span class="text-base font-semibold text-gray-700 dark:text-gray-200 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+              <span class="text-base font-semibold text-gray-700 dark:text-gray-200 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                 {{ player.name }}
               </span>
             </div>
           </div>
 
-          <div v-if="team.players.length === 0" class="text-sm text-center text-gray-400 py-4 italic">
+          <div v-if="team.players.length === 0" class="text-sm text-center text-muted py-4 italic">
             尚未登錄選手
           </div>
         </div>

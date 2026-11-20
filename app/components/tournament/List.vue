@@ -59,7 +59,7 @@ const shown = (key: Key) => key === 'past'
         <UInput v-model="query" icon="i-lucide-search" :placeholder="tab.placeholder" color="info" variant="outline"
           class="w-full" :ui="{
             base: 'bg-white dark:bg-default border-gray-200 dark:border-default text-gray-900 dark:text-white transition-colors duration-200',
-            leadingIcon: 'text-gray-500 dark:text-gray-400 transition-colors'
+            leadingIcon: 'text-dimmed transition-colors'
           }" />
       </div>
 
@@ -79,8 +79,8 @@ const shown = (key: Key) => key === 'past'
 
         <div v-else
           class="mt-4 p-12 text-center border border-gray-200 dark:border-default rounded-lg bg-white/50 dark:bg-default">
-          <UIcon :name="tab.emptyIcon" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p class="text-gray-500 dark:text-gray-400">{{ query ? tab.noMatch : tab.empty }}</p>
+          <UIcon :name="tab.emptyIcon" class="w-12 h-12 text-dimmed mx-auto mb-4" />
+          <p class="text-muted">{{ query ? tab.noMatch : tab.empty }}</p>
         </div>
       </div>
     </template>
