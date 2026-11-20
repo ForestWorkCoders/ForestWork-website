@@ -15,7 +15,7 @@ defineProps<{ rounds: Round[] }>()
     </div>
 
     <div v-for="round in rounds" :key="round.id">
-      <h4 class="text-sm font-extrabold tracking-widest uppercase text-blue-700 dark:text-blue-400 mb-3">{{ round.title }}</h4>
+      <h4 class="text-sm font-extrabold tracking-widest uppercase text-primary mb-3">{{ round.title }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <TournamentMatchCard v-for="match in round.matches" :key="match.id" :match="match" />
       </div>

@@ -72,7 +72,7 @@ const displayData = computed(() => {
 // 2. 动态注入 Head 和 Open Graph 标签
 if (match.value) {
   // 消除边界情况：确保即便某些字段为空，也能优雅降级
-  const title = `${match.value.redTeam.name || 'Unknown'} vs ${match.value.blueTeam.name || 'Unknown'} - ${match.value.phase || '?'}`
+  const title = `${match.value.redTeam.name || 'Unknown'} vs ${match.value.blueTeam.name || 'Unknown'} · ${match.value.phase || '?'} · ForestWork`
   const description = `Status: ${match.value.status || 'TBA'} | ${match.value.tournamentTitle}`
 
   useSeoMeta({
@@ -86,7 +86,7 @@ if (match.value) {
 } else {
   // 找不到比赛时的后备方案，Never break userspace
   useSeoMeta({
-    title: 'Match Not Found - ForestWork',
+    title: '找不到對戰 · Match Not Found · ForestWork',
   })
 }
 
@@ -192,7 +192,7 @@ const abnormalMatchMessage = computed(() => {
       <h2 class="text-2xl font-bold dark:text-white mb-2 uppercase tracking-wider">
         Match Terminated
       </h2>
-      <p class="text-lg text-gray-300 font-medium">
+      <p class="text-lg text-gray-300 font-semibold">
         {{ abnormalMatchMessage }}
       </p>
     </div>
@@ -203,12 +203,12 @@ const abnormalMatchMessage = computed(() => {
       <div class="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button @click="activeTab = 'all'"
           class="shrink-0 whitespace-nowrap px-4 md:px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
-          :class="activeTab === 'all' ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
+          :class="activeTab === 'all' ? 'bg-primary text-inverted border-primary' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
           All Maps
         </button>
         <button v-for="game in match.games" :key="game.id" @click="activeTab = game.gameNumber"
           class="shrink-0 whitespace-nowrap px-4 md:px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
-          :class="activeTab === game.gameNumber ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
+          :class="activeTab === game.gameNumber ? 'bg-primary text-inverted border-primary' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
           Map {{ game.gameNumber }} - {{ game.map.name }}
         </button>
       </div>
@@ -347,12 +347,12 @@ const abnormalMatchMessage = computed(() => {
               <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
                   <tr class="text-xs text-muted border-b border-gray-200 dark:border-default">
-                    <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
-                    <th class="py-2 px-3 font-medium w-12">K</th>
-                    <th class="py-2 px-3 font-medium w-12">D</th>
+                    <th class="py-2 pr-4 text-left font-semibold sticky">Player</th>
+                    <th class="py-2 px-3 font-semibold w-12">K</th>
+                    <th class="py-2 px-3 font-semibold w-12">D</th>
                     <th class="py-2 px-3 font-bold text-gray-600 dark:text-gray-300 w-16">K/D</th>
-                    <th class="py-2 px-3 font-medium w-16" title="Headshots">HS</th>
-                    <th class="py-2 pl-3 font-medium w-12" title="Aces">ACE</th>
+                    <th class="py-2 px-3 font-semibold w-16" title="Headshots">HS</th>
+                    <th class="py-2 pl-3 font-semibold w-12" title="Aces">ACE</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -390,12 +390,12 @@ const abnormalMatchMessage = computed(() => {
               <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
                   <tr class="text-xs text-muted border-b border-gray-200 dark:border-default">
-                    <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
-                    <th class="py-2 px-3 font-medium w-12">K</th>
-                    <th class="py-2 px-3 font-medium w-12">D</th>
+                    <th class="py-2 pr-4 text-left font-semibold sticky">Player</th>
+                    <th class="py-2 px-3 font-semibold w-12">K</th>
+                    <th class="py-2 px-3 font-semibold w-12">D</th>
                     <th class="py-2 px-3 font-bold text-gray-600 dark:text-gray-300 w-16">K/D</th>
-                    <th class="py-2 px-3 font-medium w-16" title="Headshots">HS</th>
-                    <th class="py-2 pl-3 font-medium w-12" title="Aces">ACE</th>
+                    <th class="py-2 px-3 font-semibold w-16" title="Headshots">HS</th>
+                    <th class="py-2 pl-3 font-semibold w-12" title="Aces">ACE</th>
                   </tr>
                 </thead>
                 <tbody>

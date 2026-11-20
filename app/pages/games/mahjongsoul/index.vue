@@ -20,8 +20,8 @@ const mahjongSidebarData = {
 const { data: allTournaments } = await useFetch('/api/mahjong/tournaments')
 
 useSeoMeta({
-    title: '雀魂麻將 | MahjongSoul | Forestwork',
-    ogTitle: () => '雀魂麻將 | MahjongSoul | Forestwork',
+    title: '雀魂麻將 · Mahjong Soul · ForestWork',
+    ogTitle: () => '雀魂麻將 · Mahjong Soul · ForestWork',
     description: () => `查看雀魂麻將的即時戰況、積分排行榜與對局紀錄。`,
     ogDescription: () => `查看雀魂麻將的即時戰況、積分排行榜與對局紀錄。`,
     ogImage: () => 'https://forestwork.vercel.app/images/mahjongSoul/logo-white.png'

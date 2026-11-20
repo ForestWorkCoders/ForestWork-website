@@ -62,12 +62,12 @@ const podiumEntries = computed(() => top3Players.value.map(player => ({
 const items = [{
   value: 'match_stats',
   slot: 'match',
-  label: '宏觀戰績 (Match Stats)',
+  label: '宏觀戰績 · Match Stats',
   icon: 'i-lucide-trophy'
 }, {
   value: 'playstyle_stats',
   slot: 'playstyle',
-  label: '打法風格 (Playstyle Stats)',
+  label: '打法風格 · Playstyle Stats',
   icon: 'i-lucide-chart-pie'
 }]
 
@@ -141,7 +141,7 @@ const playPercentStyles = [
     <section>
       <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-          綜合數據 <span class="text-muted font-normal text-lg ml-2">Overall Statistics</span>
+          綜合數據 · Overall Statistics
         </h2>
       </div>
 

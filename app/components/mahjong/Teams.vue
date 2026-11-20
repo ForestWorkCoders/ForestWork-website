@@ -60,7 +60,7 @@ const roleColor = {
             <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ team.name }}</h3>
             <div v-if="team.notes" class="flex items-center gap-1.5 mt-1 opacity-75">
               <UIcon name="i-lucide-trophy" class="w-4 h-4 text-dimmed" />
-              <span class="text-sm font-medium text-muted truncate max-w-[200px]" :title="team.notes">
+              <span class="text-sm font-semibold text-muted truncate max-w-[200px]" :title="team.notes">
                 {{ team.notes }}
               </span>
             </div>
@@ -80,7 +80,7 @@ const roleColor = {
             
             <div class="flex items-center gap-3 flex-1 min-w-0">
               <UAvatar :src="player.avatar" :alt="player.name" size="sm" />
-              <span class="text-base font-semibold text-gray-700 dark:text-gray-200 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+              <span class="text-base font-semibold text-gray-700 dark:text-gray-200 truncate group-hover:text-primary transition-colors">
                 {{ player.name }}
               </span>
             </div>

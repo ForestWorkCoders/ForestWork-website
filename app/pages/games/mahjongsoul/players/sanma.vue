@@ -88,6 +88,11 @@ const switchToMyself = () => {
 
 const currentPlayer = computed(() => playerItems.value.find(p => p.id === selectedPlayerId.value))
 
+const pageTitle = computed(() => currentPlayer.value?.label
+  ? `${currentPlayer.value.label} · 三麻選手數據 · ForestWork`
+  : '三麻選手數據 · Sanma Player Stats · ForestWork')
+useSeoMeta({ title: pageTitle, ogTitle: pageTitle })
+
 // ==========================================
 // 3. 時間範圍狀態機與巨集預設
 // ==========================================
@@ -534,12 +539,12 @@ const dealInTargetOption = computed(() => {
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">三麻選手數據面板</h1>
+                        <h1 class="min-w-0 break-words text-2xl font-bold text-gray-900 dark:text-white">{{ currentPlayer?.label ?? '三麻選手數據' }}</h1>
                         <UBadge v-if="isViewingSelf" color="primary" variant="solid" size="md">
-                            🀄 我的主頁 (You)
+                            我的主頁 · You
                         </UBadge>
                     </div>
-                    <p class="text-sm text-muted mt-6">Sanma Player Dashboard & Career Highlights</p>
+                    <p class="text-sm text-muted mt-2">三麻選手數據 · Sanma Player Stats</p>
                 </div>
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
@@ -839,7 +844,7 @@ const dealInTargetOption = computed(() => {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2.5 font-mono text-xs pt-1">
                     <div v-for="(yaku, idx) in (currentMajorHand?.yakus ?? [])" :key="idx"
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-default">
-                        <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
+                        <span class="text-gray-800 dark:text-gray-200 font-semibold">{{ yaku.name }}</span>
                         <span class="font-bold" :class="[
                             yaku.isYakuman ? 'text-amber-700 dark:text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary' : 'text-rose-700 dark:text-rose-400')
                         ]">

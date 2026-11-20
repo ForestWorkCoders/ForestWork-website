@@ -83,11 +83,11 @@ const navLinks: SeasonLink[] = [
 
             <!-- IP 复制交互按钮 -->
             <UButton color="primary" size="xl" variant="solid" :icon="buttonIcon"
-                class="font-medium tracking-wide shadow-2xl hover:scale-105 transition-transform" @click="onClick()">
+                class="font-semibold tracking-wide shadow-2xl hover:scale-105 transition-transform" @click="onClick()">
                 {{ flash ?? (serverIp || 'Coming Soon') }}
             </UButton>
 
-            <p class="text-gray-200 text-sm sm:text-base font-medium drop-shadow">
+            <p class="text-gray-200 text-sm sm:text-base font-semibold drop-shadow">
                 林間小鎮 麥塊多人生存
             </p>
 

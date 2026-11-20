@@ -170,7 +170,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
       <section>
         <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-            綜合數據 <span class="text-muted font-normal text-lg ml-2">Overall Statistics</span>
+            綜合數據 · Overall Statistics
           </h2>
         </div>
 
@@ -223,7 +223,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
 
             <!-- 得分高亮 -->
             <template #score-cell="{ row }">
-              <span class="font-mono font-bold text-emerald-700 dark:text-emerald-500 text-sm">
+              <span class="font-mono font-bold text-primary text-sm">
                 {{ row.original.score }}
               </span>
             </template>
@@ -238,7 +238,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
 
             <!-- 擊殺與死亡 -->
             <template #kills-cell="{ row }">
-              <span class="font-mono text-sm text-gray-800 dark:text-gray-200 font-medium">
+              <span class="font-mono text-sm text-gray-800 dark:text-gray-200 font-semibold">
                 {{ row.original.kills }}
               </span>
             </template>

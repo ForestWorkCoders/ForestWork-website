@@ -82,7 +82,7 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
   <section>
     <div class="flex flex-col sm:flex-row sm:items-end gap-3 mb-6">
       <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-        頂尖選手 <span class="text-muted font-normal text-lg ml-2">Top Performers</span>
+        頂尖選手 · Top Performers
       </h2>
     </div>
 
@@ -107,7 +107,7 @@ const cards = computed(() => props.entries.map(e => ({ ...e, option: e.axes ? ra
           <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ card.name }}</h3>
           <div class="mt-2 flex items-center gap-1 font-extrabold text-2xl" :class="MEDALS[index]?.value">
             <span>{{ card.value }}</span>
-            <span class="text-xs text-muted font-medium tracking-widest ml-1">{{ valueLabel }}</span>
+            <span class="text-xs text-muted font-semibold tracking-widest ml-1">{{ valueLabel }}</span>
           </div>
 
           <div class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-muted">

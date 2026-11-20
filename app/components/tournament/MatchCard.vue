@@ -19,7 +19,7 @@ const signed = (v: number) => (v > 0 ? `+${v}` : `${v}`)
         <span v-if="match.label" class="font-bold text-amber-700 dark:text-amber-500">{{ match.label }}</span>
       </span>
       <NuxtLink v-if="match.url" :to="match.url" :target="external ? '_blank' : undefined"
-        class="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-accented px-2 py-0.5 rounded hover:bg-gray-300 dark:hover:bg-accented transition-colors">
+        class="flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-accented px-2 py-0.5 rounded hover:bg-gray-300 dark:hover:bg-accented transition-colors">
         <UIcon :name="external ? 'i-lucide-external-link' : 'i-lucide-arrow-right'" class="w-3 h-3" />
         {{ external ? 'Replay' : 'Details' }}
       </NuxtLink>
@@ -36,7 +36,7 @@ const signed = (v: number) => (v > 0 ? `+${v}` : `${v}`)
           :style="side.entrant?.colour ? { backgroundColor: side.entrant.colour } : {}" />
 
         <span class="flex-1 min-w-0 truncate text-gray-900 dark:text-gray-200"
-          :class="side.winner ? 'font-bold' : 'font-medium'">
+          :class="side.winner ? 'font-bold' : 'font-semibold'">
           {{ side.entrant?.name ?? 'TBD' }}
         </span>
 

@@ -139,7 +139,7 @@ const breadcrumb = computed(() => [
         </div>
 
         <div
-          class="bg-white/90 dark:bg-default text-gray-900 dark:text-white rounded-t-xl overflow-hidden shadow-2xl grid grid-cols-[auto_1fr] md:flex md:flex-row p-5 md:p-16 gap-4 md:gap-12 items-center md:items-start border border-gray-200 dark:border-default transition-colors duration-300">
+          class="bg-white/90 dark:bg-elevated text-gray-900 dark:text-white rounded-t-xl overflow-hidden shadow-2xl grid grid-cols-[auto_1fr] md:flex md:flex-row p-5 md:p-16 gap-4 md:gap-12 items-center md:items-start border border-gray-200 dark:border-default transition-colors duration-300">
 
           <!-- Phones: avatar and title share a row, then the rules button, then the meta grid.
                The two wrappers only exist from md up (display: contents before that). -->
@@ -185,7 +185,7 @@ const breadcrumb = computed(() => [
         </div>
 
         <div
-          class="bg-white dark:bg-default w-full border-x border-b border-gray-200 dark:border-default rounded-b-xl shadow-sm">
+          class="bg-white dark:bg-elevated w-full border-x border-b border-gray-200 dark:border-default rounded-b-xl shadow-sm">
           <!-- The bar scrolls sideways when the labels don't fit (phones), instead of cutting them to "…" -->
           <div v-if="visibleTabs.length > 1" ref="tabsRoot">
             <UTabs v-model="activeTab" :items="visibleTabs" class="w-full" :ui="{

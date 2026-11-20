@@ -104,7 +104,7 @@ const tableMeta = {
       </template>
 
       <template #total-cell="{ row }">
-        <div class="text-left font-extrabold text-lg font-mono text-emerald-700 dark:text-emerald-500">
+        <div class="text-left font-extrabold text-lg font-mono text-primary">
           {{ row.original.total }}
         </div>
       </template>
