@@ -115,7 +115,7 @@ const breadcrumb = computed(() => [
 
 <template>
   <div v-if="error" class="min-h-screen flex items-center justify-center text-white">
-    <p class="text-xl font-bold text-red-400">載入失敗：{{ error.message }}</p>
+    <p class="text-xl font-bold text-red-700 dark:text-red-400">載入失敗：{{ error.message }}</p>
   </div>
 
   <div v-else-if="pending || !tournament" class="min-h-screen flex items-center justify-center text-white">
@@ -139,7 +139,7 @@ const breadcrumb = computed(() => [
             <UAvatar :src="tournament.imageUrl" :alt="tournament.title" size="3xl"
               class="row-start-1 col-start-1 w-16 h-16 text-xl md:w-48 md:h-48 md:text-5xl shrink-0 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
 
-            <UButton :to="game.rules" target="_blank" color="info" variant="outline" icon="i-lucide-book-open"
+            <UButton :to="game.rules" target="_blank" color="primary" variant="outline" icon="i-lucide-book-open"
               class="row-start-2 col-span-2 justify-self-start w-fit md:w-full justify-center font-bold tracking-widest text-sm transition-colors">
               Rules · 賽規
             </UButton>
@@ -150,26 +150,26 @@ const breadcrumb = computed(() => [
 
             <div class="row-start-3 col-span-2 grid grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-4 md:gap-y-8 md:gap-x-6">
               <div class="space-y-1">
-                <p class="text-xs font-bold text-gray-400 tracking-wider">時程 · Duration</p>
+                <p class="text-xs font-bold text-toned tracking-wider">時程 · Duration</p>
                 <p class="text-sm font-semibold">{{ tournament.duration }}</p>
               </div>
               <div class="space-y-1">
-                <p class="text-xs font-bold text-gray-400 tracking-wider">狀態 · Status</p>
+                <p class="text-xs font-bold text-toned tracking-wider">狀態 · Status</p>
                 <p class="text-sm font-semibold"
-                  :class="tournament.status?.includes('進行中') ? 'text-green-400' : 'text-gray'">
+                  :class="tournament.status?.includes('進行中') ? 'text-green-700 dark:text-green-400' : ''">
                   {{ tournament.status }}
                 </p>
               </div>
               <div class="space-y-1">
-                <p class="text-xs font-bold text-gray-400 tracking-wider">主辦方 · Organizer</p>
+                <p class="text-xs font-bold text-toned tracking-wider">主辦方 · Organizer</p>
                 <p class="text-sm font-semibold">{{ tournament.organizer }}</p>
               </div>
               <div class="space-y-1">
-                <p class="text-xs font-bold text-gray-400 tracking-wider">參賽賽區 · Venue</p>
+                <p class="text-xs font-bold text-toned tracking-wider">參賽賽區 · Venue</p>
                 <p class="text-sm font-semibold">{{ tournament.region }}</p>
               </div>
               <div class="space-y-1">
-                <p class="text-xs font-bold text-gray-400 tracking-wider">賽事級別 · Tier</p>
+                <p class="text-xs font-bold text-toned tracking-wider">賽事級別 · Tier</p>
                 <p class="text-sm font-semibold">Tier {{ tournament.tier }}</p>
               </div>
             </div>

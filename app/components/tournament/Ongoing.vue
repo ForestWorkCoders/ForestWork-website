@@ -32,7 +32,7 @@ const groups = computed(() => GAMES
     <div class="space-y-6">
       <div v-for="g in groups" :key="g.slug">
         <NuxtLink :to="`/games/${g.slug}`"
-          class="inline-block mb-2 text-xs font-bold tracking-wider text-gray-500 dark:text-gray-400 hover:text-emerald-500 transition-colors">
+          class="inline-block mb-2 text-xs font-bold tracking-wider text-muted hover:text-primary transition-colors">
           {{ g.name }}
         </NuxtLink>
         <div class="space-y-3">

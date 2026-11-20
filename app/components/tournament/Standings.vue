@@ -12,17 +12,17 @@ const isDnf = (rank: Row['rank']) => rank === 'DNF'
 const data = computed(() => props.rows.map(r => ({ rank: r.rank, name: r.entrant.name, avatar: r.entrant.avatar, ...r.stats })))
 
 const MEDALS: Record<number, string> = {
-  1: 'text-yellow-400 bg-yellow-400/10',
-  2: 'text-slate-300 bg-slate-300/10',
-  3: 'text-amber-600 bg-amber-600/10'
+  1: 'text-yellow-700 dark:text-yellow-400 bg-yellow-400/10',
+  2: 'text-slate-500 dark:text-slate-300 bg-slate-300/10',
+  3: 'text-amber-800 dark:text-amber-600 bg-amber-600/10'
 }
 
 // Every badge is the same: coloured text on a 10% fill of that colour. Only the colour differs.
 const rankClass = (rank: number) => {
-  if (props.phase.final) return MEDALS[rank] ?? 'text-gray-500'
-  if (props.phase.promotedRanks?.includes(rank)) return 'text-success bg-success/10'
-  if (props.phase.disqualifiedRanks?.includes(rank)) return 'text-error bg-error/10'
-  return 'text-gray-500'
+  if (props.phase.final) return MEDALS[rank] ?? 'text-muted'
+  if (props.phase.promotedRanks?.includes(rank)) return 'text-green-700 dark:text-green-400 bg-success/10'
+  if (props.phase.disqualifiedRanks?.includes(rank)) return 'text-red-700 dark:text-red-400 bg-error/10'
+  return 'text-muted'
 }
 
 // DNF sorts after every rank
@@ -47,7 +47,7 @@ const columns = computed(() => createSortableColumns([
 ]))
 
 const signedClass = (v: number | null | undefined) =>
-  v == null || v === 0 ? 'text-gray-400 dark:text-gray-500' : v > 0 ? 'text-success' : 'text-error'
+  v == null || v === 0 ? 'text-muted' : v > 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
 </script>
 
 <template>
@@ -55,7 +55,7 @@ const signedClass = (v: number | null | undefined) =>
     <template #rank-cell="{ row }">
       <div class="flex items-center justify-center w-full px-1">
         <div v-if="isDnf(row.original.rank)"
-          class="inline-block text-center font-bold text-xs font-mono tracking-wider px-2 py-0.5 rounded text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-elevated select-none">
+          class="inline-block text-center font-bold text-xs font-mono tracking-wider px-2 py-0.5 rounded text-muted bg-gray-100 dark:bg-elevated select-none">
           DNF
         </div>
         <div v-else class="inline-block text-center font-extrabold text-base sm:text-lg italic px-2 py-0.5 rounded transition-colors"
@@ -67,20 +67,21 @@ const signedClass = (v: number | null | undefined) =>
 
     <template #name-cell="{ row }">
       <div class="flex items-center gap-2 sm:gap-3 w-full transition-opacity"
-        :class="isDnf(row.original.rank) ? 'opacity-60 grayscale-[30%]' : 'opacity-100'">
+        :class="{ 'grayscale-[30%]': isDnf(row.original.rank) }">
         <UAvatar :src="row.original.avatar" :alt="row.original.name" size="xs" class="sm:hidden" />
         <UAvatar :src="row.original.avatar" :alt="row.original.name" size="sm" class="hidden sm:inline-flex" />
-        <span class="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100 truncate">{{ row.original.name }}</span>
+        <span class="font-bold text-xs sm:text-sm truncate"
+          :class="isDnf(row.original.rank) ? 'text-muted' : 'text-gray-900 dark:text-gray-100'">{{ row.original.name }}</span>
       </div>
     </template>
 
     <template v-for="col in phase.columns" :key="col.key" #[`${col.key}-cell`]="{ row }">
       <div v-if="col.main" class="text-center font-bold text-sm sm:text-base font-mono"
-        :class="isDnf(row.original.rank) ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-primary font-extrabold'">
+        :class="isDnf(row.original.rank) ? 'text-muted line-through' : 'text-primary font-extrabold'">
         {{ row.original[col.key] }}
       </div>
       <div v-else class="text-center font-mono text-sm font-medium"
-        :class="[isDnf(row.original.rank) ? 'opacity-60' : 'opacity-100', col.signed ? signedClass(row.original[col.key]) : '']">
+        :class="isDnf(row.original.rank) ? 'text-muted' : col.signed ? signedClass(row.original[col.key]) : ''">
         {{ col.signed && row.original[col.key] > 0 ? '+' : '' }}{{ row.original[col.key] ?? '-' }}
       </div>
     </template>

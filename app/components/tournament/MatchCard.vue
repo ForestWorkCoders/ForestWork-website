@@ -14,9 +14,9 @@ const signed = (v: number) => (v > 0 ? `+${v}` : `${v}`)
     class="bg-white dark:bg-elevated rounded-xl border border-gray-200 dark:border-default shadow-sm hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
     <div v-if="match.time || match.url || match.label"
       class="px-4 py-2 border-b border-gray-100 dark:border-default flex justify-between items-center gap-2 bg-gray-50/80 dark:bg-elevated">
-      <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">
+      <span class="text-xs text-muted font-mono">
         {{ match.time }}
-        <span v-if="match.label" class="font-bold text-amber-500">{{ match.label }}</span>
+        <span v-if="match.label" class="font-bold text-amber-700 dark:text-amber-500">{{ match.label }}</span>
       </span>
       <NuxtLink v-if="match.url" :to="match.url" :target="external ? '_blank' : undefined"
         class="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-accented px-2 py-0.5 rounded hover:bg-gray-300 dark:hover:bg-accented transition-colors">
@@ -29,7 +29,7 @@ const signed = (v: number) => (v > 0 ? `+${v}` : `${v}`)
       <li v-for="(side, i) in match.sides" :key="i"
         class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-accented transition-colors">
         <span v-if="side.seat" class="w-5 font-bold"
-          :class="side.winner ? 'text-amber-500 dark:text-amber-400 drop-shadow-sm' : 'text-gray-400 dark:text-gray-500'">
+          :class="side.winner ? 'text-amber-700 dark:text-amber-400 drop-shadow-sm' : 'text-muted'">
           {{ side.seat }}
         </span>
         <span v-else class="w-1.5 h-5 rounded-sm bg-gray-200 dark:bg-accented"
@@ -45,7 +45,7 @@ const signed = (v: number) => (v > 0 ? `+${v}` : `${v}`)
         </span>
 
         <span v-if="side.points !== undefined" class="w-14 text-right font-mono font-bold"
-          :class="side.points > 0 ? 'text-emerald-600 dark:text-emerald-400' : side.points < 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'">
+          :class="side.points > 0 ? 'text-emerald-700 dark:text-emerald-400' : side.points < 0 ? 'text-red-700 dark:text-red-400' : 'text-muted'">
           {{ signed(side.points) }}
         </span>
       </li>

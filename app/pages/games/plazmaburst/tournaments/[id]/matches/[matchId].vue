@@ -168,7 +168,7 @@ const abnormalMatchMessage = computed(() => {
   <div v-if="pending" class="min-h-screen flex items-center justify-center">
     <UIcon name="i-lucide-loader-2" class="w-10 h-10 animate-spin text-blue-500" />
   </div>
-  <div v-else-if="error" class="min-h-screen flex items-center justify-center text-red-500 font-bold">
+  <div v-else-if="error" class="min-h-screen flex items-center justify-center text-red-700 dark:text-red-500 font-bold">
     加載失敗：{{ error.message }}
   </div>
 
@@ -181,9 +181,9 @@ const abnormalMatchMessage = computed(() => {
         li: 'flex items-center gap-1.5',
         base: 'text-xs md:text-sm font-bold tracking-wide transition-colors',
         active: 'text-gray-900 dark:text-white cursor-default',
-        inactive: 'text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400',
-        icon: { base: 'w-4 h-4', active: 'text-blue-500', inactive: 'text-gray-500' },
-        separator: { base: 'w-4 h-4 text-gray-400' }
+        inactive: 'text-muted hover:text-blue-700 dark:text-gray-400 dark:hover:text-blue-400',
+        icon: { base: 'w-4 h-4', active: 'text-blue-700 dark:text-blue-500', inactive: 'text-dimmed' },
+        separator: { base: 'w-4 h-4 text-dimmed' }
       }" />
     </div>
 
@@ -282,7 +282,7 @@ const abnormalMatchMessage = computed(() => {
                 <div v-for="roundNum in totalRounds" :key="roundNum" class="flex flex-col gap-1 w-8 items-center">
 
                   <!-- 頂部回合數字 -->
-                  <div class="h-6 text-xs font-bold text-gray-400 flex items-end justify-center pb-1">
+                  <div class="h-6 text-xs font-bold text-muted flex items-end justify-center pb-1">
                     {{ roundNum }}
                   </div>
 
@@ -316,11 +316,11 @@ const abnormalMatchMessage = computed(() => {
           <div v-for="game in match.games" :key="game.id"
             class="bg-white dark:bg-elevated p-4 border border-gray-200 dark:border-default rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-gray-400 transition-colors"
             @click="activeTab = game.gameNumber">
-            <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">Map {{ game.gameNumber }}</span>
+            <span class="text-xs font-bold text-muted tracking-widest uppercase">Map {{ game.gameNumber }}</span>
             <span class="text-sm font-extrabold truncate max-w-full">{{ game.map.name }}</span>
             <div class="flex items-center gap-3 mt-1 font-mono text-lg font-bold">
               <span :style="{ color: match.redTeam.colour }">{{ game.score.red ?? '-' }}</span>
-              <span class="text-gray-400 text-sm">:</span>
+              <span class="text-muted text-sm">:</span>
               <span :style="{ color: match.blueTeam.colour }">{{ game.score.blue ?? '-' }}</span>
             </div>
           </div>
@@ -328,7 +328,7 @@ const abnormalMatchMessage = computed(() => {
 
         <!-- 如果沒有回合數據的空狀態提示 -->
         <div v-else
-          class="py-8 text-center text-sm font-bold text-gray-400 uppercase tracking-widest border-t border-dashed border-gray-200 dark:border-default pt-12">
+          class="py-8 text-center text-sm font-bold text-muted uppercase tracking-widest border-t border-dashed border-gray-200 dark:border-default pt-12">
           Timeline data not available
         </div>
 
@@ -346,7 +346,7 @@ const abnormalMatchMessage = computed(() => {
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
               <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
-                  <tr class="text-xs text-gray-400 border-b border-gray-200 dark:border-default">
+                  <tr class="text-xs text-muted border-b border-gray-200 dark:border-default">
                     <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
                     <th class="py-2 px-3 font-medium w-12">K</th>
                     <th class="py-2 px-3 font-medium w-12">D</th>
@@ -361,21 +361,21 @@ const abnormalMatchMessage = computed(() => {
                     <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100">
                       {{ player.name }}</td>
                     <td class="py-2.5 px-3 font-mono">{{ player.kills }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.deaths }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.deaths }}</td>
                     <!-- 品味細節：KDR 大於等於 1 顯示高亮色，小於 1 顯示暗色 -->
                     <td class="py-2.5 px-3 font-mono font-bold"
-                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'">
+                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-muted'">
                       {{ player.kdr }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.headshots }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.headshots }}</td>
                     <td class="py-2.5 pl-3 font-mono font-bold"
-                      :class="player.aces > 0 ? 'text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
+                      :class="player.aces > 0 ? 'text-amber-700 dark:text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
                       '-' }}</td>
                   </tr>
                 </tbody>
               </table>
               <!-- 無數據防呆 -->
               <div v-if="!displayData.redTeamStats || displayData.redTeamStats.length === 0"
-                class="py-8 text-center text-xs text-gray-400 italic">No player stats available</div>
+                class="py-8 text-center text-xs text-muted italic">No player stats available</div>
             </div>
           </div>
 
@@ -389,7 +389,7 @@ const abnormalMatchMessage = computed(() => {
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
               <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
-                  <tr class="text-xs text-gray-400 border-b border-gray-200 dark:border-default">
+                  <tr class="text-xs text-muted border-b border-gray-200 dark:border-default">
                     <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
                     <th class="py-2 px-3 font-medium w-12">K</th>
                     <th class="py-2 px-3 font-medium w-12">D</th>
@@ -404,22 +404,22 @@ const abnormalMatchMessage = computed(() => {
                     <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100">
                       {{ player.name }}</td>
                     <td class="py-2.5 px-3 font-mono">{{ player.kills }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.deaths }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.deaths }}</td>
                     <!-- 品味細節：KDR 變色 -->
                     <td class="py-2.5 px-3 font-mono font-bold"
-                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'">
+                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-muted'">
                       {{ player.kdr }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.headshots }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.headshots }}</td>
                     <!-- 有 ACE 時用醒目的琥珀色 -->
                     <td class="py-2.5 pl-3 font-mono font-bold"
-                      :class="player.aces > 0 ? 'text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
+                      :class="player.aces > 0 ? 'text-amber-700 dark:text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
                       '-' }}</td>
                   </tr>
                 </tbody>
               </table>
               <!-- 無數據防呆 -->
               <div v-if="!displayData.blueTeamStats || displayData.blueTeamStats.length === 0"
-                class="py-8 text-center text-xs text-gray-400 italic">No player stats available</div>
+                class="py-8 text-center text-xs text-muted italic">No player stats available</div>
             </div>
           </div>
 

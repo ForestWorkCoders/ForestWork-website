@@ -372,10 +372,10 @@ const radarOption = computed(() => {
             textStyle: { color: '#f3f4f6', fontSize: 12 },
             formatter: () => `
         <div class="font-bold border-b border-gray-700 pb-1 mb-1 text-emerald-400">四維作風指標 (基準量綱: 0 ~ 100)</div>
-        <div>攻 (ATK): ${scores[0]}分 <span class="text-xs text-gray-400">(場均打點 ${raw.atk.toLocaleString()}點)</span></div>
-        <div>速 (SPD): ${scores[1]}分 <span class="text-xs text-gray-400">(平均和巡 ${raw.spd}巡)</span></div>
-        <div>防 (DEF): ${scores[2]}分 <span class="text-xs text-gray-400">(放銃率 ${raw.def}%)</span></div>
-        <div>運 (LUK): ${scores[3]}分 <span class="text-xs text-gray-400">(累計番運 ${raw.luk}役)</span></div>
+        <div>攻 (ATK): ${scores[0]}分 <span class="text-xs text-muted">(場均打點 ${raw.atk.toLocaleString()}點)</span></div>
+        <div>速 (SPD): ${scores[1]}分 <span class="text-xs text-muted">(平均和巡 ${raw.spd}巡)</span></div>
+        <div>防 (DEF): ${scores[2]}分 <span class="text-xs text-muted">(放銃率 ${raw.def}%)</span></div>
+        <div>運 (LUK): ${scores[3]}分 <span class="text-xs text-muted">(累計番運 ${raw.luk}役)</span></div>
       `
         },
         radar: {
@@ -492,7 +492,7 @@ const dealInTargetOption = computed(() => {
                             🀄 我的主頁 (You)
                         </UBadge>
                     </div>
-                    <p class="text-sm text-gray-500 mt-6">Sanma Player Dashboard & Career Highlights</p>
+                    <p class="text-sm text-muted mt-6">Sanma Player Dashboard & Career Highlights</p>
                 </div>
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
@@ -511,10 +511,10 @@ const dealInTargetOption = computed(() => {
             <!-- 時間導航與賽制過濾 -->
             <div class="pt-4 border-t border-gray-100 dark:border-default space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <span class="text-xs font-bold uppercase tracking-wider text-muted">
                         統計時間範圍 (Timeline Scope)
                     </span>
-                    <span class="text-xs font-mono text-gray-500">
+                    <span class="text-xs font-mono text-muted">
                         當前區間: {{ dateRange.start || careerBounds.start }} ~ {{ dateRange.end || careerBounds.end }}
                     </span>
                 </div>
@@ -523,18 +523,18 @@ const dealInTargetOption = computed(() => {
                     <div class="flex flex-wrap items-center gap-1.5 bg-gray-100 dark:bg-accented p-1 rounded-lg">
                         <button v-for="preset in presets" :key="preset.id"
                             class="px-2.5 py-1 text-xs rounded-md font-mono transition-colors"
-                            :class="activePresetId === preset.id ? 'bg-primary text-inverted font-bold shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                            :class="activePresetId === preset.id ? 'bg-primary text-inverted font-bold shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white'"
                             @click="applyPreset(preset)">
                             {{ preset.label }}
                         </button>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
-                        <span class="text-gray-400">自訂月份:</span>
+                        <span class="text-muted">自訂月份:</span>
                         <input v-model="dateRange.start" type="month" :min="careerBounds.start"
                             :max="dateRange.end || careerBounds.end"
                             class="bg-transparent border border-gray-300 dark:border-default rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary" />
-                        <span class="text-gray-400">至</span>
+                        <span class="text-muted">至</span>
                         <input v-model="dateRange.end" type="month" :min="dateRange.start || careerBounds.start"
                             :max="careerBounds.end"
                             class="bg-transparent border border-gray-300 dark:border-default rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary" />
@@ -543,7 +543,7 @@ const dealInTargetOption = computed(() => {
 
                 <div
                     class="pt-3 border-t border-gray-100 dark:border-default flex flex-wrap items-center gap-6 text-xs font-mono">
-                    <span class="text-gray-400 font-bold uppercase tracking-wider">特殊賽制過濾:</span>
+                    <span class="text-muted font-bold uppercase tracking-wider">特殊賽制過濾:</span>
                     <div class="flex items-center gap-4">
                         <UCheckbox v-model="excludeInvitational" name="excludeInvitational"
                             label="排除邀請賽 (Invitational)" />
@@ -560,7 +560,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center gap-3">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">基礎戰績矩陣 · Basic Performance</h2>
                 </div>
-                <div class="text-xs font-mono text-gray-500">
+                <div class="text-xs font-mono text-muted">
                     記錄場數: <span class="font-bold text-gray-900 dark:text-white">{{ basic.matchesCount }}</span> 場 /
                     總局數: <span class="font-bold text-gray-900 dark:text-white">{{ basic.totalRounds }}</span> 局
                 </div>
@@ -569,75 +569,75 @@ const dealInTargetOption = computed(() => {
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 font-mono">
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均順位</div>
+                    <div class="text-xs text-muted">平均順位</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.avgRank }}</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">和牌率</div>
-                    <div class="text-lg font-bold text-emerald-500 mt-1">{{ basic.winRate }}%</div>
+                    <div class="text-xs text-muted">和牌率</div>
+                    <div class="text-lg font-bold text-emerald-700 dark:text-emerald-500 mt-1">{{ basic.winRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">放銃率</div>
-                    <div class="text-lg font-bold text-rose-500 mt-1">{{ basic.dealInRate }}%</div>
+                    <div class="text-xs text-muted">放銃率</div>
+                    <div class="text-lg font-bold text-rose-700 dark:text-rose-400 mt-1">{{ basic.dealInRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">立直率</div>
-                    <div class="text-lg font-bold text-blue-500 mt-1">{{ basic.riichiRate }}%</div>
+                    <div class="text-xs text-muted">立直率</div>
+                    <div class="text-lg font-bold text-blue-700 dark:text-blue-400 mt-1">{{ basic.riichiRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">副露率</div>
-                    <div class="text-lg font-bold text-amber-500 mt-1">{{ basic.callRate }}%</div>
+                    <div class="text-xs text-muted">副露率</div>
+                    <div class="text-lg font-bold text-amber-700 dark:text-amber-500 mt-1">{{ basic.callRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">默聽率</div>
+                    <div class="text-xs text-muted">默聽率</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.damaRate }}%</div>
                 </div>
 
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">自摸率</div>
-                    <div class="text-lg font-bold text-emerald-400 mt-1">{{ basic.tsumoRate }}%</div>
+                    <div class="text-xs text-muted">自摸率</div>
+                    <div class="text-lg font-bold text-emerald-700 dark:text-emerald-400 mt-1">{{ basic.tsumoRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">流局聽牌率</div>
-                    <div class="text-lg font-bold text-purple-400 mt-1">{{ basic.drawTenpaiRate }}%</div>
+                    <div class="text-xs text-muted">流局聽牌率</div>
+                    <div class="text-lg font-bold text-purple-700 dark:text-purple-400 mt-1">{{ basic.drawTenpaiRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">流局率</div>
-                    <div class="text-lg font-bold text-gray-400 mt-1">{{ basic.drawRate }}%</div>
+                    <div class="text-xs text-muted">流局率</div>
+                    <div class="text-lg font-bold text-muted mt-1">{{ basic.drawRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均打點</div>
+                    <div class="text-xs text-muted">平均打點</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{
                         basic.avgWinScore.toLocaleString() }}</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均銃點</div>
-                    <div class="text-lg font-bold text-rose-400 mt-1">{{ basic.avgDealInScore.toLocaleString() }}</div>
+                    <div class="text-xs text-muted">平均銃點</div>
+                    <div class="text-lg font-bold text-rose-700 dark:text-rose-400 mt-1">{{ basic.avgDealInScore.toLocaleString() }}</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均和牌巡數</div>
+                    <div class="text-xs text-muted">平均和牌巡數</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.avgWinTurn }} 巡</div>
                 </div>
 
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">被飛率</div>
-                    <div class="text-lg font-bold text-rose-500 mt-1">{{ basic.bustingRate }}%</div>
+                    <div class="text-xs text-muted">被飛率</div>
+                    <div class="text-lg font-bold text-rose-700 dark:text-rose-400 mt-1">{{ basic.bustingRate }}%</div>
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">天梯等級 ({{ basic.mrLabel }})</div>
+                    <div class="text-xs text-muted">天梯等級 ({{ basic.mrLabel }})</div>
                     <div class="text-lg font-bold text-primary mt-1">{{ basic.mrRating }}</div>
                 </div>
             </div>
@@ -651,7 +651,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-default pb-3 mb-2">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">累計順位戰績 · Rank Distribution</h2>
-                        <p class="text-xs text-gray-500 mt-4.5">所選區間內一位、二位、三位分佈佔比</p>
+                        <p class="text-xs text-muted mt-4.5">所選區間內一位、二位、三位分佈佔比</p>
                     </div>
                 </div>
 
@@ -659,7 +659,7 @@ const dealInTargetOption = computed(() => {
                     <ClientOnly>
                         <VChart v-if="pieOption" :option="pieOption" class="w-full h-full" autoresize />
                         <template #fallback>
-                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
+                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-dimmed" />
                         </template>
                     </ClientOnly>
                 </div>
@@ -671,7 +671,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-default pb-3 mb-2">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">四維選手畫像 · Performance Radar</h2>
-                        <p class="text-xs text-gray-500 mt-4.5">攻 / 速 / 防 (滾動近100局) · 運 (近20局)</p>
+                        <p class="text-xs text-muted mt-4.5">攻 / 速 / 防 (滾動近100局) · 運 (近20局)</p>
                     </div>
                 </div>
 
@@ -679,7 +679,7 @@ const dealInTargetOption = computed(() => {
                     <ClientOnly>
                         <VChart v-if="radarOption" :option="radarOption" class="w-full h-full" autoresize />
                         <template #fallback>
-                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
+                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-dimmed" />
                         </template>
                     </ClientOnly>
                 </div>
@@ -692,14 +692,14 @@ const dealInTargetOption = computed(() => {
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">和銃分佈體系 · Win & Deal-in Patterns</h2>
-                    <p class="text-xs text-gray-500 mt-4.5">和牌時狀態 · 放銃時自身姿態 · 放銃至對手姿態</p>
+                    <p class="text-xs text-muted mt-4.5">和牌時狀態 · 放銃時自身姿態 · 放銃至對手姿態</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- 和牌時 -->
                 <div class="flex flex-col items-center">
-                    <span class="text-xs font-bold text-gray-400 mb-2">和牌時</span>
+                    <span class="text-xs font-bold text-muted mb-2">和牌時</span>
                     <div class="h-60 w-full flex items-center justify-center">
                         <ClientOnly>
                             <VChart v-if="winStyleOption" :option="winStyleOption" class="w-full h-full" autoresize />
@@ -709,7 +709,7 @@ const dealInTargetOption = computed(() => {
 
                 <!-- 放銃時 (自身狀態) -->
                 <div class="flex flex-col items-center">
-                    <span class="text-xs font-bold text-gray-400 mb-2">放銃時 (自身狀態)</span>
+                    <span class="text-xs font-bold text-muted mb-2">放銃時 (自身狀態)</span>
                     <div class="h-60 w-full flex items-center justify-center">
                         <ClientOnly>
                             <VChart v-if="dealInStyleOption" :option="dealInStyleOption" class="w-full h-full"
@@ -720,7 +720,7 @@ const dealInTargetOption = computed(() => {
 
                 <!-- 放銃至 (對手狀態) -->
                 <div class="flex flex-col items-center">
-                    <span class="text-xs font-bold text-gray-400 mb-2">放銃至 (對象狀態)</span>
+                    <span class="text-xs font-bold text-muted mb-2">放銃至 (對象狀態)</span>
                     <div class="h-60 w-full flex items-center justify-center">
                         <ClientOnly>
                             <VChart v-if="dealInTargetOption" :option="dealInTargetOption" class="w-full h-full"
@@ -737,9 +737,9 @@ const dealInTargetOption = computed(() => {
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">近期競技走勢 · Recent Form</h2>
-                    <UBadge color="primary" variant="subtle" size="md">近 30 戰 (Recent 30 Matches)</UBadge>
+                    <UBadge color="primary" variant="outline" size="md">近 30 戰 (Recent 30 Matches)</UBadge>
                 </div>
-                <div class="text-xs text-gray-500 font-mono">
+                <div class="text-xs text-muted font-mono">
                     最新場次在右側，1位為波峰，3位為谷底
                 </div>
             </div>
@@ -748,7 +748,7 @@ const dealInTargetOption = computed(() => {
                 <ClientOnly>
                     <VChart v-if="lineOption" :option="lineOption" class="w-full h-full" autoresize />
                     <template #fallback>
-                        <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
+                        <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-dimmed" />
                     </template>
                 </ClientOnly>
             </div>
@@ -760,9 +760,9 @@ const dealInTargetOption = computed(() => {
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">最常同桌宿敵 · Frequent Opponents</h2>
-                    <UBadge color="primary" variant="subtle" size="md">Top 12 遭遇記錄</UBadge>
+                    <UBadge color="primary" variant="outline" size="md">Top 12 遭遇記錄</UBadge>
                 </div>
-                <div class="text-xs text-gray-500 font-mono">
+                <div class="text-xs text-muted font-mono">
                     點擊選手可直接切換視角
                 </div>
             </div>
@@ -776,19 +776,19 @@ const dealInTargetOption = computed(() => {
                         <UIcon name="i-lucide-menu"
                             class="w-4 h-4 text-primary shrink-0 group-hover:scale-110 transition-transform" />
                         <span
-                            class="text-sm font-bold text-success-600 dark:text-success-400 truncate group-hover:underline">
+                            class="text-sm font-bold text-green-700 dark:text-green-400 truncate group-hover:underline">
                             {{ opp.nickname }}
                         </span>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+                    <div class="text-xs text-muted shrink-0">
                         <span class="font-bold text-gray-900 dark:text-white">{{ opp.rate }}%</span>
-                        <span class="text-xs text-gray-400 ml-1">({{ opp.count }})</span>
+                        <span class="text-xs text-muted ml-1">({{ opp.count }})</span>
                     </div>
                 </div>
             </div>
 
             <!-- 空態防禦 -->
-            <div v-else class="text-center py-8 text-sm text-gray-400 font-mono">
+            <div v-else class="text-center py-8 text-sm text-muted font-mono">
                 當前選定區間內暫無同桌對局記錄
             </div>
         </div>
@@ -800,7 +800,9 @@ const dealInTargetOption = computed(() => {
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">極限戰局記錄 · Major Hands</h2>
-                    <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="subtle" size="md">
+                    <!-- outline + red-700 text: subtle primary/error on its tint is under 4.5:1 in light mode -->
+                    <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="outline" size="md"
+                        :class="majorHandMode === 'win' ? '' : 'text-red-700 dark:text-red-400'">
                         {{ majorHandMode === 'win' ? '生涯最高打點' : '最近最大痛銃' }}
                     </UBadge>
                 </div>
@@ -809,12 +811,12 @@ const dealInTargetOption = computed(() => {
                 <div
                     class="flex items-center gap-1.5 bg-gray-100 dark:bg-accented p-1 rounded-lg self-start sm:self-auto font-mono text-xs">
                     <button class="px-3 py-1 rounded-md transition-colors font-bold"
-                        :class="majorHandMode === 'win' ? 'bg-primary text-inverted shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                        :class="majorHandMode === 'win' ? 'bg-primary text-inverted shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white'"
                         @click="majorHandMode = 'win'">
                         🏆 生涯最大和牌
                     </button>
                     <button class="px-3 py-1 rounded-md transition-colors font-bold"
-                        :class="majorHandMode === 'dealIn' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                        :class="majorHandMode === 'dealIn' ? 'bg-rose-500 text-white shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white'"
                         @click="majorHandMode = 'dealIn'">
                         💥 最近最大痛銃
                     </button>
@@ -827,17 +829,17 @@ const dealInTargetOption = computed(() => {
                     <!-- 左側：標題與得失點數 -->
                     <div class="flex items-baseline gap-2">
                         <span class="text-xl font-extrabold font-mono"
-                            :class="majorHandMode === 'win' ? 'text-primary' : 'text-rose-500'">
+                            :class="majorHandMode === 'win' ? 'text-primary' : 'text-rose-700 dark:text-rose-400'">
                             {{ currentMajorHand.title }}
                         </span>
-                        <span class="text-xs text-gray-400 font-mono">
+                        <span class="text-xs text-muted font-mono">
                             ({{ currentMajorHand.score.toLocaleString() }}點)
                         </span>
                     </div>
 
                     <!-- ★★★ 右側：對局時間 + 官方牌譜重播直達按鈕 ★★★ -->
                     <div class="flex items-center gap-3 font-mono text-xs">
-                        <span class="text-gray-400">{{ currentMajorHand.date }}</span>
+                        <span class="text-muted">{{ currentMajorHand.date }}</span>
 
                         <UButton v-if="currentMajorHand.paipuId"
                             :to="`https://game.maj-soul.com/1/?paipu=${currentMajorHand.paipuId}`" target="_blank"
@@ -854,7 +856,7 @@ const dealInTargetOption = computed(() => {
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-default">
                         <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
                         <span class="font-bold" :class="[
-                            yaku.isYakuman ? 'text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary' : 'text-rose-400')
+                            yaku.isYakuman ? 'text-amber-700 dark:text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary' : 'text-rose-700 dark:text-rose-400')
                         ]">
                             {{ yaku.label || `${yaku.han} 番` }}
                         </span>
@@ -863,7 +865,7 @@ const dealInTargetOption = computed(() => {
             </div>
 
             <!-- 空態防禦 -->
-            <div v-else class="text-center py-8 text-sm text-gray-400 font-mono">
+            <div v-else class="text-center py-8 text-sm text-muted font-mono">
                 當前選定區間內暫無{{ majorHandMode === 'win' ? '和牌' : '放銃' }}記錄
             </div>
         </div>
@@ -874,9 +876,9 @@ const dealInTargetOption = computed(() => {
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">榮譽與成就 · Achievements</h2>
-                    <UBadge color="primary" variant="subtle" size="md">{{ achievements.length }} 項榮譽</UBadge>
+                    <UBadge color="primary" variant="outline" size="md">{{ achievements.length }} 項榮譽</UBadge>
                 </div>
-                <div class="text-xs text-gray-500 font-mono">賽事主辦手動維護</div>
+                <div class="text-xs text-muted font-mono">賽事主辦手動維護</div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -892,7 +894,7 @@ const dealInTargetOption = computed(() => {
                         <div class="text-sm font-bold text-gray-900 dark:text-white truncate" :title="ach.title">{{ ach.title }}</div>
                         <NuxtLink :to="`/games/mahjongsoul/tournaments/${ach.tournamentId}`"
                             class="block text-xs font-mono text-primary truncate hover:underline focus-visible:underline" :title="ach.tournamentTitle">{{ ach.tournamentTitle }}</NuxtLink>
-                        <div class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ ach.date }}</div>
+                        <div class="text-xs font-mono text-muted">{{ ach.date }}</div>
                     </div>
                 </div>
             </div>

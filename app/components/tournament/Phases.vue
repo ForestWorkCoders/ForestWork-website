@@ -20,7 +20,7 @@ const phase = computed(() =>
         <button v-for="p in list" :key="p.id" type="button" @click="activeId = p.id"
           class="px-4 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200" :class="p.id === phase.id
             ? 'bg-white dark:bg-elevated text-primary shadow-sm'
-            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'">
+            : 'text-muted hover:text-gray-900 dark:hover:text-white'">
           {{ p.title }}
         </button>
       </div>
@@ -31,7 +31,7 @@ const phase = computed(() =>
         :class="phase.final ? 'text-secondary' : 'text-primary'">
         <UIcon :name="phase.final ? 'i-lucide-trophy' : 'i-lucide-flag'" />
         <span>{{ phase.title }}</span>
-        <span v-if="phase.subtitle" class="text-gray-400 font-normal text-lg sm:text-xl tracking-wider">{{ phase.subtitle }}</span>
+        <span v-if="phase.subtitle" class="text-muted font-normal text-lg sm:text-xl tracking-wider">{{ phase.subtitle }}</span>
       </h2>
     </div>
 
@@ -46,7 +46,7 @@ const phase = computed(() =>
   </div>
 
   <div v-else
-    class="py-20 flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-200 dark:border-default rounded-xl bg-gray-50 dark:bg-elevated">
+    class="py-20 flex flex-col items-center justify-center text-muted border border-dashed border-gray-200 dark:border-default rounded-xl bg-gray-50 dark:bg-elevated">
     <UIcon name="i-lucide-trophy" class="w-12 h-12 mb-4 opacity-50" />
     <p class="text-sm">尚無賽事結果。</p>
   </div>

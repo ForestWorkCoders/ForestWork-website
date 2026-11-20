@@ -46,7 +46,7 @@
 
     <div class="text-center mb-12">
       <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Circuits · 競賽清單</h2>
-      <p class="text-gray-500">探索林間小鎮的多元賽事與社群活動</p>
+      <p class="text-muted">探索林間小鎮的多元賽事與社群活動</p>
     </div>
 
     <div class="max-w-2xl mx-auto mb-16 px-4 flex flex-col gap-2">
@@ -66,7 +66,7 @@
 
     <div v-if="filteredCircuits.length === 0" class="text-center py-20">
       <UIcon name="i-lucide-ghost" class="size-12 text-gray-300 mx-auto mb-4" />
-      <p class="text-gray-400">找不到相關競賽，試試別的關鍵字？</p>
+      <p class="text-muted">找不到相關競賽，試試別的關鍵字？</p>
     </div>
   </UContainer>
 </template>

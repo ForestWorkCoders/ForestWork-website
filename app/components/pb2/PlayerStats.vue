@@ -159,18 +159,18 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
   <div class="px-4 md:px-6 mt-8 space-y-8 animate-fade-in pb-12">
     <!-- 加载骨架 -->
     <div v-if="pending" class="flex justify-center py-12">
-      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 animate-spin text-gray-500" />
+      <UIcon name="i-lucide-refresh-cw" class="w-8 h-8 animate-spin text-dimmed" />
     </div>
 
     <template v-else-if="players && players.length > 0">
-      <TournamentPodium :entries="podiumEntries" value-label="SCORE" value-class="text-emerald-500 dark:text-emerald-400"
+      <TournamentPodium :entries="podiumEntries" value-label="SCORE" value-class="text-emerald-700 dark:text-emerald-400"
         sub-icon="i-lucide-crosshair" />
 
       <!-- 2. 綜合數據表格區域 (100% 鏡像對齊雀魂的 DOM 結構) -->
       <section>
         <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
-            綜合數據 <span class="text-gray-400 dark:text-gray-500 font-normal text-lg ml-2">Overall Statistics</span>
+            綜合數據 <span class="text-muted font-normal text-lg ml-2">Overall Statistics</span>
           </h2>
         </div>
 
@@ -197,12 +197,12 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
             <template #rank-cell="{ row }">
               <div class="flex items-center justify-center w-full">
                 <span class="font-extrabold text-xs sm:text-base italic px-1.5 py-0.5 rounded transition-colors" :class="row.original.rank === 1
-                  ? 'text-yellow-400 bg-yellow-400/10'
+                  ? 'text-yellow-700 dark:text-yellow-400 bg-yellow-400/10'
                   : row.original.rank === 2
-                    ? 'text-slate-300 bg-slate-300/10'
+                    ? 'text-slate-500 dark:text-slate-300 bg-slate-300/10'
                     : row.original.rank === 3
-                      ? 'text-amber-600 bg-amber-600/10'
-                      : 'text-gray-400 dark:text-gray-500'
+                      ? 'text-amber-800 dark:text-amber-600 bg-amber-600/10'
+                      : 'text-muted'
                   ">
                   #{{ row.original.rank }}
                 </span>
@@ -223,7 +223,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
 
             <!-- 得分高亮 -->
             <template #score-cell="{ row }">
-              <span class="font-mono font-bold text-emerald-500 text-sm">
+              <span class="font-mono font-bold text-emerald-700 dark:text-emerald-500 text-sm">
                 {{ row.original.score }}
               </span>
             </template>
@@ -231,7 +231,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
             <!-- KDR 正負語義變色 -->
             <template #kdr-cell="{ row }">
               <span class="font-mono font-semibold text-sm"
-                :class="parseFloat(row.original.kdr) >= 1.0 ? 'text-emerald-500' : 'text-rose-500'">
+                :class="parseFloat(row.original.kdr) >= 1.0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'">
                 {{ row.original.kdr }}
               </span>
             </template>
@@ -243,7 +243,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
               </span>
             </template>
             <template #deaths-cell="{ row }">
-              <span class="font-mono text-sm text-gray-500 dark:text-gray-400">
+              <span class="font-mono text-sm text-muted">
                 {{ row.original.deaths }}
               </span>
             </template>
@@ -251,13 +251,13 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
             <!-- Aces & Clutch 表現 -->
             <template #aces-cell="{ row }">
               <span class="font-mono text-sm"
-                :class="row.original.aces > 0 ? 'text-amber-500 font-bold' : 'text-gray-400 dark:text-gray-600'">
+                :class="row.original.aces > 0 ? 'text-amber-700 dark:text-amber-500 font-bold' : 'text-muted'">
                 {{ row.original.aces }}
               </span>
             </template>
             <template #headshots-cell="{ row }">
               <span class="font-mono text-sm"
-                :class="row.original.headshots > 0 ? 'text-purple-500 dark:text-purple-400 font-bold' : 'text-gray-400 dark:text-gray-600'">
+                :class="row.original.headshots > 0 ? 'text-purple-700 dark:text-purple-400 font-bold' : 'text-muted'">
                 {{ row.original.headshots }}
               </span>
             </template>
@@ -266,7 +266,7 @@ const podiumEntries = computed(() => (players.value ?? []).slice(0, 3).map(p => 
       </section>
     </template>
 
-    <div v-else class="text-center py-12 text-gray-500">
+    <div v-else class="text-center py-12 text-muted">
       No stats available for this tournament yet.
     </div>
   </div>
