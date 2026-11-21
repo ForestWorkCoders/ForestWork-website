@@ -1,21 +1,9 @@
 <script setup lang="ts">
-const { data: sessions, status, error } = await useAsyncData('gartic-sessions', () => 
-  $fetch<Array<{ 
-    id: string; 
-    year: string; 
-    month: string; 
-    phase: string; 
-    mode?: string;
-    title: string; 
-    chainsCount: number 
-  }>>('/data/index.json'),
-  { server: false }
-)
+import sessionIndex from '~~/public/data/index.json'
 
-const sortedSessions = computed(() => {
-  if (!sessions.value) return []
-  return [...sessions.value].sort((a, b) => b.id.localeCompare(a.id))
-})
+// Bundled like [id].vue does, so the list is in the server HTML: no fetch, no loading or error state.
+// Newest first; ids are YYYY-MM-phase_N, so string order is date order.
+const sortedSessions = [...sessionIndex].sort((a, b) => b.id.localeCompare(a.id))
 
 // 为不同的玩法模式配置高对比度的波普色系（消除单调，赋予生命力）
 function getModeBadgeClass(mode?: string) {
@@ -56,16 +44,8 @@ useSeoMeta({
     </header>
 
     <main class="max-w-6xl mx-auto">
-      <div v-if="status === 'pending'" class="text-center font-mono text-2xl text-amber-700 dark:text-amber-400 animate-pulse">
-        LOADING ARCHIVES...
-      </div>
-
-      <div v-else-if="error" class="bg-rose-500 border-4 border-black shadow-[5px_5px_0px_0px_#000] p-6 rounded-xl text-white font-extrabold text-center text-lg">
-        致命錯誤：無法載入對局索引清單。請確認 public/data/index.json 是否存在！
-      </div>
-
       <!-- 卡片网格 -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <NuxtLink 
           v-for="session in sortedSessions" 
           :key="session.id"
