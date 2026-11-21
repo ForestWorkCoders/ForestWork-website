@@ -348,9 +348,7 @@ function getCurrentNode(): VFSNode {
 // ==========================================
 async function hydrateChallenges(): Promise<string[]> {
     try {
-        const data = await $fetch<any[]>('/api/ctf/challenges', {
-            params: { operator: currentOperatorId.value }
-        })
+        const data = await $fetch<any[]>('/api/ctf/challenges')
         if (!data || !vfs['challenges']) return []
 
         // ★ 核心好品味：水合前彻底清空旧挂载，消灭任何 HMR 或旧迭代残留的脏目录！
