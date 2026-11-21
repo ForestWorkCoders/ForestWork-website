@@ -77,9 +77,10 @@ export function unsealSessionData(cookieValue?: unknown): UserSession | null {
     const data = JSON.parse(rawJson) as Partial<UserSession> & { exp?: unknown }
     // Tokens without an expiry (issued before expiry was added) are rejected
     if (!data || typeof data.exp !== 'number' || data.exp <= Math.floor(Date.now() / 1000)) return null
+    if (typeof data.id !== 'string' || typeof data.username !== 'string') return null
     return {
-      id: data.id as string,
-      username: data.username as string,
+      id: data.id,
+      username: data.username,
       global_name: data.global_name ?? null,
       avatar: data.avatar ?? null,
     }
