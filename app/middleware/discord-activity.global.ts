@@ -12,6 +12,6 @@ export default defineNuxtRouteMiddleware((to) => {
       ? window.location.search
       : (url.search || '')
 
-    return navigateTo(`/activities/skill-test${rawSearch}`, { replace: true })
+    return navigateTo(`/activities/ctf${rawSearch}`, { replace: true })
   }
 })
