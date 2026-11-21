@@ -48,7 +48,7 @@
     <TournamentOngoing />
 
     <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Circuits · 競賽清單</h2>
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">競賽清單 · Circuits</h2>
       <p class="text-muted">探索林間小鎮的多元賽事與社群活動</p>
     </div>
 

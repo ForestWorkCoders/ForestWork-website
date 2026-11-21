@@ -28,10 +28,10 @@ const latest = computed(() => GAMES
       <div class="text-center mb-8">
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-3 flex items-center justify-center gap-3">
           <span class="relative flex h-3 w-3">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
           </span>
-          Ongoing now · 進行中賽事
+          進行中賽事 · Ongoing now
         </h2>
       </div>
 
@@ -51,7 +51,7 @@ const latest = computed(() => GAMES
     <div v-if="latest.length">
       <div class="text-center mb-8">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-          Latest results · 最新戰報
+          最新戰報 · Latest results
         </h2>
       </div>
 
