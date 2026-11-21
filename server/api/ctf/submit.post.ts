@@ -90,12 +90,27 @@ export default defineEventHandler(async (event) => {
   const { data: challenge, error: challengeError } = await supabase
     .schema('ctf')
     .from('challenges')
-    .select('id, title, is_active')
+    .select('id, title, is_active, prerequisite_id')
     .eq('flag_hash', flagHash)
     .single()
 
   if (challengeError || !challenge || !challenge.is_active) {
     return { success: false, message: 'Invalid token sequence. Access rejected.' }
+  }
+
+  // 3.5 前置关卡校验
+  if (challenge.prerequisite_id) {
+    const { data: prerequisiteSolve } = await supabase
+      .schema('ctf')
+      .from('solves')
+      .select('id')
+      .eq('account_id', accountId)
+      .eq('challenge_id', challenge.prerequisite_id)
+      .maybeSingle()
+
+    if (!prerequisiteSolve) {
+      return { success: false, message: 'Challenge locked. Solve its prerequisite first.' }
+    }
   }
 
   // 4. 检查是否重复提交过

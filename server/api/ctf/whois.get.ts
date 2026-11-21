@@ -1,5 +1,5 @@
 // server/api/ctf/whois.get.ts
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 
 export default defineEventHandler(async (event) => {
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     return { found: false }
   }
 
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = serverSupabaseServiceRole<Database>(event)
 
   // 1. 多態檢索：既支援 Snowflake ID 比對，也支援暱稱比對
   let rankQuery = supabase
