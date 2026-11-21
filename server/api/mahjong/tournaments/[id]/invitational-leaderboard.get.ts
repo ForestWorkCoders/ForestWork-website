@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 
 export default defineEventHandler(async (event) => {
@@ -129,7 +129,8 @@ export default defineEventHandler(async (event) => {
         .in('account_id', accountIds)
 
     const discordIdsStr = participants?.map(p => p.discord_id_str).filter(Boolean) as string[]
-    const { data: profiles } = await supabase
+    const admin = serverSupabaseServiceRole<Database>(event)
+    const { data: profiles } = await admin
         .schema('public')
         .from('participant_data')
         .select('discord_id_str:discord_id::text, discord_username, profile_img')
