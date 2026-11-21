@@ -375,11 +375,10 @@ const SKILL_MODULES: Record<number, SkillModuleMeta> = {
 }
 
 /**
- * 構造雙排互動組件：Row 1 下拉選單 + Row 2 Activity 原生啟動按鈕
+ * 構造雙排互動組件：Row 1 下拉選單 + Row 2 網頁版入口
+ * (Discord Activity 自 v5.14 起改為 CTF，技能評定只剩網頁版訪客模式)
  */
 export function buildSkillLeaderboardComponents(currentModuleId: number) {
-  const clientId = process.env.DISCORD_CLIENT_ID || process.env.DISCORD_APPLICATION_ID || '311484597248720907'
-  
   // 1. 構造 10 槽位下拉選單選項
   const options = Object.values(SKILL_MODULES).map(m => ({
     label: `${m.title} // ${m.category}`,
@@ -402,20 +401,14 @@ export function buildSkillLeaderboardComponents(currentModuleId: number) {
         }
       ]
     },
-    // ActionRow 2: Discord Activity 原生直通按鈕 (Link Button)
+    // ActionRow 2: 網頁版入口 (Link Button)
     {
       type: 1,
       components: [
         {
           type: 2, // BUTTON
           style: 5, // LINK
-          label: '🚀 啟動 Discord 靶場 (Launch Activity)',
-          url: `https://discord.com/activities/${clientId}`
-        },
-        {
-          type: 2,
-          style: 5,
-          label: '🌐 Web 備用入口',
+          label: '🌐 網頁版試玩 (訪客模式 · 不記錄成績)',
           url: 'https://forestwork.vercel.app/activities/skill-test'
         }
       ]
@@ -429,7 +422,7 @@ export function buildSkillLeaderboardComponents(currentModuleId: number) {
 export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: string) {
   const mod = SKILL_MODULES[moduleId] || SKILL_MODULES[1]!
   const title = `技能評定 · ${mod.emoji} ${mod.title} // ${mod.category}`
-  const note = 'ForestWork 技能評定 · 點擊下方按鈕直接啟動 Activity'
+  const note = 'ForestWork 技能評定 · 網頁版為訪客模式，不記錄成績'
   const components = buildSkillLeaderboardComponents(mod.id)
 
   // 鎖定模組：沒有排名，只有告知
@@ -488,7 +481,7 @@ export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: 
           stats: mine
             ? [['個人最佳', `\`${mine.score.toLocaleString()} PTS\``], ['評級', `\`[${mine.rating || 'COMBAT READY'}]\``]]
             : [],
-          unranked: '尚未完成該科目評定 · 點擊下方按鈕啟動 Activity 開始測試！'
+          unranked: '尚無該科目的評定記錄'
         }
       : null,
     note
