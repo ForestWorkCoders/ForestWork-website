@@ -89,7 +89,6 @@ export default defineEventHandler(async (event) => {
   const { error: upsertError } = await supabase
     .from('participant_data')
     .upsert({
-      account_id: user.id,
       discord_id: user.id,
       discord_username: rawUsername, // ★ 永遠、純粹是唯一 handle（如 eaglepb2）
       discord_nickname: rawNickname, // ★ 真正的社交暱稱獨立入庫（如 鷹の紅石指令部）
@@ -99,7 +98,7 @@ export default defineEventHandler(async (event) => {
     })
 
   if (upsertError) {
-    console.warn('[AUTH] Participant upsert warning:', upsertError.message)
+    console.error('[AUTH] Participant upsert failed:', upsertError.message)
   }
 
   // 4. 签发轻量 HttpOnly Cookie
