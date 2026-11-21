@@ -1,10 +1,10 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import { unsealSessionData, SESSION_COOKIE_NAME } from '../../utils/session'
+import { getSessionUser } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
   const supabase = serverSupabaseServiceRole<Database>(event)
-  const session = unsealSessionData(getCookie(event, SESSION_COOKIE_NAME))
+  const session = getSessionUser(event)
 
   // 1. 查询所有激活关卡（包含 prerequisite_id）
   const { data: challenges, error } = await supabase

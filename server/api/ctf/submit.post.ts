@@ -2,12 +2,11 @@
 import { createHash } from 'node:crypto'
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import { unsealSessionData, SESSION_COOKIE_NAME } from '../../utils/session'
+import { getSessionUser } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
-  // 1. ★ 核心好品味：从无状态签名的 Cookie 提取真实登录会话
-  const cookieValue = getCookie(event, SESSION_COOKIE_NAME)
-  const session = unsealSessionData(cookieValue)
+  // 1. Signed-in user from the session cookie or a Bearer ticket
+  const session = getSessionUser(event)
 
   if (!session) {
     throw createError({
