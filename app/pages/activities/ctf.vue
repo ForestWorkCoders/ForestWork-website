@@ -48,7 +48,7 @@ const host = computed<CtfHost>(() => {
 </script>
 
 <template>
-  <div class="h-dvh w-full bg-[#0f141c]">
+  <div class="relative h-dvh w-full overflow-hidden bg-[#0f141c]">
     <CtfTerminal
       v-if="activity.status.value === 'ready'"
       :host="host"
@@ -65,5 +65,28 @@ const host = computed<CtfHost>(() => {
       class="h-dvh flex items-center justify-center font-mono text-sm text-emerald-400">
       Signing in through Discord…
     </div>
+
+    <!-- Picture-in-picture is far too small for the terminal: cover it (kept mounted underneath). Shown by CSS only. -->
+    <div
+      role="status"
+      class="ctf-small-window absolute inset-0 z-50 hidden flex-col items-center justify-center gap-1.5 overflow-hidden bg-[#0f141c] px-4 text-center font-mono select-none">
+      <div class="text-xs font-bold tracking-widest text-emerald-400 uppercase">
+        &gt; SYSTEM_HALT: VIEWPORT_GEOMETRY_RESTRICTED
+      </div>
+      <p class="text-xs leading-snug text-zinc-300">
+        目前視窗高度受限，無法使用 CTF 終端。<br>
+        請放大或彈出視窗，以解除限制。<br>
+        <span class="text-rose-400">Window too small: enlarge or pop out the Activity.</span>
+      </p>
+    </div>
   </div>
 </template>
+
+<style scoped>
+/* Same height threshold as the skill test Activity (max-height: 329px). */
+@media (max-height: 329px) {
+  .ctf-small-window {
+    display: flex;
+  }
+}
+</style>
