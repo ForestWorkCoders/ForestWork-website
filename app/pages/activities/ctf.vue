@@ -15,6 +15,8 @@ useSeoMeta({
 const activity = useDiscordActivity()
 
 onMounted(async () => {
+  // The home page hides itself while a launch moves here; show this page now
+  document.documentElement.removeAttribute('data-activity-launch')
   const embedded = await activity.start()
   if (!embedded) {
     await navigateTo('/games/ctf', { replace: true })

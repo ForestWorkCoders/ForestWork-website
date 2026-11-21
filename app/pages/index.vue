@@ -79,13 +79,20 @@ import { ref, computed } from 'vue'
 
 const searchQuery = ref('')
 
-// A Discord Activity launch lands on this prerendered page. Leave before it paints,
-// so the home page never flashes. The route middleware still covers client-side navigation.
+// A Discord Activity launch lands on this prerendered page. Hide it before it paints;
+// the route middleware then moves to /activities/ctf in the same document, which the
+// Discord SDK needs (a full reload breaks its handshake). The CTF Activity page unhides
+// on mount, and the timer unhides anyway so a failure never leaves a blank page.
 useHead({
+  style: [{
+    key: 'discord-activity-launch-style',
+    tagPriority: 'critical',
+    innerHTML: 'html[data-activity-launch]{background:#0f141c}html[data-activity-launch] body{visibility:hidden}'
+  }],
   script: [{
     key: 'discord-activity-launch',
     tagPriority: 'critical',
-    innerHTML: "if(/(^|[?&])frame_id=/.test(location.search.slice(1))||location.hostname.endsWith('discordsays.com'))location.replace('/activities/ctf'+location.search)"
+    innerHTML: "if(/(^|[?&])frame_id=/.test(location.search.slice(1))||location.hostname.endsWith('discordsays.com')){var d=document.documentElement;d.setAttribute('data-activity-launch','');setTimeout(function(){d.removeAttribute('data-activity-launch')},5000)}"
   }]
 })
 
