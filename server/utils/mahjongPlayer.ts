@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { getSupabase } from '~~/server/utils/supabase'
 
 export interface MahjongPlayerProfile {
   name: string
@@ -25,7 +26,7 @@ export async function fetchPlayerDict(
   const discordIdsStr = participants?.map((p: any) => p.discord_id_str).filter(Boolean) as string[]
 
   // 2. 跨 Schema 撈取 Discord 頭像與用戶名
-  const { data: profiles } = await supabase
+  const { data: profiles } = await getSupabase()
     .schema('public')
     .from('participant_data')
     .select('discord_id_str:discord_id::text, discord_username, profile_img')

@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   const tournamentId = getRouterParam(event, 'id')
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid phase' })
   }
 
-  const client = await serverSupabaseClient(event)
+  const client = serverSupabaseServiceRole(event)
 
   const { data, error } = await client
     .schema('mahjong')

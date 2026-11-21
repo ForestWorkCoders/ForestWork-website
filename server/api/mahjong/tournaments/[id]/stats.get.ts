@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   // 1. 抓取 URL 里的 UUID 參數
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 2. 獲取 Supabase 客戶端
-  const client = await serverSupabaseClient(event)
+  const client = serverSupabaseServiceRole(event)
 
   // 3. 呼叫你剛剛建好的 RPC 函數。
   // 注意：因為你的表在 mahjong schema 下，必須鏈式調用 .schema('mahjong') 防爆！
