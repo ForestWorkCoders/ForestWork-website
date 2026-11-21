@@ -53,10 +53,17 @@ export function useDiscordActivity() {
     const discordSdk = new DiscordSDK(clientId)
     sdk = discordSdk
 
-    await Promise.race([
-      discordSdk.ready(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('SDK_TIMEOUT: Discord ready() took > 8s')), SDK_READY_TIMEOUT_MS))
-    ])
+    let readyTimer: ReturnType<typeof setTimeout> | undefined
+    try {
+      await Promise.race([
+        discordSdk.ready(),
+        new Promise((_, reject) => {
+          readyTimer = setTimeout(() => reject(new Error('SDK_TIMEOUT: Discord ready() took > 8s')), SDK_READY_TIMEOUT_MS)
+        })
+      ])
+    } finally {
+      clearTimeout(readyTimer)
+    }
 
     const { code } = await discordSdk.commands.authorize({
       client_id: clientId,
@@ -86,17 +93,19 @@ export function useDiscordActivity() {
       status.value = 'ready'
     } catch (err: unknown) {
       const e = err as { data?: { statusMessage?: string }, message?: string }
-      console.error('[Activity Auth Error]:', err)
       ticket.value = ''
       user.value = null
       error.value = e?.data?.statusMessage || e?.message || 'UNKNOWN_ERROR'
+      console.error('[Activity Auth Error]:', error.value)
       status.value = 'error'
     }
     return true
   }
 
   // Discord client opens the link through RPC; plain browsers (or an SDK failure) use window.open
-  async function openExternal(url: string) {
+  async function openExternal(rawUrl: string) {
+    const url = rawUrl.trim()
+    if (!/^https?:\/\//i.test(url)) return
     if (sdk) {
       try {
         await sdk.commands.openExternalLink({ url })
