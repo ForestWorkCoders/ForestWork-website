@@ -3,26 +3,48 @@ import { ref, computed } from 'vue'
 import { createSortableColumns } from '~/utils/table'
 
 const props = defineProps({
-  tournamentId: { type: String, required: true }
+  tournamentId: { type: String, required: true },
+  // Tournament format and the /phases data, both already fetched by the page (same data as the result tab)
+  format: { type: String, default: null },
+  phases: { type: Array, default: null }
 })
 
+// Invitational and relay split their stats by phase; regular and event tournaments do not
+const isPhased = computed(() => props.format === 'invitational' || props.format === 'relay')
+const phaseList = computed(() => (isPhased.value ? props.phases ?? [] : []))
+// Unset until the reader picks a phase; same default as the result tab (the final, else the last)
+const activePhaseId = ref()
+const phase = computed(() =>
+  phaseList.value.find(p => p.id === activePhaseId.value)
+  ?? phaseList.value.find(p => p.final)
+  ?? phaseList.value.at(-1))
+// Filter only when there is a choice. With one phase every match is in it anyway, and the
+// 2023/2024 invitationals' single phase is the engine's made-up "MAIN", which no match is tagged with.
+const statsQuery = computed(() => (phaseList.value.length > 1 ? { phase: phase.value.id } : {}))
+
 const { data: matchData, pending, error } = await useFetch(
-  `/api/mahjong/tournaments/${props.tournamentId}/stats`
+  `/api/mahjong/tournaments/${props.tournamentId}/stats`,
+  { query: statsQuery }
 )
 
 const { data: playstyleData, pending: playstylePending } = await useFetch(
-  `/api/mahjong/tournaments/${props.tournamentId}/playstyle`
+  `/api/mahjong/tournaments/${props.tournamentId}/playstyle`,
+  { query: statsQuery }
 )
 
-// A player needs this many games to get on the podium
-const PODIUM_MIN_GAMES = 8
+// A player needs this many games to get on the podium (1 in a phase, 8 across a regular tournament)
+const PODIUM_MIN_GAMES = computed(() => (isPhased.value ? 1 : 8))
+
+const podiumEmptyText = computed(() => isPhased.value
+  ? '此階段尚無對局 · No games in this phase yet'
+  : `尚無選手打滿 ${PODIUM_MIN_GAMES.value} 場 · No player has ${PODIUM_MIN_GAMES.value} games yet`)
 
 const top3Players = computed(() => {
   if (!matchData.value) return []
 
-  return matchData.value
-    // 1. 过滤：只允许打满 PODIUM_MIN_GAMES 局及以上的硬核玩家入场
-    .filter(player => player.play_count >= PODIUM_MIN_GAMES)
+  return [...matchData.value]
+    // 1. 过滤：只允许打满 PODIUM_MIN_GAMES 局及以上的玩家入场
+    .filter(player => player.play_count >= PODIUM_MIN_GAMES.value)
     // 2. 排序：主要按平均顺位升序 (越低越牛)；如果顺位相同，按打的场数降序 (场数越多含金量越高)
     .sort((a, b) => {
       if (a.avg_rank === b.avg_rank) {
@@ -133,10 +155,25 @@ const playPercentStyles = [
 <template>
   <div class="px-4 md:px-6 mt-8 space-y-8 animate-fade-in pb-12">
 
+    <!-- One sub-tab per phase (invitational / relay with 2+ phases), styled like the result tab's toggle -->
+    <div v-if="phaseList.length > 1" class="flex justify-center">
+      <div class="inline-flex flex-wrap justify-center bg-gray-100 dark:bg-accented p-1 rounded-xl border border-gray-200 dark:border-default">
+        <button v-for="p in phaseList" :key="p.id" type="button" :aria-pressed="p.id === phase.id" @click="activePhaseId = p.id"
+          class="px-4 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200" :class="p.id === phase.id
+            ? 'bg-white dark:bg-elevated text-primary shadow-sm'
+            : 'text-muted hover:text-gray-900 dark:hover:text-white'">
+          {{ p.title }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Previous phase stays on screen, dimmed, while the next one loads -->
+    <div class="space-y-8 transition-opacity duration-200" :class="pending || playstylePending ? 'opacity-60' : ''">
+
     <!-- Early in a cup nobody has enough games yet; the podium says so instead of showing nothing -->
     <TournamentPodium :entries="podiumEntries" value-label="AVG RANK"
       sub-icon="i-lucide-swords"
-      :empty-text="`尚無選手打滿 ${PODIUM_MIN_GAMES} 場 · No player has ${PODIUM_MIN_GAMES} games yet`" />
+      :empty-text="podiumEmptyText" />
 
     <section>
       <div class="mb-6 border-b border-gray-200 dark:border-default pb-4 flex justify-between items-end">
@@ -232,5 +269,6 @@ const playPercentStyles = [
       </div>
     </section>
 
+    </div>
   </div>
 </template>

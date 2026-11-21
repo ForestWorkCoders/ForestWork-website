@@ -110,7 +110,7 @@ useHead({
             </TournamentPhases>
         </template>
         <template #stats>
-            <MahjongPlayerStats :tournament-id="route.params.id" />
+            <MahjongPlayerStats :tournament-id="route.params.id" :format="tourney?.format" :phases="phases" />
         </template>
         <template #vods>
             <TournamentVods />
