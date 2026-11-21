@@ -548,7 +548,7 @@ const commands: Record<string, (args: string[]) => void> = {
   scoreboard         檢視全場即時積分榜 (別名: top)
   clear              清除終端屏幕
   whoami             顯示當前權限標記
-  whois [player]     查詢玩家解題檔案明細 (缺省為本人)${props.host.login ? `
+  whois [player]     查詢玩家解題檔案明細 (缺省為本人，名稱含空格可加引號)${props.host.login ? `
   login              Discord登入` : ''}${props.host.logout ? `
   logout             登出當前操作員會話` : ''}`, 'system')
     },
@@ -593,7 +593,9 @@ const commands: Record<string, (args: string[]) => void> = {
     // ==========================================
     whois: async (args) => {
         // 核心好品味：如果没有传参，无缝降级为查询自己！
-        const target = args[0]?.trim() || currentOperatorId.value
+        // 名稱可含空格：args 全部合併為單一名稱，並去除一對外層引號
+        const joined = args.join(' ').trim().replace(/^(["'])(.*)\1$/, '$2').trim()
+        const target = joined || currentOperatorId.value
 
         appendHistory(`[TELEMETRY] 尋轉關於 ${target} 的記錄...`, 'system')
 
