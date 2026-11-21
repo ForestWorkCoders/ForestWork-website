@@ -20,7 +20,7 @@ interface Node { id: string; x: number; y: number; match: Match }
 const decided = (m: Match) => m.sides.some(s => s.winner)
 const sideClass = (m: Match, s: Side) =>
   s.winner ? 'font-extrabold text-gray-900 dark:text-white'
-    : !decided(m) ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-gray-500'
+    : !decided(m) ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-semibold text-muted'
 
 // --- 核心佈局引擎 (Layout Engine) ---
 const graphData = computed(() => {
@@ -92,7 +92,7 @@ const orthogonal = (x1: number, y1: number, x2: number, y2: number) => {
       </svg>
 
       <div v-for="header in graphData.headers" :key="header.id"
-        class="absolute text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center select-none pointer-events-none"
+        class="absolute text-xs font-extrabold text-muted uppercase tracking-widest text-center select-none pointer-events-none"
         :style="{ left: header.x + 'px', top: header.y + 'px', width: CARD_W + 'px' }">
         {{ header.text }}
       </div>
@@ -102,7 +102,7 @@ const orthogonal = (x1: number, y1: number, x2: number, y2: number) => {
         :style="{ left: node.x + 'px', top: node.y + 'px', width: CARD_W + 'px', height: CARD_H + 'px' }">
         <div v-for="(side, i) in node.match.sides" :key="i"
           class="flex items-center justify-between p-2.5 transition-all duration-300"
-          :class="[{ 'border-b border-gray-100 dark:border-default': i === 0 }, { 'opacity-40 grayscale-[50%]': decided(node.match) && !side.winner }]">
+          :class="[{ 'border-b border-gray-100 dark:border-default': i === 0 }]">
           <div class="flex items-center gap-2">
             <div class="w-1.5 h-6 rounded-sm transition-colors"
               :style="side.winner && side.entrant?.colour ? { backgroundColor: side.entrant.colour } : {}"

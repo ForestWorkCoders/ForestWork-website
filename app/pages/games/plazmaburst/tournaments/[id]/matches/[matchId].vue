@@ -72,7 +72,7 @@ const displayData = computed(() => {
 // 2. 动态注入 Head 和 Open Graph 标签
 if (match.value) {
   // 消除边界情况：确保即便某些字段为空，也能优雅降级
-  const title = `${match.value.redTeam.name || 'Unknown'} vs ${match.value.blueTeam.name || 'Unknown'} - ${match.value.phase || '?'}`
+  const title = `${match.value.redTeam.name || 'Unknown'} vs ${match.value.blueTeam.name || 'Unknown'} · ${match.value.phase || '?'} · ForestWork`
   const description = `Status: ${match.value.status || 'TBA'} | ${match.value.tournamentTitle}`
 
   useSeoMeta({
@@ -86,7 +86,7 @@ if (match.value) {
 } else {
   // 找不到比赛时的后备方案，Never break userspace
   useSeoMeta({
-    title: 'Match Not Found - ForestWork',
+    title: '找不到對戰 · Match Not Found · ForestWork',
   })
 }
 
@@ -116,7 +116,7 @@ const breadcrumbLinks = computed(() => {
       // 直接读取后端喂过来的赛事标题。使用可选链 (?.) 和回退操作符 (||) 防止白屏崩溃
       label: match.value?.tournamentTitle || '賽事主頁 · Tournament',
       icon: 'i-lucide-trophy',
-      to: `/games/plazmaburst/tournaments/${tournamentId}`
+      to: `/games/plazmaburst/tournaments/${tournamentId}?tab=result`
     },
     {
       // 動態顯示當前對戰的兩支隊伍
@@ -146,6 +146,29 @@ const getContrastClass = (hexColor) => {
   return yiq >= 128 ? 'text-gray-900 drop-shadow-none' : 'text-white drop-shadow-md'
 }
 
+// Team colours come from the database (e.g. #FFFFFF). Where one is under 3:1 against the card
+// (white in light mode, #161B22 in dark), its score/dot gets a thin edge in that mode only.
+const luminance = (hex) => {
+  const h = hex.replace('#', '')
+  const full = h.length === 3 ? [...h].map(c => c + c).join('') : h
+  const [r, g, b] = [0, 2, 4].map(i => {
+    const v = parseInt(full.slice(i, i + 2), 16) / 255
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+const teamEdge = (hex) => {
+  if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex || '')) return ''
+  return [
+    contrast(hex, '#FFFFFF') < 3 && 'team-edge-light',
+    contrast(hex, '#161B22') < 3 && 'team-edge-dark'
+  ].filter(Boolean).join(' ')
+}
+
 const isAbnormalMatch = computed(() => {
   return ['Walkover_Blue', 'Walkover_Red', 'Cancelled'].includes(match.value?.status)
 })
@@ -168,11 +191,12 @@ const abnormalMatchMessage = computed(() => {
   <div v-if="pending" class="min-h-screen flex items-center justify-center">
     <UIcon name="i-lucide-loader-2" class="w-10 h-10 animate-spin text-blue-500" />
   </div>
-  <div v-else-if="error" class="min-h-screen flex items-center justify-center text-red-500 font-bold">
+  <div v-else-if="error" class="min-h-screen flex items-center justify-center text-red-700 dark:text-red-500 font-bold">
     加載失敗：{{ error.message }}
   </div>
 
-  <div v-else-if="match" class="max-w-6xl mx-auto p-4 md:p-8 space-y-6 animate-fade-in">
+  <!-- w-full: in the layout's flex column, mx-auto stops the stretch, so without it the page sizes to its widest content -->
+  <div v-else-if="match" class="w-full max-w-6xl mx-auto p-4 md:p-8 space-y-6 animate-fade-in">
 
     <div class="mb-8 px-2 animate-fade-in">
       <UBreadcrumb :items="breadcrumbLinks" separator="i-lucide-chevron-right" :ui="{
@@ -180,9 +204,9 @@ const abnormalMatchMessage = computed(() => {
         li: 'flex items-center gap-1.5',
         base: 'text-xs md:text-sm font-bold tracking-wide transition-colors',
         active: 'text-gray-900 dark:text-white cursor-default',
-        inactive: 'text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400',
-        icon: { base: 'w-4 h-4', active: 'text-blue-500', inactive: 'text-gray-500' },
-        separator: { base: 'w-4 h-4 text-gray-400' }
+        inactive: 'text-muted hover:text-blue-700 dark:text-gray-400 dark:hover:text-blue-400',
+        icon: { base: 'w-4 h-4', active: 'text-blue-700 dark:text-blue-500', inactive: 'text-dimmed' },
+        separator: { base: 'w-4 h-4 text-dimmed' }
       }" />
     </div>
 
@@ -191,22 +215,23 @@ const abnormalMatchMessage = computed(() => {
       <h2 class="text-2xl font-bold dark:text-white mb-2 uppercase tracking-wider">
         Match Terminated
       </h2>
-      <p class="text-lg text-gray-300 font-medium">
+      <p class="text-lg text-gray-300 font-semibold">
         {{ abnormalMatchMessage }}
       </p>
     </div>
 
     <template v-else>
       <!-- 1. 地圖切換 Tabs (Wireframe 頂部) -->
-      <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+      <!-- One row that scrolls sideways on phones, instead of wrapping into a pile or running off the screen -->
+      <div class="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button @click="activeTab = 'all'"
-          class="px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
-          :class="activeTab === 'all' ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
+          class="shrink-0 whitespace-nowrap px-4 md:px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
+          :class="activeTab === 'all' ? 'bg-primary text-inverted border-primary' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
           All Maps
         </button>
         <button v-for="game in match.games" :key="game.id" @click="activeTab = game.gameNumber"
-          class="px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
-          :class="activeTab === game.gameNumber ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
+          class="shrink-0 whitespace-nowrap px-4 md:px-6 py-3 font-bold text-sm transition-colors border border-gray-200 dark:border-default"
+          :class="activeTab === game.gameNumber ? 'bg-primary text-inverted border-primary' : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-elevated dark:text-gray-400 dark:hover:bg-accented'">
           Map {{ game.gameNumber }} - {{ game.map.name }}
         </button>
       </div>
@@ -219,31 +244,35 @@ const abnormalMatchMessage = computed(() => {
         <div class="flex items-center justify-between">
 
           <!-- 紅隊 (左側) -->
-          <div class="flex items-center gap-4 flex-1">
+          <!-- min-w-0 lets the column shrink below the name's width; long names take 2 lines on phones, 1 line + "…" from md -->
+          <div class="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
             <!-- 分數：動態讀取，並注入隊伍主題色 -->
-            <div class="text-4xl md:text-5xl font-extrabold w-12 text-center"
+            <div class="text-4xl md:text-5xl font-extrabold w-10 md:w-12 shrink-0 text-center"
+              :class="teamEdge(match.redTeam.colour)"
               :style="{ color: match.redTeam.colour || '#ef4444' }">
               {{ displayData.scoreRed ?? '-' }}
             </div>
-            <UAvatar :src="match.redTeam.logo" size="lg" class="hidden md:block bg-white shadow-sm"
+            <UAvatar :src="match.redTeam.logo" size="lg" class="hidden md:block shrink-0 bg-white shadow-sm"
               :ui="{ rounded: 'rounded-md' }" />
-            <div class="font-extrabold text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate">
+            <div :title="match.redTeam.name"
+              class="min-w-0 font-extrabold text-lg md:text-3xl leading-tight tracking-tight text-gray-900 dark:text-white line-clamp-2 break-words md:line-clamp-1">
               {{ match.redTeam.name }}
             </div>
           </div>
 
           <!-- VS 標籤 -->
-          <div class="px-4 text-gray-400 font-extrabold text-sm uppercase tracking-widest opacity-50">VS</div>
+          <div class="shrink-0 px-2 md:px-4 text-muted font-extrabold text-sm uppercase tracking-widest">VS</div>
 
           <!-- 藍隊 (右側) -->
-          <div class="flex items-center gap-4 flex-1 justify-end">
-            <div
-              class="font-extrabold text-xl md:text-3xl tracking-tight text-gray-900 dark:text-white truncate text-right">
+          <div class="flex items-center gap-2 md:gap-4 flex-1 min-w-0 justify-end">
+            <div :title="match.blueTeam.name"
+              class="min-w-0 font-extrabold text-lg md:text-3xl leading-tight tracking-tight text-gray-900 dark:text-white line-clamp-2 break-words md:line-clamp-1 text-right">
               {{ match.blueTeam.name }}
             </div>
-            <UAvatar :src="match.blueTeam.logo" size="lg" class="hidden md:block bg-white shadow-sm"
+            <UAvatar :src="match.blueTeam.logo" size="lg" class="hidden md:block shrink-0 bg-white shadow-sm"
               :ui="{ rounded: 'rounded-md' }" />
-            <div class="text-4xl md:text-5xl font-extrabold w-12 text-center"
+            <div class="text-4xl md:text-5xl font-extrabold w-10 md:w-12 shrink-0 text-center"
+              :class="teamEdge(match.blueTeam.colour)"
               :style="{ color: match.blueTeam.colour || '#3b82f6' }">
               {{ displayData.scoreBlue ?? '-' }}
             </div>
@@ -278,7 +307,7 @@ const abnormalMatchMessage = computed(() => {
                 <div v-for="roundNum in totalRounds" :key="roundNum" class="flex flex-col gap-1 w-8 items-center">
 
                   <!-- 頂部回合數字 -->
-                  <div class="h-6 text-xs font-bold text-gray-400 flex items-end justify-center pb-1">
+                  <div class="h-6 text-xs font-bold text-muted flex items-end justify-center pb-1">
                     {{ roundNum }}
                   </div>
 
@@ -312,19 +341,19 @@ const abnormalMatchMessage = computed(() => {
           <div v-for="game in match.games" :key="game.id"
             class="bg-white dark:bg-elevated p-4 border border-gray-200 dark:border-default rounded-lg flex flex-col items-center gap-2 cursor-pointer hover:border-gray-400 transition-colors"
             @click="activeTab = game.gameNumber">
-            <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">Map {{ game.gameNumber }}</span>
+            <span class="text-xs font-bold text-muted tracking-widest uppercase">Map {{ game.gameNumber }}</span>
             <span class="text-sm font-extrabold truncate max-w-full">{{ game.map.name }}</span>
             <div class="flex items-center gap-3 mt-1 font-mono text-lg font-bold">
-              <span :style="{ color: match.redTeam.colour }">{{ game.score.red ?? '-' }}</span>
-              <span class="text-gray-400 text-sm">:</span>
-              <span :style="{ color: match.blueTeam.colour }">{{ game.score.blue ?? '-' }}</span>
+              <span :class="teamEdge(match.redTeam.colour)" :style="{ color: match.redTeam.colour }">{{ game.score.red ?? '-' }}</span>
+              <span class="text-muted text-sm">:</span>
+              <span :class="teamEdge(match.blueTeam.colour)" :style="{ color: match.blueTeam.colour }">{{ game.score.blue ?? '-' }}</span>
             </div>
           </div>
         </div>
 
         <!-- 如果沒有回合數據的空狀態提示 -->
         <div v-else
-          class="py-8 text-center text-sm font-bold text-gray-400 uppercase tracking-widest border-t border-dashed border-gray-200 dark:border-default pt-12">
+          class="py-8 text-center text-sm font-bold text-muted uppercase tracking-widest border-t border-dashed border-gray-200 dark:border-default pt-12">
           Timeline data not available
         </div>
 
@@ -335,20 +364,20 @@ const abnormalMatchMessage = computed(() => {
           <!-- 紅隊統計表 (左側) -->
           <div class="space-y-3">
             <div class="flex items-center gap-2 mb-4">
-              <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: match.redTeam.colour || '#ef4444' }"></div>
+              <div class="w-3 h-3 rounded-full" :class="teamEdge(match.redTeam.colour)" :style="{ backgroundColor: match.redTeam.colour || '#ef4444' }"></div>
               <h4 class="font-extrabold text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
                 match.redTeam.name }}</h4>
             </div>
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
               <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
-                  <tr class="text-xs text-gray-400 border-b border-gray-200 dark:border-default">
-                    <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
-                    <th class="py-2 px-3 font-medium w-12">K</th>
-                    <th class="py-2 px-3 font-medium w-12">D</th>
+                  <tr class="text-xs text-muted border-b border-gray-200 dark:border-default">
+                    <th class="py-2 pr-4 text-left font-semibold sticky">Player</th>
+                    <th class="py-2 px-3 font-semibold w-12">K</th>
+                    <th class="py-2 px-3 font-semibold w-12">D</th>
                     <th class="py-2 px-3 font-bold text-gray-600 dark:text-gray-300 w-16">K/D</th>
-                    <th class="py-2 px-3 font-medium w-16" title="Headshots">HS</th>
-                    <th class="py-2 pl-3 font-medium w-12" title="Aces">ACE</th>
+                    <th class="py-2 px-3 font-semibold w-16" title="Headshots">HS</th>
+                    <th class="py-2 pl-3 font-semibold w-12" title="Aces">ACE</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -357,41 +386,41 @@ const abnormalMatchMessage = computed(() => {
                     <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100">
                       {{ player.name }}</td>
                     <td class="py-2.5 px-3 font-mono">{{ player.kills }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.deaths }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.deaths }}</td>
                     <!-- 品味細節：KDR 大於等於 1 顯示高亮色，小於 1 顯示暗色 -->
                     <td class="py-2.5 px-3 font-mono font-bold"
-                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'">
+                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-muted'">
                       {{ player.kdr }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.headshots }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.headshots }}</td>
                     <td class="py-2.5 pl-3 font-mono font-bold"
-                      :class="player.aces > 0 ? 'text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
+                      :class="player.aces > 0 ? 'text-amber-700 dark:text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
                       '-' }}</td>
                   </tr>
                 </tbody>
               </table>
               <!-- 無數據防呆 -->
               <div v-if="!displayData.redTeamStats || displayData.redTeamStats.length === 0"
-                class="py-8 text-center text-xs text-gray-400 italic">No player stats available</div>
+                class="py-8 text-center text-xs text-muted italic">No player stats available</div>
             </div>
           </div>
 
           <!-- 藍隊統計表 (右側) -->
           <div class="space-y-3">
             <div class="flex items-center gap-2 mb-4">
-              <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: match.blueTeam.colour || '#3b82f6' }"></div>
+              <div class="w-3 h-3 rounded-full" :class="teamEdge(match.blueTeam.colour)" :style="{ backgroundColor: match.blueTeam.colour || '#3b82f6' }"></div>
               <h4 class="font-extrabold text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
                 match.blueTeam.name }}</h4>
             </div>
             <div class="overflow-x-auto [&::-webkit-scrollbar]:hidden">
               <table class="w-full text-right text-sm whitespace-nowrap">
                 <thead>
-                  <tr class="text-xs text-gray-400 border-b border-gray-200 dark:border-default">
-                    <th class="py-2 pr-4 text-left font-medium sticky">Player</th>
-                    <th class="py-2 px-3 font-medium w-12">K</th>
-                    <th class="py-2 px-3 font-medium w-12">D</th>
+                  <tr class="text-xs text-muted border-b border-gray-200 dark:border-default">
+                    <th class="py-2 pr-4 text-left font-semibold sticky">Player</th>
+                    <th class="py-2 px-3 font-semibold w-12">K</th>
+                    <th class="py-2 px-3 font-semibold w-12">D</th>
                     <th class="py-2 px-3 font-bold text-gray-600 dark:text-gray-300 w-16">K/D</th>
-                    <th class="py-2 px-3 font-medium w-16" title="Headshots">HS</th>
-                    <th class="py-2 pl-3 font-medium w-12" title="Aces">ACE</th>
+                    <th class="py-2 px-3 font-semibold w-16" title="Headshots">HS</th>
+                    <th class="py-2 pl-3 font-semibold w-12" title="Aces">ACE</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -400,22 +429,22 @@ const abnormalMatchMessage = computed(() => {
                     <td class="py-2.5 pr-4 text-left font-bold text-gray-900 dark:text-gray-100">
                       {{ player.name }}</td>
                     <td class="py-2.5 px-3 font-mono">{{ player.kills }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.deaths }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.deaths }}</td>
                     <!-- 品味細節：KDR 變色 -->
                     <td class="py-2.5 px-3 font-mono font-bold"
-                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'">
+                      :class="Number(player.kdr) >= 1 ? 'text-gray-900 dark:text-white' : 'text-muted'">
                       {{ player.kdr }}</td>
-                    <td class="py-2.5 px-3 font-mono text-gray-500">{{ player.headshots }}</td>
+                    <td class="py-2.5 px-3 font-mono text-muted">{{ player.headshots }}</td>
                     <!-- 有 ACE 時用醒目的琥珀色 -->
                     <td class="py-2.5 pl-3 font-mono font-bold"
-                      :class="player.aces > 0 ? 'text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
+                      :class="player.aces > 0 ? 'text-amber-700 dark:text-amber-500' : 'text-gray-300 dark:text-gray-700'">{{ player.aces ||
                       '-' }}</td>
                   </tr>
                 </tbody>
               </table>
               <!-- 無數據防呆 -->
               <div v-if="!displayData.blueTeamStats || displayData.blueTeamStats.length === 0"
-                class="py-8 text-center text-xs text-gray-400 italic">No player stats available</div>
+                class="py-8 text-center text-xs text-muted italic">No player stats available</div>
             </div>
           </div>
 
@@ -425,3 +454,21 @@ const abnormalMatchMessage = computed(() => {
     </template>
   </div>
 </template>
+
+<style>
+/* teamEdge(): a 1px muted edge around a team colour that is too close to the card.
+   Text (scores) gets a text outline; the empty dots get a ring. */
+.team-edge-light:not(:empty) {
+  text-shadow: -1px -1px 0 var(--ui-text-muted), 1px -1px 0 var(--ui-text-muted),
+    -1px 1px 0 var(--ui-text-muted), 1px 1px 0 var(--ui-text-muted);
+}
+.team-edge-light:empty { box-shadow: inset 0 0 0 1px var(--ui-text-muted); }
+.dark .team-edge-light:not(:empty) { text-shadow: none; }
+.dark .team-edge-light:empty { box-shadow: none; }
+
+.dark .team-edge-dark:not(:empty) {
+  text-shadow: -1px -1px 0 var(--ui-text-muted), 1px -1px 0 var(--ui-text-muted),
+    -1px 1px 0 var(--ui-text-muted), 1px 1px 0 var(--ui-text-muted);
+}
+.dark .team-edge-dark:empty { box-shadow: inset 0 0 0 1px var(--ui-text-muted); }
+</style>

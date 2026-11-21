@@ -5,7 +5,7 @@ updates:
     target-branch: staging
     schedule: { interval: weekly }
     cooldown: { default-days: 7 } # same idea as pnpm's minimum release age
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0 # PRs off: dependencies are updated by hand; alerts stay on
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -13,3 +13,4 @@ updates:
     directory: /
     target-branch: staging
     schedule: { interval: monthly }
+    open-pull-requests-limit: 0

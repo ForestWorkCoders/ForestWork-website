@@ -34,11 +34,19 @@
 .light {
   --ui-primary: var(--ui-color-primary-700);
   --ui-secondary: var(--ui-color-secondary-600);
+
+  /* Muted text: Nuxt UI's slate-500 is 4.76:1 on white but only 4.35:1 on its own
+     slate-100 tab/table surfaces. Halfway to slate-600 is 4.8:1 even on slate-200,
+     and still lighter than toned text (slate-600). Dark keeps slate-400 (5.8:1+). */
+  --ui-text-muted: color-mix(in oklab, var(--ui-color-neutral-500), var(--ui-color-neutral-600));
 }
 
 .dark {
   --ui-primary: var(--ui-color-primary-400);
   --ui-secondary: var(--ui-color-secondary-600);
+
+  /* Must be restated: :root above also matches <html class="dark"> and, being unlayered, beats Nuxt UI's own dark value */
+  --ui-text-muted: var(--ui-color-neutral-400);
 
   /* Dark surfaces (see /brand): Ink Black page, #161B22 cards, #30363D borders.
      Nuxt UI's defaults are slate-900 / slate-800, which read navy next to Ink Black. */

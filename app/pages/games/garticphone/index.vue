@@ -56,7 +56,7 @@ useSeoMeta({
     </header>
 
     <main class="max-w-6xl mx-auto">
-      <div v-if="status === 'pending'" class="text-center font-mono text-2xl text-amber-400 animate-pulse">
+      <div v-if="status === 'pending'" class="text-center font-mono text-2xl text-amber-700 dark:text-amber-400 animate-pulse">
         LOADING ARCHIVES...
       </div>
 
@@ -89,7 +89,7 @@ useSeoMeta({
           </div>
 
           <!-- 主标题：Round <n>: <title>，悬停时亮起靛蓝高光 -->
-          <h2 class="text-2xl font-extrabold mb-4 text-black group-hover:text-indigo-600 transition-colors leading-snug">
+          <h2 class="text-2xl font-extrabold mb-4 text-black group-hover:text-indigo-700 transition-colors leading-snug">
             {{ session.title }}
           </h2>
 

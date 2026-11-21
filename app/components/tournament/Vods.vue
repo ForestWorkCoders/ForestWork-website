@@ -16,7 +16,7 @@ const isEmpty = computed(() => !props.streams.length && !props.archives.length &
 <template>
   <div class="px-4 md:px-6 mt-8 space-y-12 animate-fade-in pb-12">
 
-    <div v-if="isEmpty" class="text-gray-500 text-center py-8">
+    <div v-if="isEmpty" class="text-muted text-center py-8">
       尚未有影音記錄。
     </div>
 
@@ -27,7 +27,7 @@ const isEmpty = computed(() => !props.streams.length && !props.archives.length &
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
           </span>
-          實況轉播 <span class="text-gray-400 dark:text-gray-500 font-normal text-sm ml-1">Live Streams</span>
+          實況轉播 <span class="text-muted font-normal text-sm ml-1">Live Streams</span>
         </h2>
       </div>
       
@@ -39,14 +39,14 @@ const isEmpty = computed(() => !props.streams.length && !props.archives.length &
               <UIcon name="i-lucide-play" class="w-12 h-12 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all drop-shadow-lg" />
             </div>
             <div class="absolute top-3 left-3 px-2 py-1 rounded bg-black/70 backdrop-blur-sm flex items-center gap-1.5 text-xs font-bold text-white">
-              <span :class="stream.platform === 'twitch' ? 'text-purple-400' : 'text-red-500'">●</span>
+              <span :class="stream.platform === 'twitch' ? 'text-purple-700 dark:text-purple-400' : 'text-red-700 dark:text-red-500'">●</span>
               {{ stream.platform === 'twitch' ? 'Twitch' : 'YouTube' }}
             </div>
             <div class="absolute bottom-3 left-3 px-2 py-1 rounded bg-red-600 text-white text-xs font-bold tracking-wider flex items-center gap-1">
               <UIcon name="i-lucide-users" class="w-3.5 h-3.5" /> {{ stream.viewers }}
             </div>
           </div>
-          <h3 class="font-bold text-gray-900 dark:text-gray-100 line-clamp-2 group-hover:text-amber-500 transition-colors">{{ stream.title }}</h3>
+          <h3 class="font-bold text-gray-900 dark:text-gray-100 line-clamp-2 group-hover:text-amber-700 dark:group-hover:text-amber-500 transition-colors">{{ stream.title }}</h3>
         </a>
       </div>
     </section>
@@ -54,7 +54,7 @@ const isEmpty = computed(() => !props.streams.length && !props.archives.length &
     <section v-if="archives.length > 0">
       <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-default pb-2">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-          賽事存檔 <span class="text-gray-400 dark:text-gray-500 font-normal text-sm ml-1">Archives</span>
+          賽事存檔 <span class="text-muted font-normal text-sm ml-1">Archives</span>
         </h2>
       </div>
       
@@ -67,8 +67,8 @@ const isEmpty = computed(() => !props.streams.length && !props.archives.length &
             </div>
           </div>
           <div class="flex flex-col">
-            <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-200 line-clamp-2 group-hover:text-amber-500 transition-colors leading-tight">{{ arc.title }}</h3>
-            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ arc.date }}</span>
+            <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-200 line-clamp-2 group-hover:text-amber-700 dark:group-hover:text-amber-500 transition-colors leading-tight">{{ arc.title }}</h3>
+            <span class="text-xs text-muted mt-1">{{ arc.date }}</span>
           </div>
         </a>
       </div>
@@ -78,7 +78,7 @@ const isEmpty = computed(() => !props.streams.length && !props.archives.length &
       <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-default pb-2">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-lucide-zap" class="w-5 h-5 text-amber-500" />
-          精華短片 <span class="text-gray-400 dark:text-gray-500 font-normal text-sm ml-1">Shorts & Highlights</span>
+          精華短片 <span class="text-muted font-normal text-sm ml-1">Shorts & Highlights</span>
         </h2>
       </div>
       
@@ -95,7 +95,7 @@ const isEmpty = computed(() => !props.streams.length && !props.archives.length &
               <UIcon name="i-lucide-circle-play" class="w-6 h-6 text-white/80 group-hover:text-white transition-colors" />
             </div>
           </div>
-          <h3 class="font-semibold text-xs md:text-sm text-gray-800 dark:text-gray-300 line-clamp-2 leading-snug group-hover:text-amber-500 transition-colors">{{ montage.title }}</h3>
+          <h3 class="font-semibold text-xs md:text-sm text-gray-800 dark:text-gray-300 line-clamp-2 leading-snug group-hover:text-amber-700 dark:group-hover:text-amber-500 transition-colors">{{ montage.title }}</h3>
         </a>
       </div>
     </section>

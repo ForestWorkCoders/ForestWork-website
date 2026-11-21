@@ -88,6 +88,11 @@ const switchToMyself = () => {
 
 const currentPlayer = computed(() => playerItems.value.find(p => p.id === selectedPlayerId.value))
 
+const pageTitle = computed(() => currentPlayer.value?.label
+  ? `${currentPlayer.value.label} · 三麻選手數據 · ForestWork`
+  : '三麻選手數據 · Sanma Player Stats · ForestWork')
+useSeoMeta({ title: pageTitle, ogTitle: pageTitle })
+
 // ==========================================
 // 3. 時間範圍狀態機與巨集預設
 // ==========================================
@@ -192,6 +197,51 @@ const basic = computed(() => statsData.value?.basicStats || {
     mrLabel: '當前賽季'
 })
 
+interface StatTile { label: string; value: string | number; cls?: string }
+interface TileGroup { label: string; span: string; cols: string; tiles: StatTile[] }
+
+const tileGroups = computed<TileGroup[]>(() => [
+    {
+        label: '綜合 · Overall', span: 'lg:col-span-3', cols: 'sm:grid-cols-3',
+        tiles: [
+            { label: '平均順位', value: basic.value.avgRank },
+            { label: '被飛率', value: `${basic.value.bustingRate}%` },
+            { label: `天梯等級 (${basic.value.mrLabel})`, value: basic.value.mrRating, cls: 'text-primary' }
+        ]
+    },
+    {
+        label: '和牌 · Winning', span: 'lg:col-span-4', cols: 'sm:grid-cols-4',
+        tiles: [
+            { label: '和牌率', value: `${basic.value.winRate}%` },
+            { label: '自摸率', value: `${basic.value.tsumoRate}%` },
+            { label: '平均打點', value: basic.value.avgWinScore.toLocaleString() },
+            { label: '平均和牌巡數', value: `${basic.value.avgWinTurn} 巡` }
+        ]
+    },
+    {
+        label: '放銃 · Deal-in', span: 'lg:col-span-2', cols: 'sm:grid-cols-2',
+        tiles: [
+            { label: '放銃率', value: `${basic.value.dealInRate}%` },
+            { label: '平均銃點', value: basic.value.avgDealInScore.toLocaleString() }
+        ]
+    },
+    {
+        label: '打法 · Style', span: 'lg:col-span-3', cols: 'sm:grid-cols-3',
+        tiles: [
+            { label: '立直率', value: `${basic.value.riichiRate}%` },
+            { label: '副露率', value: `${basic.value.callRate}%` },
+            { label: '默聽率', value: `${basic.value.damaRate}%` }
+        ]
+    },
+    {
+        label: '流局 · Draws', span: 'lg:col-span-2', cols: 'sm:grid-cols-2',
+        tiles: [
+            { label: '流局率', value: `${basic.value.drawRate}%` },
+            { label: '流局聽牌率', value: `${basic.value.drawTenpaiRate}%` }
+        ]
+    }
+])
+
 // 預設檢視模式：'win' (最大和牌) 或 'dealIn' (最近大銃)
 const majorHandMode = ref<'win' | 'dealIn'>('win')
 
@@ -215,24 +265,31 @@ const currentMajorHand = computed(() => {
 const colorMode = useColorMode()
 const sliceGap = computed(() => colorMode.value === 'dark' ? '#161B22' : '#ffffff')
 
+// Brand-aligned chart palette (forest = primary, amber = 副露, slate = neutral)
+const chart = computed(() => colorMode.value === 'dark'
+    ? { forest: '#8BCBB2', amber: '#D97706', slate: '#94a3b8', red: '#ef4444', empty: '#30363D', text: '#94a3b8', axis: '#30363D', grid: '#21262D' }
+    : { forest: '#4C7766', amber: '#D97706', slate: '#64748b', red: '#dc2626', empty: '#e2e8f0', text: '#475569', axis: '#cbd5e1', grid: '#e2e8f0' })
+const forestRgb = computed(() => colorMode.value === 'dark' ? '139, 203, 178' : '76, 119, 102')
+
 // 6.1 順位餅圖
 const pieOption = computed(() => {
     const p = statsData.value?.placements || { rank1: 0, rank2: 0, rank3: 0, total: 0 }
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}場 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af' } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: p.total > 0 ? [
-                { value: p.rank1, name: '一位 (1st)', itemStyle: { color: '#10b981' } },
-                { value: p.rank2, name: '二位 (2nd)', itemStyle: { color: '#64748b' } },
-                { value: p.rank3, name: '三位 (3rd)', itemStyle: { color: '#ef4444' } }
+                { value: p.rank1, name: '一位 (1st)', itemStyle: { color: chart.value.forest } },
+                { value: p.rank2, name: '二位 (2nd)', itemStyle: { color: chart.value.slate } },
+                { value: p.rank3, name: '三位 (3rd)', itemStyle: { color: chart.value.red } }
             ] : [
-                { value: 1, name: '無出賽記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無出賽記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -246,15 +303,15 @@ const lineOption = computed(() => {
             trigger: 'axis',
             formatter: '第 {b} 場: 第 {c} 位',
             backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            borderColor: '#374151',
+            borderColor: chart.value.axis,
             textStyle: { color: '#f3f4f6', fontSize: 12 }
         },
         grid: { left: '40', right: '30', top: '25', bottom: '30' },
         xAxis: {
             type: 'category',
             data: Array.from({ length: ranks.length }, (_, i) => i + 1),
-            axisLine: { lineStyle: { color: '#374151' } },
-            axisLabel: { color: '#9ca3af', fontSize: 12 }
+            axisLine: { lineStyle: { color: chart.value.axis } },
+            axisLabel: { color: chart.value.text, fontSize: 12 }
         },
         yAxis: {
             type: 'value',
@@ -264,29 +321,20 @@ const lineOption = computed(() => {
             interval: 1,
             axisLabel: {
                 formatter: (v: number) => v === 1 ? '1位' : v === 2 ? '2位' : '3位',
-                color: '#9ca3af',
+                color: chart.value.text,
                 fontSize: 12
             },
-            splitLine: { lineStyle: { color: '#1f2937' } }
+            splitLine: { lineStyle: { color: chart.value.grid } }
         },
         series: [{
             data: ranks,
             type: 'line',
-            smooth: 0.25, // 微平滑，避免過度彎曲
+            smooth: false,
             showSymbol: true,
             symbolSize: 6, // 點多時自動收縮點徑，保持乾淨
-            itemStyle: { color: '#3b82f6' },
-            lineStyle: { width: 2.5, color: '#3b82f6' },
-            areaStyle: {
-                color: {
-                    type: 'linear',
-                    x: 0, y: 0, x2: 0, y2: 1,
-                    colorStops: [
-                        { offset: 0, color: 'rgba(59, 130, 246, 0.25)' },
-                        { offset: 1, color: 'rgba(59, 130, 246, 0.0)' }
-                    ]
-                }
-            }
+            itemStyle: { color: chart.value.forest },
+            // No area fill: with the inverted axis it shades towards 1st place, which means nothing for a rank
+            lineStyle: { width: 2.5, color: chart.value.forest }
         }]
     }
 })
@@ -354,6 +402,7 @@ function normalizeRadarMetric(val: number, config: { min: number; max: number; i
 }
 
 // 3. ECharts 雷達配置
+const radarLine = computed(() => colorMode.value === 'dark' ? 'rgba(148, 163, 184, 0.2)' : 'rgba(100, 116, 139, 0.25)')
 const radarOption = computed(() => {
     const raw = statsData.value?.radarStats || { atk: 0, spd: 0, def: 0, luk: 0 }
 
@@ -368,14 +417,14 @@ const radarOption = computed(() => {
         tooltip: {
             trigger: 'item',
             backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            borderColor: '#374151',
+            borderColor: chart.value.axis,
             textStyle: { color: '#f3f4f6', fontSize: 12 },
             formatter: () => `
-        <div class="font-bold border-b border-gray-700 pb-1 mb-1 text-emerald-400">四維作風指標 (基準量綱: 0 ~ 100)</div>
-        <div>攻 (ATK): ${scores[0]}分 <span class="text-xs text-gray-400">(場均打點 ${raw.atk.toLocaleString()}點)</span></div>
-        <div>速 (SPD): ${scores[1]}分 <span class="text-xs text-gray-400">(平均和巡 ${raw.spd}巡)</span></div>
-        <div>防 (DEF): ${scores[2]}分 <span class="text-xs text-gray-400">(放銃率 ${raw.def}%)</span></div>
-        <div>運 (LUK): ${scores[3]}分 <span class="text-xs text-gray-400">(累計番運 ${raw.luk}役)</span></div>
+        <div class="font-bold border-b border-gray-700 pb-1 mb-1" style="color:#8BCBB2">四維作風指標 (基準量綱: 0 ~ 100)</div>
+        <div>攻 (ATK): ${scores[0]}分 <span class="text-xs text-muted">(場均打點 ${raw.atk.toLocaleString()}點)</span></div>
+        <div>速 (SPD): ${scores[1]}分 <span class="text-xs text-muted">(平均和巡 ${raw.spd}巡)</span></div>
+        <div>防 (DEF): ${scores[2]}分 <span class="text-xs text-muted">(放銃率 ${raw.def}%)</span></div>
+        <div>運 (LUK): ${scores[3]}分 <span class="text-xs text-muted">(累計番運 ${raw.luk}役)</span></div>
       `
         },
         radar: {
@@ -387,18 +436,18 @@ const radarOption = computed(() => {
             ],
             radius: '65%',
             splitNumber: 4,
-            axisName: { color: '#9ca3af', fontSize: 12, fontWeight: 'bold' },
-            splitLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } },
-            axisLine: { lineStyle: { color: 'rgba(156, 163, 175, 0.2)' } }
+            axisName: { color: chart.value.text, fontSize: 12, fontWeight: 'bold' },
+            splitLine: { lineStyle: { color: radarLine.value } },
+            axisLine: { lineStyle: { color: radarLine.value } }
         },
         series: [{
             type: 'radar',
             data: [{
                 value: scores,
                 name: '選手風格',
-                itemStyle: { color: '#10b981' },
-                areaStyle: { color: 'rgba(16, 185, 129, 0.25)' },
-                lineStyle: { width: 2, color: '#10b981' },
+                itemStyle: { color: chart.value.forest },
+                areaStyle: { color: `rgba(${forestRgb.value}, 0.25)` },
+                lineStyle: { width: 2, color: chart.value.forest },
                 symbolSize: 6
             }]
         }]
@@ -411,19 +460,20 @@ const winStyleOption = computed(() => {
     const total = ws.riichi + ws.dama + ws.fulo
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text, fontSize: 12 } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: total > 0 ? [
-                { value: ws.riichi, name: '立直', itemStyle: { color: '#0f4c81' } },
-                { value: ws.fulo, name: '副露', itemStyle: { color: '#7c3aed' } },
-                { value: ws.dama, name: '默聽', itemStyle: { color: '#f43f5e' } }
+                { value: ws.riichi, name: '立直', itemStyle: { color: chart.value.forest } },
+                { value: ws.fulo, name: '副露', itemStyle: { color: chart.value.amber } },
+                { value: ws.dama, name: '默聽', itemStyle: { color: chart.value.slate } }
             ] : [
-                { value: 1, name: '無和牌記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無和牌記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -435,19 +485,20 @@ const dealInStyleOption = computed(() => {
     const total = ds.riichi + ds.fulo + ds.menzen
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text, fontSize: 12 } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: total > 0 ? [
-                { value: ds.riichi, name: '立直時', itemStyle: { color: '#0f4c81' } },
-                { value: ds.fulo, name: '副露時', itemStyle: { color: '#7c3aed' } },
-                { value: ds.menzen, name: '門清時', itemStyle: { color: '#f43f5e' } }
+                { value: ds.riichi, name: '立直時', itemStyle: { color: chart.value.forest } },
+                { value: ds.fulo, name: '副露時', itemStyle: { color: chart.value.amber } },
+                { value: ds.menzen, name: '門清時', itemStyle: { color: chart.value.slate } }
             ] : [
-                { value: 1, name: '無放銃記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無放銃記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -459,19 +510,20 @@ const dealInTargetOption = computed(() => {
     const total = ts.riichi + ts.fulo + ts.dama
     return {
         tooltip: { trigger: 'item', formatter: '{b}: {c}次 ({d}%)' },
-        legend: { bottom: '0', textStyle: { color: '#9ca3af', fontSize: 12 } },
+        legend: { bottom: 0, itemGap: 12, itemWidth: 12, itemHeight: 12, textStyle: { color: chart.value.text, fontSize: 12 } },
         series: [{
             type: 'pie',
-            radius: ['45%', '72%'],
+            center: ['50%', '42%'],
+            radius: ['38%', '62%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 6, borderColor: sliceGap.value, borderWidth: 2 },
             label: { show: false },
             data: total > 0 ? [
-                { value: ts.riichi, name: '放銃至立直', itemStyle: { color: '#0f4c81' } },
-                { value: ts.fulo, name: '放銃至副露', itemStyle: { color: '#7c3aed' } },
-                { value: ts.dama, name: '放銃至默聽', itemStyle: { color: '#f43f5e' } }
+                { value: ts.riichi, name: '放銃至立直', itemStyle: { color: chart.value.forest } },
+                { value: ts.fulo, name: '放銃至副露', itemStyle: { color: chart.value.amber } },
+                { value: ts.dama, name: '放銃至默聽', itemStyle: { color: chart.value.slate } }
             ] : [
-                { value: 1, name: '無放銃記錄', itemStyle: { color: '#374151' } }
+                { value: 1, name: '無放銃記錄', itemStyle: { color: chart.value.empty } }
             ]
         }]
     }
@@ -486,13 +538,13 @@ const dealInTargetOption = computed(() => {
             class="bg-white dark:bg-elevated border border-gray-200 dark:border-default rounded-xl p-6 shadow-sm space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">三麻選手數據面板</h1>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <h1 class="min-w-0 break-words text-2xl font-bold text-gray-900 dark:text-white">{{ currentPlayer?.label ?? '三麻選手數據' }}</h1>
                         <UBadge v-if="isViewingSelf" color="primary" variant="solid" size="md">
-                            🀄 我的主頁 (You)
+                            我的主頁 · You
                         </UBadge>
                     </div>
-                    <p class="text-sm text-gray-500 mt-6">Sanma Player Dashboard & Career Highlights</p>
+                    <p class="text-sm text-muted mt-2">三麻選手數據 · Sanma Player Stats</p>
                 </div>
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
@@ -501,9 +553,11 @@ const dealInTargetOption = computed(() => {
                         回我的主頁
                     </UButton>
 
-                    <div class="w-full md:w-64">
-                        <USelectMenu v-model="selectedPlayerId" :items="playerItems" value-key="id"
-                            placeholder="選擇選手..." class="w-full" />
+                    <div class="w-full md:w-auto flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                        <label for="sanma-player-picker" class="text-xs font-bold text-toned whitespace-nowrap">選手 · Player</label>
+                        <USelectMenu id="sanma-player-picker" v-model="selectedPlayerId" :items="playerItems"
+                            value-key="id" placeholder="選擇選手..."
+                            class="w-full md:w-64" />
                     </div>
                 </div>
             </div>
@@ -511,10 +565,10 @@ const dealInTargetOption = computed(() => {
             <!-- 時間導航與賽制過濾 -->
             <div class="pt-4 border-t border-gray-100 dark:border-default space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <span class="text-xs font-bold uppercase tracking-wider text-muted">
                         統計時間範圍 (Timeline Scope)
                     </span>
-                    <span class="text-xs font-mono text-gray-500">
+                    <span class="text-xs font-mono text-muted">
                         當前區間: {{ dateRange.start || careerBounds.start }} ~ {{ dateRange.end || careerBounds.end }}
                     </span>
                 </div>
@@ -523,18 +577,18 @@ const dealInTargetOption = computed(() => {
                     <div class="flex flex-wrap items-center gap-1.5 bg-gray-100 dark:bg-accented p-1 rounded-lg">
                         <button v-for="preset in presets" :key="preset.id"
                             class="px-2.5 py-1 text-xs rounded-md font-mono transition-colors"
-                            :class="activePresetId === preset.id ? 'bg-primary text-inverted font-bold shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                            :class="activePresetId === preset.id ? 'bg-primary text-inverted font-bold shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white'"
                             @click="applyPreset(preset)">
                             {{ preset.label }}
                         </button>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
-                        <span class="text-gray-400">自訂月份:</span>
+                        <span class="text-muted">自訂月份:</span>
                         <input v-model="dateRange.start" type="month" :min="careerBounds.start"
                             :max="dateRange.end || careerBounds.end"
                             class="bg-transparent border border-gray-300 dark:border-default rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary" />
-                        <span class="text-gray-400">至</span>
+                        <span class="text-muted">至</span>
                         <input v-model="dateRange.end" type="month" :min="dateRange.start || careerBounds.start"
                             :max="careerBounds.end"
                             class="bg-transparent border border-gray-300 dark:border-default rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-primary" />
@@ -543,7 +597,7 @@ const dealInTargetOption = computed(() => {
 
                 <div
                     class="pt-3 border-t border-gray-100 dark:border-default flex flex-wrap items-center gap-6 text-xs font-mono">
-                    <span class="text-gray-400 font-bold uppercase tracking-wider">特殊賽制過濾:</span>
+                    <span class="text-muted font-bold uppercase tracking-wider">特殊賽制過濾:</span>
                     <div class="flex items-center gap-4">
                         <UCheckbox v-model="excludeInvitational" name="excludeInvitational"
                             label="排除邀請賽 (Invitational)" />
@@ -560,86 +614,23 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center gap-3">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">基礎戰績矩陣 · Basic Performance</h2>
                 </div>
-                <div class="text-xs font-mono text-gray-500">
+                <div class="text-xs font-mono text-muted">
                     記錄場數: <span class="font-bold text-gray-900 dark:text-white">{{ basic.matchesCount }}</span> 場 /
                     總局數: <span class="font-bold text-gray-900 dark:text-white">{{ basic.totalRounds }}</span> 局
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 font-mono">
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均順位</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.avgRank }}</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">和牌率</div>
-                    <div class="text-lg font-bold text-emerald-500 mt-1">{{ basic.winRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">放銃率</div>
-                    <div class="text-lg font-bold text-rose-500 mt-1">{{ basic.dealInRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">立直率</div>
-                    <div class="text-lg font-bold text-blue-500 mt-1">{{ basic.riichiRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">副露率</div>
-                    <div class="text-lg font-bold text-amber-500 mt-1">{{ basic.callRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">默聽率</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.damaRate }}%</div>
-                </div>
-
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">自摸率</div>
-                    <div class="text-lg font-bold text-emerald-400 mt-1">{{ basic.tsumoRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">流局聽牌率</div>
-                    <div class="text-lg font-bold text-purple-400 mt-1">{{ basic.drawTenpaiRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">流局率</div>
-                    <div class="text-lg font-bold text-gray-400 mt-1">{{ basic.drawRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均打點</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{
-                        basic.avgWinScore.toLocaleString() }}</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均銃點</div>
-                    <div class="text-lg font-bold text-rose-400 mt-1">{{ basic.avgDealInScore.toLocaleString() }}</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">平均和牌巡數</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mt-1">{{ basic.avgWinTurn }} 巡</div>
-                </div>
-
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">被飛率</div>
-                    <div class="text-lg font-bold text-rose-500 mt-1">{{ basic.bustingRate }}%</div>
-                </div>
-                <div
-                    class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
-                    <div class="text-xs text-gray-400">天梯等級 ({{ basic.mrLabel }})</div>
-                    <div class="text-lg font-bold text-primary mt-1">{{ basic.mrRating }}</div>
-                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-7 gap-x-6 gap-y-5">
+                <section v-for="group in tileGroups" :key="group.label" :class="group.span">
+                    <h3 class="text-xs font-bold text-toned tracking-wider mb-2">{{ group.label }}</h3>
+                    <div class="grid gap-3 font-mono grid-cols-2" :class="group.cols">
+                        <div v-for="tile in group.tiles" :key="tile.label"
+                            class="bg-gray-50 dark:bg-accented p-3 rounded-lg border border-gray-100 dark:border-default">
+                            <div class="text-xs text-muted">{{ tile.label }}</div>
+                            <div class="text-lg font-bold mt-1" :class="tile.cls || 'text-gray-900 dark:text-white'">{{ tile.value }}</div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
 
@@ -651,7 +642,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-default pb-3 mb-2">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">累計順位戰績 · Rank Distribution</h2>
-                        <p class="text-xs text-gray-500 mt-4.5">所選區間內一位、二位、三位分佈佔比</p>
+                        <p class="text-xs text-muted mt-4.5">所選區間內一位、二位、三位分佈佔比</p>
                     </div>
                 </div>
 
@@ -659,7 +650,7 @@ const dealInTargetOption = computed(() => {
                     <ClientOnly>
                         <VChart v-if="pieOption" :option="pieOption" class="w-full h-full" autoresize />
                         <template #fallback>
-                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
+                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-dimmed" />
                         </template>
                     </ClientOnly>
                 </div>
@@ -671,7 +662,7 @@ const dealInTargetOption = computed(() => {
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-default pb-3 mb-2">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">四維選手畫像 · Performance Radar</h2>
-                        <p class="text-xs text-gray-500 mt-4.5">攻 / 速 / 防 (滾動近100局) · 運 (近20局)</p>
+                        <p class="text-xs text-muted mt-4.5">攻 / 速 / 防 (滾動近100局) · 運 (近20局)</p>
                     </div>
                 </div>
 
@@ -679,7 +670,7 @@ const dealInTargetOption = computed(() => {
                     <ClientOnly>
                         <VChart v-if="radarOption" :option="radarOption" class="w-full h-full" autoresize />
                         <template #fallback>
-                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
+                            <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-dimmed" />
                         </template>
                     </ClientOnly>
                 </div>
@@ -692,14 +683,14 @@ const dealInTargetOption = computed(() => {
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">和銃分佈體系 · Win & Deal-in Patterns</h2>
-                    <p class="text-xs text-gray-500 mt-4.5">和牌時狀態 · 放銃時自身姿態 · 放銃至對手姿態</p>
+                    <p class="text-xs text-muted mt-4.5">和牌時狀態 · 放銃時自身姿態 · 放銃至對手姿態</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- 和牌時 -->
                 <div class="flex flex-col items-center">
-                    <span class="text-xs font-bold text-gray-400 mb-2">和牌時</span>
+                    <span class="text-xs font-bold text-muted mb-2">和牌時</span>
                     <div class="h-60 w-full flex items-center justify-center">
                         <ClientOnly>
                             <VChart v-if="winStyleOption" :option="winStyleOption" class="w-full h-full" autoresize />
@@ -709,7 +700,7 @@ const dealInTargetOption = computed(() => {
 
                 <!-- 放銃時 (自身狀態) -->
                 <div class="flex flex-col items-center">
-                    <span class="text-xs font-bold text-gray-400 mb-2">放銃時 (自身狀態)</span>
+                    <span class="text-xs font-bold text-muted mb-2">放銃時 (自身狀態)</span>
                     <div class="h-60 w-full flex items-center justify-center">
                         <ClientOnly>
                             <VChart v-if="dealInStyleOption" :option="dealInStyleOption" class="w-full h-full"
@@ -720,7 +711,7 @@ const dealInTargetOption = computed(() => {
 
                 <!-- 放銃至 (對手狀態) -->
                 <div class="flex flex-col items-center">
-                    <span class="text-xs font-bold text-gray-400 mb-2">放銃至 (對象狀態)</span>
+                    <span class="text-xs font-bold text-muted mb-2">放銃至 (對象狀態)</span>
                     <div class="h-60 w-full flex items-center justify-center">
                         <ClientOnly>
                             <VChart v-if="dealInTargetOption" :option="dealInTargetOption" class="w-full h-full"
@@ -737,9 +728,9 @@ const dealInTargetOption = computed(() => {
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">近期競技走勢 · Recent Form</h2>
-                    <UBadge color="primary" variant="subtle" size="md">近 30 戰 (Recent 30 Matches)</UBadge>
+                    <UBadge color="primary" variant="outline" size="md">近 30 戰 (Recent 30 Matches)</UBadge>
                 </div>
-                <div class="text-xs text-gray-500 font-mono">
+                <div class="text-xs text-muted font-mono">
                     最新場次在右側，1位為波峰，3位為谷底
                 </div>
             </div>
@@ -748,7 +739,7 @@ const dealInTargetOption = computed(() => {
                 <ClientOnly>
                     <VChart v-if="lineOption" :option="lineOption" class="w-full h-full" autoresize />
                     <template #fallback>
-                        <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-gray-400" />
+                        <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-dimmed" />
                     </template>
                 </ClientOnly>
             </div>
@@ -760,35 +751,34 @@ const dealInTargetOption = computed(() => {
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">最常同桌宿敵 · Frequent Opponents</h2>
-                    <UBadge color="primary" variant="subtle" size="md">Top 12 遭遇記錄</UBadge>
+                    <UBadge color="primary" variant="outline" size="md">Top 12 遭遇記錄</UBadge>
                 </div>
-                <div class="text-xs text-gray-500 font-mono">
+                <div class="text-xs text-muted font-mono">
                     點擊選手可直接切換視角
                 </div>
             </div>
 
             <div v-if="frequentOpponents.length > 0"
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 font-mono">
-                <div v-for="opp in frequentOpponents" :key="opp.accountId"
-                    class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-accented border border-gray-100 dark:border-default hover:border-primary/50 hover:bg-primary/5 transition-all group cursor-pointer"
+                <button v-for="opp in frequentOpponents" :key="opp.accountId" type="button"
+                    class="w-full text-left flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-accented border border-gray-100 dark:border-default hover:border-primary/50 hover:bg-primary/5 transition-all group cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    :aria-label="`${opp.nickname}，同桌 ${opp.rate}% (${opp.count})，切換至該選手數據 · View ${opp.nickname}'s stats`"
                     @click="inspectOpponent(opp.accountId)">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                        <UIcon name="i-lucide-menu"
-                            class="w-4 h-4 text-primary shrink-0 group-hover:scale-110 transition-transform" />
                         <span
-                            class="text-sm font-bold text-success-600 dark:text-success-400 truncate group-hover:underline">
+                            class="text-sm font-bold text-green-700 dark:text-green-400 truncate group-hover:underline group-focus-visible:underline">
                             {{ opp.nickname }}
                         </span>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+                    <div class="text-xs text-muted shrink-0">
                         <span class="font-bold text-gray-900 dark:text-white">{{ opp.rate }}%</span>
-                        <span class="text-xs text-gray-400 ml-1">({{ opp.count }})</span>
+                        <span class="text-xs text-muted ml-1">({{ opp.count }})</span>
                     </div>
-                </div>
+                </button>
             </div>
 
             <!-- 空態防禦 -->
-            <div v-else class="text-center py-8 text-sm text-gray-400 font-mono">
+            <div v-else class="text-center py-8 text-sm text-muted font-mono">
                 當前選定區間內暫無同桌對局記錄
             </div>
         </div>
@@ -800,7 +790,9 @@ const dealInTargetOption = computed(() => {
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">極限戰局記錄 · Major Hands</h2>
-                    <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="subtle" size="md">
+                    <!-- outline + red-700 text: subtle primary/error on its tint is under 4.5:1 in light mode -->
+                    <UBadge :color="majorHandMode === 'win' ? 'primary' : 'error'" variant="outline" size="md"
+                        :class="majorHandMode === 'win' ? '' : 'text-red-700 dark:text-red-400'">
                         {{ majorHandMode === 'win' ? '生涯最高打點' : '最近最大痛銃' }}
                     </UBadge>
                 </div>
@@ -809,12 +801,12 @@ const dealInTargetOption = computed(() => {
                 <div
                     class="flex items-center gap-1.5 bg-gray-100 dark:bg-accented p-1 rounded-lg self-start sm:self-auto font-mono text-xs">
                     <button class="px-3 py-1 rounded-md transition-colors font-bold"
-                        :class="majorHandMode === 'win' ? 'bg-primary text-inverted shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                        :class="majorHandMode === 'win' ? 'bg-primary text-inverted shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white'"
                         @click="majorHandMode = 'win'">
                         🏆 生涯最大和牌
                     </button>
                     <button class="px-3 py-1 rounded-md transition-colors font-bold"
-                        :class="majorHandMode === 'dealIn' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'"
+                        :class="majorHandMode === 'dealIn' ? 'bg-rose-500 text-white shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white'"
                         @click="majorHandMode = 'dealIn'">
                         💥 最近最大痛銃
                     </button>
@@ -827,17 +819,17 @@ const dealInTargetOption = computed(() => {
                     <!-- 左側：標題與得失點數 -->
                     <div class="flex items-baseline gap-2">
                         <span class="text-xl font-extrabold font-mono"
-                            :class="majorHandMode === 'win' ? 'text-primary' : 'text-rose-500'">
+                            :class="majorHandMode === 'win' ? 'text-primary' : 'text-rose-700 dark:text-rose-400'">
                             {{ currentMajorHand.title }}
                         </span>
-                        <span class="text-xs text-gray-400 font-mono">
+                        <span class="text-xs text-muted font-mono">
                             ({{ currentMajorHand.score.toLocaleString() }}點)
                         </span>
                     </div>
 
                     <!-- ★★★ 右側：對局時間 + 官方牌譜重播直達按鈕 ★★★ -->
                     <div class="flex items-center gap-3 font-mono text-xs">
-                        <span class="text-gray-400">{{ currentMajorHand.date }}</span>
+                        <span class="text-muted">{{ currentMajorHand.date }}</span>
 
                         <UButton v-if="currentMajorHand.paipuId"
                             :to="`https://game.maj-soul.com/1/?paipu=${currentMajorHand.paipuId}`" target="_blank"
@@ -852,9 +844,9 @@ const dealInTargetOption = computed(() => {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2.5 font-mono text-xs pt-1">
                     <div v-for="(yaku, idx) in (currentMajorHand?.yakus ?? [])" :key="idx"
                         class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-default">
-                        <span class="text-gray-800 dark:text-gray-200 font-medium">{{ yaku.name }}</span>
+                        <span class="text-gray-800 dark:text-gray-200 font-semibold">{{ yaku.name }}</span>
                         <span class="font-bold" :class="[
-                            yaku.isYakuman ? 'text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary' : 'text-rose-400')
+                            yaku.isYakuman ? 'text-amber-700 dark:text-amber-500 font-extrabold' : (majorHandMode === 'win' ? 'text-primary' : 'text-rose-700 dark:text-rose-400')
                         ]">
                             {{ yaku.label || `${yaku.han} 番` }}
                         </span>
@@ -863,7 +855,7 @@ const dealInTargetOption = computed(() => {
             </div>
 
             <!-- 空態防禦 -->
-            <div v-else class="text-center py-8 text-sm text-gray-400 font-mono">
+            <div v-else class="text-center py-8 text-sm text-muted font-mono">
                 當前選定區間內暫無{{ majorHandMode === 'win' ? '和牌' : '放銃' }}記錄
             </div>
         </div>
@@ -874,9 +866,9 @@ const dealInTargetOption = computed(() => {
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-default pb-3">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-4.5">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">榮譽與成就 · Achievements</h2>
-                    <UBadge color="primary" variant="subtle" size="md">{{ achievements.length }} 項榮譽</UBadge>
+                    <UBadge color="primary" variant="outline" size="md">{{ achievements.length }} 項榮譽</UBadge>
                 </div>
-                <div class="text-xs text-gray-500 font-mono">賽事主辦手動維護</div>
+                <div class="text-xs text-muted font-mono">賽事主辦手動維護</div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -892,7 +884,7 @@ const dealInTargetOption = computed(() => {
                         <div class="text-sm font-bold text-gray-900 dark:text-white truncate" :title="ach.title">{{ ach.title }}</div>
                         <NuxtLink :to="`/games/mahjongsoul/tournaments/${ach.tournamentId}`"
                             class="block text-xs font-mono text-primary truncate hover:underline focus-visible:underline" :title="ach.tournamentTitle">{{ ach.tournamentTitle }}</NuxtLink>
-                        <div class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ ach.date }}</div>
+                        <div class="text-xs font-mono text-muted">{{ ach.date }}</div>
                     </div>
                 </div>
             </div>

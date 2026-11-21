@@ -60,7 +60,7 @@ const roleColor = {
     </div>
 
     <div v-else-if="!teams || teams.length === 0" class="text-center py-16 bg-white dark:bg-elevated rounded-xl border border-dashed border-gray-300 dark:border-default">
-      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Teams are yet to be announced.</p>
+      <p class="text-muted text-sm mt-1">Teams are yet to be announced.</p>
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
@@ -87,7 +87,7 @@ const roleColor = {
             </div>
           </div>
           
-          <div class="p-2 text-gray-400 flex-shrink-0">
+          <div class="p-2 text-muted flex-shrink-0">
             <UIcon 
               name="i-lucide-chevron-down" 
               class="w-6 h-6 transition-transform duration-300"
@@ -102,9 +102,9 @@ const roleColor = {
         >
           <div class="p-4 border-b border-gray-100 dark:border-default flex justify-center">
             <div class="inline-flex bg-gray-200/50 dark:bg-accented p-1 rounded-lg border border-gray-200 dark:border-default text-xs font-bold">
-              <button @click="setActiveTab(team.id, 'main')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'main' ? 'bg-white dark:bg-accented text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">Main</button>
-              <button @click="setActiveTab(team.id, 'sub')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'sub' ? 'bg-white dark:bg-accented text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">Sub</button>
-              <button @click="setActiveTab(team.id, 'history')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'history' ? 'bg-white dark:bg-accented text-red-500 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white']">History</button>
+              <button @click="setActiveTab(team.id, 'main')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'main' ? 'bg-white dark:bg-accented text-blue-700 dark:text-blue-400 shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white']">Main</button>
+              <button @click="setActiveTab(team.id, 'sub')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'sub' ? 'bg-white dark:bg-accented text-blue-700 dark:text-blue-400 shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white']">Sub</button>
+              <button @click="setActiveTab(team.id, 'history')" :class="['px-4 py-1.5 rounded-md transition-all', getActiveTab(team.id) === 'history' ? 'bg-white dark:bg-accented text-red-700 dark:text-red-500 shadow-sm' : 'text-muted hover:text-gray-900 dark:hover:text-white']">History</button>
             </div>
           </div>
 
@@ -136,7 +136,7 @@ const roleColor = {
               </div>
             </div>
 
-            <div v-if="getFilteredPlayers(team).length === 0" class="text-sm text-center text-gray-400 py-6 italic">
+            <div v-if="getFilteredPlayers(team).length === 0" class="text-sm text-center text-muted py-6 italic">
               無符合條件的選手 (No players found)
             </div>
           </div>

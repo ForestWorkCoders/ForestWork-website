@@ -45,7 +45,7 @@ export default defineEventHandler(async (event): Promise<Phase[]> => {
 
     if (league.rounds.length) phases.push({
         id: 'group',
-        title: 'Group Stage',
+        title: '小組賽 · Group Stage',
         stage: 'league',
         sides: 2,
         entrant: 'team',
@@ -65,8 +65,8 @@ export default defineEventHandler(async (event): Promise<Phase[]> => {
     })
 
     const sections: Section[] = [
-        { id: 'upper', title: 'Upper Bracket', rounds: bracket.upperBracket },
-        { id: 'lower', title: 'Lower Bracket', rounds: bracket.lowerBracket }
+        { id: 'upper', title: '勝部 · Upper Bracket', rounds: bracket.upperBracket },
+        { id: 'lower', title: '敗部 · Lower Bracket', rounds: bracket.lowerBracket }
     ]
         .filter(s => s.rounds.length)
         .map(s => ({
@@ -78,7 +78,7 @@ export default defineEventHandler(async (event): Promise<Phase[]> => {
 
     if (sections.length) phases.push({
         id: 'playoffs',
-        title: 'Playoffs',
+        title: '季後賽 · Playoffs',
         stage: bracket.lowerBracket.length ? 'double_elim' : 'single_elim',
         sides: 2,
         entrant: 'team',

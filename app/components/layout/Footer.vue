@@ -6,7 +6,7 @@
   <UFooter>
     <!-- 左侧：版权声明 + 站内工具/资源入口 -->
     <template #left>
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400 font-mono">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted font-mono">
         <span>Copyright © {{ new Date().getFullYear() }} ForestWork. All rights reserved.</span>
 
         <!-- 1. 品牌资源中心入口 -->
