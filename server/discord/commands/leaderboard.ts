@@ -254,6 +254,49 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
   }
 }
 
+/**
+ * CTF 榜：前 10 名與查詢者的名次 (account_id 即 Discord 用戶 ID)
+ */
+export async function renderCtfLeaderboardPayload(viewerId: string) {
+  // 解過題的人只有十幾個：拉完整份，前 10 與個人都從這份算
+  const { data, error } = await getSupabase()
+    .schema('ctf')
+    .from('leaderboard')
+    .select('rank, account_id, username, score, solves_count')
+    .order('rank', { ascending: true })
+  if (error) console.error('[-] CTF 排行榜查詢異常:', error.message)
+  const all = data || []
+  const me = all.find(r => String(r.account_id) === String(viewerId))
+
+  const board: Leaderboard = {
+    title: 'CTF · 解題積分榜',
+    scoreLabel: '積分',
+    rows: all.slice(0, 10).map(r => ({
+      rank: r.rank,
+      name: displayName(r.username, r.account_id),
+      score: `\`${r.score}\` pts · ${r.solves_count} 題`
+    })),
+    empty: '尚無解題記錄 · 在 CTF 終端提交第一個 flag 吧！',
+    me: {
+      rank: me ? me.rank : null,
+      stats: me ? [['積分', `\`${me.score}\` pts`], ['解題數', `\`${me.solves_count}\` 題`]] : [],
+      unranked: '未入榜 (尚未解出任何題目) · 點擊下方按鈕開始挑戰！'
+    },
+    note: 'ForestWork CTF · 點擊下方按鈕啟動 Activity'
+  }
+
+  const clientId = process.env.DISCORD_CLIENT_ID || process.env.DISCORD_APPLICATION_ID || '311484597248720907'
+  const components = [{
+    type: 1,
+    components: [
+      { type: 2, style: 5, label: '🚩 啟動 CTF Activity', url: `https://discord.com/activities/${clientId}` },
+      { type: 2, style: 5, label: '🌐 網站版 CTF', url: 'https://forestwork.vercel.app/games/ctf' }
+    ]
+  }]
+
+  return { embeds: [buildLeaderboardEmbed(board)], components }
+}
+
 // -------------------------------------------------------------
 // 3. 斜槓指令入口 (/leaderboard)
 // -------------------------------------------------------------
@@ -281,6 +324,10 @@ export async function handleLeaderboardCommand(interaction: any, event: H3Event)
     const mode = subOptions.find((o: any) => o.name === 'mode')?.value || 'received'
     const payload = await renderQuasoLeaderboardPayload(mode, callerId)
     return { type: 4, data: payload }
+  }
+
+  if (subCommand === 'ctf') {
+    return { type: 4, data: await renderCtfLeaderboardPayload(callerId) }
   }
 
   if (subCommand === 'skill') {
