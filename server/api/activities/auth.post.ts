@@ -1,6 +1,6 @@
 // server/api/activities/auth.post.ts
 import { serverSupabaseServiceRole } from '#supabase/server'
-import { sealSessionData } from '../../utils/session'
+import { sealSessionData, ACTIVITY_TICKET_TTL } from '../../utils/session'
 
 interface AuthBody {
   code?: string
@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
     username: rawUsername,
     global_name: rawNickname,
     avatar: avatarUrl
-  })
+  }, ACTIVITY_TICKET_TTL)
 
   // 5. 吐出纯净的操作员会话实体
   return {
