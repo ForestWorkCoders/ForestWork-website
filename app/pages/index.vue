@@ -79,6 +79,16 @@ import { ref, computed } from 'vue'
 
 const searchQuery = ref('')
 
+// A Discord Activity launch lands on this prerendered page. Leave before it paints,
+// so the home page never flashes. The route middleware still covers client-side navigation.
+useHead({
+  script: [{
+    key: 'discord-activity-launch',
+    tagPriority: 'critical',
+    innerHTML: "if(/(^|[?&])frame_id=/.test(location.search.slice(1))||location.hostname.endsWith('discordsays.com'))location.replace('/activities/ctf'+location.search)"
+  }]
+})
+
 // 1. 定義資料結構
 const circuits = [
   { 
