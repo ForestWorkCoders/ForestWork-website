@@ -271,15 +271,16 @@ export async function renderCtfLeaderboardPayload(viewerId: string) {
   const board: Leaderboard = {
     title: 'CTF · 解題積分榜',
     scoreLabel: '積分',
-    rows: all.slice(0, 10).map(r => ({
-      rank: r.rank,
+    // 視圖欄位型別可為 null：名次退回列序，分數與題數退回 0
+    rows: all.slice(0, 10).map((r, i) => ({
+      rank: r.rank ?? i + 1,
       name: displayName(r.username, r.account_id),
-      score: `\`${r.score}\` pts · ${r.solves_count} 題`
+      score: `\`${r.score ?? 0}\` pts · ${r.solves_count ?? 0} 題`
     })),
-    empty: '尚無解題記錄 · 在 CTF 終端提交第一個 flag 吧！',
+    empty: error ? '⚠️ 排行榜暫時無法讀取，請稍後再試。' : '尚無解題記錄 · 在 CTF 終端提交第一個 flag 吧！',
     me: {
-      rank: me ? me.rank : null,
-      stats: me ? [['積分', `\`${me.score}\` pts`], ['解題數', `\`${me.solves_count}\` 題`]] : [],
+      rank: me ? (me.rank ?? all.indexOf(me) + 1) : null,
+      stats: me ? [['積分', `\`${me.score ?? 0}\` pts`], ['解題數', `\`${me.solves_count ?? 0}\` 題`]] : [],
       unranked: '未入榜 (尚未解出任何題目) · 點擊下方按鈕開始挑戰！'
     },
     note: 'ForestWork CTF · 點擊下方按鈕啟動 Activity'
