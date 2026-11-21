@@ -237,7 +237,7 @@ const abnormalMatchMessage = computed(() => {
           </div>
 
           <!-- VS 標籤 -->
-          <div class="shrink-0 px-2 md:px-4 text-gray-400 font-extrabold text-sm uppercase tracking-widest opacity-50">VS</div>
+          <div class="shrink-0 px-2 md:px-4 text-muted font-extrabold text-sm uppercase tracking-widest">VS</div>
 
           <!-- 藍隊 (右側) -->
           <div class="flex items-center gap-2 md:gap-4 flex-1 min-w-0 justify-end">
