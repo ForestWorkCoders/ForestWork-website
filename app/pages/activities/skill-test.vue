@@ -12,24 +12,22 @@ import { Module6Tracking } from '~/utils/skill-tests/module6-tracking'
 import { Module8Tiles } from '~/utils/skill-tests/module8-tiles'
 import { Module9Cps } from '~/utils/skill-tests/module9-cps'
 
+// Open in any browser. Inside Discord the player signs in through the Activity SDK and scores
+// are saved; in a normal browser the player is a guest: playable, leaderboard visible, nothing saved.
 definePageMeta({
-  layout: false,
-  middleware: [
-    (to) => {
-      if (import.meta.dev || to.query.debug === '114514') return
-      const hasFrameId = typeof to.query.frame_id === 'string' && to.query.frame_id.length > 0
-      const isDiscordHost = import.meta.client && window.location.hostname.includes('discordsays.com')
-      if (!hasFrameId && !isDiscordHost) {
-        throw createError({ statusCode: 404, statusMessage: 'Page Not Found', fatal: true })
-      }
-    }
-  ]
+  layout: false
 })
 
+useSeoMeta({
+  title: '選手實力評定沙盒 · Skill Test · ForestWork',
+  description: '十個反應、精準與追蹤測驗。在 Discord 活動中遊玩即可登上排行榜。'
+})
 
 const currentDiscordId = ref<string>('10001')
 // Signed ticket from /api/activities/auth; the server reads the player's ID only from this
 const authTicket = ref<string>('')
+// True outside Discord: no SDK, no sign-in, no score submission
+const isGuest = ref(false)
 const currentOperatorDisplay = ref<string>('CONNECTING...')
 
 // ★ 1. 提升为组件作用域变量，供全页面交互调用
@@ -77,7 +75,9 @@ async function initDiscordSdkAsync() {
       // 如果两者全都没有，说明这根本不是 Discord 客户端环境（例如独立浏览器直接打开）
       const finalSearchParams = new URLSearchParams(window.location.search)
       if (!finalSearchParams.has('frame_id') && !window.location.hostname.includes('discordsays.com')) {
-        throw new Error('ENV_STANDALONE: Non-Discord environment')
+        isGuest.value = true
+        currentOperatorDisplay.value = '訪客 · Guest'
+        return
       }
     }
 
@@ -542,8 +542,8 @@ function tick(now: number) {
       }
     }
 
-    // 正式提交入库
-    if (currentSlot.value.moduleId) {
+    // 正式提交入库（訪客模式不提交）
+    if (currentSlot.value.moduleId && !isGuest.value) {
       $fetch('/api/activities/submit', {
         method: 'POST',
         body: {
@@ -749,7 +749,8 @@ onUnmounted(() => {
 
           <div class="hidden sm:flex min-w-0 justify-end items-center gap-2 font-mono text-xs whitespace-nowrap">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span class="min-w-0 truncate text-xs text-emerald-400 tracking-wider">
+            <span class="min-w-0 truncate text-xs text-emerald-400 tracking-wider"
+              :title="isGuest ? '成績只在 Discord 活動中記錄 · Scores save only inside Discord' : undefined">
               OP: {{ currentOperatorDisplay }}
             </span>
           </div>
@@ -985,6 +986,9 @@ onUnmounted(() => {
                   BEST {{ currentSlot.bestScore }}
                 </span>
               </div>
+              <p v-if="isGuest" class="pt-1 text-xs text-zinc-400">
+                訪客模式不記錄成績 · 在 Discord 活動中遊玩才會上榜
+              </p>
             </div>
 
             <!-- 2. 中部：双 Tab 容器 (MATCH SUMMARY vs GLOBAL RANKING) -->

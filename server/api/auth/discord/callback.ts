@@ -1,6 +1,6 @@
 // server/api/auth/discord/callback.get.ts
 import { createClient } from '@supabase/supabase-js'
-import { sealSessionData, sanitizeRedirect, SESSION_COOKIE_NAME, OAUTH_STATE_COOKIE } from '../../../utils/session'
+import { sealSessionData, WEB_SESSION_TTL, sanitizeRedirect, SESSION_COOKIE_NAME, OAUTH_STATE_COOKIE } from '../../../utils/session'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -108,13 +108,13 @@ export default defineEventHandler(async (event) => {
     username: rawUsername,
     global_name: rawNickname,
     avatar: avatarUrl
-  })
+  }, WEB_SESSION_TTL)
 
   setCookie(event, SESSION_COOKIE_NAME, sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 30, // 30 天
+    maxAge: WEB_SESSION_TTL,
     path: '/'
   })
 

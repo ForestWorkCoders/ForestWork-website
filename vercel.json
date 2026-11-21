@@ -9,7 +9,7 @@
           "key": "frame_id"
         }
       ],
-      "destination": "/activities/skill-test"
+      "destination": "/activities/ctf"
     }
   ],
   "crons": [
