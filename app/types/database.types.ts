@@ -717,7 +717,7 @@ export type Database = {
         }[]
       }
       get_tournament_match_stats: {
-        Args: { t_id: string }
+        Args: { p_phase?: string; t_id: string }
         Returns: {
           avatar: string
           avg_rank: number
@@ -746,7 +746,7 @@ export type Database = {
         }[]
       }
       get_tournament_playstyle_stats: {
-        Args: { t_id: string }
+        Args: { p_phase?: string; t_id: string }
         Returns: {
           avatar: string
           avg_baopai: number
