@@ -146,6 +146,29 @@ const getContrastClass = (hexColor) => {
   return yiq >= 128 ? 'text-gray-900 drop-shadow-none' : 'text-white drop-shadow-md'
 }
 
+// Team colours come from the database (e.g. #FFFFFF). Where one is under 3:1 against the card
+// (white in light mode, #161B22 in dark), its score/dot gets a thin edge in that mode only.
+const luminance = (hex) => {
+  const h = hex.replace('#', '')
+  const full = h.length === 3 ? [...h].map(c => c + c).join('') : h
+  const [r, g, b] = [0, 2, 4].map(i => {
+    const v = parseInt(full.slice(i, i + 2), 16) / 255
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+const teamEdge = (hex) => {
+  if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex || '')) return ''
+  return [
+    contrast(hex, '#FFFFFF') < 3 && 'team-edge-light',
+    contrast(hex, '#161B22') < 3 && 'team-edge-dark'
+  ].filter(Boolean).join(' ')
+}
+
 const isAbnormalMatch = computed(() => {
   return ['Walkover_Blue', 'Walkover_Red', 'Cancelled'].includes(match.value?.status)
 })
@@ -225,6 +248,7 @@ const abnormalMatchMessage = computed(() => {
           <div class="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
             <!-- 分數：動態讀取，並注入隊伍主題色 -->
             <div class="text-4xl md:text-5xl font-extrabold w-10 md:w-12 shrink-0 text-center"
+              :class="teamEdge(match.redTeam.colour)"
               :style="{ color: match.redTeam.colour || '#ef4444' }">
               {{ displayData.scoreRed ?? '-' }}
             </div>
@@ -248,6 +272,7 @@ const abnormalMatchMessage = computed(() => {
             <UAvatar :src="match.blueTeam.logo" size="lg" class="hidden md:block shrink-0 bg-white shadow-sm"
               :ui="{ rounded: 'rounded-md' }" />
             <div class="text-4xl md:text-5xl font-extrabold w-10 md:w-12 shrink-0 text-center"
+              :class="teamEdge(match.blueTeam.colour)"
               :style="{ color: match.blueTeam.colour || '#3b82f6' }">
               {{ displayData.scoreBlue ?? '-' }}
             </div>
@@ -319,9 +344,9 @@ const abnormalMatchMessage = computed(() => {
             <span class="text-xs font-bold text-muted tracking-widest uppercase">Map {{ game.gameNumber }}</span>
             <span class="text-sm font-extrabold truncate max-w-full">{{ game.map.name }}</span>
             <div class="flex items-center gap-3 mt-1 font-mono text-lg font-bold">
-              <span :style="{ color: match.redTeam.colour }">{{ game.score.red ?? '-' }}</span>
+              <span :class="teamEdge(match.redTeam.colour)" :style="{ color: match.redTeam.colour }">{{ game.score.red ?? '-' }}</span>
               <span class="text-muted text-sm">:</span>
-              <span :style="{ color: match.blueTeam.colour }">{{ game.score.blue ?? '-' }}</span>
+              <span :class="teamEdge(match.blueTeam.colour)" :style="{ color: match.blueTeam.colour }">{{ game.score.blue ?? '-' }}</span>
             </div>
           </div>
         </div>
@@ -339,7 +364,7 @@ const abnormalMatchMessage = computed(() => {
           <!-- 紅隊統計表 (左側) -->
           <div class="space-y-3">
             <div class="flex items-center gap-2 mb-4">
-              <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: match.redTeam.colour || '#ef4444' }"></div>
+              <div class="w-3 h-3 rounded-full" :class="teamEdge(match.redTeam.colour)" :style="{ backgroundColor: match.redTeam.colour || '#ef4444' }"></div>
               <h4 class="font-extrabold text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
                 match.redTeam.name }}</h4>
             </div>
@@ -382,7 +407,7 @@ const abnormalMatchMessage = computed(() => {
           <!-- 藍隊統計表 (右側) -->
           <div class="space-y-3">
             <div class="flex items-center gap-2 mb-4">
-              <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: match.blueTeam.colour || '#3b82f6' }"></div>
+              <div class="w-3 h-3 rounded-full" :class="teamEdge(match.blueTeam.colour)" :style="{ backgroundColor: match.blueTeam.colour || '#3b82f6' }"></div>
               <h4 class="font-extrabold text-gray-900 dark:text-white uppercase tracking-wider text-sm">{{
                 match.blueTeam.name }}</h4>
             </div>
@@ -429,3 +454,21 @@ const abnormalMatchMessage = computed(() => {
     </template>
   </div>
 </template>
+
+<style>
+/* teamEdge(): a 1px muted edge around a team colour that is too close to the card.
+   Text (scores) gets a text outline; the empty dots get a ring. */
+.team-edge-light:not(:empty) {
+  text-shadow: -1px -1px 0 var(--ui-text-muted), 1px -1px 0 var(--ui-text-muted),
+    -1px 1px 0 var(--ui-text-muted), 1px 1px 0 var(--ui-text-muted);
+}
+.team-edge-light:empty { box-shadow: inset 0 0 0 1px var(--ui-text-muted); }
+.dark .team-edge-light:not(:empty) { text-shadow: none; }
+.dark .team-edge-light:empty { box-shadow: none; }
+
+.dark .team-edge-dark:not(:empty) {
+  text-shadow: -1px -1px 0 var(--ui-text-muted), 1px -1px 0 var(--ui-text-muted),
+    -1px 1px 0 var(--ui-text-muted), 1px 1px 0 var(--ui-text-muted);
+}
+.dark .team-edge-dark:empty { box-shadow: inset 0 0 0 1px var(--ui-text-muted); }
+</style>
