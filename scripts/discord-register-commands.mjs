@@ -596,6 +596,11 @@ const forestCommands = [
                 ]
             },
             {
+                name: 'ctf',
+                description: '查看 CTF 解題積分榜 (前 10 名與你的排名)',
+                type: 1 // SUB_COMMAND
+            },
+            {
                 name: 'skill',
                 description: '查看選手實力評定沙盒 (Skill Benchmark) 10 槽位天梯排行榜',
                 type: 1, // SUB_COMMAND

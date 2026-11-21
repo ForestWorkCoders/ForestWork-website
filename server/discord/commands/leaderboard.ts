@@ -254,6 +254,50 @@ export async function renderQuasoLeaderboardPayload(mode: 'received' | 'sent', v
   }
 }
 
+/**
+ * CTF 榜：前 10 名與查詢者的名次 (account_id 即 Discord 用戶 ID)
+ */
+export async function renderCtfLeaderboardPayload(viewerId: string) {
+  // 解過題的人只有十幾個：拉完整份，前 10 與個人都從這份算
+  const { data, error } = await getSupabase()
+    .schema('ctf')
+    .from('leaderboard')
+    .select('rank, account_id, username, score, solves_count')
+    .order('rank', { ascending: true })
+  if (error) console.error('[-] CTF 排行榜查詢異常:', error.message)
+  const all = data || []
+  const me = all.find(r => String(r.account_id) === String(viewerId))
+
+  const board: Leaderboard = {
+    title: 'CTF · 解題積分榜',
+    scoreLabel: '積分',
+    // 視圖欄位型別可為 null：名次退回列序，分數與題數退回 0
+    rows: all.slice(0, 10).map((r, i) => ({
+      rank: r.rank ?? i + 1,
+      name: displayName(r.username, r.account_id),
+      score: `\`${r.score ?? 0}\` pts · ${r.solves_count ?? 0} 題`
+    })),
+    empty: error ? '⚠️ 排行榜暫時無法讀取，請稍後再試。' : '尚無解題記錄 · 在 CTF 終端提交第一個 flag 吧！',
+    me: {
+      rank: me ? (me.rank ?? all.indexOf(me) + 1) : null,
+      stats: me ? [['積分', `\`${me.score ?? 0}\` pts`], ['解題數', `\`${me.solves_count ?? 0}\` 題`]] : [],
+      unranked: '未入榜 (尚未解出任何題目) · 點擊下方按鈕開始挑戰！'
+    },
+    note: 'ForestWork CTF · 點擊下方按鈕啟動 Activity'
+  }
+
+  const clientId = process.env.DISCORD_CLIENT_ID || process.env.DISCORD_APPLICATION_ID || '311484597248720907'
+  const components = [{
+    type: 1,
+    components: [
+      { type: 2, style: 5, label: '🚩 啟動 CTF Activity', url: `https://discord.com/activities/${clientId}` },
+      { type: 2, style: 5, label: '🌐 網站版 CTF', url: 'https://forestwork.vercel.app/games/ctf' }
+    ]
+  }]
+
+  return { embeds: [buildLeaderboardEmbed(board)], components }
+}
+
 // -------------------------------------------------------------
 // 3. 斜槓指令入口 (/leaderboard)
 // -------------------------------------------------------------
@@ -281,6 +325,10 @@ export async function handleLeaderboardCommand(interaction: any, event: H3Event)
     const mode = subOptions.find((o: any) => o.name === 'mode')?.value || 'received'
     const payload = await renderQuasoLeaderboardPayload(mode, callerId)
     return { type: 4, data: payload }
+  }
+
+  if (subCommand === 'ctf') {
+    return { type: 4, data: await renderCtfLeaderboardPayload(callerId) }
   }
 
   if (subCommand === 'skill') {
@@ -327,11 +375,10 @@ const SKILL_MODULES: Record<number, SkillModuleMeta> = {
 }
 
 /**
- * 構造雙排互動組件：Row 1 下拉選單 + Row 2 Activity 原生啟動按鈕
+ * 構造雙排互動組件：Row 1 下拉選單 + Row 2 網頁版入口
+ * (Discord Activity 自 v5.14 起改為 CTF，技能評定只剩網頁版訪客模式)
  */
 export function buildSkillLeaderboardComponents(currentModuleId: number) {
-  const clientId = process.env.DISCORD_CLIENT_ID || process.env.DISCORD_APPLICATION_ID || '311484597248720907'
-  
   // 1. 構造 10 槽位下拉選單選項
   const options = Object.values(SKILL_MODULES).map(m => ({
     label: `${m.title} // ${m.category}`,
@@ -354,20 +401,14 @@ export function buildSkillLeaderboardComponents(currentModuleId: number) {
         }
       ]
     },
-    // ActionRow 2: Discord Activity 原生直通按鈕 (Link Button)
+    // ActionRow 2: 網頁版入口 (Link Button)
     {
       type: 1,
       components: [
         {
           type: 2, // BUTTON
           style: 5, // LINK
-          label: '🚀 啟動 Discord 靶場 (Launch Activity)',
-          url: `https://discord.com/activities/${clientId}`
-        },
-        {
-          type: 2,
-          style: 5,
-          label: '🌐 Web 備用入口',
+          label: '🌐 網頁版試玩 (訪客模式 · 不記錄成績)',
           url: 'https://forestwork.vercel.app/activities/skill-test'
         }
       ]
@@ -381,7 +422,7 @@ export function buildSkillLeaderboardComponents(currentModuleId: number) {
 export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: string) {
   const mod = SKILL_MODULES[moduleId] || SKILL_MODULES[1]!
   const title = `技能評定 · ${mod.emoji} ${mod.title} // ${mod.category}`
-  const note = 'ForestWork 技能評定 · 點擊下方按鈕直接啟動 Activity'
+  const note = 'ForestWork 技能評定 · 網頁版為訪客模式，不記錄成績'
   const components = buildSkillLeaderboardComponents(mod.id)
 
   // 鎖定模組：沒有排名，只有告知
@@ -440,7 +481,7 @@ export async function renderSkillLeaderboardPayload(moduleId: number, viewerId: 
           stats: mine
             ? [['個人最佳', `\`${mine.score.toLocaleString()} PTS\``], ['評級', `\`[${mine.rating || 'COMBAT READY'}]\``]]
             : [],
-          unranked: '尚未完成該科目評定 · 點擊下方按鈕啟動 Activity 開始測試！'
+          unranked: '尚無該科目的評定記錄'
         }
       : null,
     note

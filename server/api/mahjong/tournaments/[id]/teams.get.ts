@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 
 // 定義職位的排序權重 (確保先鋒在最上面，大將在下面)
@@ -52,7 +52,8 @@ export default defineEventHandler(async (event) => {
 
     const discordIdsStr = participants?.map(p => p.discord_id_str).filter(Boolean) as string[]
 
-    const { data: profiles } = await supabase
+    const admin = serverSupabaseServiceRole<Database>(event)
+    const { data: profiles } = await admin
         .schema('public')
         .from('participant_data')
         .select('discord_id_str:discord_id::text, discord_username, profile_img')
