@@ -80,7 +80,7 @@ const signedClass = (v: number | null | undefined) =>
         :class="isDnf(row.original.rank) ? 'text-muted line-through' : 'text-primary font-extrabold'">
         {{ row.original[col.key] }}
       </div>
-      <div v-else class="text-center font-mono text-sm font-medium"
+      <div v-else class="text-center font-mono text-sm font-semibold"
         :class="isDnf(row.original.rank) ? 'text-muted' : col.signed ? signedClass(row.original[col.key]) : ''">
         {{ col.signed && row.original[col.key] > 0 ? '+' : '' }}{{ row.original[col.key] ?? '-' }}
       </div>

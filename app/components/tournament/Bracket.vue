@@ -20,7 +20,7 @@ interface Node { id: string; x: number; y: number; match: Match }
 const decided = (m: Match) => m.sides.some(s => s.winner)
 const sideClass = (m: Match, s: Side) =>
   s.winner ? 'font-extrabold text-gray-900 dark:text-white'
-    : !decided(m) ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-medium text-muted'
+    : !decided(m) ? 'font-bold text-gray-700 dark:text-gray-300' : 'font-semibold text-muted'
 
 // --- 核心佈局引擎 (Layout Engine) ---
 const graphData = computed(() => {

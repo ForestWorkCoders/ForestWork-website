@@ -36,7 +36,7 @@ export default defineNuxtConfig({
   // Open Sans tops out at 800. The Chinese fallbacks stay system fonts: never download them.
   fonts: {
     defaults: {
-      weights: [400, 600, 700, 800]
+      weights: [400, 500, 600, 700, 800] // 500: Nuxt UI's buttons, tabs, badges, breadcrumbs
     },
     families: [
       { name: 'PingFang TC', provider: 'none' },
