@@ -1,5 +1,6 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { fetchPlayerDict } from '~~/server/utils/mahjongPlayer'
 
 // 定義職位的排序權重 (確保先鋒在最上面，大將在下面)
 const ROLE_WEIGHT: Record<string, number> = {
@@ -44,29 +45,8 @@ export default defineEventHandler(async (event) => {
     // 3. 跨 Schema 撈取玩家的真實名稱與大頭貼 (The String Cast Fix)
     const accountIds = Array.from(new Set(tourneyPlayers.map(tp => tp.player_id)))
     
-    const { data: participants } = await supabase
-        .schema('mahjong')
-        .from('participants')
-        .select('account_id, nickname, discord_id_str:discord_id::text')
-        .in('account_id', accountIds)
-
-    const discordIdsStr = participants?.map(p => p.discord_id_str).filter(Boolean) as string[]
-
-    const admin = serverSupabaseServiceRole<Database>(event)
-    const { data: profiles } = await admin
-        .schema('public')
-        .from('participant_data')
-        .select('discord_id_str:discord_id::text, discord_username, profile_img')
-        .in('discord_id', discordIdsStr as unknown as number[])
-
-    // 建立玩家字典
-    const playerDict = new Map()
-    participants?.forEach(p => {
-        const profile = profiles?.find(pr => pr.discord_id_str === p.discord_id_str)
-        playerDict.set(p.account_id, {
-            name: p.nickname || profile?.discord_username || `Unknown_${p.account_id}`,
-            avatar: profile?.profile_img || null
-        })
+    const playerDict = await fetchPlayerDict(supabase, accountIds, {
+        admin: serverSupabaseServiceRole<Database>(event)
     })
 
     // 4. 組裝最終的資料結構

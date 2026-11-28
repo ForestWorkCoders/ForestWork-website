@@ -1,5 +1,6 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { fetchPlayerDict } from '~~/server/utils/mahjongPlayer'
 
 export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, 'id')
@@ -122,27 +123,9 @@ export default defineEventHandler(async (event) => {
 
     // 4. 獲取玩家名稱與頭像 (保持你原來的邏輯不變)
     const accountIds = currentLeaderboard.map(r => r[0])
-    const { data: participants } = await supabase
-        .schema('mahjong')
-        .from('participants')
-        .select('account_id, nickname, discord_id_str:discord_id::text')
-        .in('account_id', accountIds)
-
-    const discordIdsStr = participants?.map(p => p.discord_id_str).filter(Boolean) as string[]
-    const admin = serverSupabaseServiceRole<Database>(event)
-    const { data: profiles } = await admin
-        .schema('public')
-        .from('participant_data')
-        .select('discord_id_str:discord_id::text, discord_username, profile_img')
-        .in('discord_id', discordIdsStr as unknown as number[])
-
-    const playerDict = new Map()
-    participants?.forEach(p => {
-        const profile = profiles?.find(pr => pr.discord_id_str === p.discord_id_str)
-        playerDict.set(p.account_id, {
-            name: p.nickname || profile?.discord_username || `Player_${p.account_id}`,
-            avatar: profile?.profile_img || null
-        })
+    const playerDict = await fetchPlayerDict(supabase, accountIds, {
+        admin: serverSupabaseServiceRole<Database>(event),
+        fallbackPrefix: 'Player'
     })
 
     // 5. 組裝成前端需要的陣列

@@ -1203,38 +1203,41 @@ export type Database = {
   }
   public: {
     Tables: {
-      mahjong_data: {
+      discord_users: {
         Row: {
-          account_id: number
+          avatar_url: string | null
+          created_at: string
           discord_id: number
+          global_name: string | null
+          in_guild: boolean
+          joined_at: string
+          server_nick: string | null
+          synced_at: string | null
           username: string
         }
         Insert: {
-          account_id: number
+          avatar_url?: string | null
+          created_at?: string
           discord_id: number
+          global_name?: string | null
+          in_guild?: boolean
+          joined_at?: string
+          server_nick?: string | null
+          synced_at?: string | null
           username: string
         }
         Update: {
-          account_id?: number
+          avatar_url?: string | null
+          created_at?: string
           discord_id?: number
+          global_name?: string | null
+          in_guild?: boolean
+          joined_at?: string
+          server_nick?: string | null
+          synced_at?: string | null
           username?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "mahjong_data_discord_id_fkey"
-            columns: ["discord_id"]
-            isOneToOne: true
-            referencedRelation: "participant_data"
-            referencedColumns: ["discord_id"]
-          },
-          {
-            foreignKeyName: "mahjong_data_discord_id_fkey"
-            columns: ["discord_id"]
-            isOneToOne: true
-            referencedRelation: "v_member_boost_summary"
-            referencedColumns: ["discord_id"]
-          },
-        ]
+        Relationships: []
       }
       member_key_redemptions: {
         Row: {
@@ -1269,7 +1272,7 @@ export type Database = {
             foreignKeyName: "member_key_redemptions_discord_id_fkey"
             columns: ["discord_id"]
             isOneToOne: false
-            referencedRelation: "participant_data"
+            referencedRelation: "discord_users"
             referencedColumns: ["discord_id"]
           },
           {
@@ -1320,7 +1323,7 @@ export type Database = {
             foreignKeyName: "member_profiles_discord_id_fkey"
             columns: ["discord_id"]
             isOneToOne: true
-            referencedRelation: "participant_data"
+            referencedRelation: "discord_users"
             referencedColumns: ["discord_id"]
           },
           {
@@ -1332,38 +1335,19 @@ export type Database = {
           },
         ]
       }
+    }
+    Views: {
       participant_data: {
         Row: {
-          created_at: string
-          discord_id: number
+          created_at: string | null
+          discord_id: number | null
           discord_nickname: string | null
-          discord_username: string
-          id: number
-          joined_at: string
+          discord_username: string | null
+          joined_at: string | null
           profile_img: string | null
-        }
-        Insert: {
-          created_at?: string
-          discord_id: number
-          discord_nickname?: string | null
-          discord_username: string
-          id?: number
-          joined_at?: string
-          profile_img?: string | null
-        }
-        Update: {
-          created_at?: string
-          discord_id?: number
-          discord_nickname?: string | null
-          discord_username?: string
-          id?: number
-          joined_at?: string
-          profile_img?: string | null
         }
         Relationships: []
       }
-    }
-    Views: {
       v_member_boost_summary: {
         Row: {
           current_streak_months: number | null
@@ -1395,23 +1379,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_user_data:
-        | {
-            Args: {
-              p_new_pfp?: string
-              p_new_username: string
-              p_user_id: number
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_new_pfp?: string
-              p_new_username: string
-              p_user_id: string
-            }
-            Returns: undefined
-          }
     }
     Enums: {
       [_ in never]: never

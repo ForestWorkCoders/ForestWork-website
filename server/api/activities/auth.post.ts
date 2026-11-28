@@ -36,7 +36,8 @@ export default defineEventHandler(async (event) => {
       client_secret: clientSecret,
       grant_type: 'authorization_code',
       code
-    })
+    }),
+    signal: AbortSignal.timeout(8000)
   })
 
   if (!tokenRes.ok) {
@@ -49,7 +50,8 @@ export default defineEventHandler(async (event) => {
 
   // 2. 携带 token 抓取当前真实 Discord 用户画像
   const userRes = await fetch('https://discord.com/api/v10/users/@me', {
-    headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    signal: AbortSignal.timeout(8000)
   })
 
   if (!userRes.ok) {
@@ -67,17 +69,17 @@ export default defineEventHandler(async (event) => {
   const rawUsername = String(user.username || '').trim().toLowerCase()
   const rawNickname = user.global_name ? String(user.global_name).trim() : rawUsername
 
-  // 4. 核心好品味：顺手无缝沉淀进全站公共名册 public.participant_data
+  // 4. 核心好品味：顺手无缝沉淀进全站公共名册 public.discord_users
   try {
     const supabase = await serverSupabaseServiceRole(event)
     await supabase
       .schema('public')
-      .from('participant_data')
+      .from('discord_users')
       .upsert({
         discord_id: user.id, // 保持字符串纯度防精度截断
-        discord_username: rawUsername,
-        discord_nickname: rawNickname,
-        profile_img: avatarUrl
+        username: rawUsername,
+        global_name: rawNickname,
+        avatar_url: avatarUrl
       }, {
         onConflict: 'discord_id'
       })

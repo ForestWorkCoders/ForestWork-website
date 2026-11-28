@@ -9,6 +9,7 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "test": "node --test \"tests/**/*.test.ts\"",
     "update:database": "npx supabase gen types typescript --remote=efsheupssjxlmrfgmxwp --schema public,mahjong,plazmaburst,trpg,ctf > app/types/database.types.ts",
     "url:redirects": "node --env-file=.env scripts/verify-redirects.mjs",
     "discord:register-commands": "node --env-file=.env scripts/discord-register-commands.mjs",
