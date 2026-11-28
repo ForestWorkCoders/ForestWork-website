@@ -19,7 +19,8 @@ async function discordApi(path: string, method: string = 'GET', body?: any) {
       Authorization: `Bot ${token}`,
       'Content-Type': 'application/json'
     },
-    body: body ? JSON.stringify(body) : undefined
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(10000)
   })
 
   if (!res.ok) {
@@ -51,7 +52,8 @@ function deferReply(interaction: any, work: () => Promise<string>) {
     .then(content => fetch(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content })
+      body: JSON.stringify({ content }),
+      signal: AbortSignal.timeout(10000)
     }))
     .then(async (res) => {
       if (!res.ok) console.error('[Room Reply Edit Failed]:', res.status, await res.text().catch(() => ''))
