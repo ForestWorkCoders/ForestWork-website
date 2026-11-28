@@ -74,12 +74,15 @@ export default defineEventHandler(async (event) => {
     return Array.isArray(page) ? { ok: true, members: page } : { ok: false }
   })
 
-  // 2. Upsert everyone we saw. Profile and guild fields only; created_at / joined_at stay as they are.
+  // 2. Upsert everyone we saw. joined_at is only sent when Discord gave it. A batch must not mix rows
+  //    with and without the key (missing keys would be written as null), so the two kinds go in separate batches.
   let complete = listComplete
   let upserted = 0
-  const rows = members.map(m => toUserRow(m, runStart))
-  for (let i = 0; i < rows.length; i += UPSERT_CHUNK) {
-    const chunk = rows.slice(i, i + UPSERT_CHUNK)
+  const allRows = members.map(m => toUserRow(m, runStart))
+  const batches = [allRows.filter(r => r.joined_at), allRows.filter(r => !r.joined_at)]
+  const chunks = batches.flatMap(rows =>
+    Array.from({ length: Math.ceil(rows.length / UPSERT_CHUNK) }, (_, i) => rows.slice(i * UPSERT_CHUNK, (i + 1) * UPSERT_CHUNK)))
+  for (const chunk of chunks) {
     const { error } = await supabase.from('discord_users').upsert(chunk, { onConflict: 'discord_id' })
     if (error) {
       console.error('[Member Sync] Upsert failed:', error.message)

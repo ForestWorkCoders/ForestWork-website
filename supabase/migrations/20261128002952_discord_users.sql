@@ -150,6 +150,134 @@ BEGIN
 END;
 $function$;
 
+-- 5b. Mahjong stats functions read discord_users (bodies otherwise unchanged)
+CREATE OR REPLACE FUNCTION mahjong.get_tournament_match_stats(t_id uuid, p_phase text DEFAULT NULL::text)
+ RETURNS TABLE(player_id integer, nickname text, avatar text, play_count integer, avg_rank numeric, east_count integer, avg_rank_east numeric, south_count integer, avg_rank_south numeric, west_count integer, avg_rank_west numeric, north_count integer, avg_rank_north numeric, rank_1_count integer, top_rate_pct numeric, rank_2_count integer, top2_rate_pct numeric, rank_3_count integer, avoid_last_rate_pct numeric, rank_4_count integer, busting_rate numeric, avg_score numeric, highest_point numeric, lowest_point numeric)
+ LANGUAGE sql
+ SET search_path TO 'mahjong', 'public'
+AS $function$
+WITH unpivoted_matches AS (
+  SELECT
+    m.id AS match_id,
+    v.player_id,
+    v.score,
+    v.seat_name,
+    RANK() OVER (PARTITION BY m.id ORDER BY v.score DESC) as rank
+  FROM mahjong.matches m
+  CROSS JOIN LATERAL (
+    VALUES
+      ('East', m.east_id, m.east_score),
+      ('South', m.south_id, m.south_score),
+      ('West', m.west_id, m.west_score),
+      ('North', m.north_id, m.north_score)
+  ) AS v(seat_name, player_id, score)
+  WHERE m.tournament_bind_id = t_id
+    AND (p_phase IS NULL OR m.group_tag = p_phase)
+    AND v.player_id IS NOT NULL -- 过滤掉三麻的空北风位
+    AND v.player_id != 1
+)
+SELECT
+  u.player_id,
+  p.nickname,
+  pd.avatar_url AS avatar,
+  COUNT(score) AS play_count,
+  ROUND(AVG(u.rank)::numeric, 2) AS avg_rank,
+  COUNT(CASE WHEN u.seat_name = 'East' THEN 1 END) AS east_count,
+  ROUND(AVG(CASE WHEN u.seat_name = 'East' THEN u.rank END)::numeric, 2) AS avg_rank_east,
+  COUNT(CASE WHEN u.seat_name = 'South' THEN 1 END) AS south_count,
+  ROUND(AVG(CASE WHEN u.seat_name = 'South' THEN u.rank END)::numeric, 2) AS avg_rank_south,
+  COUNT(CASE WHEN u.seat_name = 'West' THEN 1 END) AS west_count,
+  ROUND(AVG(CASE WHEN u.seat_name = 'West' THEN u.rank END)::numeric, 2) AS avg_rank_west,
+  COUNT(CASE WHEN u.seat_name = 'North' THEN 1 END) AS north_count,
+  ROUND(AVG(CASE WHEN u.seat_name = 'North' THEN u.rank END)::numeric, 2) AS avg_rank_north,
+  COUNT(CASE WHEN rank = 1 THEN 1 END) AS rank_1_count,
+  ROUND(COUNT(CASE WHEN u.rank = 1 THEN 1 END) * 100.0 / COUNT(u.score), 2) AS top_rate_pct,
+  COUNT(CASE WHEN rank = 2 THEN 1 END) AS rank_2_count,
+  ROUND(COUNT(CASE WHEN u.rank IN (1, 2) THEN 1 END) * 100.0 / COUNT(u.score), 2) AS top2_rate_pct,
+  COUNT(CASE WHEN rank = 3 THEN 1 END) AS rank_3_count,
+  ROUND(COUNT(CASE WHEN u.rank != 4 THEN 1 END) * 100.0 / COUNT(u.score), 2) AS avoid_last_rate_pct,
+  COUNT(CASE WHEN rank = 4 THEN 1 END) AS rank_4_count,
+  ROUND(COUNT(CASE WHEN u.score < 0 THEN 1 END) * 100.0 / COUNT(u.score), 2) AS busting_rate_pct,
+  ROUND((AVG(u.score)::numeric - 35000)/1000, 1) AS avg_score,
+  ROUND(MAX((score::numeric - 35000)/1000), 1) AS highest_point,
+  ROUND(MIN((score::numeric - 35000)/1000), 1) AS lowest_point
+FROM unpivoted_matches u
+JOIN mahjong.participants p ON u.player_id = p.account_id
+LEFT JOIN public.discord_users pd ON p.discord_id = pd.discord_id
+GROUP BY u.player_id, p.nickname, pd.avatar_url
+ORDER BY avg_rank ASC;
+$function$
+;
+CREATE OR REPLACE FUNCTION mahjong.get_tournament_playstyle_stats(t_id uuid, p_phase text DEFAULT NULL::text)
+ RETURNS TABLE(player_id integer, nickname text, avatar text, total_rounds bigint, win_rate numeric, deal_in_rate numeric, tsumo_rate numeric, dama_rate numeric, exhaustive_draw_rate numeric, draw_tenpai_rate numeric, call_rate numeric, riichi_rate numeric, avg_turns numeric, avg_win_score numeric, avg_deal_in_score numeric, avg_baopai numeric, li_baopai_rate_pct numeric, babei_rate_pct numeric)
+ LANGUAGE sql
+ SET search_path TO 'mahjong', 'public'
+AS $function$
+WITH player_rounds AS (
+    SELECT
+      m.id AS match_id,
+      pr.id AS round_id,
+      v.seat_index,
+      v.player_id,
+      pr.won_seat,
+      pr.ron_seat,
+      pr.won_type,
+      pr.win_turn,
+      (pr.delta_scores ->> v.seat_index)::numeric AS delta_score,
+      (pr.riichi_status ->> v.seat_index)::int AS is_riichi,
+      (pr.fulo_status ->> v.seat_index)::int AS is_fulo,
+      (pr.draw_tenpai ->> v.seat_index)::int AS is_tenpai,
+      COALESCE((pr.won_yaku ->> '31')::int, 0) AS count_dora,
+      COALESCE((pr.won_yaku ->> '32')::int, 0) AS count_akadora,
+      COALESCE((pr.won_yaku ->> '33')::int, 0) AS count_uradora,
+      COALESCE((pr.won_yaku ->> '34')::int, 0) AS count_kitadora,
+      COALESCE((pr.babei_status ->> v.seat_index)::int, 0) AS babei_count
+    FROM mahjong.matches m
+    JOIN mahjong.paipu_rounds pr ON m.uuid = pr.paipu_id
+    CROSS JOIN LATERAL (
+      VALUES
+        (0, m.east_id),
+        (1, m.south_id),
+        (2, m.west_id),
+        (3, m.north_id)
+    ) AS v(seat_index, player_id)
+    WHERE m.tournament_bind_id = t_id
+      AND (p_phase IS NULL OR m.group_tag = p_phase)
+      AND v.player_id IS NOT NULL
+      AND v.player_id != 1
+  )
+  SELECT
+    u.player_id,
+    p.nickname,
+    pd.avatar_url AS avatar,
+    COUNT(u.round_id) AS total_rounds,
+    ROUND(COUNT(CASE WHEN u.won_seat = u.seat_index THEN 1 END) * 100.0 / COUNT(u.round_id), 2) AS win_rate,
+    ROUND(COUNT(CASE WHEN u.ron_seat = u.seat_index THEN 1 END) * 100.0 / COUNT(u.round_id), 2) AS deal_in_rate,
+    ROUND(COUNT(CASE WHEN u.won_seat = u.seat_index AND u.won_type = 'zimo' THEN 1 END) * 100.0 /
+          NULLIF(COUNT(CASE WHEN u.won_seat = u.seat_index THEN 1 END), 0), 2) AS tsumo_rate,
+    ROUND(COUNT(CASE WHEN u.won_seat = u.seat_index AND u.is_riichi = 0 AND u.is_fulo = 0 THEN 1 END) * 100.0 /
+          NULLIF(COUNT(CASE WHEN u.won_seat = u.seat_index THEN 1 END), 0), 2) AS dama_rate,
+    ROUND(COUNT(CASE WHEN u.won_type = 'draw' THEN 1 END) * 100.0 / COUNT(u.round_id), 2) AS exhaustive_draw_rate,
+    ROUND(COUNT(CASE WHEN u.won_type = 'draw' AND u.is_tenpai = 1 THEN 1 END) * 100.0 /
+          NULLIF(COUNT(CASE WHEN u.won_type = 'draw' THEN 1 END), 0), 2) AS draw_tenpai_rate,
+    ROUND(COUNT(CASE WHEN u.is_fulo = 1 THEN 1 END) * 100.0 / COUNT(u.round_id), 2) AS call_rate,
+    ROUND(COUNT(CASE WHEN u.is_riichi = 1 THEN 1 END) * 100.0 / COUNT(u.round_id), 2) AS riichi_rate,
+    ROUND(AVG(CASE WHEN u.won_seat = u.seat_index THEN u.win_turn END)::numeric, 2) AS avg_turns,
+    ROUND(AVG(CASE WHEN u.won_seat = u.seat_index THEN u.delta_score END)::numeric, 0) AS avg_win_score,
+    ROUND(AVG(CASE WHEN u.ron_seat = u.seat_index THEN ABS(u.delta_score) END)::numeric, 0) AS avg_deal_in_score,
+    ROUND(AVG(CASE WHEN u.won_seat = u.seat_index
+                   THEN u.count_dora + u.count_akadora + u.count_uradora + u.count_kitadora
+              END)::numeric, 2) AS avg_baopai,
+    ROUND(COUNT(CASE WHEN u.won_seat = u.seat_index AND u.is_riichi = 1 AND u.count_uradora > 0 THEN 1 END) * 100.0 /
+          NULLIF(COUNT(CASE WHEN u.won_seat = u.seat_index AND u.is_riichi = 1 THEN 1 END), 0), 2) AS li_baopai_rate_pct,
+    ROUND(COUNT(CASE WHEN u.babei_count > 0 THEN 1 END) * 100.0 / COUNT(u.round_id), 2) AS babei_rate_pct
+  FROM player_rounds u
+  JOIN mahjong.participants p ON u.player_id = p.account_id
+  LEFT JOIN public.discord_users pd ON p.discord_id = pd.discord_id
+  GROUP BY u.player_id, p.nickname, pd.avatar_url
+  ORDER BY total_rounds DESC;
+$function$
+;
 -- 6. Remove what nothing uses (public.mahjong_data is dropped in step 2)
 DROP FUNCTION public.update_user_data(text, text, text);
 DROP FUNCTION public.update_user_data(bigint, text, text);

@@ -13,6 +13,8 @@ export interface GuildMember {
   }
   nick?: string | null
   roles?: string[]
+  /** ISO timestamp of when the member (last) joined the server */
+  joined_at?: string | null
 }
 
 export interface DiscordUserRow {
@@ -23,6 +25,8 @@ export interface DiscordUserRow {
   avatar_url: string | null
   in_guild: true
   synced_at: string
+  /** Left out when Discord does not send it, so an existing value is kept */
+  joined_at?: string
 }
 
 export type MemberPage = { ok: true, members: GuildMember[] } | { ok: false }
@@ -36,7 +40,7 @@ export function avatarUrl(userId: string, hash?: string | null): string | null {
 
 export function toUserRow(member: GuildMember, syncedAt: string): DiscordUserRow {
   const { user } = member
-  return {
+  const row: DiscordUserRow = {
     discord_id: String(user.id),
     username: String(user.username || '').trim().toLowerCase(),
     global_name: user.global_name ? String(user.global_name).trim() : null,
@@ -45,6 +49,8 @@ export function toUserRow(member: GuildMember, syncedAt: string): DiscordUserRow
     in_guild: true,
     synced_at: syncedAt
   }
+  if (member.joined_at) row.joined_at = member.joined_at
+  return row
 }
 
 /**

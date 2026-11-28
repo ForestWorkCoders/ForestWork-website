@@ -41,6 +41,13 @@ test('toUserRow maps names, keeps the ID a string and marks the member as in the
   assert.equal(toUserRow(member(5), 'T').global_name, null)
 })
 
+test('toUserRow sets joined_at from the member, and leaves it out when absent', () => {
+  const joined = '2024-05-06T07:08:09.000000+00:00'
+  assert.equal(toUserRow({ ...member(5), joined_at: joined }, 'T').joined_at, joined)
+  assert.equal('joined_at' in toUserRow(member(5), 'T'), false)
+  assert.equal('joined_at' in toUserRow({ ...member(5), joined_at: null }, 'T'), false)
+})
+
 test('collectMembers: a short page ends the walk and passes the last ID as the cursor', async () => {
   const afters: string[] = []
   const result = await collectMembers(async (after) => {
