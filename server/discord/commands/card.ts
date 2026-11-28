@@ -220,7 +220,7 @@ async function storeAvatar(attachment: any, callerId: string): Promise<string> {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN
   if (!blobToken) throw new Error('服務端缺少 BLOB_READ_WRITE_TOKEN 配置')
 
-  const res = await fetch(attachment.url)
+  const res = await fetch(attachment.url, { signal: AbortSignal.timeout(10000) })
   if (!res.ok) throw new Error(`從 Discord 下載圖片失敗 (HTTP ${res.status})`)
   const buffer = Buffer.from(await res.arrayBuffer())
   const ext = attachment.filename?.split('.').pop() || 'png'

@@ -21,7 +21,8 @@ async function fetchAllGuildMembers(guildId: string, botToken: string): Promise<
     }
 
     const res = await fetch(url.toString(), {
-      headers: { Authorization: `Bot ${botToken}` }
+      headers: { Authorization: `Bot ${botToken}` },
+      signal: AbortSignal.timeout(15000)
     })
 
     if (!res.ok) {
@@ -100,7 +101,8 @@ export async function handleDumpIds(interaction: any, event: H3Event) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             content: `⚠️ 身分組 <@&${roleId}> 目前沒有任何成員。`
-          })
+          }),
+          signal: AbortSignal.timeout(10000)
         })
         return
       }
@@ -127,7 +129,8 @@ export async function handleDumpIds(interaction: any, event: H3Event) {
 
       const patchRes = await fetch(webhookUrl, {
         method: 'PATCH',
-        body: formData
+        body: formData,
+        signal: AbortSignal.timeout(10000)
       })
 
       if (!patchRes.ok) {
@@ -141,7 +144,8 @@ export async function handleDumpIds(interaction: any, event: H3Event) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: `💥 導出失敗：${err?.message || '未知異常'}`
-        })
+        }),
+        signal: AbortSignal.timeout(10000)
       }).catch(() => {})
     }
   }
