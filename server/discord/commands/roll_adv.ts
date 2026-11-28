@@ -18,7 +18,8 @@ async function postDiscordMessage(channelId: string, content: string) {
       Authorization: `Bot ${token}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ content })
+    body: JSON.stringify({ content }),
+    signal: AbortSignal.timeout(10000)
   }).catch((err) => console.error('[Discord Sync Error]:', err))
 }
 

@@ -59,7 +59,8 @@ export default defineEventHandler(async (event) => {
     if (lastId) endpoint.searchParams.set('after', lastId)
 
     const res = await fetch(endpoint.toString(), {
-      headers: { Authorization: `Bot ${botToken}` }
+      headers: { Authorization: `Bot ${botToken}` },
+      signal: AbortSignal.timeout(10000)
     })
 
     if (!res.ok) {

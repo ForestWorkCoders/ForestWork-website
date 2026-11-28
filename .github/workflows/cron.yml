@@ -1,0 +1,32 @@
+# The clock for the Vercel cron endpoints. Hobby crons run at most once a day, so this
+# workflow calls the endpoints on a schedule instead. It holds no logic and no database or bot
+# secrets: those stay on Vercel; this job only sends the shared bearer secret.
+#
+# Setup: a GitHub environment named "production" with secrets CRON_SECRET and CRON_BASE_URL
+# (the site origin, no trailing slash), restricted to the main branch.
+name: Cron
+
+on:
+  schedule:
+    - cron: '17 * * * *' # curse sync, hourly
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync-curse:
+    name: sync-curse
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 7
+    steps:
+      - name: Call /api/cron/sync-curse
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          CRON_BASE_URL: ${{ secrets.CRON_BASE_URL }}
+        run: |
+          curl --silent --show-error --fail-with-body --max-time 320 \
+            --header "Authorization: Bearer ${CRON_SECRET}" \
+            "${CRON_BASE_URL}/api/cron/sync-curse"
+          echo
