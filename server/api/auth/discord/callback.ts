@@ -45,7 +45,8 @@ export default defineEventHandler(async (event) => {
       grant_type: 'authorization_code',
       code,
       redirect_uri: redirectUri
-    })
+    }),
+    signal: AbortSignal.timeout(8000)
   })
 
   if (!tokenRes.ok) {
@@ -60,7 +61,8 @@ export default defineEventHandler(async (event) => {
   const tokenData = await tokenRes.json()
 
   const userRes = await fetch('https://discord.com/api/v10/users/@me', {
-    headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    signal: AbortSignal.timeout(8000)
   })
 
   if (!userRes.ok) {
@@ -83,16 +85,17 @@ export default defineEventHandler(async (event) => {
   const rawUsername = String(user.username || '').trim().toLowerCase()
   const rawNickname = user.global_name ? String(user.global_name).trim() : rawUsername
 
-  // 3. ★ 核心好品味：无状态客户端直连，就地 UPSERT 进全站公用的 participant_data！
+  // 3. ★ 核心好品味：无状态客户端直连，就地 UPSERT 进全站公用的 discord_users！
+  //    Only profile fields are written here; server_nick / in_guild belong to the member sync.
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const { error: upsertError } = await supabase
-    .from('participant_data')
+    .from('discord_users')
     .upsert({
       discord_id: user.id,
-      discord_username: rawUsername, // ★ 永遠、純粹是唯一 handle（如 eaglepb2）
-      discord_nickname: rawNickname, // ★ 真正的社交暱稱獨立入庫（如 鷹の紅石指令部）
-      profile_img: avatarUrl
+      username: rawUsername, // ★ 永遠、純粹是唯一 handle（如 eaglepb2）
+      global_name: rawNickname, // ★ 真正的社交暱稱獨立入庫（如 鷹の紅石指令部）
+      avatar_url: avatarUrl
     }, {
       onConflict: 'discord_id'
     })
