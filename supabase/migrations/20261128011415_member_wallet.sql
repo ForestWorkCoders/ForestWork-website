@@ -25,4 +25,7 @@ COMMENT ON COLUMN public.member_key_redemptions.created_at  IS 'When EaglePB2 re
 COMMENT ON COLUMN public.member_key_redemptions.sent_at     IS 'When the member won the key';
 COMMENT ON COLUMN public.member_key_redemptions.redeemed_at IS 'When the member sent proof of redemption (entered by hand)';
 
+ALTER TABLE public.member_key_redemptions ADD COLUMN steam_app_id integer CHECK (steam_app_id > 0);
+COMMENT ON COLUMN public.member_key_redemptions.steam_app_id IS 'Steam store app ID (optional). The site builds the capsule image and store link from it; game_name stays the typed display name.';
+
 COMMIT;

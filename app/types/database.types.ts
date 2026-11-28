@@ -1247,6 +1247,7 @@ export type Database = {
           id: number
           redeemed_at: string | null
           sent_at: string
+          steam_app_id: number | null
           steam_key: string
         }
         Insert: {
@@ -1256,6 +1257,7 @@ export type Database = {
           id?: never
           redeemed_at?: string | null
           sent_at: string
+          steam_app_id?: number | null
           steam_key: string
         }
         Update: {
@@ -1265,6 +1267,7 @@ export type Database = {
           id?: never
           redeemed_at?: string | null
           sent_at?: string
+          steam_app_id?: number | null
           steam_key?: string
         }
         Relationships: [
