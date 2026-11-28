@@ -1245,17 +1245,17 @@ export type Database = {
           discord_id: number
           game_name: string
           id: number
-          revealed_at: string | null
+          redeemed_at: string | null
           sent_at: string
           steam_key: string
         }
         Insert: {
-          created_at?: string
+          created_at: string
           discord_id: number
           game_name: string
           id?: never
-          revealed_at?: string | null
-          sent_at?: string
+          redeemed_at?: string | null
+          sent_at: string
           steam_key: string
         }
         Update: {
@@ -1263,7 +1263,7 @@ export type Database = {
           discord_id?: number
           game_name?: string
           id?: never
-          revealed_at?: string | null
+          redeemed_at?: string | null
           sent_at?: string
           steam_key?: string
         }
@@ -1288,33 +1288,45 @@ export type Database = {
         Row: {
           created_at: string
           discord_id: number
+          forest_coins: number
           historical_boost_months: number
           is_currently_boosting: boolean
           level: number
           metadata: Json
           premium_since: string | null
+          reputation: number
+          server_coins: number
+          twitch_coins: number
           updated_at: string
           xp: number
         }
         Insert: {
           created_at?: string
           discord_id: number
+          forest_coins?: number
           historical_boost_months?: number
           is_currently_boosting?: boolean
           level?: number
           metadata?: Json
           premium_since?: string | null
+          reputation?: number
+          server_coins?: number
+          twitch_coins?: number
           updated_at?: string
           xp?: number
         }
         Update: {
           created_at?: string
           discord_id?: number
+          forest_coins?: number
           historical_boost_months?: number
           is_currently_boosting?: boolean
           level?: number
           metadata?: Json
           premium_since?: string | null
+          reputation?: number
+          server_coins?: number
+          twitch_coins?: number
           updated_at?: string
           xp?: number
         }
